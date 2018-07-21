@@ -23,12 +23,12 @@ struct mee_clock {
 };
 
 /* Returns the current rate of the given clock. */
-inline long mee_clock_get_rate_hz(const struct mee_clock *clk) { return clk->vtable->get_rate_hz(clk); }
+extern inline long mee_clock_get_rate_hz(const struct mee_clock *clk) { return clk->vtable->get_rate_hz(clk); }
 
 /* Attempts to set the current rate of the given clock to as close as possible
  * to the given rate.  Returns the actual value that's been selected, which
  * could be anything! */
-inline long mee_clock_set_rate_hz(struct mee_clock *clk, long hz)
+extern inline long mee_clock_set_rate_hz(struct mee_clock *clk, long hz)
 {
     long out = clk->vtable->set_rate_hz(clk, hz);
     if (clk->rate_change_callback != NULL)
@@ -37,7 +37,7 @@ inline long mee_clock_set_rate_hz(struct mee_clock *clk, long hz)
 }
 
 /* Registers a callback that must be called whenever. */
-inline void mee_clock_register_rate_change_callback(struct mee_clock *clk, mee_clock_rate_change_callback cb, void *priv)
+extern inline void mee_clock_register_rate_change_callback(struct mee_clock *clk, mee_clock_rate_change_callback cb, void *priv)
 {
     clk->rate_change_callback = cb;
     clk->rate_change_callback_priv = priv;
