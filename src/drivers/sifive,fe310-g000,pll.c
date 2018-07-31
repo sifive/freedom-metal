@@ -23,33 +23,33 @@ long __mee_driver_sifive_fe310_g000_pll_get_rate_hz(const struct mee_clock *cloc
 
     /* At the end of the PLL there's one big mux: it either selects the HFROSC
      * (bypassing the PLL entirely) or uses the PLL. */
-    if (MEE_GET_FIELD(cfg, PLL_SEL) == 0)
+    if (__MEE_GET_FIELD(cfg, PLL_SEL) == 0)
         return mee_clock_get_rate_hz(clk->pllsel0);
 
     /* There's a clock mux before the PLL that selects between the HFROSC adn
      * the HFXOSC as the PLL's input clock. */
-    long ref_hz = mee_clock_get_rate_hz(MEE_GET_FIELD(cfg, PLL_REFSEL) ? clk->pllsel0 : clk->pllref);
+    long ref_hz = mee_clock_get_rate_hz(__MEE_GET_FIELD(cfg, PLL_REFSEL) ? clk->pllsel0 : clk->pllref);
 
     /* It's possible to bypass the PLL, which is an internal bpyass.  This
      * still obays the PLL's input clock mu. */
-    if (MEE_GET_FIELD(cfg, PLL_BYPASS))
+    if (__MEE_GET_FIELD(cfg, PLL_BYPASS))
         return ref_hz;
 
     /* Logically the PLL is a three stage div-mul-div. */
-    long div_r = MEE_GET_FIELD(cfg, PLL_R) + 1;
-    long mul_f = 1 << MEE_GET_FIELD(cfg, PLL_F);
-    if (MEE_GET_FIELD(cfg, PLL_Q) == 0)
+    long div_r = __MEE_GET_FIELD(cfg, PLL_R) + 1;
+    long mul_f = 1 << __MEE_GET_FIELD(cfg, PLL_F);
+    if (__MEE_GET_FIELD(cfg, PLL_Q) == 0)
         return -1;
-    long div_q = 1 << MEE_GET_FIELD(cfg, PLL_Q);
+    long div_q = 1 << __MEE_GET_FIELD(cfg, PLL_Q);
 
     /* In addition to the dividers inherent in the PLL, there's an additional
      * clock divider that lives after the PLL and lets us pick a more
      * interesting range of frequencies. */
     long pllout = (((ref_hz / div_r) * mul_f) / div_q);
-    if (MEE_GET_FIELD(div, DIV_1))
+    if (__MEE_GET_FIELD(div, DIV_1))
         return pllout;
 
-    return pllout / (2 << MEE_GET_FIELD(div, DIV_DIV));
+    return pllout / (2 << __MEE_GET_FIELD(div, DIV_DIV));
 }
 
 long __mee_driver_sifive_fe310_g000_pll_set_rate_hz(struct mee_clock *clock, long rate)
