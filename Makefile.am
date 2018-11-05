@@ -61,13 +61,16 @@ nobase_include_HEADERS = \
 	mee/drivers/sifive,gpio0.h \
 	mee/drivers/sifive,uart0.h \
 	mee/drivers/sifive,test0.h \
+	mee/drivers/sifive,timer.h \
 	mee/compiler.h \
 	mee/clock.h \
 	mee/io.h \
 	mee/machine.h \
 	mee/shutdown.h \
 	mee/tty.h \
-	mee/uart.h
+	mee/uart.h \
+	mee/times.h \
+	mee/timer.h
 
 # Builds the machine-specific MEE header file, which paramaterizes the MEE for
 # one specific machine.  This is automatically picked up by GCC so users
@@ -97,10 +100,13 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive,fe310-g000,pll.c \
 	src/drivers/sifive,test0.c \
 	src/drivers/sifive,gpio0.c \
+	src/drivers/sifive,timer.c \
 	src/drivers/sifive,uart0.c \
 	src/clock.c \
 	src/tty.c \
 	src/shutdown.c \
+	src/timer.c \
+	src/times.c \
 	src/uart.c \
 	src/entry.S
 
