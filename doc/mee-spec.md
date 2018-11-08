@@ -58,6 +58,31 @@ changed every time the given function is called, but it's guaranteed
 that the given function will be called every time the given clock's rate
 has been changed.
 
+### Timer Interface
+
+The timer interface allows for access of various timers values in
+the system.  Timers are defined by a pointer to a `struct mee_timer`, the
+contents of which is implementation defined.  Users of the timer
+interface must call the functions defined below in order to interact
+with a `struct mee_timer *`.
+
+Note that no mechanism for obtaining a pointer to a `struct mee_timer`
+has been defined, making it impossible to call any of these functions
+without invoking implementation-defined behavior.
+
+#### `int mee_timer_get_cyclecount(int hartid, unsigned long long *mcc)`
+
+Returns the cpu machine cycle count of a given hartid.
+
+#### `int mee_timer_get_timebase_frequency(int hartid, unsigned long long *timebase)`
+
+Returns the timebase frequency of a given hartid, s.t a time elapse duration can determined.
+For example, a timebase frequency of 1000000 (1MHz) will have each cycle count of 1s.
+
+#### `void mee_timer_init(const struct mee_timer *timer, unsigned long long timebase)`
+
+Setup the timebase frequency for a given timer, in Hz.
+
 ### Power Control Interface
 
 The MEE defines a mechanism to control the power state of a given
