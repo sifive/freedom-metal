@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <limits.h>
 
+#include <mee/machine.h>
 #include <mee/drivers/sifive,fe310-g000,pll.h>
 #include <stdlib.h>
 
@@ -311,3 +312,14 @@ long __mee_driver_sifive_fe310_g000_pll_set_rate_hz(struct mee_clock *clock, lon
 
     return __mee_driver_sifive_fe310_g000_pll_get_rate_hz(clock);
 }
+
+#ifdef __MEE_DT_SIFIVE_FE310_G000_PLL_HANDLE
+static void use_hfxosc(void) __attribute__((constructor));
+static void use_hfxosc(void)
+{
+    mee_clock_set_rate_hz(
+        &__MEE_DT_SIFIVE_FE310_G000_PLL_HANDLE->clock,
+        __MEE_DT_SIFIVE_FE310_G000_PLL_HANDLE->init_rate
+    );
+}
+#endif
