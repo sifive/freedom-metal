@@ -103,10 +103,13 @@ mee/machine/@MACHINE_NAME@.h: @MEE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
 	$< --dtb $(filter %.dtb,$^) --output $@
 endif # PRECONFIGURED
 
+# Quash an automake warning.
+lib_LIBRARIES =
+
 # Everything in here is compiled into a single library, which contains all the
 # source files in the project.  It's named for one specific machine, which GCC
 # uses to select the target machine that this MEE implementation points at.
-lib_LIBRARIES = libriscv__mmachine__@MACHINE_NAME@.a
+lib_LIBRARIES += libriscv__mmachine__@MACHINE_NAME@.a
 
 libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS  = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
@@ -125,6 +128,49 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/shutdown.c \
 	src/uart.c \
 	src/entry.S
+
+# Freedom MEE has its own libgloss implementation that is only built in
+# --with-builtin-libgloss is passed to configure.
+if WITH_BUILTIN_LIBGLOSS
+
+lib_LIBRARIES += libriscv__menv__mee.a
+
+libriscv__menv__mee_a_SOURCES = \
+	gloss/nanosleep.c \
+	gloss/sys_access.c \
+	gloss/sys_chdir.c \
+	gloss/sys_chmod.c \
+	gloss/sys_chown.c \
+	gloss/sys_close.c \
+	gloss/sys_execve.c \
+	gloss/sys_exit.c \
+	gloss/sys_faccessat.c \
+	gloss/sys_fork.c \
+	gloss/sys_fstat.c \
+	gloss/sys_fstatat.c \
+	gloss/sys_ftime.c \
+	gloss/sys_getcwd.c \
+	gloss/sys_getpid.c \
+	gloss/sys_gettimeofday.c \
+	gloss/sys_isatty.c \
+	gloss/sys_kill.c \
+	gloss/sys_link.c \
+	gloss/sys_lseek.c \
+	gloss/sys_lstat.c \
+	gloss/sys_open.c \
+	gloss/sys_openat.c \
+	gloss/sys_read.c \
+	gloss/sys_sbrk.c \
+	gloss/sys_stat.c \
+	gloss/sys_sysconf.c \
+	gloss/sys_times.c \
+	gloss/sys_unlink.c \
+	gloss/sys_utime.c \
+	gloss/sys_wait.c \
+	gloss/sys_write.c \
+	gloss/crt0.S
+
+endif
 
 # Quash an automake warning.
 check_PROGRAMS =
