@@ -91,6 +91,10 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+
+# Freedom MEE has its own libgloss implementation that is only built in
+# --with-builtin-libgloss is passed to configure.
+@WITH_BUILTIN_LIBGLOSS_TRUE@am__append_1 = libriscv__menv__mee.a
 check_PROGRAMS = return_pass$(EXEEXT) return_fail$(EXEEXT) \
 	hello$(EXEEXT) pll_set_hz$(EXEEXT)
 subdir = .
@@ -142,9 +146,58 @@ AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
+libriscv__menv__mee_a_AR = $(AR) $(ARFLAGS)
+libriscv__menv__mee_a_LIBADD =
+am__libriscv__menv__mee_a_SOURCES_DIST = gloss/nanosleep.c \
+	gloss/sys_access.c gloss/sys_chdir.c gloss/sys_chmod.c \
+	gloss/sys_chown.c gloss/sys_close.c gloss/sys_execve.c \
+	gloss/sys_exit.c gloss/sys_faccessat.c gloss/sys_fork.c \
+	gloss/sys_fstat.c gloss/sys_fstatat.c gloss/sys_ftime.c \
+	gloss/sys_getcwd.c gloss/sys_getpid.c gloss/sys_gettimeofday.c \
+	gloss/sys_isatty.c gloss/sys_kill.c gloss/sys_link.c \
+	gloss/sys_lseek.c gloss/sys_lstat.c gloss/sys_open.c \
+	gloss/sys_openat.c gloss/sys_read.c gloss/sys_sbrk.c \
+	gloss/sys_stat.c gloss/sys_sysconf.c gloss/sys_times.c \
+	gloss/sys_unlink.c gloss/sys_utime.c gloss/sys_wait.c \
+	gloss/sys_write.c gloss/crt0.S
+am__dirstamp = $(am__leading_dot)dirstamp
+@WITH_BUILTIN_LIBGLOSS_TRUE@am_libriscv__menv__mee_a_OBJECTS =  \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chmod.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chown.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_close.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_execve.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_exit.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_faccessat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fork.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstatat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_ftime.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getcwd.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getpid.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_gettimeofday.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_isatty.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_kill.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_link.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_lseek.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_lstat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_open.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_openat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_read.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_sbrk.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_stat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_sysconf.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_times.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_unlink.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_utime.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT)
+libriscv__menv__mee_a_OBJECTS = $(am_libriscv__menv__mee_a_OBJECTS)
 libriscv__mmachine__@MACHINE_NAME@_a_AR = $(AR) $(ARFLAGS)
 libriscv__mmachine__@MACHINE_NAME@_a_LIBADD =
-am__dirstamp = $(am__leading_dot)dirstamp
 am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-fixed-clock.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfxosc.$(OBJEXT) \
@@ -218,10 +271,12 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
+SOURCES = $(libriscv__menv__mee_a_SOURCES) \
+	$(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
 	$(hello_SOURCES) $(pll_set_hz_SOURCES) $(return_fail_SOURCES) \
 	$(return_pass_SOURCES)
-DIST_SOURCES = $(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
+DIST_SOURCES = $(am__libriscv__menv__mee_a_SOURCES_DIST) \
+	$(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
 	$(hello_SOURCES) $(pll_set_hz_SOURCES) $(return_fail_SOURCES) \
 	$(return_pass_SOURCES)
 am__can_run_installinfo = \
@@ -404,10 +459,12 @@ nobase_include_HEADERS = \
 	mee/uart.h
 
 
+# Quash an automake warning.
+
 # Everything in here is compiled into a single library, which contains all the
 # source files in the project.  It's named for one specific machine, which GCC
 # uses to select the target machine that this MEE implementation points at.
-lib_LIBRARIES = libriscv__mmachine__@MACHINE_NAME@.a
+lib_LIBRARIES = libriscv__mmachine__@MACHINE_NAME@.a $(am__append_1)
 libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
@@ -424,6 +481,41 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/shutdown.c \
 	src/uart.c \
 	src/entry.S
+
+@WITH_BUILTIN_LIBGLOSS_TRUE@libriscv__menv__mee_a_SOURCES = \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chmod.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chown.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_close.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_execve.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_exit.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_faccessat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fork.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstatat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_ftime.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getcwd.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getpid.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_gettimeofday.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_isatty.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_kill.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_link.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_lseek.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_lstat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_open.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_openat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_read.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_sbrk.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_stat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_sysconf.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_times.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_unlink.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_utime.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S
 
 return_pass_SOURCES = test/return_pass.c
 return_pass_CFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
@@ -505,6 +597,83 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
+gloss/$(am__dirstamp):
+	@$(MKDIR_P) gloss
+	@: > gloss/$(am__dirstamp)
+gloss/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) gloss/$(DEPDIR)
+	@: > gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/nanosleep.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_access.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_chdir.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_chmod.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_chown.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_close.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_execve.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_exit.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_faccessat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_fork.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_fstat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_fstatat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_ftime.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_getcwd.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_getpid.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_gettimeofday.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_isatty.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_kill.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_link.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_lseek.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_lstat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_open.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_openat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_read.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_sbrk.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_stat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_sysconf.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_times.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_unlink.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_utime.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_wait.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_write.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+
+libriscv__menv__mee.a: $(libriscv__menv__mee_a_OBJECTS) $(libriscv__menv__mee_a_DEPENDENCIES) $(EXTRA_libriscv__menv__mee_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libriscv__menv__mee.a
+	$(AM_V_AR)$(libriscv__menv__mee_a_AR) libriscv__menv__mee.a $(libriscv__menv__mee_a_OBJECTS) $(libriscv__menv__mee_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libriscv__menv__mee.a
 src/drivers/$(am__dirstamp):
 	@$(MKDIR_P) src/drivers
 	@: > src/drivers/$(am__dirstamp)
@@ -592,6 +761,7 @@ return_pass$(EXEEXT): $(return_pass_OBJECTS) $(return_pass_DEPENDENCIES) $(EXTRA
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f gloss/*.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
 	-rm -f src/drivers/*.$(OBJEXT)
 	-rm -f test/*.$(OBJEXT)
@@ -599,6 +769,39 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/nanosleep.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_access.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_chdir.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_chmod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_chown.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_execve.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_faccessat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_fork.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_fstatat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_ftime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_getcwd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_getpid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_gettimeofday.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_kill.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_link.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_lstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_openat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_sysconf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_times.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_utime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-entry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po@am__quote@
@@ -1209,6 +1412,8 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f gloss/$(DEPDIR)/$(am__dirstamp)
+	-rm -f gloss/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
 	-rm -f src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -1226,7 +1431,7 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libLIBRARIES \
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf src/$(DEPDIR) src/drivers/$(DEPDIR) test/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR) test/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1275,7 +1480,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf src/$(DEPDIR) src/drivers/$(DEPDIR) test/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR) test/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

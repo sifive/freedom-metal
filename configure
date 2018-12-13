@@ -600,6 +600,8 @@ MAKEATTRIBUTES_GENERATOR
 LDSCRIPT_GENERATOR
 MEE_HEADER_GENERATOR
 DTC
+WITH_BUILTIN_LIBGLOSS_FALSE
+WITH_BUILTIN_LIBGLOSS_TRUE
 MACHINE_NAME
 am__fastdepCCAS_FALSE
 am__fastdepCCAS_TRUE
@@ -700,6 +702,7 @@ enable_maintainer_mode
 enable_dependency_tracking
 with_machine_name
 with_preconfigured
+with_builtin_libgloss
 with_machine_header
 with_machine_ldscript
 with_machine_dts
@@ -1355,6 +1358,7 @@ Optional Packages:
                           Install this machine with a particular name
   --with-preconfigured    Use pre-configured machine support files instead of
                           generating them during the build
+  --with-bultin-libgloss  Build libgloss along with the MEE
   --with-machine-header=PATH
                           Path to the machine header file
   --with-machine-ldscript=PATH
@@ -3848,6 +3852,25 @@ else
 fi
 
 
+
+# Check whether --with-builtin-libgloss was given.
+if test "${with_builtin_libgloss+set}" = set; then :
+  withval=$with_builtin_libgloss; with_builtin_libgloss="yes"
+else
+  with_builtin_libgloss="no"
+
+fi
+
+
+ if test "x$with_builtin_libgloss" = "xyes"; then
+  WITH_BUILTIN_LIBGLOSS_TRUE=
+  WITH_BUILTIN_LIBGLOSS_FALSE='#'
+else
+  WITH_BUILTIN_LIBGLOSS_TRUE='#'
+  WITH_BUILTIN_LIBGLOSS_FALSE=
+fi
+
+
 ########################################################
 # Preconfigured Options (--with-preconfigured)
 ########################################################
@@ -4550,6 +4573,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCCAS_TRUE}" && test -z "${am__fastdepCCAS_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCCAS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_BUILTIN_LIBGLOSS_TRUE}" && test -z "${WITH_BUILTIN_LIBGLOSS_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_BUILTIN_LIBGLOSS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PRECONFIGURED_TRUE}" && test -z "${PRECONFIGURED_FALSE}"; then

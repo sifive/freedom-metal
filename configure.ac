@@ -64,6 +64,14 @@ AC_ARG_WITH([preconfigured],
     [with_preconfigured="no"]
 )
 
+AC_ARG_WITH([builtin-libgloss],
+    [AS_HELP_STRING([--with-bultin-libgloss], [Build libgloss along with the MEE])],
+    [with_builtin_libgloss="yes"],
+    [with_builtin_libgloss="no"]
+)
+
+AM_CONDITIONAL([WITH_BUILTIN_LIBGLOSS], [test "x$with_builtin_libgloss" = "xyes"])
+
 ########################################################
 # Preconfigured Options (--with-preconfigured)
 ########################################################
