@@ -42,6 +42,10 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
 #endif
 ])], [], [AC_MSG_FAILURE([The C compiler doesn't define __riscv, which means it's probably not a RISC-V compiler.  You should specify something like --host=riscv64-sifive-elf when building this, as it will only work on RISC-V systems.])])
 
+########################################################
+# Generic Options
+########################################################
+
 # Allows users to specify some device tree information.
 AC_ARG_WITH([machine-name],
     [AS_HELP_STRING([--with-machine-name=NAME], [Install this machine with a particular name])],
@@ -54,15 +58,36 @@ AS_IF([test "x$with_machine_name" != "xno"],
     [AC_MSG_FAILURE([--with-machine-name is required])]
 )
 
+AC_ARG_WITH([preconfigured],
+    [AS_HELP_STRING([--with-preconfigured], [Use pre-configured machine support files instead of generating them during the build])],
+    [with_preconfigured="yes"],
+    [with_preconfigured="no"]
+)
+
+########################################################
+# Preconfigured Options (--with-preconfigured)
+########################################################
+
+AC_ARG_WITH([machine-header],
+    [AS_HELP_STRING([--with-machine-header=PATH], [Path to the machine header file])],
+    [],
+    [with_machine_header="no"]
+)
+
+AC_ARG_WITH([machine-ldscript],
+    [AS_HELP_STRING([--with-machine-ldscript=PATH], [Path to the machine ldscript])],
+    [],
+    [with_machine_ldscript="no"]
+)
+
+########################################################
+# Configuration Options (--without-preconfigured)
+########################################################
+
 AC_ARG_WITH([machine-dts],
     [AS_HELP_STRING([--with-machine-dts=PATH], [The full path to the device tree])],
     [],
     [with_machine_dts="no"]
-)
-
-AS_IF([test "x$with_machine_dts" != "xno"],
-    [AC_SUBST([MACHINE_DTS], "$with_machine_dts")],
-    [AC_MSG_FAILURE([--with-machine-dts is required])]
 )
 
 # Allows users to specify a path to DTC
@@ -73,14 +98,6 @@ AC_ARG_WITH([dtc],
 )
 
 AC_ARG_VAR(DTC, [The absolute path to dtc])
-AS_IF([test "x$with_dtc" == "xcheck"],
-    [AC_PATH_PROG(DTC, dtc, [no])],
-    [DTC="$with_dtc"]
-)
-AS_IF([test "x$DTC" != "xno"],
-    [AC_SUBST([DTC], "$DTC")],
-    [AC_MSG_ERROR([Unable to find dtc, either place it in PATH or try the --with-dtc argument.])]
-)
 
 # Allows users to specify a path to freedom-mee_header-generator, which
 # generates MEE paramaterization headers from the device tree.
@@ -91,14 +108,6 @@ AC_ARG_WITH([mee-header-generator],
 )
 
 AC_ARG_VAR(MEE_HEADER_GENERATOR, [The absolute path of the freedom-mee_header-generator])
-AS_IF([test "x$with_mee_header_generator" == "xcheck"],
-    [AC_PATH_PROG(MEE_HEADER_GENERATOR, freedom-mee_header-generator, [no])],
-    [MEE_HEADER_GENERATOR=$with_mee_header_generator]
-)
-AS_IF([test "x$MEE_HEADER_GENERATOR" != "xno"],
-    [AC_SUBST([MEE_HEADER_GENERATOR], "$MEE_HEADER_GENERATOR")],
-    [AC_MSG_ERROR([Unable to find freedom-mee_header-generator, either place it in PATH or try the --with-mee-header-generator argument.])]
-)
 
 # Allows users to specify a path to freedom-ldscript-generator, which generates
 # linker scripts that are more suitable for embedded development than the
@@ -111,14 +120,6 @@ AC_ARG_WITH([ldscript-generator],
 )
 
 AC_ARG_VAR(LDSCRIPT_GENERATOR, [The absolute path of the freedom-ldscript-generator])
-AS_IF([test "x$with_ldscript_generator" == "xcheck"],
-    [AC_PATH_PROG(LDSCRIPT_GENERATOR, freedom-ldscript-generator, [no])],
-    [LDSCRIPT_GENERATOR=$with_ldscript_generator]
-)
-AS_IF([test "x$LDSCRIPT_GENERATOR" != "xno"],
-    [AC_SUBST([LDSCRIPT_GENERATOR], "$LDSCRIPT_GENERATOR")],
-    [AC_MSG_ERROR([Unable to find freedom-ldscript-generator, either place it in PATH or try the --with-ldscript-generator argument.])]
-)
 
 # Allows users to specify a path to freedom-makeattributes-generator, which
 # generates makefile fragments that help set up the various CFLAGS that are
@@ -130,14 +131,6 @@ AC_ARG_WITH([makeattributes-generator],
 )
 
 AC_ARG_VAR(MAKEATTRIBUTES_GENERATOR, [The absolute path of the freedom-makeattributes-generator])
-AS_IF([test "x$with_makeattributes_generator" == "xcheck"],
-    [AC_PATH_PROG(MAKEATTRIBUTES_GENERATOR, freedom-makeattributes-generator, [no])],
-    [MAKEATTRIBUTES_GENERATOR=$with_makeattributes_generator]
-)
-AS_IF([test "x$MAKEATTRIBUTES_GENERATOR" != "xno"],
-    [AC_SUBST([MAKEATTRIBUTES_GENERATOR], "$MAKEATTRIBUTES_GENERATOR")],
-    [AC_MSG_ERROR([Unable to find freedom-makeattributes-generator, either place it in PATH or try the --with-makeattributes-generator argument.])]
-)
 
 # Allows users to specify a path to freedom-mee_specs-generator, which
 # generates GCC spec files to control the compilation of MEE based targets.
@@ -148,14 +141,97 @@ AC_ARG_WITH([mee_specs-generator],
 )
 
 AC_ARG_VAR(SPECS_GENERATOR, [The absolute path of the freedom-mee_specs-generator])
-AS_IF([test "x$with_mee_specs_generator" == "xcheck"],
-    [AC_PATH_PROG(SPECS_GENERATOR, freedom-mee_specs-generator, [no])],
-    [SPECS_GENERATOR=$with_mee_specs_generator]
+
+########################################################
+# Process the Preconfigured or Configured options
+########################################################
+
+
+AM_CONDITIONAL([PRECONFIGURED], [test "x$with_preconfigured" = "xyes"])
+
+AS_IF([test "x$with_preconfigured" = "xyes"],
+[
+    # Configure the build system to pass in the preconfigured machine support files
+    AS_IF([test "x$with_machine_header" != "xno"],
+        [AC_SUBST([MACHINE_HEADER], "$with_machine_header")],
+        [AC_MSG_FAILURE([--with-machine-header is required with the --with-preconfigured option])]
+    )
+
+    AS_IF([test "x$with_machine_ldscript" != "xno"],
+        [AC_SUBST([MACHINE_LDSCRIPT], "$with_machine_ldscript")],
+        [AC_MSG_FAILURE([--with-machine-ldscript is required with the --with-preconfigured option])]
+    )
+
+    AC_SUBST([MAKEATTRIBUTES_GENERATOR], [false])
+    AC_SUBST([SPECS_GENERATOR], [false])
+], [
+    # Configure the build system to generate the machine support files during build
+    AS_IF([test "x$with_machine_dts" != "xno"],
+        [AC_SUBST([MACHINE_DTS], "$with_machine_dts")],
+        [AC_MSG_FAILURE([--with-machine-dts is required])]
+    )
+
+    AS_IF([test "x$with_dtc" == "xcheck"],
+        [AC_PATH_PROG(DTC, dtc, [no])],
+        [DTC="$with_dtc"]
+    )
+    AS_IF([test "x$DTC" != "xno"],
+        [AC_SUBST([DTC], "$DTC")],
+        [AC_MSG_ERROR([Unable to find dtc, either place it in PATH or try the --with-dtc argument.])]
+    )
+
+    AS_IF([test "x$with_mee_header_generator" == "xcheck"],
+        [AC_PATH_PROG(MEE_HEADER_GENERATOR, freedom-mee_header-generator, [no])],
+        [MEE_HEADER_GENERATOR=$with_mee_header_generator]
+    )
+    AS_IF([test "x$MEE_HEADER_GENERATOR" != "xno"],
+        [AC_SUBST([MEE_HEADER_GENERATOR], "$MEE_HEADER_GENERATOR")],
+        [AC_MSG_ERROR([Unable to find freedom-mee_header-generator, either place it in PATH or try the --with-mee-header-generator argument.])]
+    )
+
+    AS_IF([test "x$with_ldscript_generator" == "xcheck"],
+        [AC_PATH_PROG(LDSCRIPT_GENERATOR, freedom-ldscript-generator, [no])],
+        [LDSCRIPT_GENERATOR=$with_ldscript_generator]
+    )
+    AS_IF([test "x$LDSCRIPT_GENERATOR" != "xno"],
+        [AC_SUBST([LDSCRIPT_GENERATOR], "$LDSCRIPT_GENERATOR")],
+        [AC_MSG_ERROR([Unable to find freedom-ldscript-generator, either place it in PATH or try the --with-ldscript-generator argument.])]
+    )
+
+    AS_IF([test "x$with_makeattributes_generator" == "xcheck"],
+        [AC_PATH_PROG(MAKEATTRIBUTES_GENERATOR, freedom-makeattributes-generator, [no])],
+        [MAKEATTRIBUTES_GENERATOR=$with_makeattributes_generator]
+    )
+    AS_IF([test "x$MAKEATTRIBUTES_GENERATOR" != "xno"],
+        [AC_SUBST([MAKEATTRIBUTES_GENERATOR], "$MAKEATTRIBUTES_GENERATOR")],
+        [AC_MSG_ERROR([Unable to find freedom-makeattributes-generator, either place it in PATH or try the --with-makeattributes-generator argument.])]
+    )
+
+    AS_IF([test "x$with_mee_specs_generator" == "xcheck"],
+        [AC_PATH_PROG(SPECS_GENERATOR, freedom-mee_specs-generator, [no])],
+        [SPECS_GENERATOR=$with_mee_specs_generator]
+    )
+    AS_IF([test "x$SPECS_GENERATOR" != "xno"],
+        [AC_SUBST([SPECS_GENERATOR], "$SPECS_GENERATOR")],
+        [AC_MSG_ERROR([Unable to find freedom-mee_specs-generator, either place it in PATH or try the --with-mee_specs-generator argument.])]
+    )
+])
+
+# Check for the additional compiler flags provided by the MEE toolchains,
+# directly substituting in the relevant 
+AX_CHECK_COMPILE_FLAG([mmachine=$machine_name],
+    [mmachine_machine_name="-mmachine=$machine_name"],
+    [mmachine_machine_name="-D__MEE_MACHINE_HEADER=\\\"$with_machine_header\\\""]
 )
-AS_IF([test "x$SPECS_GENERATOR" != "xno"],
-    [AC_SUBST([SPECS_GENERATOR], "$SPECS_GENERATOR")],
-    [AC_MSG_ERROR([Unable to find freedom-mee_specs-generator, either place it in PATH or try the --with-mee_specs-generator argument.])]
+
+AC_SUBST([MMACHINE_MACHINE_NAME], "$mmachine_machine_name")
+
+AX_CHECK_COMPILE_FLAG([menv=mee],
+    [menv_mee="-menv=mee"],
+    [menv_mee="-lriscv_mee_$machine_name"]
 )
+
+AC_SUBST([MENV_MEE], "$menv_mee")
 
 # Generates the remainder of the build system.
 AC_CONFIG_FILES([Makefile])
