@@ -1,15 +1,9 @@
 /aclocal.m4
 /autom4te.cache/
-/compile
-/configure
-/install-sh
-/missing
-/Makefile.in
 /config.log
 *.swp
 /Makefile
 /config.status
-/depcomp
 *.a
 *.o
 .dirstamp

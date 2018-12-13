@@ -25,8 +25,14 @@ $(check_PROGRAMS): libriscv__mmachine__@MACHINE_NAME@.a
 # is.
 ldsdir = $(libdir)
 lds_DATA = riscv__mmachine__@MACHINE_NAME@.lds
+
+if PRECONFIGURED
+riscv__mmachine__@MACHINE_NAME@.lds: @MACHINE_HEADER@
+	cp $< $@
+else # !PRECONFIGURED
 riscv__mmachine__@MACHINE_NAME@.lds: @LDSCRIPT_GENERATOR@ @MACHINE_NAME@.dtb
 	$< --dtb $(filter %.dtb,$^) --linker $@
+endif # PRECONFIGURED
 
 # Generates a SPEC file that sets a reasonable set of default options for this
 # build.
@@ -34,8 +40,13 @@ specdir = $(libdir)
 spec_DATA =
 
 spec_DATA += riscv__mmachine__@MACHINE_NAME@.specs
+if PRECONFIGURED
+riscv__mmachine__@MACHINE_NAME@.specs:
+	touch $@
+else # !PRECONFIGURED
 riscv__mmachine__@MACHINE_NAME@.specs: @SPECS_GENERATOR@ @MACHINE_NAME@.dtb
 	$< --dtb $(filter %.dtb,$^) --specs $@ --prefix @prefix@ --machine @MACHINE_NAME@
+endif # PRECONFIGURED
 
 spec_DATA += riscv__menv__mee.specs
 riscv__menv__mee.specs: riscv__menv__mee.specs.in
@@ -46,8 +57,13 @@ riscv__menv__mee.specs: riscv__menv__mee.specs.in
 # This is handled by generating a makefile fragment, including it, and then
 # adding those argument to CFLAGS.
 -include @MACHINE_NAME@.mk
+if PRECONFIGURED
+@MACHINE_NAME@.mk: @MACHINE_MAKEATTRIBUTES@
+	cp $< $@
+else # !PRECONFIGURED
 @MACHINE_NAME@.mk: @MAKEATTRIBUTES_GENERATOR@ @MACHINE_NAME@.dtb
 	$< --dtb $(filter %.dtb,$^) --output $@
+endif # PRECONFIGURED
 
 # Install some MEE-specific headers, one of which is automatically generated.
 # The files that aren't automatically generated are the same for all machines.
@@ -69,6 +85,11 @@ nobase_include_HEADERS = \
 	mee/tty.h \
 	mee/uart.h
 
+if PRECONFIGURED
+mee/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
+	@mkdir -p $(dir $@)
+	cp $< $@
+else # !PRECONFIGURED
 # Builds the machine-specific MEE header file, which paramaterizes the MEE for
 # one specific machine.  This is automatically picked up by GCC so users
 # automatically get the relevant definitions.  This is a two-step process:
@@ -80,14 +101,15 @@ nobase_include_HEADERS = \
 mee/machine/@MACHINE_NAME@.h: @MEE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
 	@mkdir -p $(dir $@)
 	$< --dtb $(filter %.dtb,$^) --output $@
+endif # PRECONFIGURED
 
 # Everything in here is compiled into a single library, which contains all the
 # source files in the project.  It's named for one specific machine, which GCC
 # uses to select the target machine that this MEE implementation points at.
 lib_LIBRARIES = libriscv__mmachine__@MACHINE_NAME@.a
 
-libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS  = -menv=mee -mmachine=@MACHINE_NAME@
-libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = -menv=mee -mmachine=@MACHINE_NAME@
+libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS  = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
+libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
@@ -110,24 +132,24 @@ check_PROGRAMS =
 # The simplest possible pair of tests: one that passes and one that fails
 check_PROGRAMS       += return_pass
 return_pass_SOURCES   = test/return_pass.c
-return_pass_CFLAGS    = -menv=mee -mmachine=@MACHINE_NAME@
+return_pass_CFLAGS    = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 return_pass_LDFLAGS   = -L. -Wl,--gc-sections -Wl,-Map=return_pass.map
 
 check_PROGRAMS       += return_fail
 return_fail_SOURCES   = test/return_fail.c
-return_fail_CFLAGS    = -menv=mee -mmachine=@MACHINE_NAME@
+return_fail_CFLAGS    = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 return_fail_LDFLAGS   = -L. -Wl,--gc-sections -Wl,-Map=return_fail.map
 
 # A simple "Hello, World!" program that directly uses the MEE interface to
 # print to the serial terminal.
 check_PROGRAMS       += hello
 hello_SOURCES         = test/hello.c
-hello_CFLAGS          = -menv=mee -mmachine=@MACHINE_NAME@
+hello_CFLAGS          = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 hello_LDFLAGS         = -L. -Wl,--gc-sections -Wl,-Map=hello.map
 
 check_PROGRAMS       += pll_set_hz
 pll_set_hz_SOURCES    = test/pll_set_hz.c
-pll_set_hz_CFLAGS     = -menv=mee -mmachine=@MACHINE_NAME@
+pll_set_hz_CFLAGS     = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
 pll_set_hz_LDFLAGS    = -L. -Wl,--gc-sections -Wl,-Map=pll_set_hz.map
 
 # Extra clean targets
