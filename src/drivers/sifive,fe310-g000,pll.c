@@ -5,7 +5,7 @@
 #include <limits.h>
 
 #include <mee/drivers/sifive,fe310-g000,pll.h>
-#include <mee/compiler.h>
+#include <stdlib.h>
 
 #define PLL_R        0x00000007UL
 #define PLL_F        0x000003F0UL
