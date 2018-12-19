@@ -30,6 +30,7 @@ esac
 # Probe for tools that we need in order to build.
 AC_PROG_CC
 AC_PROG_RANLIB
+AM_PROG_AR
 AM_PROG_AS
 
 # autoconf tries very hard to avoid failing, so it'll even go ahead and try to
