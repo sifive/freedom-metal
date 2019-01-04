@@ -78,6 +78,22 @@ _start:
   blt  t1, t2, 1b
 2:
 
+  /* Copy the ITIM section */
+  la t0, mee_segment_itim_source_start
+  la t1, mee_segment_itim_target_start
+  la t2, mee_segment_itim_target_end
+
+  beq t0, t1, 2f
+  bge t1, t2, 2f
+
+1:
+  lw   t3, 0(t0)
+  addi t0, t0, 4
+  sw   t3, 0(t1)
+  addi t1, t1, 4
+  blt  t1, t2, 1b
+2:
+
   /* Zero the BSS segment. */
   la t1, mee_segment_bss_target_start
   la t2, mee_segment_bss_target_end

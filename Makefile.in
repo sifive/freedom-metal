@@ -455,6 +455,7 @@ nobase_include_HEADERS = \
 	mee/drivers/sifive,test0.h \
 	mee/compiler.h \
 	mee/clock.h \
+	mee/itim.h \
 	mee/io.h \
 	mee/machine.h \
 	mee/shutdown.h \
