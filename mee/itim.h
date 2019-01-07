@@ -4,6 +4,6 @@
 #ifndef MEE__ITIM_H
 #define MEE__ITIM_H
 
-#define MEE_PLACE_IN_ITIM	__attribute__((section(".text.itim")))
+#define MEE_PLACE_IN_ITIM	__attribute__((section(".itim")))
 
 #endif
