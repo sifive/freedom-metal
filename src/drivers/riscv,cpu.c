@@ -59,7 +59,7 @@ void __mee_interrupt_timer_disable (void) {
     asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_TMR));
 }
 
-void __mee_default_exception_handler (int ecode) {
+void __mee_default_exception_handler (struct mee_cpu *cpu, int ecode) {
     mee_shutdown(100);
 }
 
@@ -75,7 +75,7 @@ void __mee_default_sw_handler (int id, void *priv) {
     asm volatile ("csrr %0, mcause" : "=r"(mcause));
     if ( cpu ) {
         intc = (struct __mee_driver_riscv_cpu_intc *)cpu->interrupt_controller;
-        intc->mee_exception_table[mcause & MEE_MCAUSE_CAUSE](id);
+        intc->mee_exception_table[mcause & MEE_MCAUSE_CAUSE]((struct mee_cpu *)cpu, id);
     }
 }
 
@@ -106,7 +106,7 @@ void __mee_exception_handler (void) {
             priv = intc->mee_mtvec_table[id].exint_data;
             intc->mee_mtvec_table[id].handler(id, priv);
         } else {
-            intc->mee_exception_table[id](id);
+            intc->mee_exception_table[id]((struct mee_cpu *)cpu, id);
         }
     }
 }
@@ -539,14 +539,20 @@ int __mee_driver_cpu_exception_register(struct mee_cpu *cpu, int ecode,
     return -1;
 }
 
-unsigned long  __mee_driver_cpu_get_exception_frame_pointer(struct mee_cpu *cpu)
+int  __mee_driver_cpu_get_instruction_length(struct mee_cpu *cpu, unsigned long epc)
+{
+    /* Per ISA compressed instruction has last two bits of opcode set */
+    return (*(unsigned short*)epc & 3) ? 4 : 2;
+}
+
+unsigned long  __mee_driver_cpu_get_exception_pc(struct mee_cpu *cpu)
 {
     unsigned long mepc;
     asm volatile ("csrr %0, mepc" : "=r"(mepc));
     return mepc;
 }
 
-int  __mee_driver_cpu_set_exception_frame_pointer(struct mee_cpu *cpu, unsigned long mepc)
+int  __mee_driver_cpu_set_exception_pc(struct mee_cpu *cpu, unsigned long mepc)
 {
     asm volatile ("csrw mepc, %0" :: "r"(mepc));
     return 0;
