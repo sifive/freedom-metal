@@ -231,7 +231,8 @@ AS_IF([test "x$with_preconfigured" = "xyes"],
 # directly substituting in the relevant 
 AX_CHECK_COMPILE_FLAG([mmachine=$machine_name],
     [mmachine_machine_name="-mmachine=$machine_name"],
-    [mmachine_machine_name="-mmachine=$with_machine_name"]
+    [mmachine_machine_name="-D__MEE_MACHINE_HEADER=\\\"$with_machine_header\\\""]
+#    [mmachine_machine_name="-mmachine=$with_machine_name"]
 )
 
 AC_SUBST([MMACHINE_MACHINE_NAME], "$mmachine_machine_name")
