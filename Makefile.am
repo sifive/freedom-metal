@@ -77,6 +77,11 @@ nobase_include_HEADERS = \
 	mee/drivers/sifive,gpio0.h \
 	mee/drivers/sifive,uart0.h \
 	mee/drivers/sifive,test0.h \
+	mee/drivers/sifive,local-external-interrupts0.h \
+	mee/drivers/sifive,global-external-interrupts0.h \
+	mee/drivers/riscv,cpu.h \
+	mee/drivers/riscv,clint0.h \
+	mee/drivers/riscv,plic0.h \
 	mee/compiler.h \
 	mee/clock.h \
 	mee/itim.h \
@@ -84,7 +89,10 @@ nobase_include_HEADERS = \
 	mee/machine.h \
 	mee/shutdown.h \
 	mee/tty.h \
-	mee/uart.h
+	mee/uart.h \
+	mee/timer.h \
+	mee/cpu.h \
+	mee/interrupt.h
 
 if PRECONFIGURED
 mee/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
@@ -123,10 +131,18 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive,fe310-g000,pll.c \
 	src/drivers/sifive,test0.c \
 	src/drivers/sifive,gpio0.c \
+        src/drivers/sifive,local-external-interrupts0.c \
+        src/drivers/sifive,global-external-interrupts0.c \
+	src/drivers/riscv,cpu.c \
 	src/drivers/sifive,uart0.c \
+	src/drivers/riscv,clint0.c \
+	src/drivers/riscv,plic0.c \
 	src/clock.c \
 	src/tty.c \
 	src/shutdown.c \
+	src/timer.c \
+	src/cpu.c \
+	src/interrupt.c \
 	src/uart.c \
 	src/entry.S
 

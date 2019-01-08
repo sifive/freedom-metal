@@ -22,6 +22,9 @@ struct __mee_driver_sifive_gpio0 {
     const struct __mee_driver_vtable_sifive_gpio0 *vtable;
     const long base;
     const long size;
+    struct mee_interrupt *interrupt_parent;
+    const int num_interrupts;
+    const int interrupt_lines[];
 };
 
 #endif
