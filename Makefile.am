@@ -74,6 +74,8 @@ nobase_include_HEADERS = \
 	mee/drivers/sifive,fe310-g000,hfxosc.h \
 	mee/drivers/sifive,fe310-g000,pll.h \
 	mee/drivers/sifive,fe310-g000,prci.h \
+	mee/drivers/riscv,rv32,pmp.h \
+	mee/drivers/riscv,rv64,pmp.h \
 	mee/drivers/sifive,gpio0.h \
 	mee/drivers/sifive,uart0.h \
 	mee/drivers/sifive,test0.h \
@@ -88,6 +90,7 @@ nobase_include_HEADERS = \
 	mee/io.h \
 	mee/machine.h \
 	mee/shutdown.h \
+	mee/pmp.h \
 	mee/tty.h \
 	mee/uart.h \
 	mee/timer.h \
@@ -125,6 +128,8 @@ libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NA
 
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
+	src/drivers/riscv,rv32,pmp.c \
+	src/drivers/riscv,rv64,pmp.c \
 	src/drivers/sifive,fe310-g000,hfrosc.c \
 	src/drivers/sifive,fe310-g000,hfxosc.c \
 	src/drivers/sifive,fe310-g000,prci.c \
@@ -143,6 +148,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/timer.c \
 	src/cpu.c \
 	src/interrupt.c \
+	src/pmp.c \
 	src/uart.c \
 	src/entry.S
 
