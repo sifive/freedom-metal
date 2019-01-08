@@ -176,8 +176,9 @@ int  __mee_driver_cpu_enable_interrupt_vector(struct mee_cpu *cpu);
 int  __mee_driver_cpu_disable_interrupt_vector(struct mee_cpu *cpu);
 int  __mee_driver_cpu_exception_register(struct mee_cpu *cpu, int ecode,
 					 mee_exception_handler_t isr);
-unsigned long  __mee_driver_cpu_get_exception_frame_pointer(struct mee_cpu *cpu);
-int  __mee_driver_cpu_set_exception_frame_pointer(struct mee_cpu *cpu, unsigned long epc);
+int  __mee_driver_cpu_get_instruction_length(struct mee_cpu *cpu, unsigned long epc);
+unsigned long  __mee_driver_cpu_get_exception_pc(struct mee_cpu *cpu);
+int  __mee_driver_cpu_set_exception_pc(struct mee_cpu *cpu, unsigned long epc);
 
 __MEE_DECLARE_VTABLE(__mee_driver_vtable_cpu) = {
     .cpu_vtable.timer_get     = __mee_driver_cpu_timer_get,
@@ -193,8 +194,9 @@ __MEE_DECLARE_VTABLE(__mee_driver_vtable_cpu) = {
     .cpu_vtable.get_msip = __mee_driver_cpu_get_msip,
     .cpu_vtable.controller_interrupt = __mee_driver_cpu_controller_interrupt,
     .cpu_vtable.exception_register = __mee_driver_cpu_exception_register,
-    .cpu_vtable.get_frame_pointer = __mee_driver_cpu_get_exception_frame_pointer,
-    .cpu_vtable.set_frame_pointer = __mee_driver_cpu_set_exception_frame_pointer,
+    .cpu_vtable.get_ilen = __mee_driver_cpu_get_instruction_length,
+    .cpu_vtable.get_epc = __mee_driver_cpu_get_exception_pc,
+    .cpu_vtable.set_epc = __mee_driver_cpu_set_exception_pc,
 };
 
 struct __mee_driver_cpu {
