@@ -92,6 +92,7 @@ nobase_include_HEADERS = \
 	mee/io.h \
 	mee/machine.h \
 	mee/shutdown.h \
+	mee/pmp.h \
 	mee/tty.h \
 	mee/uart.h \
 	mee/timer.h \
@@ -157,6 +158,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/button.c \
 	src/switch.c \
 	src/interrupt.c \
+	src/pmp.c \
 	src/uart.c \
 	src/entry.S
 
