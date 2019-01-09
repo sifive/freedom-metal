@@ -74,3 +74,29 @@ int __mee_driver_sifive_local_external_interrupt_disable(struct mee_interrupt *c
     return rc;
 }
 
+int __mee_driver_sifive_local_external_command_request (struct mee_interrupt *controller,
+                                                        int command, void *data)
+{
+    int index;
+    int rc = -1;
+    struct __mee_driver_sifive_local_external_interrupts0 *local0 =
+                              (struct __mee_driver_sifive_local_external_interrupts0 *)(controller);
+
+    switch (command) {
+    case MEE_MAX_INTERRUPT_GET:
+        rc = local0->num_interrupts;    
+        break;
+    case MEE_INDEX_INTERRUPT_GET:
+        rc = 0;
+        if (data) {
+            index = *(int *)data;
+            rc = local0->interrupt_lines[index];
+        }
+        break;
+    default:
+        break;
+    }
+
+    return rc;
+}
+

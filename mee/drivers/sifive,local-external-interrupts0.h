@@ -17,12 +17,15 @@ int __mee_driver_sifive_local_external_interrupt_register(struct mee_interrupt *
                                                           void *priv);
 int __mee_driver_sifive_local_external_interrupt_enable(struct mee_interrupt *controller, int id);
 int __mee_driver_sifive_local_external_interrupt_disable(struct mee_interrupt *controller, int id);
+int __mee_driver_sifive_local_external_command_request(struct mee_interrupt *clint,
+                                              	       int command, void *data);
 
 __MEE_DECLARE_VTABLE(__mee_driver_vtable_sifive_local_external_interrupts0) = {
     .local0_vtable.interrupt_init     = __mee_driver_sifive_local_external_interrupt_init,
     .local0_vtable.interrupt_register = __mee_driver_sifive_local_external_interrupt_register,
     .local0_vtable.interrupt_enable   = __mee_driver_sifive_local_external_interrupt_enable,
     .local0_vtable.interrupt_disable  = __mee_driver_sifive_local_external_interrupt_disable,
+    .local0_vtable.command_request    = __mee_driver_sifive_local_external_command_request,
 };
 
 struct __mee_driver_sifive_local_external_interrupts0 {

@@ -6,6 +6,7 @@
 
 struct mee_button* mee_button_get (char *label)
 {
+    int i;
     struct mee_button *button;
 
     if ((__MEE_DT_MAX_BUTTONS == 0) || (label == NULL)) {
@@ -13,7 +14,7 @@ struct mee_button* mee_button_get (char *label)
     }
 
     for (i = 0; i < __MEE_DT_MAX_BUTTONS; i++) {
-        button = (struct mee_button*)&(__mee_button_table[i]);
+        button = (struct mee_button*)__mee_button_table[i];
         if (button->vtable->button_exist(button, label)) {
             return button;
         }

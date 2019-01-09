@@ -7,6 +7,7 @@
 
 struct mee_led* mee_led_get_rgb (char *label, char *color)
 {
+    int i;
     struct mee_led *led;
     char led_label[100];
 
@@ -18,7 +19,7 @@ struct mee_led* mee_led_get_rgb (char *label, char *color)
     strcpy(led_label, label);
     strcat(led_label, color);
     for (i = 0; i < __MEE_DT_MAX_LEDS; i++) {
-        led = (struct mee_led*)&(__mee_led_table[i]);
+        led = (struct mee_led*)__mee_led_table[i];
         if (led->vtable->led_exist(led, led_label)) {
 	    return led;
 	}

@@ -6,6 +6,7 @@
 
 struct mee_switch* mee_switch_get (char *label)
 {
+    int i;
     struct mee_switch *flip;
 
     if ((__MEE_DT_MAX_BUTTONS == 0) || (label == NULL)) {
@@ -13,7 +14,7 @@ struct mee_switch* mee_switch_get (char *label)
     }
 
     for (i = 0; i < __MEE_DT_MAX_BUTTONS; i++) {
-        flip = (struct mee_switch*)&(__mee_switch_table[i]);
+        flip = (struct mee_switch*)__mee_switch_table[i];
         if (flip->vtable->switch_exist(flip, label)) {
             return flip;
         }
