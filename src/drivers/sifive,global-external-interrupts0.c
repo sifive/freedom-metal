@@ -5,19 +5,19 @@
 #include <mee/shutdown.h>
 #include <mee/drivers/sifive,global-external-interrupts0.h>
 
-void __mee_driver_sifive_global_external_interrupt_init(struct mee_interrupt *global0)
+void __mee_driver_sifive_global_external_interrupt_init(struct mee_interrupt *controller)
 {
-    struct __mee_driver_sifive_global_external_interrupts0 *mee_global0;
+    struct __mee_driver_sifive_global_external_interrupts0 *global0;
 
-    mee_global0 = (struct __mee_driver_sifive_global_external_interrupts0 *)(global0);
-    if (mee_global0) {
-        struct mee_interrupt *intc = mee_global0->interrupt_parent;
+    global0 = (struct __mee_driver_sifive_global_external_interrupts0 *)(controller);
+    if (global0) {
+        struct mee_interrupt *intc = global0->interrupt_parent;
 
 	/* Register its interrupts with with parent controller, aka all external to default isr */
-        for (int i = 0; i < mee_global0->num_interrupts; i++) {
+        for (int i = 0; i < global0->num_interrupts; i++) {
 	    intc->vtable->interrupt_register(intc,
-					      mee_global0->interrupt_lines[i],
-					      NULL, global0);
+					     global0->interrupt_lines[i],
+					     NULL, global0);
 	}
     }
 }
