@@ -4,19 +4,19 @@
 #include <mee/io.h>
 #include <mee/drivers/sifive,local-external-interrupts0.h>
 
-void __mee_driver_sifive_local_external_interrupt_init(struct mee_interrupt *local0)
+void __mee_driver_sifive_local_external_interrupt_init(struct mee_interrupt *controller)
 {
-    struct __mee_driver_sifive_local_external_interrupts0 *mee_local0;
+    struct __mee_driver_sifive_local_external_interrupts0 *local0;
 
-    mee_local0 = (struct __mee_driver_sifive_local_external_interrupts0 *)(local0);
-    if (mee_local0) {
-        struct mee_interrupt *intc = mee_local0->interrupt_parent;
+    local0 = (struct __mee_driver_sifive_local_external_interrupts0 *)(controller);
+    if (local0) {
+        struct mee_interrupt *intc = local0->interrupt_parent;
 
 	/* Register its interruptswith with parent controller, aka all external to default isr */
-        for (int i = 0; i < mee_local0->num_interrupts; i++) {
+        for (int i = 0; i < local0->num_interrupts; i++) {
 	  intc->vtable->interrupt_register(intc,
-					   mee_local0->interrupt_lines[i],
-					   NULL, 0);
+					   local0->interrupt_lines[i],
+					   NULL, local0);
 	}
     }
 }
