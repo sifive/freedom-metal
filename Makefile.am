@@ -79,6 +79,9 @@ nobase_include_HEADERS = \
 	mee/drivers/sifive,test0.h \
 	mee/drivers/sifive,local-external-interrupts0.h \
 	mee/drivers/sifive,global-external-interrupts0.h \
+	mee/drivers/sifive,gpio-leds.h \
+	mee/drivers/sifive,gpio-buttons.h \
+	mee/drivers/sifive,gpio-switches.h \
 	mee/drivers/riscv,cpu.h \
 	mee/drivers/riscv,clint0.h \
 	mee/drivers/riscv,plic0.h \
@@ -92,6 +95,9 @@ nobase_include_HEADERS = \
 	mee/uart.h \
 	mee/timer.h \
 	mee/cpu.h \
+	mee/led.h \
+	mee/button.h \
+	mee/switch.h \
 	mee/interrupt.h
 
 if PRECONFIGURED
@@ -135,6 +141,9 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
         src/drivers/sifive,global-external-interrupts0.c \
 	src/drivers/riscv,cpu.c \
 	src/drivers/sifive,uart0.c \
+	src/drivers/sifive,gpio-leds.c \
+	src/drivers/sifive,gpio-buttons.c \
+	src/drivers/sifive,gpio-switches.c \
 	src/drivers/riscv,clint0.c \
 	src/drivers/riscv,plic0.c \
 	src/clock.c \
@@ -142,6 +151,9 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/shutdown.c \
 	src/timer.c \
 	src/cpu.c \
+	src/led.c \
+	src/button.c \
+	src/switch.c \
 	src/interrupt.c \
 	src/uart.c \
 	src/entry.S

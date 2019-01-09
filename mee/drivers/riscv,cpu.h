@@ -99,6 +99,8 @@ typedef enum {
   MEE_SOFTWARE_IPI_CLEAR,
   MEE_SOFTWARE_IPI_SET,
   MEE_SOFTWARE_MSIP_GET,
+  MEE_MAX_INTERRUPT_GET,
+  MEE_INDEX_INTERRUPT_GET,
 } mee_interrup_cmd_e;
 
 typedef struct __mee_interrupt_data {

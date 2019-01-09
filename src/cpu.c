@@ -7,7 +7,7 @@
 struct mee_cpu* mee_cpu_get(int hartid)
 {
     if (hartid < __MEE_DT_MAX_HARTS) {
-        return &(__mee_cpu_table[hartid].cpu);
+        return &(__mee_cpu_table[hartid]->cpu);
     }   
     return NULL;
 }

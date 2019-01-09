@@ -8,7 +8,7 @@
 struct mee_cpu *__mee_driver_cpu_get(int hartid)
 {
     if (hartid < __MEE_DT_MAX_HARTS) {
-        return &(__mee_cpu_table[hartid].cpu);
+        return &(__mee_cpu_table[hartid]->cpu);
     }
     return (struct mee_cpu *)NULL;
 }
@@ -70,7 +70,7 @@ void __mee_default_interrupt_handler (int id, void *priv) {
 void __mee_default_sw_handler (int id, void *priv) {
     unsigned long mcause;
     struct __mee_driver_riscv_cpu_intc *intc;
-    struct __mee_driver_cpu *cpu = &__mee_cpu_table[__mee_myhart_id()];
+    struct __mee_driver_cpu *cpu = __mee_cpu_table[__mee_myhart_id()];
 
     asm volatile ("csrr %0, mcause" : "=r"(mcause));
     if ( cpu ) {
@@ -93,7 +93,7 @@ void __mee_exception_handler (void) {
     void *priv;
     unsigned long mcause, mepc, mtval;
     struct __mee_driver_riscv_cpu_intc *intc;
-    struct __mee_driver_cpu *cpu = &__mee_cpu_table[__mee_myhart_id()];
+    struct __mee_driver_cpu *cpu = __mee_cpu_table[__mee_myhart_id()];
 
     asm volatile ("csrr %0, mcause" : "=r"(mcause) );
     asm volatile ("csrr %0, mepc" : "=r"(mepc));
