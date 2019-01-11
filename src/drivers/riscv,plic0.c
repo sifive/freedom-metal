@@ -100,6 +100,7 @@ void __mee_driver_riscv_plic0_init (struct mee_interrupt *controller)
 	intc->vtable->interrupt_register(intc,
 					 plic->interrupt_line,
 					 __mee_plic0_handler, plic);
+        plic->init_done = 1;
     }
 }
 

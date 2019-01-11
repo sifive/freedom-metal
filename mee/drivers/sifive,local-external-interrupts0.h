@@ -31,6 +31,7 @@ __MEE_DECLARE_VTABLE(__mee_driver_vtable_sifive_local_external_interrupts0) = {
 struct __mee_driver_sifive_local_external_interrupts0 {
     struct mee_interrupt irc;
     const struct __mee_driver_vtable_sifive_local_external_interrupts0 *vtable;
+    int init_done;
     struct mee_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_lines[];

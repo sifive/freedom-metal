@@ -48,7 +48,6 @@ void __mee_interrupt_software_disable (void) {
     asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_SW));
 }
 
-
 void __mee_interrupt_timer_enable (void) {
     unsigned long m;
     asm volatile ("csrrs %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_TMR));
@@ -57,6 +56,28 @@ void __mee_interrupt_timer_enable (void) {
 void __mee_interrupt_timer_disable (void) {
     unsigned long m;
     asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_TMR));
+}
+
+void __mee_interrupt_external_enable (void) {
+    unsigned long m;
+    asm volatile ("csrrs %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_EXT));
+}
+
+void __mee_interrupt_external_disable (void) {
+    unsigned long m;
+    asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_EXT));
+}
+
+void __mee_interrupt_local_enable (int id) {
+    unsigned long b = 1 << id;
+    unsigned long m;
+    asm volatile ("csrrs %0, mie, %1" : "=r"(m) : "r"(b));
+}
+
+void __mee_interrupt_local_disable (int id) {
+    unsigned long b = 1 << id;
+    unsigned long m;
+    asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(b));
 }
 
 void __mee_default_exception_handler (struct mee_cpu *cpu, int ecode) {
@@ -193,6 +214,12 @@ int __mee_local_interrupt_enable (struct mee_interrupt *controller,
 	}
 	break;
     case MEE_INTERRUPT_ID_EXT:
+        if (enable) {
+            __mee_interrupt_external_enable();
+        } else {
+            __mee_interrupt_external_disable();
+        }
+        break;
     case MEE_INTERRUPT_ID_LC0:
     case MEE_INTERRUPT_ID_LC1:
     case MEE_INTERRUPT_ID_LC2:
@@ -209,6 +236,12 @@ int __mee_local_interrupt_enable (struct mee_interrupt *controller,
     case MEE_INTERRUPT_ID_LC13:
     case MEE_INTERRUPT_ID_LC14:
     case MEE_INTERRUPT_ID_LC15:
+        if (enable) {
+            __mee_interrupt_local_enable(id);
+        } else {
+            __mee_interrupt_local_disable(id);
+        }
+        break;
     defaut:
         rc = -1;
     }
