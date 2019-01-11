@@ -9,7 +9,7 @@ void __mee_driver_sifive_local_external_interrupt_init(struct mee_interrupt *con
     struct __mee_driver_sifive_local_external_interrupts0 *local0;
 
     local0 = (struct __mee_driver_sifive_local_external_interrupts0 *)(controller);
-    if (local0) {
+    if ( !local0->init_done ) {
         struct mee_interrupt *intc = local0->interrupt_parent;
 
 	/* Register its interruptswith with parent controller, aka all external to default isr */
@@ -18,6 +18,7 @@ void __mee_driver_sifive_local_external_interrupt_init(struct mee_interrupt *con
 					   local0->interrupt_lines[i],
 					   NULL, local0);
 	}
+        local0->init_done = 1;
     }
 }
 
@@ -29,7 +30,7 @@ int __mee_driver_sifive_local_external_interrupt_register(struct mee_interrupt *
     struct __mee_driver_sifive_local_external_interrupts0 *local0 =
                               (struct __mee_driver_sifive_local_external_interrupts0 *)(controller);
 
-    if (local0 && (id != 0)) {
+    if (id != 0) {
         struct mee_interrupt *intc = local0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
@@ -46,7 +47,7 @@ int __mee_driver_sifive_local_external_interrupt_enable(struct mee_interrupt *co
     struct __mee_driver_sifive_local_external_interrupts0 *local0 =
                               (struct __mee_driver_sifive_local_external_interrupts0 *)(controller);
 
-    if (local0 && (id != 0)) {
+    if (id != 0) {
         struct mee_interrupt *intc = local0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
@@ -63,7 +64,7 @@ int __mee_driver_sifive_local_external_interrupt_disable(struct mee_interrupt *c
     struct __mee_driver_sifive_local_external_interrupts0 *local0 =
                               (struct __mee_driver_sifive_local_external_interrupts0 *)(controller);
 
-    if (local0 && (id != 0)) {
+    if (id != 0) {
         struct mee_interrupt *intc = local0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */

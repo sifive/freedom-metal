@@ -10,7 +10,7 @@ void __mee_driver_sifive_global_external_interrupt_init(struct mee_interrupt *co
     struct __mee_driver_sifive_global_external_interrupts0 *global0;
 
     global0 = (struct __mee_driver_sifive_global_external_interrupts0 *)(controller);
-    if (global0) {
+    if ( !global0->init_done ) {
         struct mee_interrupt *intc = global0->interrupt_parent;
 
 	/* Register its interrupts with with parent controller, aka all external to default isr */
@@ -19,6 +19,7 @@ void __mee_driver_sifive_global_external_interrupt_init(struct mee_interrupt *co
 					     global0->interrupt_lines[i],
 					     NULL, global0);
 	}
+        global0->init_done = 1;
     }
 }
 
@@ -30,7 +31,7 @@ int __mee_driver_sifive_global_external_interrupt_register(struct mee_interrupt 
     struct __mee_driver_sifive_global_external_interrupts0 *global0 =
                               (struct __mee_driver_sifive_global_external_interrupts0 *)(controller);
 
-    if (global0 && (id != 0)) {
+    if (id != 0) {
         struct mee_interrupt *intc = global0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
@@ -47,7 +48,7 @@ int __mee_driver_sifive_global_external_interrupt_enable(struct mee_interrupt *c
     struct __mee_driver_sifive_global_external_interrupts0 *global0 =
                               (struct __mee_driver_sifive_global_external_interrupts0 *)(controller);
 
-    if (global0 && (id != 0)) {
+    if (id != 0) {
         struct mee_interrupt *intc = global0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
@@ -64,7 +65,7 @@ int __mee_driver_sifive_global_external_interrupt_disable(struct mee_interrupt *
     struct __mee_driver_sifive_global_external_interrupts0 *global0 =
                               (struct __mee_driver_sifive_global_external_interrupts0 *)(controller);
 
-    if (global0 && (id != 0)) {
+    if (id != 0) {
         struct mee_interrupt *intc = global0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
