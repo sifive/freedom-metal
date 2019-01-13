@@ -33,7 +33,7 @@ __MEE_DECLARE_VTABLE(__mee_driver_vtable_riscv_clint0) = {
 };
 
 struct __mee_driver_riscv_clint0 {
-    struct mee_interrupt clint;
+    struct mee_interrupt controller;
     const struct __mee_driver_vtable_riscv_clint0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
