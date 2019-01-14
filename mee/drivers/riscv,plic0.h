@@ -9,7 +9,7 @@
 
 
 struct __mee_driver_vtable_riscv_plic0 {
-    struct mee_interrupt_vtable controller_vtable;
+    struct mee_interrupt_vtable plic_vtable;
 };
 
 void __mee_driver_riscv_plic0_init(struct mee_interrupt *controller);
@@ -20,14 +20,14 @@ int __mee_driver_riscv_plic0_enable(struct mee_interrupt *controller, int id);
 int __mee_driver_riscv_plic0_disable(struct mee_interrupt *controller, int id);
 
 __MEE_DECLARE_VTABLE(__mee_driver_vtable_riscv_plic0) = {
-    .controller_vtable.interrupt_init = __mee_driver_riscv_plic0_init,
-    .controller_vtable.interrupt_register = __mee_driver_riscv_plic0_register,
-    .controller_vtable.interrupt_enable   = __mee_driver_riscv_plic0_enable,
-    .controller_vtable.interrupt_disable  = __mee_driver_riscv_plic0_disable,
+    .plic_vtable.interrupt_init = __mee_driver_riscv_plic0_init,
+    .plic_vtable.interrupt_register = __mee_driver_riscv_plic0_register,
+    .plic_vtable.interrupt_enable   = __mee_driver_riscv_plic0_enable,
+    .plic_vtable.interrupt_disable  = __mee_driver_riscv_plic0_disable,
 };
 
 struct __mee_driver_riscv_plic0 {
-    struct mee_interrupt plic0;
+    struct mee_interrupt controller;
     const struct __mee_driver_vtable_riscv_plic0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;

@@ -83,6 +83,7 @@ nobase_include_HEADERS = \
 	mee/drivers/sifive,gpio-buttons.h \
 	mee/drivers/sifive,gpio-switches.h \
 	mee/drivers/riscv,cpu.h \
+	mee/drivers/sifive,clic0.h \
 	mee/drivers/riscv,clint0.h \
 	mee/drivers/riscv,plic0.h \
 	mee/compiler.h \
@@ -144,6 +145,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive,gpio-leds.c \
 	src/drivers/sifive,gpio-buttons.c \
 	src/drivers/sifive,gpio-switches.c \
+	src/drivers/sifive,clic0.c \
 	src/drivers/riscv,clint0.c \
 	src/drivers/riscv,plic0.c \
 	src/clock.c \
