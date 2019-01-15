@@ -38,8 +38,8 @@ extern inline struct mee_interrupt* mee_cpu_interrupt_controller(struct mee_cpu 
 
 extern inline int mee_cpu_exception_register(struct mee_cpu *cpu, int ecode, mee_exception_handler_t handler);
 
-extern inline int mee_cpu_get_instruction_length(struct mee_cpu *cpu, unsigned long epc);
+extern inline int mee_cpu_get_instruction_length(struct mee_cpu *cpu, uintptr_t epc);
 
-extern inline unsigned long mee_cpu_get_exception_pc(struct mee_cpu *cpu);
+extern inline uintptr_t mee_cpu_get_exception_pc(struct mee_cpu *cpu);
 
-extern inline int mee_cpu_set_exception_pc(struct mee_cpu *cpu, unsigned long epc);
+extern inline int mee_cpu_set_exception_pc(struct mee_cpu *cpu, uintptr_t epc);

@@ -13,9 +13,9 @@ struct mee_cpu *__mee_driver_cpu_get(int hartid)
     return (struct mee_cpu *)NULL;
 }
 
-unsigned long __mee_myhart_id (void)
+uintptr_t __mee_myhart_id (void)
 {
-    unsigned long myhart;
+    uintptr_t myhart;
     asm volatile ("csrr %0, mhartid" : "=r"(myhart));
     return myhart;
 }
@@ -29,37 +29,37 @@ void __mee_zero_memory (unsigned char *base, unsigned int size)
 }
 
 void __mee_interrupt_global_enable (void) {
-    unsigned long m;
+    uintptr_t m;
     asm volatile ("csrrs %0, mstatus, %1" : "=r"(m) : "r"(MEE_MIE_INTERRUPT));
 }
 
 void __mee_interrupt_global_disable (void) {
-    unsigned long m;
+    uintptr_t m;
     asm volatile ("csrrc %0, mstatus, %1" : "=r"(m) : "r"(MEE_MIE_INTERRUPT));
 }
 
 void __mee_interrupt_software_enable (void) {
-    unsigned long m;
+    uintptr_t m;
     asm volatile ("csrrs %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_SW));
 }
 
 void __mee_interrupt_software_disable (void) {
-    unsigned long m;
+    uintptr_t m;
     asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_SW));
 }
 
 void __mee_interrupt_timer_enable (void) {
-    unsigned long m;
+    uintptr_t m;
     asm volatile ("csrrs %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_TMR));
 }
 
 void __mee_interrupt_timer_disable (void) {
-    unsigned long m;
+    uintptr_t m;
     asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_TMR));
 }
 
 void __mee_interrupt_external_enable (void) {
-    unsigned long m;
+    uintptr_t m;
     asm volatile ("csrrs %0, mie, %1" : "=r"(m) : "r"(MEE_LOCAL_INTERRUPT_EXT));
 }
 
@@ -69,14 +69,14 @@ void __mee_interrupt_external_disable (void) {
 }
 
 void __mee_interrupt_local_enable (int id) {
-    unsigned long b = 1 << id;
-    unsigned long m;
+    uintptr_t b = 1 << id;
+    uintptr_t m;
     asm volatile ("csrrs %0, mie, %1" : "=r"(m) : "r"(b));
 }
 
 void __mee_interrupt_local_disable (int id) {
-    unsigned long b = 1 << id;
-    unsigned long m;
+    uintptr_t b = 1 << id;
+    uintptr_t m;
     asm volatile ("csrrc %0, mie, %1" : "=r"(m) : "r"(b));
 }
 
@@ -89,7 +89,7 @@ void __mee_default_interrupt_handler (int id, void *priv) {
 }
 
 void __mee_default_sw_handler (int id, void *priv) {
-    unsigned long mcause;
+    uintptr_t mcause;
     struct __mee_driver_riscv_cpu_intc *intc;
     struct __mee_driver_cpu *cpu = __mee_cpu_table[__mee_myhart_id()];
 
@@ -112,7 +112,7 @@ void __mee_exception_handler(void) __attribute__((interrupt, aligned(128)));
 void __mee_exception_handler (void) {
     int id;
     void *priv;
-    unsigned long mcause, mepc, mtval;
+    uintptr_t mcause, mepc, mtval;
     struct __mee_driver_riscv_cpu_intc *intc;
     struct __mee_driver_cpu *cpu = __mee_cpu_table[__mee_myhart_id()];
 
@@ -134,7 +134,7 @@ void __mee_exception_handler (void) {
 
 void __mee_controller_interrupt_vectored (struct mee_interrupt *controller, int enable)
 {  
-    unsigned long trap_entry;
+    uintptr_t trap_entry;
     struct __mee_driver_riscv_cpu_intc *intc = (void *)(controller);
 
     if ( !controller ) {
@@ -142,10 +142,10 @@ void __mee_controller_interrupt_vectored (struct mee_interrupt *controller, int 
     }
 
     if (enable) {
-        trap_entry = (unsigned long)&intc->mee_mtvec_table[0].handler;
+        trap_entry = (uintptr_t)&intc->mee_mtvec_table[0].handler;
         asm volatile ("csrw mtvec, %0" :: "r"(trap_entry | MEE_MTVEC_VECTORED));
     } else {
-        trap_entry = (unsigned long)&__mee_exception_handler;
+        trap_entry = (uintptr_t)&__mee_exception_handler;
         asm volatile ("csrw mtvec, %0" :: "r"(trap_entry));
     }
 }
@@ -185,7 +185,6 @@ int __mee_local_interrupt_enable (struct mee_interrupt *controller,
 				  mee_interrupt_id_e id, int enable)
 {
     int rc = 0;
-    unsigned long m;
   
     if ( !controller) {
         return -1;
@@ -572,20 +571,20 @@ int __mee_driver_cpu_exception_register(struct mee_cpu *cpu, int ecode,
     return -1;
 }
 
-int  __mee_driver_cpu_get_instruction_length(struct mee_cpu *cpu, unsigned long epc)
+int  __mee_driver_cpu_get_instruction_length(struct mee_cpu *cpu, uintptr_t epc)
 {
     /* Per ISA compressed instruction has last two bits of opcode set */
     return (*(unsigned short*)epc & 3) ? 4 : 2;
 }
 
-unsigned long  __mee_driver_cpu_get_exception_pc(struct mee_cpu *cpu)
+uintptr_t  __mee_driver_cpu_get_exception_pc(struct mee_cpu *cpu)
 {
-    unsigned long mepc;
+    uintptr_t mepc;
     asm volatile ("csrr %0, mepc" : "=r"(mepc));
     return mepc;
 }
 
-int  __mee_driver_cpu_set_exception_pc(struct mee_cpu *cpu, unsigned long mepc)
+int  __mee_driver_cpu_set_exception_pc(struct mee_cpu *cpu, uintptr_t mepc)
 {
     asm volatile ("csrw mepc, %0" :: "r"(mepc));
     return 0;
