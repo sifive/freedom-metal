@@ -19,8 +19,13 @@
 #define MEE_MTVEC_VECTORED       0x01
 #define MEE_MTVEC_CLIC           0x02
 #define MEE_MTVEC_CLIC_VECTORED  0x03
-#define MEE_MCAUSE_INTR          0x80000000UL // gen from mee-header!!
-#define MEE_MCAUSE_CAUSE         0x000003FFUL // gen from mee-header!!
+#if __riscv_xlen == 32
+#define MEE_MCAUSE_INTR          0x80000000UL
+#define MEE_MCAUSE_CAUSE         0x000003FFUL
+#else
+#define MEE_MCAUSE_INTR          0x8000000000000000UL
+#define MEE_MCAUSE_CAUSE         0x00000000000003FFUL
+#endif
 #define MEE_LOCAL_INTR(X)        (16 + X)
 #define MEE_MCAUSE_EVAL(cause)   (cause & MEE_MCAUSE_INTR)
 #define MEE_INTERRUPT(cause)     (MEE_MCAUSE_EVAL(cause) ? 1 : 0)
@@ -112,7 +117,7 @@ typedef struct __mee_interrupt_data {
 
 /* CPU interrupt controller */
 
-unsigned long __mee_myhart_id(void);
+uintptr_t __mee_myhart_id(void);
 
 struct __mee_driver_interrupt_controller_vtable {
     void (*interrupt_init)(struct mee_interrupt *controller);
@@ -178,9 +183,9 @@ int  __mee_driver_cpu_enable_interrupt_vector(struct mee_cpu *cpu);
 int  __mee_driver_cpu_disable_interrupt_vector(struct mee_cpu *cpu);
 int  __mee_driver_cpu_exception_register(struct mee_cpu *cpu, int ecode,
 					 mee_exception_handler_t isr);
-int  __mee_driver_cpu_get_instruction_length(struct mee_cpu *cpu, unsigned long epc);
-unsigned long  __mee_driver_cpu_get_exception_pc(struct mee_cpu *cpu);
-int  __mee_driver_cpu_set_exception_pc(struct mee_cpu *cpu, unsigned long epc);
+int  __mee_driver_cpu_get_instruction_length(struct mee_cpu *cpu, uintptr_t epc);
+uintptr_t  __mee_driver_cpu_get_exception_pc(struct mee_cpu *cpu);
+int  __mee_driver_cpu_set_exception_pc(struct mee_cpu *cpu, uintptr_t epc);
 
 __MEE_DECLARE_VTABLE(__mee_driver_vtable_cpu) = {
     .cpu_vtable.timer_get     = __mee_driver_cpu_timer_get,

@@ -5,6 +5,7 @@
 #ifndef MEE__CPU_H
 #define MEE__CPU_H
 
+#include <stdint.h>
 #include <mee/interrupt.h>
 
 struct mee_cpu;
@@ -25,9 +26,9 @@ struct mee_cpu_vtable {
     int (*get_msip)(struct mee_cpu *cpu, int hartid);
     struct mee_interrupt* (*controller_interrupt)(struct mee_cpu *cpu);
     int (*exception_register)(struct mee_cpu *cpu, int ecode, mee_exception_handler_t handler);
-    int (*get_ilen)(struct mee_cpu *cpu, unsigned long epc);
-    unsigned long (*get_epc)(struct mee_cpu *cpu);
-    int (*set_epc)(struct mee_cpu *cpu, unsigned long epc);
+    int (*get_ilen)(struct mee_cpu *cpu, uintptr_t epc);
+    uintptr_t (*get_epc)(struct mee_cpu *cpu);
+    int (*set_epc)(struct mee_cpu *cpu, uintptr_t epc);
 };
 
 struct mee_cpu {
@@ -75,13 +76,13 @@ inline struct mee_interrupt* mee_cpu_interrupt_controller(struct mee_cpu *cpu)
 inline int mee_cpu_exception_register(struct mee_cpu *cpu, int ecode, mee_exception_handler_t handler)
 { return cpu->vtable->exception_register(cpu, ecode, handler); }
 
-inline int mee_cpu_get_instruction_length(struct mee_cpu *cpu, unsigned long epc)
+inline int mee_cpu_get_instruction_length(struct mee_cpu *cpu, uintptr_t epc)
 { return cpu->vtable->get_ilen(cpu, epc); }
 
-inline unsigned long mee_cpu_get_exception_pc(struct mee_cpu *cpu)
+inline uintptr_t mee_cpu_get_exception_pc(struct mee_cpu *cpu)
 { return cpu->vtable->get_epc(cpu); }
 
-inline int mee_cpu_set_exception_pc(struct mee_cpu *cpu, unsigned long epc)
+inline int mee_cpu_set_exception_pc(struct mee_cpu *cpu, uintptr_t epc)
 { return cpu->vtable->set_epc(cpu, epc); }
 
 #endif
