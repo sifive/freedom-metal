@@ -7,6 +7,7 @@
  * will simply get the relevant error when actually trying to use the memory
  * that's been allocated. */
 extern char mee_segment_heap_target_start;
+extern char mee_segment_heap_target_end;
 static char *brk = &mee_segment_heap_target_start;
 
 int
@@ -20,6 +21,18 @@ char *
 _sbrk(ptrdiff_t incr)
 {
   char *old = brk;
-  brk += incr;
+
+  /* If __heap_size == 0, we can't allocate memory on the heap */
+  if(&mee_segment_heap_target_start == &mee_segment_heap_target_end) {
+    return NULL;
+  }
+
+  /* Don't move the break past the end of the heap */
+  if ((brk + incr) < &mee_segment_heap_target_end) {
+    brk += incr;
+  } else {
+    brk = &mee_segment_heap_target_end;
+  }
+
   return old;
 }
