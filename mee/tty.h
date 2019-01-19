@@ -4,8 +4,20 @@
 #ifndef MEE__TTY_H
 #define MEE__TTY_H
 
-/* Writes a character to to default output device, which is probably the serial
- * port.  This returns 0 on success, or -1 on failure. */
+/*!
+ * @file tty.h
+ * @brief API for emulated serial teriminals
+ */
+
+/*!
+ * @brief Write a character to the default output device
+ *
+ * Write a character to the default output device, which for most
+ * targets is the UART serial port.
+ * 
+ * @param c The character to write to the terminal
+ * @return 0 on success, or -1 on failure.
+ */
 int mee_tty_putc(unsigned char c);
 
 #endif
