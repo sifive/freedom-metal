@@ -12,9 +12,9 @@ struct mee_cpu* mee_cpu_get(int hartid)
     return NULL;
 }
 
-extern inline int mee_cpu_get_timer(struct mee_cpu *cpu, int hartid, unsigned long long *tv);
+extern inline unsigned long long mee_cpu_get_timer(struct mee_cpu *cpu);
 
-extern inline int mee_cpu_get_timebase(struct mee_cpu *cpu, unsigned long long *tb);
+extern inline unsigned long long mee_cpu_get_timebase(struct mee_cpu *cpu);
 
 extern inline unsigned long long mee_cpu_get_mtime(struct mee_cpu *cpu);
 

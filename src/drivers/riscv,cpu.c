@@ -351,43 +351,34 @@ int __mee_driver_riscv_cpu_controller_command_request (struct mee_interrupt *con
 
 /* CPU driver !!! */
 
-int __mee_driver_cpu_timer_get(struct mee_cpu *cpu,
-			       int hartid, unsigned long long *tv)
+unsigned long long __mee_driver_cpu_timer_get(struct mee_cpu *cpu)
 {
     unsigned long long val = 0;
-    int myhart;
 
-    asm volatile ("csrr %0, mhartid" : "=r"(myhart));
-    if (myhart == hartid) {
-    #if __riscv_xlen == 32
-        unsigned long hi, hi1, lo;
+#if __riscv_xlen == 32
+    unsigned long hi, hi1, lo;
 
-        asm volatile ("csrr %0, mcycleh" : "=r"(hi));
-        asm volatile ("csrr %0, mcycle" : "=r"(lo));
-        asm volatile ("csrr %0, mcycleh" : "=r"(hi1));
-	if (hi == hi1) {
-	    val = ((unsigned long long)hi << 32) | lo;
-        }
-    #else
-        asm volatile ("csrr %0, mcycle" : "=r"(val));
-    #endif
-
-	*tv = val;
-	return 0;
+    asm volatile ("csrr %0, mcycleh" : "=r"(hi));
+    asm volatile ("csrr %0, mcycle" : "=r"(lo));
+    asm volatile ("csrr %0, mcycleh" : "=r"(hi1));
+    if (hi == hi1) {
+        val = ((unsigned long long)hi << 32) | lo;
     }
-    return -1;
+#else
+    asm volatile ("csrr %0, mcycle" : "=r"(val));
+#endif
+
+    return val;
 }
 
-int __mee_driver_cpu_timebase_get(struct mee_cpu *cpu,
-				  unsigned long long *tb)
+unsigned long long __mee_driver_cpu_timebase_get(struct mee_cpu *cpu)
 {
     struct __mee_driver_cpu *_cpu = (void *)(cpu);
-
-    if (_cpu && tb) {
-        *tb = _cpu->timebase;
-	return 0;
+    if (!_cpu) {
+        return 0;
     }
-    return -1;
+
+    return _cpu->timebase;
 }
 
 unsigned long long  __mee_driver_cpu_mtime_get (struct mee_cpu *cpu)

@@ -20,8 +20,8 @@ struct mee_cpu;
 typedef void (*mee_exception_handler_t) (struct mee_cpu *cpu, int ecode);
 
 struct mee_cpu_vtable {
-    int (*timer_get)(struct mee_cpu *cpu, int hartid, unsigned long long *value);
-    int (*timebase_get)(struct mee_cpu *cpu, unsigned long long *value);
+    unsigned long long (*timer_get)(struct mee_cpu *cpu);
+    unsigned long long (*timebase_get)(struct mee_cpu *cpu);
     unsigned long long (*mtime_get)(struct mee_cpu *cpu);
     int (*mtimecmp_set)(struct mee_cpu *cpu, unsigned long long time);
     struct mee_interrupt* (*tmr_controller_interrupt)(struct mee_cpu *cpu);
@@ -56,23 +56,20 @@ struct mee_cpu* mee_cpu_get(int hartid);
  * Get the value of the cycle count timer for a given CPU
  *
  * @param cpu The CPU device handle
- * @param hartid The CPU hart ID
- * @param tv The variable to hold the timer value
- * @return 0 upon success
+ * @return The value of the CPU cycle count timer
  */
-inline int mee_cpu_get_timer(struct mee_cpu *cpu, int hartid, unsigned long long *tv)
-{ return cpu->vtable->timer_get(cpu, hartid, tv); }
+inline unsigned long long mee_cpu_get_timer(struct mee_cpu *cpu)
+{ return cpu->vtable->timer_get(cpu); }
 
 /*! @brief Get the timebase of the CPU
  *
  * Get the value of the timebase of the cycle count timer
  *
  * @param cpu The CPU device handle
- * @param tb The variable to hold the timebase value
- * @return 0 upon success
+ * @return The value of the cycle count timer timebase
  */
-inline int mee_cpu_get_timebase(struct mee_cpu *cpu, unsigned long long *tb)
-{ return cpu->vtable->timebase_get(cpu, tb); }
+inline unsigned long long mee_cpu_get_timebase(struct mee_cpu *cpu)
+{ return cpu->vtable->timebase_get(cpu); }
 
 /*! @brief Get the value of the mtime RTC
  *
