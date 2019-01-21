@@ -47,12 +47,12 @@ struct mee_clock {
     const struct __mee_clock_vtable *vtable;
 
     /* Pre-rate change callback */
-    mee_clock_pre_rate_change_callback pre_rate_change_callback;
-    void *pre_rate_change_callback_priv;
+    mee_clock_pre_rate_change_callback _pre_rate_change_callback;
+    void *_pre_rate_change_callback_priv;
 
     /* Post-rate change callback */
-    mee_clock_post_rate_change_callback post_rate_change_callback;
-    void *post_rate_change_callback_priv;
+    mee_clock_post_rate_change_callback _post_rate_change_callback;
+    void *_post_rate_change_callback_priv;
 };
 
 /*!
@@ -79,13 +79,13 @@ inline long mee_clock_get_rate_hz(const struct mee_clock *clk) { return clk->vta
  */
 inline long mee_clock_set_rate_hz(struct mee_clock *clk, long hz)
 {
-    if(clk->pre_rate_change_callback != NULL)
-        clk->pre_rate_change_callback(clk->pre_rate_change_callback_priv);
+    if(clk->_pre_rate_change_callback != NULL)
+        clk->_pre_rate_change_callback(clk->_pre_rate_change_callback_priv);
 
     long out = clk->vtable->set_rate_hz(clk, hz);
 
-    if (clk->post_rate_change_callback != NULL)
-        clk->post_rate_change_callback(clk->post_rate_change_callback_priv);
+    if (clk->_post_rate_change_callback != NULL)
+        clk->_post_rate_change_callback(clk->_post_rate_change_callback_priv);
 
     return out;
 }
@@ -99,8 +99,8 @@ inline long mee_clock_set_rate_hz(struct mee_clock *clk, long hz)
  */
 inline void mee_clock_register_pre_rate_change_callback(struct mee_clock *clk, mee_clock_pre_rate_change_callback cb, void *priv)
 {
-    clk->pre_rate_change_callback = cb;
-    clk->pre_rate_change_callback_priv = priv;
+    clk->_pre_rate_change_callback = cb;
+    clk->_pre_rate_change_callback_priv = priv;
 }
 
 /*!
@@ -112,8 +112,8 @@ inline void mee_clock_register_pre_rate_change_callback(struct mee_clock *clk, m
  */
 inline void mee_clock_register_post_rate_change_callback(struct mee_clock *clk, mee_clock_post_rate_change_callback cb, void *priv)
 {
-    clk->post_rate_change_callback = cb;
-    clk->post_rate_change_callback_priv = priv;
+    clk->_post_rate_change_callback = cb;
+    clk->_post_rate_change_callback_priv = priv;
 }
 
 #endif
