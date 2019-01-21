@@ -39,44 +39,10 @@ __mee_driver_sifive_uart0_interrupt_controller(struct mee_uart *uart)
     return (struct mee_interrupt *)uart0->interrupt_parent;
 }
 
-void __mee_driver_sifive_uart0_interrupt_init(struct mee_uart *uart)
-{
-    struct __mee_driver_sifive_uart0 *uart0 = (void *)uart;
-    if (uart0->interrupt_parent) {
-        struct mee_interrupt *intc = uart0->interrupt_parent;
-
-        intc->vtable->interrupt_init(intc);
-        intc->vtable->interrupt_register(intc, uart0->interrupt_line,
-					 NULL, uart);
-    }
-}
-
 int __mee_driver_sifive_uart0_get_interrupt_id(struct mee_uart *uart)
 {
     struct __mee_driver_sifive_uart0 *uart0 = (void *)uart;
     return (uart0->interrupt_line + MEE_INTERRUPT_ID_GL0);
-}
-
-int __mee_driver_sifive_uart0_enable_interrupt_id(struct mee_uart *uart, int id)
-{
-    struct __mee_driver_sifive_uart0 *uart0 = (void *)uart;
-    if ((uart0->interrupt_parent) && (id == uart0->interrupt_line)) {
-        struct mee_interrupt *intc = uart0->interrupt_parent;
-
-        return intc->vtable->interrupt_enable(intc, id);
-    }
-    return -1;
-}
-
-int __mee_driver_sifive_uart0_disable_interrupt_id(struct mee_uart *uart, int id)
-{
-    struct __mee_driver_sifive_uart0 *uart0 = (void *)uart;
-    if ((uart0->interrupt_parent) && (id == uart0->interrupt_line)) {
-        struct mee_interrupt *intc = uart0->interrupt_parent;
-
-        return intc->vtable->interrupt_disable(intc, id);
-    }
-    return -1;
 }
 
 int __mee_driver_sifive_uart0_putc(struct mee_uart *uart, unsigned char c)
