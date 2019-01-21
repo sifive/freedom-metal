@@ -14,9 +14,9 @@
 struct mee_switch;
 
 struct mee_switch_vtable {
-    int (*switch_exist)(struct mee_switch *flip, char *label);
-    struct mee_interrupt* (*interrupt_controller)(struct mee_switch *flip);
-    int (*get_interrupt_id)(struct mee_switch *flip);
+    int (*switch_exist)(struct mee_switch *sw, char *label);
+    struct mee_interrupt* (*interrupt_controller)(struct mee_switch *sw);
+    int (*get_interrupt_id)(struct mee_switch *sw);
 };
 
 /*!
@@ -35,17 +35,17 @@ struct mee_switch* mee_switch_get(char *label);
 
 /*!
  * @brief Get the interrupt controller for a switch
- * @param flip The handle for the switch
+ * @param sw The handle for the switch
  * @return The interrupt controller handle
  */
 inline struct mee_interrupt*
-    mee_switch_interrupt_controller(struct mee_switch *flip) { return flip->vtable->interrupt_controller(flip); }
+    mee_switch_interrupt_controller(struct mee_switch *sw) { return sw->vtable->interrupt_controller(sw); }
 
 /*!
  * @brief Get the interrupt id for a switch
- * @param flip The handle for the switch
+ * @param sw The handle for the switch
  * @return The interrupt ID for the switch
  */
-inline int mee_switch_get_interrupt_id(struct mee_switch *flip) { return flip->vtable->get_interrupt_id(flip); }
+inline int mee_switch_get_interrupt_id(struct mee_switch *sw) { return sw->vtable->get_interrupt_id(sw); }
 
 #endif
