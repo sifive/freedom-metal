@@ -86,11 +86,9 @@ inline int mee_interrupt_disable(struct mee_interrupt *controller, int id)
     return controller->vtable->interrupt_disable(controller, id);
 }
 
-/*!
- * @brief Internal use only
- */
-inline int mee_interrupt_command_request(struct mee_interrupt *controller,
-					 int cmd, void *data)
+/* Internal-use utility function for a given interrupt controller */
+inline int _mee_interrupt_command_request(struct mee_interrupt *controller,
+					  int cmd, void *data)
 {
     return controller->vtable->command_request(controller, cmd, data);
 }

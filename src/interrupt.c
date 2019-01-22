@@ -15,5 +15,5 @@ extern inline int mee_interrupt_enable(struct mee_interrupt *controller, int id)
 
 extern inline int mee_interrupt_disable(struct mee_interrupt *controller, int id);
 
-extern inline int mee_interrupt_command_request(struct mee_interrupt *controller,
+extern inline int _mee_interrupt_command_request(struct mee_interrupt *controller,
                                          	int cmd, void *data);
