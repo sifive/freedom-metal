@@ -4,13 +4,33 @@
 #ifndef MEE__TIMER_H
 #define MEE__TIMER_H
 
-/* Read the machine cycle counts from csrr register */
+/*!
+ * @file timer.h
+ * @brief API for reading and manipulating the machine timer
+ */
+
+/*!
+ * @brief Read the machine cycle count
+ * @param hartid The hart ID to read the cycle count of
+ * @param cyclecount The variable to hold the value
+ * @return 0 upon success
+ */
 int mee_timer_get_cyclecount(int hartid, unsigned long long *cyclecount);
 
-/* Get the machine timebase frequency, so number seconds can be calculate. */
+/*!
+ * @brief Get the machine timebase frequency
+ * @param hartid The hart ID to read the timebase of
+ * @param timebase The variable to hold the value
+ * @return 0 upon success
+ */
 int mee_timer_get_timebase_frequency(int hartid, unsigned long long *timebase);
 
-/* Set the machine timer tick interval in second. */
+/*! 
+ * @brief Set the machine timer tick interval in seconds
+ * @param hartid The hart ID to read the timebase of
+ * @param second The number of seconds to set the tick interval to
+ * @return 0 upon success
+ */
 int mee_timer_set_tick(int hartid, int second);
 
 #endif
