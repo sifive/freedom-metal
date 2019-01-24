@@ -149,9 +149,9 @@ static void mee_sifive_fe310_g000_pll_init(void) {
 void __mee_driver_sifive_fe310_g000_pll_init(struct __mee_driver_sifive_fe310_g000_pll *pll) {
     __mee_io_u32 *pllcfg = (__mee_io_u32 *) (pll->config_base->base + pll->config_offset);
 
-    /* If the PLL clock has had a pre_rate_change_callback configured, call it */
-    if(pll->clock.pre_rate_change_callback != NULL)
-        pll->clock.pre_rate_change_callback(pll->clock.pre_rate_change_callback_priv);
+    /* If the PLL clock has had a _pre_rate_change_callback configured, call it */
+    if(pll->clock._pre_rate_change_callback != NULL)
+        pll->clock._pre_rate_change_callback(pll->clock._pre_rate_change_callback_priv);
 
     /* If we're running off of the PLL, switch off before we start configuring it*/
     if((__MEE_ACCESS_ONCE(pllcfg) & PLL_SEL) == 0)
@@ -167,8 +167,8 @@ void __mee_driver_sifive_fe310_g000_pll_init(struct __mee_driver_sifive_fe310_g0
     pll->vtable->clock.set_rate_hz(&(pll->clock), pll->init_rate);
 
     /* If the PLL clock has had a rate_change_callback configured, call it */
-    if(pll->clock.post_rate_change_callback != NULL)
-        pll->clock.post_rate_change_callback(pll->clock.post_rate_change_callback_priv);
+    if(pll->clock._post_rate_change_callback != NULL)
+        pll->clock._post_rate_change_callback(pll->clock._post_rate_change_callback_priv);
 }
 
 long __mee_driver_sifive_fe310_g000_pll_get_rate_hz(const struct mee_clock *clock)
