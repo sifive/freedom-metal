@@ -10,6 +10,7 @@ Freedom Metal
    classes/cpu
    classes/interrupt
    classes/itim
+   classes/pmp
    classes/led
    classes/shutdown
    classes/switch
