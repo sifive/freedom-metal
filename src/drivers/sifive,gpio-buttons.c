@@ -29,11 +29,11 @@ int __mee_driver_button_get_interrupt_id(struct mee_button *button)
     struct __mee_driver_sifive_gpio_button *but = (void *)(button);
 
     if (but->interrupt_parent != NULL) {
-        max_irq = mee_interrupt_command_request(but->interrupt_parent,
+        max_irq = _mee_interrupt_command_request(but->interrupt_parent,
                                                 MEE_MAX_INTERRUPT_GET, NULL);
 
 	if (but->interrupt_line < max_irq) {
-            return mee_interrupt_command_request(but->interrupt_parent,
+            return _mee_interrupt_command_request(but->interrupt_parent,
                                                  MEE_INDEX_INTERRUPT_GET,
 						 (void *)&but->interrupt_line);
 	}

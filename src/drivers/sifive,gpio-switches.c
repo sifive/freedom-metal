@@ -29,11 +29,11 @@ int __mee_driver_switch_get_interrupt_id(struct mee_switch *flip)
     struct __mee_driver_sifive_gpio_switch *swch = (void *)(flip);
 
     if (swch->interrupt_parent != NULL) {
-        max_irq = mee_interrupt_command_request(swch->interrupt_parent,
+        max_irq = _mee_interrupt_command_request(swch->interrupt_parent,
                                                 MEE_MAX_INTERRUPT_GET, NULL);
 
         if (swch->interrupt_line < max_irq) {
-            return mee_interrupt_command_request(swch->interrupt_parent,
+            return _mee_interrupt_command_request(swch->interrupt_parent,
                                                  MEE_INDEX_INTERRUPT_GET,
                                                  (void *)&swch->interrupt_line);
 	}
