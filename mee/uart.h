@@ -20,10 +20,7 @@ struct mee_uart_vtable {
     int (*get_baud_rate)(struct mee_uart *uart);
     int (*set_baud_rate)(struct mee_uart *uart, int baud_rate);
     struct mee_interrupt* (*controller_interrupt)(struct mee_uart *uart);
-    void (*interrupt_init)(struct mee_uart *uart);
     int (*get_interrupt_id)(struct mee_uart *uart);
-    int (*enable_interrupt_id)(struct mee_uart *uart, int id);
-    int (*disable_interrupt_id)(struct mee_uart *uart, int id);
 };
 
 /*!
@@ -88,32 +85,10 @@ inline int mee_uart_set_baud_rate(struct mee_uart *uart, int baud_rate) { return
 inline struct mee_interrupt* mee_uart_interrupt_controller(struct mee_uart *uart) { return uart->vtable->controller_interrupt(uart); }
 
 /*!
- * @brief Initialize the UART interrupt controller
- * @param uart The UART device handle
- */
-inline void mee_uart_interrupt_init(struct mee_uart *uart) { uart->vtable->interrupt_init(uart); }
-
-/*!
  * @brief Get the interrupt ID of the UART controller
  * @param uart The UART device handle
  * @return The UART interrupt id
  */
 inline int mee_uart_get_interrupt_id(struct mee_uart *uart) { return uart->vtable->get_interrupt_id(uart); }
-
-/*!
- * @brief Enable the interrupt ID of the UART controller
- * @param uart The UART device handle
- * @param id The interrupt ID to enable
- * @return 0 upon success
- */
-inline int mee_uart_enable_interrupt_id(struct mee_uart *uart, int id) { return uart->vtable->enable_interrupt_id(uart, id); }
-
-/*!
- * @brief Disable the interrupt ID of the UART controller
- * @param uart The UART device handle
- * @param id The interrupt ID to disable
- * @return 0 upon success
- */
-inline int mee_uart_disable_interrupt_id(struct mee_uart *uart, int id) { return uart->vtable->disable_interrupt_id(uart, id); }
 
 #endif
