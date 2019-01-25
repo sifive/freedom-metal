@@ -163,8 +163,8 @@ struct __mee_driver_vtable_cpu {
   struct mee_cpu_vtable cpu_vtable;
 };
 
-int  __mee_driver_cpu_timer_get(struct mee_cpu *cpu, int hartid, unsigned long long *tv);
-int  __mee_driver_cpu_timebase_get(struct mee_cpu *cpu, unsigned long long *tb);
+unsigned long long  __mee_driver_cpu_timer_get(struct mee_cpu *cpu);
+unsigned long long  __mee_driver_cpu_timebase_get(struct mee_cpu *cpu);
 unsigned long long
       __mee_driver_cpu_mtime_get(struct mee_cpu *cpu);
 int  __mee_driver_cpu_mtimecmp_set(struct mee_cpu *cpu, unsigned long long time);

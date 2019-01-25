@@ -15,7 +15,8 @@ int mee_timer_get_cyclecount(int hartid, unsigned long long *mcc)
     struct mee_cpu *cpu = mee_cpu_get(hartid);
 
     if ( cpu ) {
-       return mee_cpu_get_timer(cpu, hartid, mcc);
+        *mcc = mee_cpu_get_timer(cpu);
+        return 0;
     }	
     return -1;
 }
@@ -25,7 +26,8 @@ int mee_timer_get_timebase_frequency(int hartid, unsigned long long *timebase)
     struct mee_cpu *cpu = mee_cpu_get(hartid);
 
     if ( cpu ) {
-       return mee_cpu_get_timebase(cpu, timebase);
+        *timebase = mee_cpu_get_timebase(cpu);
+        return 0;
     } 
     return -1;
 }
