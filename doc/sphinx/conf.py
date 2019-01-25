@@ -23,14 +23,8 @@ project = 'Freedom Metal'
 copyright = '2019, SiFive Inc.'
 author = 'SiFive Inc.'
 
-# The full version, including alpha/beta/rc tags
-release = ''
-
-# The short X.Y version
-if not release:
-    branch = os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
-    commit = os.popen("git rev-parse HEAD").read().strip()[:7]
-    version = branch + "-" + commit
+version = os.popen("git describe").read().strip()
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -105,7 +99,7 @@ html_static_path = ['metal_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
+html_sidebars = { '**': ['about.html', 'navigation.html', 'relations.html', 'searchbox.html']}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
