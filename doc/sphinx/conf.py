@@ -12,7 +12,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -23,10 +23,14 @@ project = 'Freedom Metal'
 copyright = '2019, SiFive Inc.'
 author = 'SiFive Inc.'
 
-# The short X.Y version
-version = ''
 # The full version, including alpha/beta/rc tags
 release = ''
+
+# The short X.Y version
+if not release:
+    branch = os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
+    commit = os.popen("git rev-parse HEAD").read().strip()[:7]
+    version = branch + "-" + commit
 
 
 # -- General configuration ---------------------------------------------------
@@ -101,6 +105,7 @@ html_static_path = ['metal_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
