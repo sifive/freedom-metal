@@ -9,5 +9,5 @@ The API documentation is split into sections corresponding to each feature:
 .. toctree::
    :glob:
 
-   classes/*
+   apiref/*
 
