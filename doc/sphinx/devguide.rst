@@ -1,4 +1,9 @@
 Developer Guide
 ===============
 
-Foo
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   devguide/*
+
