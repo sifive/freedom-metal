@@ -18,7 +18,16 @@ In Freedom Metal, the heirarchy is a tree. The nodes of the tree consist of
 
 And the vertices of the tree consist of interrupt ``id``.
 
-**TODO** Heirarchy Diagram
+.. digraph:: int_heirarchy_graph
+
+   cpu [label="CPU"];
+   cpu_int [label="CPU Interrupt Controller", shape=box];
+   timer_int [label="Timer Interrupt Controller", shape=box];
+   soft_int [label="Software Interrupt Controller", shape=box];
+
+   cpu -> cpu_int [label="ID = 0"];
+   cpu_int -> timer_int [label="ID = timer_id"];
+   cpu_int -> soft_int [label="ID = software_id"];
 
 The CPU Interrupt Controller
 ----------------------------
