@@ -12,7 +12,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -23,10 +23,8 @@ project = 'Freedom Metal'
 copyright = '2019, SiFive Inc.'
 author = 'SiFive Inc.'
 
-# The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = ''
+version = os.popen("git describe").read().strip()
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,7 +37,8 @@ release = ''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-        "breathe"
+        "breathe",
+        "sphinx.ext.graphviz"
 ]
 
 breathe_projects = {
@@ -101,6 +100,7 @@ html_static_path = ['metal_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+html_sidebars = { '**': ['about.html', 'navigation.html', 'relations.html', 'searchbox.html']}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------

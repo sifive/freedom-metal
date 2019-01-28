@@ -12,7 +12,7 @@ You'll need the following software:
 You can install the required software on Ubuntu with the following:
 
 ```
-sudo apt install doxygen python3-sphinx python3-breathe
+sudo apt install doxygen python3-sphinx python3-breathe graphviz python3-pydot
 sudo apt install texlive-full latexmk
 ```
 
@@ -23,7 +23,7 @@ The second line can be omitted if you don't intend to build the PDF.
 You can install the required software on MacOS with the following:
 
 ```
-brew install doxygen sphinx-doc
+brew install doxygen sphinx-doc graphviz
 brew cask install mactex
 ```
 

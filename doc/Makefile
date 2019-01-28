@@ -34,11 +34,6 @@ html: html/index.html
 html/index.html: xml/index.xml sphinx/*
 	sphinx-build -b html sphinx html
 
-.PHONY: clean-html
-clean-html:
-	rm -rf html
-clean: clean-html
-
 ##########################
 # Build XML Documentation
 ##########################
