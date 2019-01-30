@@ -1,6 +1,6 @@
 Interrupts
 ==========
 
-.. doxygenfile:: mee/interrupt.h
+.. doxygenfile:: metal/interrupt.h
    :project: metal
 

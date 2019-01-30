@@ -18,17 +18,17 @@ To initialize the Freedom Metal exception handlers, initialize CPU interrupts:
 
 .. code-block:: C
 
-   struct mee_cpu *cpu0 = mee_get_cpu(0);
+   struct metal_cpu *cpu0 = metal_get_cpu(0);
    if(!cpu) {
       /* There was an error acquiring the CPU hart 0 handle */
    }
 
-   struct mee_interrupt *cpu_int = mee_cpu_interrupt_controller(cpu0);
+   struct metal_interrupt *cpu_int = metal_cpu_interrupt_controller(cpu0);
    if(!cpu_int) {
       /* There was an error acquiring the CPU interrupt controller */
    }
 
-   mee_interrupt_init(cpu_int);
+   metal_interrupt_init(cpu_int);
 
 The Freedom Metal interrupt API is further documented in :doc:`/devguide/interrupts`
 and :doc:`/apiref/interrupt`.
@@ -38,7 +38,7 @@ Defining an Exception Handler
 
 Exception handlers must conform to the following function signature:
 
-.. doxygentypedef:: mee_exception_handler_t
+.. doxygentypedef:: metal_exception_handler_t
    :project: metal
    :no-link:
 
@@ -46,7 +46,7 @@ Therefore, an example exception handler might look like:
 
 .. code-block:: C
 
-   void my_exception_handler(struct mee_cpu *cpu, int ecode) {
+   void my_exception_handler(struct metal_cpu *cpu, int ecode) {
       /* Contents of handler */
    }
 
@@ -60,9 +60,9 @@ code.
 
    /* CPU Hart 0's interrupt controller must be initialized
     * if it is not already */
-   struct mee_cpu *cpu0 = mee_get_cpu(0);
+   struct metal_cpu *cpu0 = metal_get_cpu(0);
 
-   int rc = mee_cpu_exception_register(cpu0,
+   int rc = metal_cpu_exception_register(cpu0,
                <my_ecode>, /* Set to your desired value */
                my_exception_handler);
    if(rc != 0) {
@@ -82,17 +82,17 @@ the faulting instruction using the following method:
 
 .. code-block:: C
 
-   void return_after_fault(struct mee_cpu *cpu, int ecode)
+   void return_after_fault(struct metal_cpu *cpu, int ecode)
    {
       /* Get the faulting instruction address */
-      uintptr_t epc = mee_cpu_get_exception_pc(cpu);
+      uintptr_t epc = metal_cpu_get_exception_pc(cpu);
 
       /* Get the length of the faulting instruction */
-      size_t len = mee_cpu_get_instruction_length(cpu, epc);
+      size_t len = metal_cpu_get_instruction_length(cpu, epc);
 
       /* Advance stored exception program counter by the
        * instruction length */
-      mee_cpu_set_exception_pc(cpu, epc + len);
+      metal_cpu_set_exception_pc(cpu, epc + len);
    }
 
 Additional Documentation

@@ -1,6 +1,6 @@
 CPU
 ===
 
-.. doxygenfile:: mee/cpu.h
+.. doxygenfile:: metal/cpu.h
    :project: metal
 

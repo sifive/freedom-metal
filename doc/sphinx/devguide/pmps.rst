@@ -9,7 +9,7 @@ The PMP defines a finite number of PMP regions which can be individually configu
 to enforce access permissions to a range of addresses in memory. Each PMP region
 is configurable with the following options:
 
-.. doxygenstruct:: mee_pmp_config
+.. doxygenstruct:: metal_pmp_config
    :project: metal
    :members:
    :no-link:
@@ -21,7 +21,7 @@ All PMP-related functions first depend on having a handle to the PMP device:
 
 .. code-block:: C
 
-   struct mee_pmp *pmp = mee_pmp_get_device();
+   struct metal_pmp *pmp = metal_pmp_get_device();
    if(!pmp) {
       /* Failed to get PMP device handle */
    }
@@ -31,11 +31,11 @@ if possible:
 
 .. code-block:: C
 
-   mee_pmp_init(pmp);
+   metal_pmp_init(pmp);
 
 The number of PMP regions available can be retrieved from the PMP device handle:
 
-.. doxygenstruct:: mee_pmp
+.. doxygenstruct:: metal_pmp
    :project: metal
    :members:
    :no-link:
@@ -46,7 +46,7 @@ Configuring a PMP Region
 Freedom Metal has a set of APIs for configuring a PMP region. The most generic of these
 is
 
-.. doxygenfunction:: mee_pmp_set_region
+.. doxygenfunction:: metal_pmp_set_region
    :project: metal
 
 This function allows for the configuration of all PMP region settings.
@@ -54,13 +54,13 @@ This function allows for the configuration of all PMP region settings.
 Additional APIs are provided for granularly changing individual PMP region settings.
 For example:
 
-.. doxygenfunction:: mee_pmp_set_address
+.. doxygenfunction:: metal_pmp_set_address
    :project: metal
    :no-link:
-.. doxygenfunction:: mee_pmp_lock
+.. doxygenfunction:: metal_pmp_lock
    :project: metal
    :no-link:
-.. doxygenfunction:: mee_pmp_set_writeable
+.. doxygenfunction:: metal_pmp_set_writeable
    :project: metal
    :no-link:
 

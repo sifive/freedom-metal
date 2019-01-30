@@ -11,9 +11,9 @@ by the target's DeviceTree representation, which can be found in
 ``bsp/<target-name>/design.dts``.
 
 In Freedom Metal, the heirarchy is a tree. The nodes of the tree consist of
-``struct mee_interrupt``:
+``struct metal_interrupt``:
 
-.. doxygenstruct:: mee_interrupt
+.. doxygenstruct:: metal_interrupt
    :project: metal
 
 And the vertices of the tree consist of interrupt ``id``.
@@ -37,15 +37,15 @@ initialized before any other interrupt controllers are initialized. In example:
 
 .. code-block:: C
 
-   struct mee_cpu *cpu0 = mee_get_cpu(0);
+   struct metal_cpu *cpu0 = metal_get_cpu(0);
    if(!cpu) {
       /* Unable to get CPU handle */
    }
-   struct mee_interrupt *cpu_int = mee_cpu_interrupt_controller(cpu0);
+   struct metal_interrupt *cpu_int = metal_cpu_interrupt_controller(cpu0);
    if(!cpu_int) {
       /* Unable to get CPU interrupt handle */
    }
-   mee_interrupt_init(cpu_int);
+   metal_interrupt_init(cpu_int);
 
 The CPU interrupt must be enabled for the CPU to receive any interrupts, and any
 enabled interrupts can be masked by disabling the CPU interrupt.
@@ -55,13 +55,13 @@ enabled interrupts can be masked by disabling the CPU interrupt.
    int rc = 0;
 
    /* Enable the CPU interrupt */
-   rc = mee_interrupt_enable(cpu_int, 0);
+   rc = metal_interrupt_enable(cpu_int, 0);
    if(rc != 0) {
       /* Failed to enable the CPU interrupt */
    }
 
    /* Disable the CPU interrupt */
-   rc = mee_interrupt_disable(cpu_int, 0);
+   rc = metal_interrupt_disable(cpu_int, 0);
    if(rc != 0) {
       /* Failed to disable the CPU interrupt */
    }
@@ -71,7 +71,7 @@ Interrupt Handlers
 
 Interrupt handlers must conform to the following function signature:
 
-.. doxygentypedef:: mee_interrupt_handler_t
+.. doxygentypedef:: metal_interrupt_handler_t
    :project: metal
 
 Therefore, an interrupt handler might look like:
@@ -90,15 +90,15 @@ they are servicing. For example, if we want to register a CPU timer interrupt:
 
 .. code-block:: C
 
-   struct mee_interrupt *timer_int = mee_cpu_timer_interrupt_controller(cpu0);
+   struct metal_interrupt *timer_int = metal_cpu_timer_interrupt_controller(cpu0);
    if(!timer_int) {
       /* Failed to get timer interrupt controller */
    }
-   mee_interrupt_init(timer_int);
+   metal_interrupt_init(timer_int);
 
-   int timer_id = mee_cpu_timer_get_interrupt_id(cpu0);
+   int timer_id = metal_cpu_timer_get_interrupt_id(cpu0);
 
-   int rc = mee_interrupt_register_handler(timer_int, timer_id, my_interrupt_handler, cpu0);
+   int rc = metal_interrupt_register_handler(timer_int, timer_id, my_interrupt_handler, cpu0);
    if(rc != 0) {
       /* Failed to register interrupt handler */
    }
