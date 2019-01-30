@@ -38,7 +38,7 @@ html/index.html: xml/index.xml sphinx/*
 # Build XML Documentation
 ##########################
 
-xml/index.xml: ../mee/*.h
+xml/index.xml: ../metal/*.h
 	cd .. && doxygen
 
 .PHONY: clean
