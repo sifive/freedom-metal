@@ -5,12 +5,12 @@
 # instead of enforcing the dependency on the .o we pretend that the C file
 # itself depends on the header.  This is the only way I could figure out that
 # would satisfy the dependency inside automake.
-%.c: mee/machine/@MACHINE_NAME@.h
-%.S: mee/machine/@MACHINE_NAME@.h
-%.o: mee/machine/@MACHINE_NAME@.h
-%.c: riscv__menv__mee.specs
-%.S: riscv__menv__mee.specs
-%.o: riscv__menv__mee.specs
+%.c: metal/machine/@MACHINE_NAME@.h
+%.S: metal/machine/@MACHINE_NAME@.h
+%.o: metal/machine/@MACHINE_NAME@.h
+%.c: riscv__menv__metal.specs
+%.S: riscv__menv__metal.specs
+%.o: riscv__menv__metal.specs
 %.c: riscv__mmachine__@MACHINE_NAME@.specs
 %.S: riscv__mmachine__@MACHINE_NAME@.specs
 %.o: riscv__mmachine__@MACHINE_NAME@.specs
@@ -48,8 +48,8 @@ riscv__mmachine__@MACHINE_NAME@.specs: @SPECS_GENERATOR@ @MACHINE_NAME@.dtb
 	$< --dtb $(filter %.dtb,$^) --specs $@ --prefix @prefix@ --machine @MACHINE_NAME@
 endif # PRECONFIGURED
 
-spec_DATA += riscv__menv__mee.specs
-riscv__menv__mee.specs: riscv__menv__mee.specs.in
+spec_DATA += riscv__menv__metal.specs
+riscv__menv__metal.specs: riscv__menv__metal.specs.in
 	cat $^ > $@
 
 # In order to generate code that's actually compatible with a machine we must
@@ -68,42 +68,42 @@ endif # PRECONFIGURED
 # Install some MEE-specific headers, one of which is automatically generated.
 # The files that aren't automatically generated are the same for all machines.
 nobase_include_HEADERS = \
-	mee/machine/@MACHINE_NAME@.h \
-	mee/drivers/fixed-clock.h \
-	mee/drivers/sifive,fe310-g000,hfrosc.h \
-	mee/drivers/sifive,fe310-g000,hfxosc.h \
-	mee/drivers/sifive,fe310-g000,pll.h \
-	mee/drivers/sifive,fe310-g000,prci.h \
-	mee/drivers/sifive,gpio0.h \
-	mee/drivers/sifive,uart0.h \
-	mee/drivers/sifive,test0.h \
-	mee/drivers/sifive,local-external-interrupts0.h \
-	mee/drivers/sifive,global-external-interrupts0.h \
-	mee/drivers/sifive,gpio-leds.h \
-	mee/drivers/sifive,gpio-buttons.h \
-	mee/drivers/sifive,gpio-switches.h \
-	mee/drivers/riscv,cpu.h \
-	mee/drivers/sifive,clic0.h \
-	mee/drivers/riscv,clint0.h \
-	mee/drivers/riscv,plic0.h \
-	mee/compiler.h \
-	mee/clock.h \
-	mee/itim.h \
-	mee/io.h \
-	mee/machine.h \
-	mee/shutdown.h \
-	mee/pmp.h \
-	mee/tty.h \
-	mee/uart.h \
-	mee/timer.h \
-	mee/cpu.h \
-	mee/led.h \
-	mee/button.h \
-	mee/switch.h \
-	mee/interrupt.h
+	metal/machine/@MACHINE_NAME@.h \
+	metal/drivers/fixed-clock.h \
+	metal/drivers/sifive,fe310-g000,hfrosc.h \
+	metal/drivers/sifive,fe310-g000,hfxosc.h \
+	metal/drivers/sifive,fe310-g000,pll.h \
+	metal/drivers/sifive,fe310-g000,prci.h \
+	metal/drivers/sifive,gpio0.h \
+	metal/drivers/sifive,uart0.h \
+	metal/drivers/sifive,test0.h \
+	metal/drivers/sifive,local-external-interrupts0.h \
+	metal/drivers/sifive,global-external-interrupts0.h \
+	metal/drivers/sifive,gpio-leds.h \
+	metal/drivers/sifive,gpio-buttons.h \
+	metal/drivers/sifive,gpio-switches.h \
+	metal/drivers/riscv,cpu.h \
+	metal/drivers/sifive,clic0.h \
+	metal/drivers/riscv,clint0.h \
+	metal/drivers/riscv,plic0.h \
+	metal/compiler.h \
+	metal/clock.h \
+	metal/itim.h \
+	metal/io.h \
+	metal/machine.h \
+	metal/shutdown.h \
+	metal/pmp.h \
+	metal/tty.h \
+	metal/uart.h \
+	metal/timer.h \
+	metal/cpu.h \
+	metal/led.h \
+	metal/button.h \
+	metal/switch.h \
+	metal/interrupt.h
 
 if PRECONFIGURED
-mee/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
+metal/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
 	@mkdir -p $(dir $@)
 	cp $< $@
 else # !PRECONFIGURED
@@ -115,7 +115,7 @@ else # !PRECONFIGURED
 @MACHINE_NAME@.dtb: @DTC@ @MACHINE_DTS@
 	$< $(filter %.dts,$^) -o $@ -O dtb -I dts
 
-mee/machine/@MACHINE_NAME@.h: @MEE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
+metal/machine/@MACHINE_NAME@.h: @MEE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
 	@mkdir -p $(dir $@)
 	$< --dtb $(filter %.dtb,$^) --output $@
 endif # PRECONFIGURED
@@ -166,9 +166,9 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 # --with-builtin-libgloss is passed to configure.
 if WITH_BUILTIN_LIBGLOSS
 
-lib_LIBRARIES += libriscv__menv__mee.a
+lib_LIBRARIES += libriscv__menv__metal.a
 
-libriscv__menv__mee_a_SOURCES = \
+libriscv__menv__metal_a_SOURCES = \
 	gloss/nanosleep.c \
 	gloss/sys_access.c \
 	gloss/sys_chdir.c \
@@ -234,5 +234,5 @@ pll_set_hz_LDFLAGS    = -L. -Wl,--gc-sections -Wl,-Map=pll_set_hz.map
 # Extra clean targets
 clean-local:
 	-rm -rf @MACHINE_NAME@.mk
-	-rm -rf mee/machine/@MACHINE_NAME@.h @MACHINE_NAME@.dtb mee-@MACHINE_NAME@.lds
+	-rm -rf metal/machine/@MACHINE_NAME@.h @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
 	-rm -rf *.map *.specs
