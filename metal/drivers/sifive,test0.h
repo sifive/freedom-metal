@@ -1,27 +1,27 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef MEE__DRIVERS__SIFIVE_TEST0_H
-#define MEE__DRIVERS__SIFIVE_TEST0_H
+#ifndef METAL__DRIVERS__SIFIVE_TEST0_H
+#define METAL__DRIVERS__SIFIVE_TEST0_H
 
-#include <mee/compiler.h>
-#include <mee/shutdown.h>
+#include <metal/compiler.h>
+#include <metal/shutdown.h>
 
-struct __mee_driver_vtable_sifive_test0 {
-    const struct __mee_shutdown_vtable shutdown;
+struct __metal_driver_vtable_sifive_test0 {
+    const struct __metal_shutdown_vtable shutdown;
 };
 
-struct __mee_driver_sifive_test0;
+struct __metal_driver_sifive_test0;
 
-void __mee_driver_sifive_test0_exit(const struct __mee_shutdown *test, int code) __attribute__((noreturn));
+void __metal_driver_sifive_test0_exit(const struct __metal_shutdown *test, int code) __attribute__((noreturn));
 
-__MEE_DECLARE_VTABLE(__mee_driver_vtable_sifive_test0) = {
-    .shutdown.exit       = &__mee_driver_sifive_test0_exit,
+__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_test0) = {
+    .shutdown.exit       = &__metal_driver_sifive_test0_exit,
 };
 
-struct __mee_driver_sifive_test0 {
-    struct __mee_shutdown shutdown;
-    const struct __mee_driver_vtable_sifive_test0 *vtable;
+struct __metal_driver_sifive_test0 {
+    struct __metal_shutdown shutdown;
+    const struct __metal_driver_vtable_sifive_test0 *vtable;
     const unsigned long base;
     const unsigned long size;
 };

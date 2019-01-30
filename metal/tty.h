@@ -1,8 +1,8 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef MEE__TTY_H
-#define MEE__TTY_H
+#ifndef METAL__TTY_H
+#define METAL__TTY_H
 
 /*!
  * @file tty.h
@@ -18,6 +18,6 @@
  * @param c The character to write to the terminal
  * @return 0 on success, or -1 on failure.
  */
-int mee_tty_putc(unsigned char c);
+int metal_tty_putc(unsigned char c);
 
 #endif

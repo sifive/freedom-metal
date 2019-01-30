@@ -8,7 +8,7 @@ AM_MAINTAINER_MODE([disable])
 AC_CONFIG_MACRO_DIRS([m4])
 
 # This library is actually an integral part of the toolchain build process on
-# MEE toolchains as it's necessary to link any program.  To prevent this from
+# METAL toolchains as it's necessary to link any program.  To prevent this from
 # causing every autoconf test failing we instead place some weak symbols in
 # confdefs.h to trick the toolchain into linking.
 #
@@ -67,7 +67,7 @@ AC_ARG_WITH([preconfigured],
 )
 
 AC_ARG_WITH([builtin-libgloss],
-    [AS_HELP_STRING([--with-bultin-libgloss], [Build libgloss along with the MEE])],
+    [AS_HELP_STRING([--with-bultin-libgloss], [Build libgloss along with the METAL])],
     [with_builtin_libgloss="yes"],
     [with_builtin_libgloss="no"]
 )
@@ -110,14 +110,14 @@ AC_ARG_WITH([dtc],
 AC_ARG_VAR(DTC, [The absolute path to dtc])
 
 # Allows users to specify a path to freedom-metal_header-generator, which
-# generates MEE paramaterization headers from the device tree.
+# generates METAL paramaterization headers from the device tree.
 AC_ARG_WITH([metal-header-generator],
     [AS_HELP_STRING([--with-metal-header-generator=PATH], [Use the given path to freedom-metal_header-generator])],
     [],
     [with_metal_header_generator=check]
 )
 
-AC_ARG_VAR(MEE_HEADER_GENERATOR, [The absolute path of the freedom-metal_header-generator])
+AC_ARG_VAR(METAL_HEADER_GENERATOR, [The absolute path of the freedom-metal_header-generator])
 
 # Allows users to specify a path to freedom-ldscript-generator, which generates
 # linker scripts that are more suitable for embedded development than the
@@ -143,7 +143,7 @@ AC_ARG_WITH([makeattributes-generator],
 AC_ARG_VAR(MAKEATTRIBUTES_GENERATOR, [The absolute path of the freedom-makeattributes-generator])
 
 # Allows users to specify a path to freedom-metal_specs-generator, which
-# generates GCC spec files to control the compilation of MEE based targets.
+# generates GCC spec files to control the compilation of METAL based targets.
 AC_ARG_WITH([metal_specs-generator],
     [AS_HELP_STRING([--with-metal_specs-generator=PATH], [Use the given path to freedom-metal_specs-generator])],
     [],
@@ -191,11 +191,11 @@ AS_IF([test "x$with_preconfigured" = "xyes"],
     )
 
     AS_IF([test "x$with_metal_header_generator" == "xcheck"],
-        [AC_PATH_PROG(MEE_HEADER_GENERATOR, freedom-metal_header-generator, [no])],
-        [MEE_HEADER_GENERATOR=$with_metal_header_generator]
+        [AC_PATH_PROG(METAL_HEADER_GENERATOR, freedom-metal_header-generator, [no])],
+        [METAL_HEADER_GENERATOR=$with_metal_header_generator]
     )
-    AS_IF([test "x$MEE_HEADER_GENERATOR" != "xno"],
-        [AC_SUBST([MEE_HEADER_GENERATOR], "$MEE_HEADER_GENERATOR")],
+    AS_IF([test "x$METAL_HEADER_GENERATOR" != "xno"],
+        [AC_SUBST([METAL_HEADER_GENERATOR], "$METAL_HEADER_GENERATOR")],
         [AC_MSG_ERROR([Unable to find freedom-metal_header-generator, either place it in PATH or try the --with-metal-header-generator argument.])]
     )
 
@@ -227,11 +227,11 @@ AS_IF([test "x$with_preconfigured" = "xyes"],
     )
 ])
 
-# Check for the additional compiler flags provided by the MEE toolchains,
+# Check for the additional compiler flags provided by the METAL toolchains,
 # directly substituting in the relevant 
 AX_CHECK_COMPILE_FLAG([mmachine=$machine_name],
     [mmachine_machine_name="-mmachine=$machine_name"],
-    [mmachine_machine_name="-D__MEE_MACHINE_HEADER=\\\"$with_machine_header\\\""]
+    [mmachine_machine_name="-D__METAL_MACHINE_HEADER=\\\"$with_machine_header\\\""]
 #    [mmachine_machine_name="-mmachine=$with_machine_name"]
 )
 
@@ -242,7 +242,7 @@ AX_CHECK_COMPILE_FLAG([menv=metal],
     [menv_metal="-lriscv_metal_$machine_name"]
 )
 
-AC_SUBST([MENV_MEE], "$menv_metal")
+AC_SUBST([MENV_METAL], "$menv_metal")
 
 # Generates the remainder of the build system.
 AC_CONFIG_FILES([Makefile])

@@ -1,42 +1,42 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <mee/machine.h>
-#include <mee/pmp.h>
+#include <metal/machine.h>
+#include <metal/pmp.h>
 
 #define CONFIG_TO_INT(_config) (*((size_t *) &(_config)))
-#define INT_TO_CONFIG(_int) (*((struct mee_pmp_config *) &(_int)))
+#define INT_TO_CONFIG(_int) (*((struct metal_pmp_config *) &(_int)))
 
-struct mee_pmp *mee_pmp_get_device(void)
+struct metal_pmp *metal_pmp_get_device(void)
 {
-#ifdef __MEE_DT_PMP_HANDLE
-    return __MEE_DT_PMP_HANDLE;
+#ifdef __METAL_DT_PMP_HANDLE
+    return __METAL_DT_PMP_HANDLE;
 #else
     return NULL;
 #endif
 }
 
-void mee_pmp_init(struct mee_pmp *pmp)
+void metal_pmp_init(struct metal_pmp *pmp)
 {
-    struct mee_pmp_config init_config = {
-        .L = MEE_PMP_UNLOCKED,
-        .A = MEE_PMP_OFF,
+    struct metal_pmp_config init_config = {
+        .L = METAL_PMP_UNLOCKED,
+        .A = METAL_PMP_OFF,
         .X = 0,
         .W = 0,
         .R = 0,
     };
 
     for(unsigned int i = 0; i < pmp->num_regions; i++) {
-        mee_pmp_set_region(pmp, i, init_config, 0);
+        metal_pmp_set_region(pmp, i, init_config, 0);
     }
 }
 
-int mee_pmp_set_region(struct mee_pmp *pmp,
+int metal_pmp_set_region(struct metal_pmp *pmp,
                        unsigned int region,
-                       struct mee_pmp_config config,
+                       struct metal_pmp_config config,
                        size_t address)
 {
-    struct mee_pmp_config old_config;
+    struct metal_pmp_config old_config;
     size_t old_address;
     size_t cfgmask;
     size_t pmpcfg;
@@ -52,13 +52,13 @@ int mee_pmp_set_region(struct mee_pmp *pmp,
         return 2;
     }
 
-    rc = mee_pmp_get_region(pmp, region, &old_config, &old_address);
+    rc = metal_pmp_get_region(pmp, region, &old_config, &old_address);
     if(rc) {
         /* Error reading region */
         return rc;
     }
 
-    if(old_config.L == MEE_PMP_LOCKED) {
+    if(old_config.L == METAL_PMP_LOCKED) {
         /* Cannot modify locked region */
         return 3;
     }
@@ -201,9 +201,9 @@ int mee_pmp_set_region(struct mee_pmp *pmp,
     return 0;
 }
 
-int mee_pmp_get_region(struct mee_pmp *pmp,
+int metal_pmp_get_region(struct metal_pmp *pmp,
                        unsigned int region,
-                       struct mee_pmp_config *config,
+                       struct metal_pmp_config *config,
                        size_t *address)
 {
     size_t pmpcfg = 0;
@@ -330,167 +330,167 @@ int mee_pmp_get_region(struct mee_pmp *pmp,
     return 0;
 }
 
-int mee_pmp_lock(struct mee_pmp *pmp, unsigned int region)
+int metal_pmp_lock(struct metal_pmp *pmp, unsigned int region)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = mee_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(pmp, region, &config, &address);
     if(rc) {
         return rc;
     }
 
-    if(config.L == MEE_PMP_LOCKED) {
+    if(config.L == METAL_PMP_LOCKED) {
         return 0;
     }
 
-    config.L = MEE_PMP_LOCKED;
+    config.L = METAL_PMP_LOCKED;
 
-    rc = mee_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(pmp, region, config, address);
 
     return rc;
 }
 
 
-int mee_pmp_set_address(struct mee_pmp *pmp, unsigned int region, size_t address)
+int metal_pmp_set_address(struct metal_pmp *pmp, unsigned int region, size_t address)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t old_address;
     int rc = 0;
 
-    rc = mee_pmp_get_region(pmp, region, &config, &old_address);
+    rc = metal_pmp_get_region(pmp, region, &config, &old_address);
     if(rc) {
         return rc;
     }
 
-    rc = mee_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(pmp, region, config, address);
 
     return rc;
 }
 
-size_t mee_pmp_get_address(struct mee_pmp *pmp, unsigned int region)
+size_t metal_pmp_get_address(struct metal_pmp *pmp, unsigned int region)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address = 0;
 
-    mee_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(pmp, region, &config, &address);
 
     return address;
 }
 
 
-int mee_pmp_set_address_mode(struct mee_pmp *pmp, unsigned int region, enum mee_pmp_address_mode mode)
+int metal_pmp_set_address_mode(struct metal_pmp *pmp, unsigned int region, enum metal_pmp_address_mode mode)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = mee_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(pmp, region, &config, &address);
     if(rc) {
         return rc;
     }
 
     config.A = mode;
 
-    rc = mee_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(pmp, region, config, address);
 
     return rc;
 }
 
-enum mee_pmp_address_mode mee_pmp_get_address_mode(struct mee_pmp *pmp, unsigned int region)
+enum metal_pmp_address_mode metal_pmp_get_address_mode(struct metal_pmp *pmp, unsigned int region)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address = 0;
 
-    mee_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(pmp, region, &config, &address);
 
     return config.A;
 }
 
 
-int mee_pmp_set_executable(struct mee_pmp *pmp, unsigned int region, int X)
+int metal_pmp_set_executable(struct metal_pmp *pmp, unsigned int region, int X)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = mee_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(pmp, region, &config, &address);
     if(rc) {
         return rc;
     }
 
     config.X = X;
 
-    rc = mee_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(pmp, region, config, address);
 
     return rc;
 }
 
-int mee_pmp_get_executable(struct mee_pmp *pmp, unsigned int region)
+int metal_pmp_get_executable(struct metal_pmp *pmp, unsigned int region)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address = 0;
 
-    mee_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(pmp, region, &config, &address);
 
     return config.X;
 }
 
 
-int mee_pmp_set_writeable(struct mee_pmp *pmp, unsigned int region, int W)
+int metal_pmp_set_writeable(struct metal_pmp *pmp, unsigned int region, int W)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = mee_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(pmp, region, &config, &address);
     if(rc) {
         return rc;
     }
 
     config.W = W;
 
-    rc = mee_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(pmp, region, config, address);
 
     return rc;
 }
 
-int mee_pmp_get_writeable(struct mee_pmp *pmp, unsigned int region)
+int metal_pmp_get_writeable(struct metal_pmp *pmp, unsigned int region)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address = 0;
 
-    mee_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(pmp, region, &config, &address);
 
     return config.W;
 }
 
 
-int mee_pmp_set_readable(struct mee_pmp *pmp, unsigned int region, int R)
+int metal_pmp_set_readable(struct metal_pmp *pmp, unsigned int region, int R)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = mee_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(pmp, region, &config, &address);
     if(rc) {
         return rc;
     }
 
     config.R = R;
 
-    rc = mee_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(pmp, region, config, address);
 
     return rc;
 }
 
-int mee_pmp_get_readable(struct mee_pmp *pmp, unsigned int region)
+int metal_pmp_get_readable(struct metal_pmp *pmp, unsigned int region)
 {
-    struct mee_pmp_config config;
+    struct metal_pmp_config config;
     size_t address = 0;
 
-    mee_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(pmp, region, &config, &address);
 
     return config.R;
 }

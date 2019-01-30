@@ -1,32 +1,32 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef MEE__BUTTON_H
-#define MEE__BUTTON_H
+#ifndef METAL__BUTTON_H
+#define METAL__BUTTON_H
 
 /*!
  * @file button.h
  * API for interfacing with physical buttons
  */
 
-#include <mee/interrupt.h>
+#include <metal/interrupt.h>
 
-struct mee_button;
+struct metal_button;
 
-struct mee_button_vtable {
-    int (*button_exist)(struct mee_button *button, char *label);
-    struct mee_interrupt* (*interrupt_controller)(struct mee_button *button);
-    int (*get_interrupt_id)(struct mee_button *button);
+struct metal_button_vtable {
+    int (*button_exist)(struct metal_button *button, char *label);
+    struct metal_interrupt* (*interrupt_controller)(struct metal_button *button);
+    int (*get_interrupt_id)(struct metal_button *button);
 };
 
 /*!
  * @brief A button device handle
  *
- * A `struct mee_button` is an implementation-defined object which represents
+ * A `struct metal_button` is an implementation-defined object which represents
  * a button on a development board.
  */
-struct mee_button {
-    const struct mee_button_vtable *vtable;
+struct metal_button {
+    const struct metal_button_vtable *vtable;
 };
 
 /*!
@@ -35,7 +35,7 @@ struct mee_button {
  * @param label The DeviceTree label for the button
  * @return A handle for the button
  */
-struct mee_button* mee_button_get(char *label);
+struct metal_button* metal_button_get(char *label);
 
 
 /*!
@@ -45,8 +45,8 @@ struct mee_button* mee_button_get(char *label);
  * @return A pointer to the interrupt controller responsible for handling
  * button interrupts.
  */
-inline struct mee_interrupt*
-    mee_button_interrupt_controller(struct mee_button *button) { return button->vtable->interrupt_controller(button); }
+inline struct metal_interrupt*
+    metal_button_interrupt_controller(struct metal_button *button) { return button->vtable->interrupt_controller(button); }
 
 /*!
  * @brief Get the interrupt id for a button
@@ -54,6 +54,6 @@ inline struct mee_interrupt*
  * @param button The handle for the button
  * @return The interrupt id corresponding to a button.
  */
-inline int mee_button_get_interrupt_id(struct mee_button *button) { return button->vtable->get_interrupt_id(button); }
+inline int metal_button_get_interrupt_id(struct metal_button *button) { return button->vtable->get_interrupt_id(button); }
 
 #endif

@@ -4,9 +4,9 @@
 /* This code executes before _start, which is contained inside the C library.
  * In embedded systems we want to ensure that _enter, which contains the first
  * code to be executed, can be loaded at a specific address.  To enable this
- * feature we provide the '.text.mee.init.enter' section, which is
+ * feature we provide the '.text.metal.init.enter' section, which is
  * defined to have the first address being where execution should start. */
-.section .text.mee.init.enter
+.section .text.metal.init.enter
 .global _enter
 _enter:
     .cfi_startproc
@@ -34,17 +34,17 @@ _enter:
      * which is left as a weak reference in order to allow initialization
      * routines that do not need a stack to be set up to transparently be
      * called. */
-    .weak __mee_stack_pointer
-    la sp, __mee_stack_pointer
+    .weak __metal_stack_pointer
+    la sp, __metal_stack_pointer
 
     /* Check for an initialization routine and call it if one exists, otherwise
-     * just skip over the call entirely.   Note that __mee_initialize isn't
+     * just skip over the call entirely.   Note that __metal_initialize isn't
      * actually a full C function, as it doesn't end up with the .bss or .data
      * segments having been initialized.  This is done to avoid putting a
      * burden on systems that can be initialized without having a C environment
      * set up. */
-    .weak __mee_before_start
-    la ra, __mee_before_start
+    .weak __metal_before_start
+    la ra, __metal_before_start
     beqz ra, 1f
     jalr ra
 1:
@@ -58,9 +58,9 @@ _enter:
     call _start
 
     /* If we've made it back here then there's probably something wrong.  We
-     * allow the MEE to register a handler here. */
-    .weak __mee_after_main
-    la ra, __mee_after_main
+     * allow the METAL to register a handler here. */
+    .weak __metal_after_main
+    la ra, __metal_after_main
     beqz ra, 1f
     jalr ra
 1:
@@ -77,7 +77,7 @@ _enter:
 
 /* For sanity's sake we set up an early trap vector that just does nothing.  If
  * you end up here then there's a bug in the early boot code somewhere. */
-.section .text.mee.init.trapvec
+.section .text.metal.init.trapvec
 .align 2
 early_trap_vector:
     .cfi_startproc
@@ -91,7 +91,7 @@ early_trap_vector:
  * going to leave this in for now.  At least it's fairly cheap :) */
 .weak __register_frame_info
 .global __register_frame_info
-.section .text.mee.init.__register_frame_info
+.section .text.metal.init.__register_frame_info
 __register_frame_info:
     .cfi_startproc
     ret

@@ -2,24 +2,24 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <string.h>
-#include <mee/led.h>
-#include <mee/machine.h>
+#include <metal/led.h>
+#include <metal/machine.h>
 
-struct mee_led* mee_led_get_rgb (char *label, char *color)
+struct metal_led* metal_led_get_rgb (char *label, char *color)
 {
     int i;
-    struct mee_led *led;
+    struct metal_led *led;
     char led_label[100];
 
-    if ((__MEE_DT_MAX_LEDS == 0) ||
+    if ((__METAL_DT_MAX_LEDS == 0) ||
 	(label == NULL) || (color == NULL)) {
         return NULL;
     }
 
     strcpy(led_label, label);
     strcat(led_label, color);
-    for (i = 0; i < __MEE_DT_MAX_LEDS; i++) {
-        led = (struct mee_led*)__mee_led_table[i];
+    for (i = 0; i < __METAL_DT_MAX_LEDS; i++) {
+        led = (struct metal_led*)__metal_led_table[i];
         if (led->vtable->led_exist(led, led_label)) {
 	    return led;
 	}
@@ -27,12 +27,12 @@ struct mee_led* mee_led_get_rgb (char *label, char *color)
     return NULL;
 }
 
-struct mee_led* mee_led_get (char *label)
+struct metal_led* metal_led_get (char *label)
 {
-    return mee_led_get_rgb(label, "");
+    return metal_led_get_rgb(label, "");
 }
 
-extern inline void mee_led_enable(struct mee_led *led);
-extern inline void mee_led_on(struct mee_led *led);
-extern inline void mee_led_off(struct mee_led *led);
-extern inline void mee_led_toggle(struct mee_led *led);
+extern inline void metal_led_enable(struct metal_led *led);
+extern inline void metal_led_on(struct metal_led *led);
+extern inline void metal_led_off(struct metal_led *led);
+extern inline void metal_led_toggle(struct metal_led *led);

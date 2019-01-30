@@ -1,8 +1,8 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef MEE__TIMER_H
-#define MEE__TIMER_H
+#ifndef METAL__TIMER_H
+#define METAL__TIMER_H
 
 /*!
  * @file timer.h
@@ -15,7 +15,7 @@
  * @param cyclecount The variable to hold the value
  * @return 0 upon success
  */
-int mee_timer_get_cyclecount(int hartid, unsigned long long *cyclecount);
+int metal_timer_get_cyclecount(int hartid, unsigned long long *cyclecount);
 
 /*!
  * @brief Get the machine timebase frequency
@@ -23,7 +23,7 @@ int mee_timer_get_cyclecount(int hartid, unsigned long long *cyclecount);
  * @param timebase The variable to hold the value
  * @return 0 upon success
  */
-int mee_timer_get_timebase_frequency(int hartid, unsigned long long *timebase);
+int metal_timer_get_timebase_frequency(int hartid, unsigned long long *timebase);
 
 /*! 
  * @brief Set the machine timer tick interval in seconds
@@ -31,6 +31,6 @@ int mee_timer_get_timebase_frequency(int hartid, unsigned long long *timebase);
  * @param second The number of seconds to set the tick interval to
  * @return 0 upon success
  */
-int mee_timer_set_tick(int hartid, int second);
+int metal_timer_set_tick(int hartid, int second);
 
 #endif

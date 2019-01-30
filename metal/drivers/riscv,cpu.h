@@ -1,246 +1,246 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef MEE__DRIVERS__RISCV_CPU_H
-#define MEE__DRIVERS__RISCV_CPU_H
+#ifndef METAL__DRIVERS__RISCV_CPU_H
+#define METAL__DRIVERS__RISCV_CPU_H
 
 #include <stdint.h>
-#include <mee/cpu.h>
-#include <mee/compiler.h>
+#include <metal/cpu.h>
+#include <metal/compiler.h>
 
-#define MEE_MAX_CORES             8
-#define MEE_MAX_MI                32  /* Per ISA MCause interrupts 32+ are Reserved */
-#define MEE_MAX_ME                12  /* Per ISA Exception codes 12+ are Reserved   */
-#define MEE_DEFAULT_RTC_FREQ      32768
+#define METAL_MAX_CORES             8
+#define METAL_MAX_MI                32  /* Per ISA MCause interrupts 32+ are Reserved */
+#define METAL_MAX_ME                12  /* Per ISA Exception codes 12+ are Reserved   */
+#define METAL_DEFAULT_RTC_FREQ      32768
 
-#define MEE_DISABLE              0
-#define MEE_ENABLE               1
+#define METAL_DISABLE              0
+#define METAL_ENABLE               1
 
-#define MEE_MTVEC_DIRECT         0x00
-#define MEE_MTVEC_VECTORED       0x01
-#define MEE_MTVEC_CLIC           0x02
-#define MEE_MTVEC_CLIC_VECTORED  0x03
-#define MEE_MTVEC_CLIC_RESERVED  0x3C
+#define METAL_MTVEC_DIRECT         0x00
+#define METAL_MTVEC_VECTORED       0x01
+#define METAL_MTVEC_CLIC           0x02
+#define METAL_MTVEC_CLIC_VECTORED  0x03
+#define METAL_MTVEC_CLIC_RESERVED  0x3C
 #if __riscv_xlen == 32
-#define MEE_MCAUSE_INTR          0x80000000UL
-#define MEE_MCAUSE_CAUSE         0x000003FFUL
+#define METAL_MCAUSE_INTR          0x80000000UL
+#define METAL_MCAUSE_CAUSE         0x000003FFUL
 #else
-#define MEE_MCAUSE_INTR          0x8000000000000000UL
-#define MEE_MCAUSE_CAUSE         0x00000000000003FFUL
+#define METAL_MCAUSE_INTR          0x8000000000000000UL
+#define METAL_MCAUSE_CAUSE         0x00000000000003FFUL
 #endif
-#define MEE_MCAUSE_MINHV         0x40000000UL
-#define MEE_MCAUSE_MPP           0x30000000UL
-#define MEE_MCAUSE_MPIE          0x08000000UL
-#define MEE_MCAUSE_MPIL          0x00FF0000UL
-#define MEE_MSTATUS_MIE          0x00000008UL
-#define MEE_MSTATUS_MPIE         0x00000080UL
-#define MEE_MSTATUS_MPP          0x00001800UL
-#define MEE_MSTATUS_MPRV         0x00020000UL
-#define MEE_MSTATUS_MXR          0x00080000UL
-#define MEE_MINTSTATUS_MIL       0xFF000000UL
-#define MEE_MINTSTATUS_SIL       0x0000FF00UL
-#define MEE_MINTSTATUS_UIL       0x000000FFUL
+#define METAL_MCAUSE_MINHV         0x40000000UL
+#define METAL_MCAUSE_MPP           0x30000000UL
+#define METAL_MCAUSE_MPIE          0x08000000UL
+#define METAL_MCAUSE_MPIL          0x00FF0000UL
+#define METAL_MSTATUS_MIE          0x00000008UL
+#define METAL_MSTATUS_MPIE         0x00000080UL
+#define METAL_MSTATUS_MPP          0x00001800UL
+#define METAL_MSTATUS_MPRV         0x00020000UL
+#define METAL_MSTATUS_MXR          0x00080000UL
+#define METAL_MINTSTATUS_MIL       0xFF000000UL
+#define METAL_MINTSTATUS_SIL       0x0000FF00UL
+#define METAL_MINTSTATUS_UIL       0x000000FFUL
 
-#define MEE_LOCAL_INTR(X)        (16 + X)
-#define MEE_MCAUSE_EVAL(cause)   (cause & MEE_MCAUSE_INTR)
-#define MEE_INTERRUPT(cause)     (MEE_MCAUSE_EVAL(cause) ? 1 : 0)
-#define MEE_EXCEPTION(cause)     (MEE_MCAUSE_EVAL(cause) ? 0 : 1)
-#define MEE_SW_INTR_EXCEPTION    (MEE_MCAUSE_INTR + 3)
-#define MEE_TMR_INTR_EXCEPTION   (MEE_MCAUSE_INTR + 7)
-#define MEE_EXT_INTR_EXCEPTION   (MEE_MCAUSE_INTR + 11)
-#define MEE_LOCAL_INTR_EXCEPTION(X) (MEE_MCAUSE_INTR + MEE_LOCAL_INTR(X))
-#define MEE_LOCAL_INTR_RESERVE0  1
-#define MEE_LOCAL_INTR_RESERVE1  2
-#define MEE_LOCAL_INTR_RESERVE2  4
-#define MEE_LOCAL_INTERRUPT_SW   8             /* Bit3 0x008 */
-#define MEE_LOCAL_INTR_RESERVE4  16
-#define MEE_LOCAL_INTR_RESERVE5  32
-#define MEE_LOCAL_INTR_RESERVE6  64
-#define MEE_LOCAL_INTERRUPT_TMR  128           /* Bit7 0x080 */
-#define MEE_LOCAL_INTR_RESERVE8  256
-#define MEE_LOCAL_INTR_RESERVE9  512
-#define MEE_LOCAL_INTR_RESERVE10 1024   
-#define MEE_LOCAL_INTERRUPT_EXT  2048          /* Bit11 0x800 */
+#define METAL_LOCAL_INTR(X)        (16 + X)
+#define METAL_MCAUSE_EVAL(cause)   (cause & METAL_MCAUSE_INTR)
+#define METAL_INTERRUPT(cause)     (METAL_MCAUSE_EVAL(cause) ? 1 : 0)
+#define METAL_EXCEPTION(cause)     (METAL_MCAUSE_EVAL(cause) ? 0 : 1)
+#define METAL_SW_INTR_EXCEPTION    (METAL_MCAUSE_INTR + 3)
+#define METAL_TMR_INTR_EXCEPTION   (METAL_MCAUSE_INTR + 7)
+#define METAL_EXT_INTR_EXCEPTION   (METAL_MCAUSE_INTR + 11)
+#define METAL_LOCAL_INTR_EXCEPTION(X) (METAL_MCAUSE_INTR + METAL_LOCAL_INTR(X))
+#define METAL_LOCAL_INTR_RESERVE0  1
+#define METAL_LOCAL_INTR_RESERVE1  2
+#define METAL_LOCAL_INTR_RESERVE2  4
+#define METAL_LOCAL_INTERRUPT_SW   8             /* Bit3 0x008 */
+#define METAL_LOCAL_INTR_RESERVE4  16
+#define METAL_LOCAL_INTR_RESERVE5  32
+#define METAL_LOCAL_INTR_RESERVE6  64
+#define METAL_LOCAL_INTERRUPT_TMR  128           /* Bit7 0x080 */
+#define METAL_LOCAL_INTR_RESERVE8  256
+#define METAL_LOCAL_INTR_RESERVE9  512
+#define METAL_LOCAL_INTR_RESERVE10 1024   
+#define METAL_LOCAL_INTERRUPT_EXT  2048          /* Bit11 0x800 */
 /* Bit12 to Bit15 are Reserved */
-#define MEE_LOCAL_INTERRUPT(X)  (0x10000 << X) /* Bit16+ Start of Custom Local Interrupt */
-#define MEE_MIE_INTERRUPT        MEE_MSTATUS_MIE
+#define METAL_LOCAL_INTERRUPT(X)  (0x10000 << X) /* Bit16+ Start of Custom Local Interrupt */
+#define METAL_MIE_INTERRUPT        METAL_MSTATUS_MIE
 
 typedef enum {
-  MEE_MACHINE_PRIVILEGE_MODE,
-  MEE_SUPERVISOR_PRIVILEGE_MODE,
-  MEE_USER_PRIVILEGE_MODE,
-} mee_privilege_mode_e;
+  METAL_MACHINE_PRIVILEGE_MODE,
+  METAL_SUPERVISOR_PRIVILEGE_MODE,
+  METAL_USER_PRIVILEGE_MODE,
+} metal_privilege_mode_e;
 
 typedef enum {
-  MEE_INTERRUPT_ID_BASE,
-  MEE_INTERRUPT_ID_SW   = (MEE_INTERRUPT_ID_BASE + 3),
-  MEE_INTERRUPT_ID_TMR  = (MEE_INTERRUPT_ID_BASE + 7),
-  MEE_INTERRUPT_ID_EXT  = (MEE_INTERRUPT_ID_BASE + 11),
-  MEE_INTERRUPT_ID_LC0  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(0)),
-  MEE_INTERRUPT_ID_LC1  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(1)),
-  MEE_INTERRUPT_ID_LC2  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(2)),
-  MEE_INTERRUPT_ID_LC3  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(3)),
-  MEE_INTERRUPT_ID_LC4  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(4)),
-  MEE_INTERRUPT_ID_LC5  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(5)),
-  MEE_INTERRUPT_ID_LC6  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(6)),
-  MEE_INTERRUPT_ID_LC7  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(7)),
-  MEE_INTERRUPT_ID_LC8  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(8)),
-  MEE_INTERRUPT_ID_LC9  = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(9)),
-  MEE_INTERRUPT_ID_LC10 = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(10)),
-  MEE_INTERRUPT_ID_LC11 = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(11)),
-  MEE_INTERRUPT_ID_LC12 = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(12)),
-  MEE_INTERRUPT_ID_LC13 = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(13)),
-  MEE_INTERRUPT_ID_LC14 = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(14)),
-  MEE_INTERRUPT_ID_LC15 = (MEE_INTERRUPT_ID_BASE + MEE_LOCAL_INTR(15)),
-  MEE_INTERRUPT_ID_LCMX,
-  MEE_INTERRUPT_ID_GL0 = MEE_INTERRUPT_ID_LCMX,
-  MEE_INTERRUPT_ID_GLMX = (MEE_MCAUSE_CAUSE + 1),
-} mee_interrupt_id_e;
+  METAL_INTERRUPT_ID_BASE,
+  METAL_INTERRUPT_ID_SW   = (METAL_INTERRUPT_ID_BASE + 3),
+  METAL_INTERRUPT_ID_TMR  = (METAL_INTERRUPT_ID_BASE + 7),
+  METAL_INTERRUPT_ID_EXT  = (METAL_INTERRUPT_ID_BASE + 11),
+  METAL_INTERRUPT_ID_LC0  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(0)),
+  METAL_INTERRUPT_ID_LC1  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(1)),
+  METAL_INTERRUPT_ID_LC2  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(2)),
+  METAL_INTERRUPT_ID_LC3  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(3)),
+  METAL_INTERRUPT_ID_LC4  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(4)),
+  METAL_INTERRUPT_ID_LC5  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(5)),
+  METAL_INTERRUPT_ID_LC6  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(6)),
+  METAL_INTERRUPT_ID_LC7  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(7)),
+  METAL_INTERRUPT_ID_LC8  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(8)),
+  METAL_INTERRUPT_ID_LC9  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(9)),
+  METAL_INTERRUPT_ID_LC10 = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(10)),
+  METAL_INTERRUPT_ID_LC11 = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(11)),
+  METAL_INTERRUPT_ID_LC12 = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(12)),
+  METAL_INTERRUPT_ID_LC13 = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(13)),
+  METAL_INTERRUPT_ID_LC14 = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(14)),
+  METAL_INTERRUPT_ID_LC15 = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(15)),
+  METAL_INTERRUPT_ID_LCMX,
+  METAL_INTERRUPT_ID_GL0 = METAL_INTERRUPT_ID_LCMX,
+  METAL_INTERRUPT_ID_GLMX = (METAL_MCAUSE_CAUSE + 1),
+} metal_interrupt_id_e;
 
 typedef enum {
-  MEE_IAM_EXCEPTION_CODE,     /* Instruction address misaligned */
-  MEE_IAF_EXCEPTION_CODE,     /* Instruction access faultd */
-  MEE_II_EXCEPTION_CODE,      /* Illegal instruction */
-  MEE_BREAK_EXCEPTION_CODE,   /* Breakpoint */
-  MEE_LAM_EXCEPTION_CODE,     /* Load address misaligned */
-  MEE_LAF_EXCEPTION_CODE,     /* Load access fault */
-  MEE_SAMOAM_EXCEPTION_CODE,  /* Store/AMO address misaligned */
-  MEE_SAMOAF_EXCEPTION_CODE,  /* Store/AMO access fault */
-  MEE_ECALL_U_EXCEPTION_CODE, /* Environment call from U-mode */
-  MEE_R9_EXCEPTION_CODE,      /* Reserved */
-  MEE_R10_EXCEPTION_CODE,     /* Reserved */
-  MEE_ECALL_M_EXCEPTION_CODE, /* Environment call from M-mode */
-  MEE_MAX_EXCEPTION_CODE,
-} mee_exception_code_e;
+  METAL_IAM_EXCEPTION_CODE,     /* Instruction address misaligned */
+  METAL_IAF_EXCEPTION_CODE,     /* Instruction access faultd */
+  METAL_II_EXCEPTION_CODE,      /* Illegal instruction */
+  METAL_BREAK_EXCEPTION_CODE,   /* Breakpoint */
+  METAL_LAM_EXCEPTION_CODE,     /* Load address misaligned */
+  METAL_LAF_EXCEPTION_CODE,     /* Load access fault */
+  METAL_SAMOAM_EXCEPTION_CODE,  /* Store/AMO address misaligned */
+  METAL_SAMOAF_EXCEPTION_CODE,  /* Store/AMO access fault */
+  METAL_ECALL_U_EXCEPTION_CODE, /* Environment call from U-mode */
+  METAL_R9_EXCEPTION_CODE,      /* Reserved */
+  METAL_R10_EXCEPTION_CODE,     /* Reserved */
+  METAL_ECALL_M_EXCEPTION_CODE, /* Environment call from M-mode */
+  METAL_MAX_EXCEPTION_CODE,
+} metal_exception_code_e;
 
 typedef enum {
-  MEE_TIMER_MTIME_GET = 1,
-  MEE_TIMER_MTIME_SET,
-  MEE_SOFTWARE_IPI_CLEAR,
-  MEE_SOFTWARE_IPI_SET,
-  MEE_SOFTWARE_MSIP_GET,
-  MEE_MAX_INTERRUPT_GET,
-  MEE_INDEX_INTERRUPT_GET,
-} mee_interrup_cmd_e;
+  METAL_TIMER_MTIME_GET = 1,
+  METAL_TIMER_MTIME_SET,
+  METAL_SOFTWARE_IPI_CLEAR,
+  METAL_SOFTWARE_IPI_SET,
+  METAL_SOFTWARE_MSIP_GET,
+  METAL_MAX_INTERRUPT_GET,
+  METAL_INDEX_INTERRUPT_GET,
+} metal_interrup_cmd_e;
 
-typedef struct __mee_interrupt_data {
+typedef struct __metal_interrupt_data {
     long long pad : 64;
-    mee_interrupt_handler_t  handler;
+    metal_interrupt_handler_t  handler;
     void *sub_int;
     void *exint_data;
-} __mee_interrupt_data;
+} __metal_interrupt_data;
 
 /* CPU interrupt controller */
 
-uintptr_t __mee_myhart_id(void);
+uintptr_t __metal_myhart_id(void);
 
-struct __mee_driver_interrupt_controller_vtable {
-    void (*interrupt_init)(struct mee_interrupt *controller);
-    int (*interrupt_register)(struct mee_interrupt *controller,
-			      int id, mee_interrupt_handler_t isr, void *priv_data);
-    int (*interrupt_enable)(struct mee_interrupt *controller, int id);
-    int (*interrupt_disable)(struct mee_interrupt *controller, int id);
-    int (*command_request)(struct mee_interrupt *intr, int cmd, void *data);
+struct __metal_driver_interrupt_controller_vtable {
+    void (*interrupt_init)(struct metal_interrupt *controller);
+    int (*interrupt_register)(struct metal_interrupt *controller,
+			      int id, metal_interrupt_handler_t isr, void *priv_data);
+    int (*interrupt_enable)(struct metal_interrupt *controller, int id);
+    int (*interrupt_disable)(struct metal_interrupt *controller, int id);
+    int (*command_request)(struct metal_interrupt *intr, int cmd, void *data);
 };
 
-struct __mee_driver_vtable_riscv_cpu_intc {
-  struct mee_interrupt_vtable controller_vtable;
+struct __metal_driver_vtable_riscv_cpu_intc {
+  struct metal_interrupt_vtable controller_vtable;
 };
 
-void __mee_driver_riscv_cpu_controller_interrupt_init(struct mee_interrupt *controller);
-int __mee_driver_riscv_cpu_controller_interrupt_register(struct mee_interrupt *controller,
-							 int id, mee_interrupt_handler_t isr,
+void __metal_driver_riscv_cpu_controller_interrupt_init(struct metal_interrupt *controller);
+int __metal_driver_riscv_cpu_controller_interrupt_register(struct metal_interrupt *controller,
+							 int id, metal_interrupt_handler_t isr,
 							 void *priv_data);
-int __mee_driver_riscv_cpu_controller_interrupt_enable(struct mee_interrupt *controller, int id);
-int __mee_driver_riscv_cpu_controller_interrupt_disable(struct mee_interrupt *controller, int id);
-int __mee_driver_riscv_cpu_controller_interrupt_enable_vector(struct mee_interrupt *controller,
-                                                              int id, mee_vector_mode mode);
-int __mee_driver_riscv_cpu_controller_interrupt_disable_vector(struct mee_interrupt *controller, int id);
-int __mee_driver_riscv_cpu_controller_command_request(struct mee_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_enable(struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_cpu_controller_interrupt_disable(struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_cpu_controller_interrupt_enable_vector(struct metal_interrupt *controller,
+                                                              int id, metal_vector_mode mode);
+int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_cpu_controller_command_request(struct metal_interrupt *controller,
 						      int cmd, void *data);
 
-void __mee_interrupt_global_enable(void);
-void __mee_interrupt_global_disable(void);
-void __mee_controller_interrupt_vector(mee_vector_mode mode, void *vec_table);
-inline int __mee_controller_interrupt_is_selective_vectored (void)
+void __metal_interrupt_global_enable(void);
+void __metal_interrupt_global_disable(void);
+void __metal_controller_interrupt_vector(metal_vector_mode mode, void *vec_table);
+inline int __metal_controller_interrupt_is_selective_vectored (void)
 {
     uintptr_t val;
 
     asm volatile ("csrr %0, mtvec" : "=r"(val));
-    return ((val & MEE_MTVEC_CLIC_VECTORED) == MEE_MTVEC_CLIC);
+    return ((val & METAL_MTVEC_CLIC_VECTORED) == METAL_MTVEC_CLIC);
 }
 
-__MEE_DECLARE_VTABLE(__mee_driver_vtable_riscv_cpu_intc) = {
-    .controller_vtable.interrupt_init = __mee_driver_riscv_cpu_controller_interrupt_init,
-    .controller_vtable.interrupt_register = __mee_driver_riscv_cpu_controller_interrupt_register,
-    .controller_vtable.interrupt_enable   = __mee_driver_riscv_cpu_controller_interrupt_enable,
-    .controller_vtable.interrupt_disable  = __mee_driver_riscv_cpu_controller_interrupt_disable,
-    .controller_vtable.interrupt_vector_enable   = __mee_driver_riscv_cpu_controller_interrupt_enable_vector,
-    .controller_vtable.interrupt_vector_disable  = __mee_driver_riscv_cpu_controller_interrupt_disable_vector,
-    .controller_vtable.command_request    = __mee_driver_riscv_cpu_controller_command_request,
+__METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
+    .controller_vtable.interrupt_init = __metal_driver_riscv_cpu_controller_interrupt_init,
+    .controller_vtable.interrupt_register = __metal_driver_riscv_cpu_controller_interrupt_register,
+    .controller_vtable.interrupt_enable   = __metal_driver_riscv_cpu_controller_interrupt_enable,
+    .controller_vtable.interrupt_disable  = __metal_driver_riscv_cpu_controller_interrupt_disable,
+    .controller_vtable.interrupt_vector_enable   = __metal_driver_riscv_cpu_controller_interrupt_enable_vector,
+    .controller_vtable.interrupt_vector_disable  = __metal_driver_riscv_cpu_controller_interrupt_disable_vector,
+    .controller_vtable.command_request    = __metal_driver_riscv_cpu_controller_command_request,
 };
 
-struct __mee_driver_riscv_cpu_intc {
-    struct mee_interrupt controller;
-    const struct __mee_driver_vtable_riscv_cpu_intc *vtable;
+struct __metal_driver_riscv_cpu_intc {
+    struct metal_interrupt controller;
+    const struct __metal_driver_vtable_riscv_cpu_intc *vtable;
     int init_done;
     int interrupt_controller;
-    uintptr_t mee_mtvec_table[MEE_MAX_MI];
-    __mee_interrupt_data mee_int_table[MEE_MAX_MI];
-    mee_exception_handler_t mee_exception_table[MEE_MAX_ME];
+    uintptr_t metal_mtvec_table[METAL_MAX_MI];
+    __metal_interrupt_data metal_int_table[METAL_MAX_MI];
+    metal_exception_handler_t metal_exception_table[METAL_MAX_ME];
 };
 
 /* CPU driver*/
-struct __mee_driver_vtable_cpu {
-  struct mee_cpu_vtable cpu_vtable;
+struct __metal_driver_vtable_cpu {
+  struct metal_cpu_vtable cpu_vtable;
 };
 
-unsigned long long  __mee_driver_cpu_timer_get(struct mee_cpu *cpu);
-unsigned long long  __mee_driver_cpu_timebase_get(struct mee_cpu *cpu);
+unsigned long long  __metal_driver_cpu_timer_get(struct metal_cpu *cpu);
+unsigned long long  __metal_driver_cpu_timebase_get(struct metal_cpu *cpu);
 unsigned long long
-      __mee_driver_cpu_mtime_get(struct mee_cpu *cpu);
-int  __mee_driver_cpu_mtimecmp_set(struct mee_cpu *cpu, unsigned long long time);
-struct mee_interrupt*
-     __mee_driver_cpu_timer_controller_interrupt(struct mee_cpu *cpu);
-int  __mee_driver_cpu_get_timer_interrupt_id(struct mee_cpu *cpu);
-struct mee_interrupt*
-     __mee_driver_cpu_sw_controller_interrupt(struct mee_cpu *cpu);
-int  __mee_driver_cpu_get_sw_interrupt_id(struct mee_cpu *cpu);
-int  __mee_driver_cpu_set_sw_ipi(struct mee_cpu *cpu, int hartid);
-int  __mee_driver_cpu_clear_sw_ipi(struct mee_cpu *cpu, int hartid);
-int  __mee_driver_cpu_get_msip(struct mee_cpu *cpu, int hartid);
-struct mee_interrupt*
-     __mee_driver_cpu_controller_interrupt(struct mee_cpu *cpu);
-int  __mee_driver_cpu_exception_register(struct mee_cpu *cpu, int ecode,
-					 mee_exception_handler_t isr);
-int  __mee_driver_cpu_get_instruction_length(struct mee_cpu *cpu, uintptr_t epc);
-uintptr_t  __mee_driver_cpu_get_exception_pc(struct mee_cpu *cpu);
-int  __mee_driver_cpu_set_exception_pc(struct mee_cpu *cpu, uintptr_t epc);
+      __metal_driver_cpu_mtime_get(struct metal_cpu *cpu);
+int  __metal_driver_cpu_mtimecmp_set(struct metal_cpu *cpu, unsigned long long time);
+struct metal_interrupt*
+     __metal_driver_cpu_timer_controller_interrupt(struct metal_cpu *cpu);
+int  __metal_driver_cpu_get_timer_interrupt_id(struct metal_cpu *cpu);
+struct metal_interrupt*
+     __metal_driver_cpu_sw_controller_interrupt(struct metal_cpu *cpu);
+int  __metal_driver_cpu_get_sw_interrupt_id(struct metal_cpu *cpu);
+int  __metal_driver_cpu_set_sw_ipi(struct metal_cpu *cpu, int hartid);
+int  __metal_driver_cpu_clear_sw_ipi(struct metal_cpu *cpu, int hartid);
+int  __metal_driver_cpu_get_msip(struct metal_cpu *cpu, int hartid);
+struct metal_interrupt*
+     __metal_driver_cpu_controller_interrupt(struct metal_cpu *cpu);
+int  __metal_driver_cpu_exception_register(struct metal_cpu *cpu, int ecode,
+					 metal_exception_handler_t isr);
+int  __metal_driver_cpu_get_instruction_length(struct metal_cpu *cpu, uintptr_t epc);
+uintptr_t  __metal_driver_cpu_get_exception_pc(struct metal_cpu *cpu);
+int  __metal_driver_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t epc);
 
-__MEE_DECLARE_VTABLE(__mee_driver_vtable_cpu) = {
-    .cpu_vtable.timer_get     = __mee_driver_cpu_timer_get,
-    .cpu_vtable.timebase_get  = __mee_driver_cpu_timebase_get,
-    .cpu_vtable.mtime_get = __mee_driver_cpu_mtime_get,
-    .cpu_vtable.mtimecmp_set = __mee_driver_cpu_mtimecmp_set,
-    .cpu_vtable.tmr_controller_interrupt = __mee_driver_cpu_timer_controller_interrupt,
-    .cpu_vtable.get_tmr_interrupt_id = __mee_driver_cpu_get_timer_interrupt_id,
-    .cpu_vtable.sw_controller_interrupt = __mee_driver_cpu_sw_controller_interrupt,
-    .cpu_vtable.get_sw_interrupt_id = __mee_driver_cpu_get_sw_interrupt_id,
-    .cpu_vtable.set_sw_ipi = __mee_driver_cpu_set_sw_ipi,
-    .cpu_vtable.clear_sw_ipi = __mee_driver_cpu_clear_sw_ipi,
-    .cpu_vtable.get_msip = __mee_driver_cpu_get_msip,
-    .cpu_vtable.controller_interrupt = __mee_driver_cpu_controller_interrupt,
-    .cpu_vtable.exception_register = __mee_driver_cpu_exception_register,
-    .cpu_vtable.get_ilen = __mee_driver_cpu_get_instruction_length,
-    .cpu_vtable.get_epc = __mee_driver_cpu_get_exception_pc,
-    .cpu_vtable.set_epc = __mee_driver_cpu_set_exception_pc,
+__METAL_DECLARE_VTABLE(__metal_driver_vtable_cpu) = {
+    .cpu_vtable.timer_get     = __metal_driver_cpu_timer_get,
+    .cpu_vtable.timebase_get  = __metal_driver_cpu_timebase_get,
+    .cpu_vtable.mtime_get = __metal_driver_cpu_mtime_get,
+    .cpu_vtable.mtimecmp_set = __metal_driver_cpu_mtimecmp_set,
+    .cpu_vtable.tmr_controller_interrupt = __metal_driver_cpu_timer_controller_interrupt,
+    .cpu_vtable.get_tmr_interrupt_id = __metal_driver_cpu_get_timer_interrupt_id,
+    .cpu_vtable.sw_controller_interrupt = __metal_driver_cpu_sw_controller_interrupt,
+    .cpu_vtable.get_sw_interrupt_id = __metal_driver_cpu_get_sw_interrupt_id,
+    .cpu_vtable.set_sw_ipi = __metal_driver_cpu_set_sw_ipi,
+    .cpu_vtable.clear_sw_ipi = __metal_driver_cpu_clear_sw_ipi,
+    .cpu_vtable.get_msip = __metal_driver_cpu_get_msip,
+    .cpu_vtable.controller_interrupt = __metal_driver_cpu_controller_interrupt,
+    .cpu_vtable.exception_register = __metal_driver_cpu_exception_register,
+    .cpu_vtable.get_ilen = __metal_driver_cpu_get_instruction_length,
+    .cpu_vtable.get_epc = __metal_driver_cpu_get_exception_pc,
+    .cpu_vtable.set_epc = __metal_driver_cpu_set_exception_pc,
 };
 
-struct __mee_driver_cpu {
-    struct mee_cpu cpu;
-    const struct __mee_driver_vtable_cpu *vtable;
+struct __metal_driver_cpu {
+    struct metal_cpu cpu;
+    const struct __metal_driver_vtable_cpu *vtable;
     const int timebase;    
-    struct mee_interrupt *interrupt_controller;
+    struct metal_interrupt *interrupt_controller;
 };
 
 #endif

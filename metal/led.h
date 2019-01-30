@@ -1,29 +1,29 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef MEE__LED_H
-#define MEE__LED_H
+#ifndef METAL__LED_H
+#define METAL__LED_H
 
 /*!
  * @file led.h
  * @brief API for manipulating LEDs
  */
 
-struct mee_led;
+struct metal_led;
 
-struct mee_led_vtable {
-    int (*led_exist)(struct mee_led *led, char *label);
-    void (*led_enable)(struct mee_led *led);
-    void (*led_on)(struct mee_led *led);
-    void (*led_off)(struct mee_led *led);
-    void (*led_toggle)(struct mee_led *led);
+struct metal_led_vtable {
+    int (*led_exist)(struct metal_led *led, char *label);
+    void (*led_enable)(struct metal_led *led);
+    void (*led_on)(struct metal_led *led);
+    void (*led_off)(struct metal_led *led);
+    void (*led_toggle)(struct metal_led *led);
 };
 
 /*!
  * @brief A handle for an LED
  */
-struct mee_led {
-    const struct mee_led_vtable *vtable;
+struct metal_led {
+    const struct metal_led_vtable *vtable;
 };
 
 /*!
@@ -31,7 +31,7 @@ struct mee_led {
  * @param label The DeviceTree label for the desired LED
  * @return A handle to the LED, or NULL if none is found for the requested label
  */
-struct mee_led* mee_led_get(char *label);
+struct metal_led* metal_led_get(char *label);
 
 /*!
  * @brief Get a handle for a channel of an RGB LED
@@ -39,30 +39,30 @@ struct mee_led* mee_led_get(char *label);
  * @param color The color for the LED in the DeviceTree
  * @return A handle to the LED, or NULL if none is found for the requested label and color
  */
-struct mee_led* mee_led_get_rgb(char *label, char *color);
+struct metal_led* metal_led_get_rgb(char *label, char *color);
 
 /*!
  * @brief Enable an LED
  * @param led The handle for the LED
  */
-inline void mee_led_enable(struct mee_led *led) { led->vtable->led_enable(led); }
+inline void metal_led_enable(struct metal_led *led) { led->vtable->led_enable(led); }
 
 /*!
  * @brief Turn an LED on
  * @param led The handle for the LED
  */
-inline void mee_led_on(struct mee_led *led) { led->vtable->led_on(led); }
+inline void metal_led_on(struct metal_led *led) { led->vtable->led_on(led); }
 
 /*!
  * @brief Turn an LED off
  * @param led The handle for the LED
  */
-inline void mee_led_off(struct mee_led *led) { led->vtable->led_off(led); }
+inline void metal_led_off(struct metal_led *led) { led->vtable->led_off(led); }
 
 /*!
  * @brief Toggle the on/off state of an LED
  * @param led The handle for the LED
  */
-inline void mee_led_toggle(struct mee_led *led) { led->vtable->led_toggle(led); }
+inline void metal_led_toggle(struct metal_led *led) { led->vtable->led_toggle(led); }
 
 #endif
