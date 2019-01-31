@@ -99,14 +99,25 @@ inline int mee_interrupt_disable(struct mee_interrupt *controller, int id)
     return controller->vtable->interrupt_disable(controller, id);
 }
 
-/* Enable an interrupt vector for a given controller and id */
+/*!
+ * @brief Enable an interrupt vector
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to enable
+ * @param mode The interrupt mode type to enable
+ * @return 0 upon success
+ */
 inline int mee_interrupt_vector_enable(struct mee_interrupt *controller,
                                        int id, mee_vector_mode mode)
 {
     return controller->vtable->interrupt_vector_enable(controller, id, mode);
 }
 
-/* Disable an interrupt vector for a given controller and id */
+/*!
+ * @brief Disable an interrupt vector
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to disable
+ * @return 0 upon success
+ */
 inline int mee_interrupt_vector_disable(struct mee_interrupt *controller, int id)
 {
     return controller->vtable->interrupt_vector_disable(controller, id);
