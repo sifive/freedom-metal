@@ -113,8 +113,7 @@ void __mee_exception_handler(void) __attribute__((interrupt, aligned(128)));
 void __mee_exception_handler (void) {
     int id;
     void *priv;
-    mee_interrupt_handler_t mtvt_handler;
-    uintptr_t mcause, mepc, mtval, mtvec, mtvt;
+    uintptr_t mcause, mepc, mtval, mtvec;
     struct __mee_driver_riscv_cpu_intc *intc;
     struct __mee_driver_cpu *cpu = __mee_cpu_table[__mee_myhart_id()];
 
@@ -122,7 +121,6 @@ void __mee_exception_handler (void) {
     asm volatile ("csrr %0, mepc" : "=r"(mepc));
     asm volatile ("csrr %0, mtval" : "=r"(mtval));
     asm volatile ("csrr %0, mtvec" : "=r"(mtvec));
-    asm volatile ("csrr %0, mtvt" : "=r"(mtvt));
 
     if ( cpu ) {
         intc = (struct __mee_driver_riscv_cpu_intc *)cpu->interrupt_controller;
@@ -134,6 +132,10 @@ void __mee_exception_handler (void) {
 		return;
             }
             if (mtvec & MEE_MTVEC_CLIC) {
+    		uintptr_t mtvt;
+    		mee_interrupt_handler_t mtvt_handler;
+
+                asm volatile ("csrr %0, mtvt" : "=r"(mtvt));
                	priv = intc->mee_int_table[MEE_INTERRUPT_ID_SW].sub_int;
                	mtvt_handler = (mee_interrupt_handler_t)mtvt;
                	mtvt_handler(id, priv);
