@@ -11,4 +11,8 @@
 #define __MEE_GET_FIELD(reg, mask)                        \
     (((reg) & (mask)) / ((mask) & ~((mask) << 1)))
 
+/* Set field with mask for a given value */
+#define __MEE_SET_FIELD(reg, mask, val) \
+        (((reg) & ~(mask)) | (((val) * ((mask) & ~((mask) << 1))) & (mask)))
+
 #endif

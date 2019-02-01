@@ -11,6 +11,16 @@
 #include <stddef.h>
 
 /*!
+ * @brief Possible mode of interrupts to operate
+ */
+typedef enum mee_vector_mode_ {
+    MEE_DIRECT_MODE = 0,
+    MEE_VECTOR_MODE = 1,
+    MEE_SELECTIVE_VECTOR_MODE = 2,
+    MEE_HARDWARE_VECTOR_MODE = 3
+} mee_vector_mode;
+
+/*!
  * @brief Function signature for interrupt callback handlers
  */
 typedef void (*mee_interrupt_handler_t) (int, void *);
@@ -23,6 +33,9 @@ struct mee_interrupt_vtable {
 			      mee_interrupt_handler_t isr, void *priv_data);
     int (*interrupt_enable)(struct mee_interrupt *controller, int id);
     int (*interrupt_disable)(struct mee_interrupt *controller, int id);
+    int (*interrupt_vector_enable)(struct mee_interrupt *controller,
+                                   int id, mee_vector_mode mode);
+    int (*interrupt_vector_disable)(struct mee_interrupt *controller, int id);
     int (*command_request)(struct mee_interrupt *controller, int cmd, void *data);
 };
 
@@ -86,9 +99,33 @@ inline int mee_interrupt_disable(struct mee_interrupt *controller, int id)
     return controller->vtable->interrupt_disable(controller, id);
 }
 
-/* Internal-use utility function for a given interrupt controller */
+/*!
+ * @brief Enable an interrupt vector
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to enable
+ * @param mode The interrupt mode type to enable
+ * @return 0 upon success
+ */
+inline int mee_interrupt_vector_enable(struct mee_interrupt *controller,
+                                       int id, mee_vector_mode mode)
+{
+    return controller->vtable->interrupt_vector_enable(controller, id, mode);
+}
+
+/*!
+ * @brief Disable an interrupt vector
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to disable
+ * @return 0 upon success
+ */
+inline int mee_interrupt_vector_disable(struct mee_interrupt *controller, int id)
+{
+    return controller->vtable->interrupt_vector_disable(controller, id);
+}
+
+/* Utilities function to controll, manages devices via a given interrupt controller */
 inline int _mee_interrupt_command_request(struct mee_interrupt *controller,
-					  int cmd, void *data)
+					 int cmd, void *data)
 {
     return controller->vtable->command_request(controller, cmd, data);
 }

@@ -1,6 +1,7 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <stdint.h>
 #include <mee/io.h>
 #include <mee/shutdown.h>
 #include <mee/machine.h>
@@ -112,41 +113,63 @@ void __mee_exception_handler(void) __attribute__((interrupt, aligned(128)));
 void __mee_exception_handler (void) {
     int id;
     void *priv;
-    uintptr_t mcause, mepc, mtval;
+    uintptr_t mcause, mepc, mtval, mtvec;
     struct __mee_driver_riscv_cpu_intc *intc;
     struct __mee_driver_cpu *cpu = __mee_cpu_table[__mee_myhart_id()];
 
-    asm volatile ("csrr %0, mcause" : "=r"(mcause) );
+    asm volatile ("csrr %0, mcause" : "=r"(mcause));
     asm volatile ("csrr %0, mepc" : "=r"(mepc));
     asm volatile ("csrr %0, mtval" : "=r"(mtval));
+    asm volatile ("csrr %0, mtvec" : "=r"(mtvec));
 
     if ( cpu ) {
         intc = (struct __mee_driver_riscv_cpu_intc *)cpu->interrupt_controller;
         id = mcause & MEE_MCAUSE_CAUSE;
-        if (mcause & MEE_MCAUSE_INTR)  {
-            priv = intc->mee_mtvec_table[id].exint_data;
-            intc->mee_mtvec_table[id].handler(id, priv);
+        if (mcause & MEE_MCAUSE_INTR) {
+            if ((id < MEE_INTERRUPT_ID_LC0) || (mtvec & MEE_MTVEC_DIRECT)) {
+                priv = intc->mee_int_table[id].exint_data;
+                intc->mee_int_table[id].handler(id, priv);
+		return;
+            }
+            if (mtvec & MEE_MTVEC_CLIC) {
+    		uintptr_t mtvt;
+    		mee_interrupt_handler_t mtvt_handler;
+
+                asm volatile ("csrr %0, mtvt" : "=r"(mtvt));
+               	priv = intc->mee_int_table[MEE_INTERRUPT_ID_SW].sub_int;
+               	mtvt_handler = (mee_interrupt_handler_t)mtvt;
+               	mtvt_handler(id, priv);
+		return;
+            }
         } else {
             intc->mee_exception_table[id]((struct mee_cpu *)cpu, id);
         }
     }
 }
 
-void __mee_controller_interrupt_vectored (struct mee_interrupt *controller, int enable)
+void __mee_controller_interrupt_vector (mee_vector_mode mode, void *vec_table)
 {  
-    uintptr_t trap_entry;
-    struct __mee_driver_riscv_cpu_intc *intc = (void *)(controller);
+    uintptr_t trap_entry, val;
 
-    if ( !controller ) {
-        return;
-    }
+    asm volatile ("csrr %0, mtvec" : "=r"(val));
+    val &= ~(MEE_MTVEC_CLIC_VECTORED | MEE_MTVEC_CLIC_RESERVED);
+    trap_entry = (uintptr_t)vec_table;
 
-    if (enable) {
-        trap_entry = (uintptr_t)&intc->mee_mtvec_table[0].handler;
+    switch (mode) {
+    case MEE_SELECTIVE_VECTOR_MODE:
+        asm volatile ("csrw mtvt, %0" :: "r"(trap_entry | MEE_MTVEC_CLIC));
+        asm volatile ("csrw mtvec, %0" :: "r"(val | MEE_MTVEC_CLIC));
+        break;
+    case MEE_HARDWARE_VECTOR_MODE:
+        asm volatile ("csrw mtvt, %0" :: "r"(trap_entry | MEE_MTVEC_CLIC_VECTORED));
+        asm volatile ("csrw mtvec, %0" :: "r"(val | MEE_MTVEC_CLIC_VECTORED));
+        break;
+    case MEE_VECTOR_MODE:
         asm volatile ("csrw mtvec, %0" :: "r"(trap_entry | MEE_MTVEC_VECTORED));
-    } else {
-        trap_entry = (uintptr_t)&__mee_exception_handler;
-        asm volatile ("csrw mtvec, %0" :: "r"(trap_entry));
+        break;
+    case MEE_DIRECT_MODE:
+        asm volatile ("csrw mtvec, %0" :: "r"(trap_entry & ~MEE_MTVEC_CLIC_VECTORED));
+        break;
     }
 }
 
@@ -266,14 +289,14 @@ void __mee_driver_riscv_cpu_controller_interrupt_init (struct mee_interrupt *con
     if ( !intc->init_done ) {
         /* Default to use direct interrupt, setup sw cb table*/
         for (int i = 0; i < MEE_MAX_MI; i++) {
-	    intc->mee_mtvec_table[i].handler = NULL;
-	    intc->mee_mtvec_table[i].sub_int = NULL;
-	    intc->mee_mtvec_table[i].exint_data = NULL;
+            intc->mee_int_table[i].handler = NULL;
+            intc->mee_int_table[i].sub_int = NULL;
+            intc->mee_int_table[i].exint_data = NULL;
 	}
 	for (int i = 0; i < MEE_MAX_ME; i++) {
 	    intc->mee_exception_table[i] = __mee_default_exception_handler;
 	}
-        __mee_controller_interrupt_vectored(controller, MEE_DISABLE);
+        __mee_controller_interrupt_vector(MEE_DIRECT_MODE, &__mee_exception_handler);
 	intc->init_done = 1;
     }
 }
@@ -290,17 +313,17 @@ int __mee_driver_riscv_cpu_controller_interrupt_register(struct mee_interrupt *c
     }
 
     if (isr) {
-        intc->mee_mtvec_table[id].handler = isr;
-        intc->mee_mtvec_table[id].exint_data = priv;
+        intc->mee_int_table[id].handler = isr;
+        intc->mee_int_table[id].exint_data = priv;
     } else {
 	switch (id) {
 	case MEE_INTERRUPT_ID_SW:
-            intc->mee_mtvec_table[id].handler = __mee_default_sw_handler;
-            intc->mee_mtvec_table[id].sub_int = priv;
+            intc->mee_int_table[id].handler = __mee_default_sw_handler;
+            intc->mee_int_table[id].sub_int = priv;
 	  break;
 	case MEE_INTERRUPT_ID_TMR:
-            intc->mee_mtvec_table[id].handler = __mee_default_timer_handler;
-            intc->mee_mtvec_table[id].sub_int = priv;
+            intc->mee_int_table[id].handler = __mee_default_timer_handler;
+            intc->mee_int_table[id].sub_int = priv;
 	  break;
 	case MEE_INTERRUPT_ID_EXT:
 	case MEE_INTERRUPT_ID_LC0:
@@ -319,8 +342,8 @@ int __mee_driver_riscv_cpu_controller_interrupt_register(struct mee_interrupt *c
 	case MEE_INTERRUPT_ID_LC13:
 	case MEE_INTERRUPT_ID_LC14:
 	case MEE_INTERRUPT_ID_LC15:
-            intc->mee_mtvec_table[id].handler = __mee_default_interrupt_handler;
-            intc->mee_mtvec_table[id].sub_int = priv;
+            intc->mee_int_table[id].handler = __mee_default_interrupt_handler;
+            intc->mee_int_table[id].sub_int = priv;
 	  break;
 	defaut:
 	  rc = -12;
@@ -329,7 +352,7 @@ int __mee_driver_riscv_cpu_controller_interrupt_register(struct mee_interrupt *c
     return rc;
 }
 
- int __mee_driver_riscv_cpu_controller_interrupt_enable (struct mee_interrupt *controller,
+int __mee_driver_riscv_cpu_controller_interrupt_enable (struct mee_interrupt *controller,
                                                         int id)
 {
     return __mee_local_interrupt_enable(controller, id, MEE_ENABLE);
@@ -341,6 +364,36 @@ int __mee_driver_riscv_cpu_controller_interrupt_disable (struct mee_interrupt *c
     return __mee_local_interrupt_enable(controller, id, MEE_DISABLE);
 }
 
+int __mee_driver_riscv_cpu_controller_interrupt_enable_vector(struct mee_interrupt *controller,
+                                                             int id, mee_vector_mode mode)
+{
+    struct __mee_driver_riscv_cpu_intc *intc = (void *)(controller);
+
+    if (id == MEE_INTERRUPT_ID_BASE) {
+        if (mode == MEE_DIRECT_MODE) {
+            __mee_controller_interrupt_vector(mode, &__mee_exception_handler);
+            return 0;
+        }   
+        if (mode == MEE_VECTOR_MODE) {
+            __mee_controller_interrupt_vector(mode, &intc->mee_mtvec_table);
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int __mee_driver_riscv_cpu_controller_interrupt_disable_vector(struct mee_interrupt *controller,
+                                                              int id)
+{
+    struct __mee_driver_riscv_cpu_intc *intc = (void *)(controller);
+
+    if (id == MEE_INTERRUPT_ID_BASE) {
+        __mee_controller_interrupt_vector(MEE_DIRECT_MODE, &__mee_exception_handler);
+        return 0;
+    }
+    return -1;
+}
+
 int __mee_driver_riscv_cpu_controller_command_request (struct mee_interrupt *controller,
 						       int cmd, void *data)
 {
@@ -348,6 +401,7 @@ int __mee_driver_riscv_cpu_controller_command_request (struct mee_interrupt *con
     return 0;
 }
 
+extern inline int __mee_controller_interrupt_is_selective_vectored(void);
 
 /* CPU driver !!! */
 
@@ -390,7 +444,7 @@ unsigned long long  __mee_driver_cpu_mtime_get (struct mee_cpu *cpu)
 
     if (_cpu->interrupt_controller) {
         intc = (void *)_cpu->interrupt_controller;
-        tmr_intc = intc->mee_mtvec_table[MEE_INTERRUPT_ID_TMR].sub_int;
+        tmr_intc = intc->mee_int_table[MEE_INTERRUPT_ID_TMR].sub_int;
         if (tmr_intc) {
             tmr_intc->vtable->command_request(tmr_intc,
                                               MEE_TIMER_MTIME_GET, &time);
@@ -408,7 +462,7 @@ int __mee_driver_cpu_mtimecmp_set (struct mee_cpu *cpu, unsigned long long time)
 
     if (_cpu->interrupt_controller) {
         intc = (void *)_cpu->interrupt_controller;
-        tmr_intc = intc->mee_mtvec_table[MEE_INTERRUPT_ID_TMR].sub_int;
+        tmr_intc = intc->mee_int_table[MEE_INTERRUPT_ID_TMR].sub_int;
         if (tmr_intc) {
             rc = tmr_intc->vtable->command_request(tmr_intc,
                                                    MEE_TIMER_MTIME_SET, &time);
@@ -423,8 +477,12 @@ __mee_driver_cpu_timer_controller_interrupt(struct mee_cpu *cpu)
 #ifdef __MEE_DT_RISCV_CLINT0_HANDLE
     return __MEE_DT_RISCV_CLINT0_HANDLE;
 #else
+#ifdef __MEE_DT_SIFIVE_CLIC0_HANDLE
+    return __MEE_DT_SIFIVE_CLIC0_HANDLE;
+#else
 #warning "There is no interrupt controller for Timer interrupt"
     return NULL;
+#endif
 #endif
 }
 
@@ -439,8 +497,12 @@ __mee_driver_cpu_sw_controller_interrupt(struct mee_cpu *cpu)
 #ifdef __MEE_DT_RISCV_CLINT0_HANDLE
     return __MEE_DT_RISCV_CLINT0_HANDLE;
 #else
+#ifdef __MEE_DT_SIFIVE_CLIC0_HANDLE
+    return __MEE_DT_SIFIVE_CLIC0_HANDLE;
+#else
 #warning "There is no interrupt controller for Software interrupt"
     return NULL;
+#endif
 #endif
 }
 
@@ -458,7 +520,7 @@ int __mee_driver_cpu_set_sw_ipi (struct mee_cpu *cpu, int hartid)
 
     if (_cpu->interrupt_controller) {
         intc = (void *)_cpu->interrupt_controller;
-        sw_intc = intc->mee_mtvec_table[MEE_INTERRUPT_ID_SW].sub_int;
+        sw_intc = intc->mee_int_table[MEE_INTERRUPT_ID_SW].sub_int;
         if (sw_intc) {
             rc = sw_intc->vtable->command_request(sw_intc,
                                                   MEE_SOFTWARE_IPI_SET, &hartid);
@@ -476,7 +538,7 @@ int __mee_driver_cpu_clear_sw_ipi (struct mee_cpu *cpu, int hartid)
 
     if (_cpu->interrupt_controller) {
         intc = (void *)_cpu->interrupt_controller;
-        sw_intc = intc->mee_mtvec_table[MEE_INTERRUPT_ID_SW].sub_int;
+        sw_intc = intc->mee_int_table[MEE_INTERRUPT_ID_SW].sub_int;
         if (sw_intc) {
             rc = sw_intc->vtable->command_request(sw_intc,
                                                   MEE_SOFTWARE_IPI_CLEAR, &hartid);
@@ -494,7 +556,7 @@ int __mee_driver_cpu_get_msip (struct mee_cpu *cpu, int hartid)
 
     if (_cpu->interrupt_controller) {
         intc = (void *)_cpu->interrupt_controller;
-        sw_intc = intc->mee_mtvec_table[MEE_INTERRUPT_ID_SW].sub_int;
+        sw_intc = intc->mee_int_table[MEE_INTERRUPT_ID_SW].sub_int;
         if (sw_intc) {
             rc = sw_intc->vtable->command_request(sw_intc,
                                                   MEE_SOFTWARE_MSIP_GET, &hartid);
@@ -527,26 +589,6 @@ int __mee_driver_cpu_disable_interrupt(struct mee_cpu *cpu, void *priv)
     if (cpu0->interrupt_controller) {
         /* Only support machine mode for now */
         __mee_interrupt_global_disable();
-    	return 0;
-    }
-    return -1;
-}
-
-int __mee_driver_cpu_enable_interrupt_vector(struct mee_cpu *cpu)
-{
-    struct __mee_driver_cpu *cpu0 = (void *)cpu;
-    if (cpu0->interrupt_controller) {
-        __mee_controller_interrupt_vectored(cpu0->interrupt_controller, MEE_ENABLE);
-    	return 0;
-    }
-    return -1;
-}
-
-int __mee_driver_cpu_disable_interrupt_vector(struct mee_cpu *cpu)
-{
-    struct __mee_driver_cpu *cpu0 = (void *)cpu;
-    if (cpu0->interrupt_controller) {
-        __mee_controller_interrupt_vectored(cpu0->interrupt_controller, MEE_DISABLE);
     	return 0;
     }
     return -1;
