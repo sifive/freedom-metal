@@ -1,4 +1,4 @@
-#include <mee/tty.h>
+#include <metal/tty.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <unistd.h>
@@ -14,6 +14,6 @@ _write(int file, const void *ptr, size_t len)
 
   const char *bptr = ptr;
   for (size_t i = 0; i < len; ++i)
-    mee_tty_putc(bptr[i]);
+    metal_tty_putc(bptr[i]);
   return 0;
 }

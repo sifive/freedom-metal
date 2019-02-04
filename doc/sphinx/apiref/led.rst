@@ -1,6 +1,6 @@
 LEDs
 ====
 
-.. doxygenfile:: mee/led.h
+.. doxygenfile:: metal/led.h
    :project: metal
 

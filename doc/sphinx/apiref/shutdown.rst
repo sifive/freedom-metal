@@ -1,6 +1,6 @@
 Shutdown
 ========
 
-.. doxygenfile:: mee/shutdown.h
+.. doxygenfile:: metal/shutdown.h
    :project: metal
 

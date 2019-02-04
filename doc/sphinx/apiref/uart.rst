@@ -1,6 +1,6 @@
 UARTs
 =====
 
-.. doxygenfile:: mee/uart.h
+.. doxygenfile:: metal/uart.h
    :project: metal
 

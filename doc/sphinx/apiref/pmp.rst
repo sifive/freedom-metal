@@ -1,6 +1,6 @@
 PMPs
 ====
 
-.. doxygenfile:: mee/pmp.h
+.. doxygenfile:: metal/pmp.h
    :project: metal
 

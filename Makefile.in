@@ -92,9 +92,9 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 
-# Freedom MEE has its own libgloss implementation that is only built in
+# Freedom METAL has its own libgloss implementation that is only built in
 # --with-builtin-libgloss is passed to configure.
-@WITH_BUILTIN_LIBGLOSS_TRUE@am__append_1 = libriscv__menv__mee.a
+@WITH_BUILTIN_LIBGLOSS_TRUE@am__append_1 = libriscv__menv__metal.a
 check_PROGRAMS = return_pass$(EXEEXT) return_fail$(EXEEXT) \
 	hello$(EXEEXT) pll_set_hz$(EXEEXT)
 subdir = .
@@ -146,9 +146,9 @@ AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
-libriscv__menv__mee_a_AR = $(AR) $(ARFLAGS)
-libriscv__menv__mee_a_LIBADD =
-am__libriscv__menv__mee_a_SOURCES_DIST = gloss/nanosleep.c \
+libriscv__menv__metal_a_AR = $(AR) $(ARFLAGS)
+libriscv__menv__metal_a_LIBADD =
+am__libriscv__menv__metal_a_SOURCES_DIST = gloss/nanosleep.c \
 	gloss/sys_access.c gloss/sys_chdir.c gloss/sys_chmod.c \
 	gloss/sys_chown.c gloss/sys_close.c gloss/sys_execve.c \
 	gloss/sys_exit.c gloss/sys_faccessat.c gloss/sys_fork.c \
@@ -161,7 +161,7 @@ am__libriscv__menv__mee_a_SOURCES_DIST = gloss/nanosleep.c \
 	gloss/sys_unlink.c gloss/sys_utime.c gloss/sys_wait.c \
 	gloss/sys_write.c gloss/crt0.S
 am__dirstamp = $(am__leading_dot)dirstamp
-@WITH_BUILTIN_LIBGLOSS_TRUE@am_libriscv__menv__mee_a_OBJECTS =  \
+@WITH_BUILTIN_LIBGLOSS_TRUE@am_libriscv__menv__metal_a_OBJECTS =  \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.$(OBJEXT) \
@@ -195,7 +195,8 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT)
-libriscv__menv__mee_a_OBJECTS = $(am_libriscv__menv__mee_a_OBJECTS)
+libriscv__menv__metal_a_OBJECTS =  \
+	$(am_libriscv__menv__metal_a_OBJECTS)
 libriscv__mmachine__@MACHINE_NAME@_a_AR = $(AR) $(ARFLAGS)
 libriscv__mmachine__@MACHINE_NAME@_a_LIBADD =
 am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-fixed-clock.$(OBJEXT) \
@@ -287,11 +288,11 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libriscv__menv__mee_a_SOURCES) \
+SOURCES = $(libriscv__menv__metal_a_SOURCES) \
 	$(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
 	$(hello_SOURCES) $(pll_set_hz_SOURCES) $(return_fail_SOURCES) \
 	$(return_pass_SOURCES)
-DIST_SOURCES = $(am__libriscv__menv__mee_a_SOURCES_DIST) \
+DIST_SOURCES = $(am__libriscv__menv__metal_a_SOURCES_DIST) \
 	$(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
 	$(hello_SOURCES) $(pll_set_hz_SOURCES) $(return_fail_SOURCES) \
 	$(return_pass_SOURCES)
@@ -382,8 +383,8 @@ MACHINE_NAME = @MACHINE_NAME@
 MAINT = @MAINT@
 MAKEATTRIBUTES_GENERATOR = @MAKEATTRIBUTES_GENERATOR@
 MAKEINFO = @MAKEINFO@
-MEE_HEADER_GENERATOR = @MEE_HEADER_GENERATOR@
-MENV_MEE = @MENV_MEE@
+MENV_METAL = @MENV_METAL@
+METAL_HEADER_GENERATOR = @METAL_HEADER_GENERATOR@
 MKDIR_P = @MKDIR_P@
 MMACHINE_MACHINE_NAME = @MMACHINE_MACHINE_NAME@
 OBJEXT = @OBJEXT@
@@ -455,54 +456,54 @@ lds_DATA = riscv__mmachine__@MACHINE_NAME@.lds
 # build.
 specdir = $(libdir)
 spec_DATA = riscv__mmachine__@MACHINE_NAME@.specs \
-	riscv__menv__mee.specs
+	riscv__menv__metal.specs
 
-# Install some MEE-specific headers, one of which is automatically generated.
+# Install some METAL-specific headers, one of which is automatically generated.
 # The files that aren't automatically generated are the same for all machines.
 nobase_include_HEADERS = \
-	mee/machine/@MACHINE_NAME@.h \
-	mee/drivers/fixed-clock.h \
-	mee/drivers/sifive,fe310-g000,hfrosc.h \
-	mee/drivers/sifive,fe310-g000,hfxosc.h \
-	mee/drivers/sifive,fe310-g000,pll.h \
-	mee/drivers/sifive,fe310-g000,prci.h \
-	mee/drivers/sifive,gpio0.h \
-	mee/drivers/sifive,uart0.h \
-	mee/drivers/sifive,test0.h \
-	mee/drivers/sifive,local-external-interrupts0.h \
-	mee/drivers/sifive,global-external-interrupts0.h \
-	mee/drivers/sifive,gpio-leds.h \
-	mee/drivers/sifive,gpio-buttons.h \
-	mee/drivers/sifive,gpio-switches.h \
-	mee/drivers/riscv,cpu.h \
-	mee/drivers/sifive,clic0.h \
-	mee/drivers/riscv,clint0.h \
-	mee/drivers/riscv,plic0.h \
-	mee/compiler.h \
-	mee/clock.h \
-	mee/itim.h \
-	mee/io.h \
-	mee/machine.h \
-	mee/shutdown.h \
-	mee/pmp.h \
-	mee/tty.h \
-	mee/uart.h \
-	mee/timer.h \
-	mee/cpu.h \
-	mee/led.h \
-	mee/button.h \
-	mee/switch.h \
-	mee/interrupt.h
+	metal/machine/@MACHINE_NAME@.h \
+	metal/drivers/fixed-clock.h \
+	metal/drivers/sifive,fe310-g000,hfrosc.h \
+	metal/drivers/sifive,fe310-g000,hfxosc.h \
+	metal/drivers/sifive,fe310-g000,pll.h \
+	metal/drivers/sifive,fe310-g000,prci.h \
+	metal/drivers/sifive,gpio0.h \
+	metal/drivers/sifive,uart0.h \
+	metal/drivers/sifive,test0.h \
+	metal/drivers/sifive,local-external-interrupts0.h \
+	metal/drivers/sifive,global-external-interrupts0.h \
+	metal/drivers/sifive,gpio-leds.h \
+	metal/drivers/sifive,gpio-buttons.h \
+	metal/drivers/sifive,gpio-switches.h \
+	metal/drivers/riscv,cpu.h \
+	metal/drivers/sifive,clic0.h \
+	metal/drivers/riscv,clint0.h \
+	metal/drivers/riscv,plic0.h \
+	metal/compiler.h \
+	metal/clock.h \
+	metal/itim.h \
+	metal/io.h \
+	metal/machine.h \
+	metal/shutdown.h \
+	metal/pmp.h \
+	metal/tty.h \
+	metal/uart.h \
+	metal/timer.h \
+	metal/cpu.h \
+	metal/led.h \
+	metal/button.h \
+	metal/switch.h \
+	metal/interrupt.h
 
 
 # Quash an automake warning.
 
 # Everything in here is compiled into a single library, which contains all the
 # source files in the project.  It's named for one specific machine, which GCC
-# uses to select the target machine that this MEE implementation points at.
+# uses to select the target machine that this METAL implementation points at.
 lib_LIBRARIES = libriscv__mmachine__@MACHINE_NAME@.a $(am__append_1)
-libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
-libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
+libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
+libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/sifive,fe310-g000,hfrosc.c \
@@ -534,7 +535,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/uart.c \
 	src/entry.S
 
-@WITH_BUILTIN_LIBGLOSS_TRUE@libriscv__menv__mee_a_SOURCES = \
+@WITH_BUILTIN_LIBGLOSS_TRUE@libriscv__menv__metal_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.c \
@@ -570,16 +571,16 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S
 
 return_pass_SOURCES = test/return_pass.c
-return_pass_CFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
+return_pass_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 return_pass_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=return_pass.map
 return_fail_SOURCES = test/return_fail.c
-return_fail_CFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
+return_fail_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 return_fail_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=return_fail.map
 hello_SOURCES = test/hello.c
-hello_CFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
+hello_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 hello_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=hello.map
 pll_set_hz_SOURCES = test/pll_set_hz.c
-pll_set_hz_CFLAGS = @MENV_MEE@ @MMACHINE_MACHINE_NAME@
+pll_set_hz_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 pll_set_hz_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=pll_set_hz.map
 all: all-am
 
@@ -722,10 +723,10 @@ gloss/sys_write.$(OBJEXT): gloss/$(am__dirstamp) \
 gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 
-libriscv__menv__mee.a: $(libriscv__menv__mee_a_OBJECTS) $(libriscv__menv__mee_a_DEPENDENCIES) $(EXTRA_libriscv__menv__mee_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libriscv__menv__mee.a
-	$(AM_V_AR)$(libriscv__menv__mee_a_AR) libriscv__menv__mee.a $(libriscv__menv__mee_a_OBJECTS) $(libriscv__menv__mee_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libriscv__menv__mee.a
+libriscv__menv__metal.a: $(libriscv__menv__metal_a_OBJECTS) $(libriscv__menv__metal_a_DEPENDENCIES) $(EXTRA_libriscv__menv__metal_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libriscv__menv__metal.a
+	$(AM_V_AR)$(libriscv__menv__metal_a_AR) libriscv__menv__metal.a $(libriscv__menv__metal_a_OBJECTS) $(libriscv__menv__metal_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libriscv__menv__metal.a
 src/drivers/$(am__dirstamp):
 	@$(MKDIR_P) src/drivers
 	@: > src/drivers/$(am__dirstamp)
@@ -1861,12 +1862,12 @@ uninstall-am: uninstall-ldsDATA uninstall-libLIBRARIES \
 # instead of enforcing the dependency on the .o we pretend that the C file
 # itself depends on the header.  This is the only way I could figure out that
 # would satisfy the dependency inside automake.
-%.c: mee/machine/@MACHINE_NAME@.h
-%.S: mee/machine/@MACHINE_NAME@.h
-%.o: mee/machine/@MACHINE_NAME@.h
-%.c: riscv__menv__mee.specs
-%.S: riscv__menv__mee.specs
-%.o: riscv__menv__mee.specs
+%.c: metal/machine/@MACHINE_NAME@.h
+%.S: metal/machine/@MACHINE_NAME@.h
+%.o: metal/machine/@MACHINE_NAME@.h
+%.c: riscv__menv__metal.specs
+%.S: riscv__menv__metal.specs
+%.o: riscv__menv__metal.specs
 %.c: riscv__mmachine__@MACHINE_NAME@.specs
 %.S: riscv__mmachine__@MACHINE_NAME@.specs
 %.o: riscv__mmachine__@MACHINE_NAME@.specs
@@ -1885,7 +1886,7 @@ $(check_PROGRAMS): libriscv__mmachine__@MACHINE_NAME@.a
 @PRECONFIGURED_TRUE@	touch $@
 @PRECONFIGURED_FALSE@riscv__mmachine__@MACHINE_NAME@.specs: @SPECS_GENERATOR@ @MACHINE_NAME@.dtb
 @PRECONFIGURED_FALSE@	$< --dtb $(filter %.dtb,$^) --specs $@ --prefix @prefix@ --machine @MACHINE_NAME@
-riscv__menv__mee.specs: riscv__menv__mee.specs.in
+riscv__menv__metal.specs: riscv__menv__metal.specs.in
 	cat $^ > $@
 
 # In order to generate code that's actually compatible with a machine we must
@@ -1898,10 +1899,10 @@ riscv__menv__mee.specs: riscv__menv__mee.specs.in
 @PRECONFIGURED_FALSE@@MACHINE_NAME@.mk: @MAKEATTRIBUTES_GENERATOR@ @MACHINE_NAME@.dtb
 @PRECONFIGURED_FALSE@	$< --dtb $(filter %.dtb,$^) --output $@
 
-@PRECONFIGURED_TRUE@mee/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
+@PRECONFIGURED_TRUE@metal/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
 @PRECONFIGURED_TRUE@	@mkdir -p $(dir $@)
 @PRECONFIGURED_TRUE@	cp $< $@
-# Builds the machine-specific MEE header file, which paramaterizes the MEE for
+# Builds the machine-specific METAL header file, which paramaterizes the METAL for
 # one specific machine.  This is automatically picked up by GCC so users
 # automatically get the relevant definitions.  This is a two-step process:
 # first a DTB is built, and then the DTB is converted to a header file using an
@@ -1909,14 +1910,14 @@ riscv__menv__mee.specs: riscv__menv__mee.specs.in
 @PRECONFIGURED_FALSE@@MACHINE_NAME@.dtb: @DTC@ @MACHINE_DTS@
 @PRECONFIGURED_FALSE@	$< $(filter %.dts,$^) -o $@ -O dtb -I dts
 
-@PRECONFIGURED_FALSE@mee/machine/@MACHINE_NAME@.h: @MEE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
+@PRECONFIGURED_FALSE@metal/machine/@MACHINE_NAME@.h: @METAL_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
 @PRECONFIGURED_FALSE@	@mkdir -p $(dir $@)
 @PRECONFIGURED_FALSE@	$< --dtb $(filter %.dtb,$^) --output $@
 
 # Extra clean targets
 clean-local:
 	-rm -rf @MACHINE_NAME@.mk
-	-rm -rf mee/machine/@MACHINE_NAME@.h @MACHINE_NAME@.dtb mee-@MACHINE_NAME@.lds
+	-rm -rf metal/machine/@MACHINE_NAME@.h @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
 	-rm -rf *.map *.specs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

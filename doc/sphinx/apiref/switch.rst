@@ -1,6 +1,6 @@
 Switches
 ========
 
-.. doxygenfile:: mee/switch.h
+.. doxygenfile:: metal/switch.h
    :project: metal
 

@@ -9,13 +9,13 @@
    http://www.opensource.org/licenses.
 */
 
-/* crt0.S: Entry point for RISC-V MEE programs. */
+/* crt0.S: Entry point for RISC-V METAL programs. */
 
 .section .text.libgloss.start
 .global _start
 .type   _start, @function
 
-  /* _start is defined by the MEE to have been called with the following
+  /* _start is defined by the METAL to have been called with the following
    * arguments:
    *   a0: the hart ID of the currently executing hart.  Harts can start at
    *       any arbitrary point, it's the C library's job to ensure the code is
@@ -32,7 +32,7 @@ _start:
 .cfi_undefined ra
 
   /* This is a bit funky: it's not usually sane for _start to return, but in
-   * this case we actually want to in order to signal an error to the MEE. */
+   * this case we actually want to in order to signal an error to the METAL. */
   mv s0, ra
 
   /* Before doing anything we must initialize the global pointer, as we cannot
@@ -44,11 +44,11 @@ _start:
   la gp, __global_pointer$
 .option pop
 
-  /* The MEE is designed for a bare-metal environment and therefor is expected
+  /* The METAL is designed for a bare-metal environment and therefor is expected
    * to define its own stack pointer.  We also align the stack pointer here
    * because the only RISC-V ABI that's currently defined mandates 16-byte
    * stack alignment. */
-  la sp, mee_segment_stack_end
+  la sp, metal_segment_stack_end
   andi sp, sp, -16
 
   /* For now we only run on single-hart systems and assume that we're always on
@@ -60,12 +60,12 @@ _start:
    * code can be run -- for example, the data segment may exist in flash upon
    * boot and then need to get relocated into a non-persistant writable memory
    * before C code can execute.  If this is the case we do so here.  This step
-   * is optional: if the MEE provides an environment in which this relocation
-   * is not necessary then it must simply set mee_segment_data_source_start to
-   * be equal to mee_segment_data_target_start. */
-  la t0, mee_segment_data_source_start
-  la t1, mee_segment_data_target_start
-  la t2, mee_segment_data_target_end
+   * is optional: if the METAL provides an environment in which this relocation
+   * is not necessary then it must simply set metal_segment_data_source_start to
+   * be equal to metal_segment_data_target_start. */
+  la t0, metal_segment_data_source_start
+  la t1, metal_segment_data_target_start
+  la t2, metal_segment_data_target_end
 
   beq t0, t1, 2f
   bge t1, t2, 2f
@@ -79,9 +79,9 @@ _start:
 2:
 
   /* Copy the ITIM section */
-  la t0, mee_segment_itim_source_start
-  la t1, mee_segment_itim_target_start
-  la t2, mee_segment_itim_target_end
+  la t0, metal_segment_itim_source_start
+  la t1, metal_segment_itim_target_start
+  la t2, metal_segment_itim_target_end
 
   beq t0, t1, 2f
   bge t1, t2, 2f
@@ -95,8 +95,8 @@ _start:
 2:
 
   /* Zero the BSS segment. */
-  la t1, mee_segment_bss_target_start
-  la t2, mee_segment_bss_target_end
+  la t1, metal_segment_bss_target_start
+  la t2, metal_segment_bss_target_end
 
   bge t1, t2, 2f
 
@@ -119,7 +119,7 @@ _start:
   call __libc_init_array
 
   /* This is a C runtime, so main() is defined to have some arguments.  Since
-   * there's nothing sane the MEE can pass we don't bother with that but
+   * there's nothing sane the METAL can pass we don't bother with that but
    * instead just setup as close to a NOP as we can. */
   li a0, 1     /* argc=1 */
   la a1, argv  /* argv = {"libgloss", NULL} */
@@ -128,11 +128,11 @@ _start:
 
   /* Call exit to handle libc's cleanup routines.  Under normal contains this
    * shouldn't even get called, but I'm still not using a tail call here
-   * because returning to the MEE is the right thing to do in pathological
+   * because returning to the METAL is the right thing to do in pathological
    * situations. */
   call exit
 
-  /* And here's where we return.  Again, it's a bit odd but the MEE defines
+  /* And here's where we return.  Again, it's a bit odd but the METAL defines
    * this as a bad idea (ie, as opposed to leaving it undefined) and at this
    * point it's really the only thing left to do. */
   mv ra, s0

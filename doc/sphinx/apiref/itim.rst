@@ -1,7 +1,7 @@
 ITIM
 ====
 
-.. doxygenfile:: mee/itim.h
+.. doxygenfile:: metal/itim.h
    :project: metal
    :no-link:
 

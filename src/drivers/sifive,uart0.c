@@ -1,7 +1,7 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <mee/drivers/sifive,uart0.h>
+#include <metal/drivers/sifive,uart0.h>
 
 /* The byte offsets of the various UART registers. */
 #define UART_REG_TXDATA         0x00
@@ -28,46 +28,46 @@
 /* IP Fields */
 #define UART_TXWM               (1 <<  0)
 
-#define UART_REG(offset)   (((unsigned long)(((struct __mee_driver_sifive_uart0 *)(uart))->control_base) + offset))
-#define UART_REGB(offset)  (__MEE_ACCESS_ONCE((__mee_io_u8  *)UART_REG(offset)))
-#define UART_REGW(offset)  (__MEE_ACCESS_ONCE((__mee_io_u32 *)UART_REG(offset)))
+#define UART_REG(offset)   (((unsigned long)(((struct __metal_driver_sifive_uart0 *)(uart))->control_base) + offset))
+#define UART_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)UART_REG(offset)))
+#define UART_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)UART_REG(offset)))
 
-struct mee_interrupt *
-__mee_driver_sifive_uart0_interrupt_controller(struct mee_uart *uart)
+struct metal_interrupt *
+__metal_driver_sifive_uart0_interrupt_controller(struct metal_uart *uart)
 {
-    struct __mee_driver_sifive_uart0 *uart0 = (void *)uart;
-    return (struct mee_interrupt *)uart0->interrupt_parent;
+    struct __metal_driver_sifive_uart0 *uart0 = (void *)uart;
+    return (struct metal_interrupt *)uart0->interrupt_parent;
 }
 
-int __mee_driver_sifive_uart0_get_interrupt_id(struct mee_uart *uart)
+int __metal_driver_sifive_uart0_get_interrupt_id(struct metal_uart *uart)
 {
-    struct __mee_driver_sifive_uart0 *uart0 = (void *)uart;
-    return (uart0->interrupt_line + MEE_INTERRUPT_ID_GL0);
+    struct __metal_driver_sifive_uart0 *uart0 = (void *)uart;
+    return (uart0->interrupt_line + METAL_INTERRUPT_ID_GL0);
 }
 
-int __mee_driver_sifive_uart0_putc(struct mee_uart *uart, unsigned char c)
+int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, unsigned char c)
 {
     while ((UART_REGW(UART_REG_TXDATA) & UART_TXFULL) != 0) { }
     UART_REGW(UART_REG_TXDATA) = c;
     return 0;
 }
 
-int __mee_driver_sifive_uart0_getc(struct mee_uart *uart, unsigned char *c)
+int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, unsigned char *c)
 {
     while ((UART_REGW(UART_REG_RXDATA) & UART_RXEMPTY) == 0) { }
     *c = UART_REGW(UART_REG_RXDATA);
     return 0;
 }
 
-int __mee_driver_sifive_uart0_get_baud_rate(struct mee_uart *guart)
+int __metal_driver_sifive_uart0_get_baud_rate(struct metal_uart *guart)
 {
-    struct __mee_driver_sifive_uart0 *uart = (void *)guart;
+    struct __metal_driver_sifive_uart0 *uart = (void *)guart;
     return uart->baud_rate;
 }
 
-int __mee_driver_sifive_uart0_set_baud_rate(struct mee_uart *guart, int baud_rate)
+int __metal_driver_sifive_uart0_set_baud_rate(struct metal_uart *guart, int baud_rate)
 {
-    struct __mee_driver_sifive_uart0 *uart = (void *)guart;
+    struct __metal_driver_sifive_uart0 *uart = (void *)guart;
 
     uart->baud_rate = baud_rate;
 
@@ -81,7 +81,7 @@ int __mee_driver_sifive_uart0_set_baud_rate(struct mee_uart *guart, int baud_rat
 
 static void pre_rate_change_callback(void *priv)
 {
-    struct __mee_driver_sifive_uart0 *uart = priv;
+    struct __metal_driver_sifive_uart0 *uart = priv;
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to one and waiting until an interrupt is pending */
@@ -105,20 +105,20 @@ static void pre_rate_change_callback(void *priv)
 
 static void post_rate_change_callback(void *priv)
 {
-    struct __mee_driver_sifive_uart0 *uart = priv;
-    mee_uart_set_baud_rate(&uart->uart, uart->baud_rate);
+    struct __metal_driver_sifive_uart0 *uart = priv;
+    metal_uart_set_baud_rate(&uart->uart, uart->baud_rate);
 }
 
-void __mee_driver_sifive_uart0_init(struct mee_uart *guart, int baud_rate)
+void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate)
 {
-    struct __mee_driver_sifive_uart0 *uart = (void *)(guart);
+    struct __metal_driver_sifive_uart0 *uart = (void *)(guart);
 
     if(uart->clock != NULL) {
-        mee_clock_register_pre_rate_change_callback(uart->clock, &pre_rate_change_callback, uart);
-        mee_clock_register_post_rate_change_callback(uart->clock, &post_rate_change_callback, uart);
+        metal_clock_register_pre_rate_change_callback(uart->clock, &pre_rate_change_callback, uart);
+        metal_clock_register_post_rate_change_callback(uart->clock, &post_rate_change_callback, uart);
     }
 
-    mee_uart_set_baud_rate(&(uart->uart), baud_rate);
+    metal_uart_set_baud_rate(&(uart->uart), baud_rate);
 
     if (uart->pinmux != NULL) {
         uart->pinmux->vtable->enable_io(

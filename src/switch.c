@@ -1,20 +1,20 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <mee/switch.h>
-#include <mee/machine.h>
+#include <metal/switch.h>
+#include <metal/machine.h>
 
-struct mee_switch* mee_switch_get (char *label)
+struct metal_switch* metal_switch_get (char *label)
 {
     int i;
-    struct mee_switch *flip;
+    struct metal_switch *flip;
 
-    if ((__MEE_DT_MAX_BUTTONS == 0) || (label == NULL)) {
+    if ((__METAL_DT_MAX_BUTTONS == 0) || (label == NULL)) {
         return NULL;
     }
 
-    for (i = 0; i < __MEE_DT_MAX_BUTTONS; i++) {
-        flip = (struct mee_switch*)__mee_switch_table[i];
+    for (i = 0; i < __METAL_DT_MAX_BUTTONS; i++) {
+        flip = (struct metal_switch*)__metal_switch_table[i];
         if (flip->vtable->switch_exist(flip, label)) {
             return flip;
         }
@@ -22,6 +22,6 @@ struct mee_switch* mee_switch_get (char *label)
     return NULL;
 }
 
-extern inline struct mee_interrupt*
-    mee_switch_interrupt_controller(struct mee_switch *flip);
-extern inline int mee_switch_get_interrupt_id(struct mee_switch *flip);
+extern inline struct metal_interrupt*
+    metal_switch_interrupt_controller(struct metal_switch *flip);
+extern inline int metal_switch_get_interrupt_id(struct metal_switch *flip);

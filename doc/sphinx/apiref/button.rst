@@ -1,6 +1,6 @@
 Buttons
 =======
 
-.. doxygenfile:: mee/button.h
+.. doxygenfile:: metal/button.h
    :project: metal
 

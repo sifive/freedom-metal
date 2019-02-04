@@ -1,6 +1,6 @@
 TTY
 ===
 
-.. doxygenfile:: mee/tty.h
+.. doxygenfile:: metal/tty.h
    :project: metal
 

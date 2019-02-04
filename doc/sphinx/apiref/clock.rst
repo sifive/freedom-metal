@@ -1,6 +1,6 @@
 Clocks
 ======
 
-.. doxygenfile:: mee/clock.h
+.. doxygenfile:: metal/clock.h
    :project: metal
 

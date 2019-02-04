@@ -1,6 +1,6 @@
 Timer API
 =========
 
-.. doxygenfile:: mee/timer.h
+.. doxygenfile:: metal/timer.h
    :project: metal
 
