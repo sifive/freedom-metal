@@ -70,37 +70,37 @@ endif # PRECONFIGURED
 nobase_include_HEADERS = \
 	metal/machine/@MACHINE_NAME@.h \
 	metal/drivers/fixed-clock.h \
+	metal/drivers/riscv,clint0.h \
+	metal/drivers/riscv,cpu.h \
+	metal/drivers/riscv,plic0.h \
+	metal/drivers/sifive,clic0.h \
 	metal/drivers/sifive,fe310-g000,hfrosc.h \
 	metal/drivers/sifive,fe310-g000,hfxosc.h \
 	metal/drivers/sifive,fe310-g000,pll.h \
 	metal/drivers/sifive,fe310-g000,prci.h \
-	metal/drivers/sifive,gpio0.h \
-	metal/drivers/sifive,uart0.h \
-	metal/drivers/sifive,test0.h \
-	metal/drivers/sifive,local-external-interrupts0.h \
 	metal/drivers/sifive,global-external-interrupts0.h \
-	metal/drivers/sifive,gpio-leds.h \
 	metal/drivers/sifive,gpio-buttons.h \
+	metal/drivers/sifive,gpio-leds.h \
 	metal/drivers/sifive,gpio-switches.h \
-	metal/drivers/riscv,cpu.h \
-	metal/drivers/sifive,clic0.h \
-	metal/drivers/riscv,clint0.h \
-	metal/drivers/riscv,plic0.h \
-	metal/compiler.h \
-	metal/clock.h \
-	metal/itim.h \
-	metal/io.h \
-	metal/machine.h \
-	metal/shutdown.h \
-	metal/pmp.h \
-	metal/tty.h \
-	metal/uart.h \
-	metal/timer.h \
-	metal/cpu.h \
-	metal/led.h \
+	metal/drivers/sifive,gpio0.h \
+	metal/drivers/sifive,local-external-interrupts0.h \
+	metal/drivers/sifive,test0.h \
+	metal/drivers/sifive,uart0.h \
 	metal/button.h \
+	metal/clock.h \
+	metal/compiler.h \
+	metal/cpu.h \
+	metal/interrupt.h \
+	metal/io.h \
+	metal/itim.h \
+	metal/led.h \
+	metal/machine.h \
+	metal/pmp.h \
+	metal/shutdown.h \
 	metal/switch.h \
-	metal/interrupt.h
+	metal/timer.h \
+	metal/tty.h \
+	metal/uart.h
 
 if PRECONFIGURED
 metal/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
@@ -133,34 +133,34 @@ libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_
 
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
+	src/drivers/riscv,clint0.c \
+	src/drivers/riscv,cpu.c \
+	src/drivers/riscv,plic0.c \
+	src/drivers/sifive,clic0.c \
 	src/drivers/sifive,fe310-g000,hfrosc.c \
 	src/drivers/sifive,fe310-g000,hfxosc.c \
-	src/drivers/sifive,fe310-g000,prci.c \
 	src/drivers/sifive,fe310-g000,pll.c \
-	src/drivers/sifive,test0.c \
-	src/drivers/sifive,gpio0.c \
-        src/drivers/sifive,local-external-interrupts0.c \
-        src/drivers/sifive,global-external-interrupts0.c \
-	src/drivers/riscv,cpu.c \
-	src/drivers/sifive,uart0.c \
-	src/drivers/sifive,gpio-leds.c \
+	src/drivers/sifive,fe310-g000,prci.c \
 	src/drivers/sifive,gpio-buttons.c \
+	src/drivers/sifive,gpio-leds.c \
 	src/drivers/sifive,gpio-switches.c \
-	src/drivers/sifive,clic0.c \
-	src/drivers/riscv,clint0.c \
-	src/drivers/riscv,plic0.c \
-	src/clock.c \
-	src/tty.c \
-	src/shutdown.c \
-	src/timer.c \
-	src/cpu.c \
-	src/led.c \
+	src/drivers/sifive,gpio0.c \
+	src/drivers/sifive,test0.c \
+	src/drivers/sifive,uart0.c \
+	src/drivers/sifive,global-external-interrupts0.c \
+	src/drivers/sifive,local-external-interrupts0.c \
 	src/button.c \
-	src/switch.c \
+	src/clock.c \
+	src/cpu.c \
+	src/entry.S \
 	src/interrupt.c \
+	src/led.c \
 	src/pmp.c \
-	src/uart.c \
-	src/entry.S
+	src/shutdown.c \
+	src/switch.c \
+	src/timer.c \
+	src/tty.c \
+	src/uart.c
 
 # Freedom METAL has its own libgloss implementation that is only built in
 # --with-builtin-libgloss is passed to configure.
@@ -169,6 +169,7 @@ if WITH_BUILTIN_LIBGLOSS
 lib_LIBRARIES += libriscv__menv__metal.a
 
 libriscv__menv__metal_a_SOURCES = \
+	gloss/crt0.S \
 	gloss/nanosleep.c \
 	gloss/sys_access.c \
 	gloss/sys_chdir.c \
@@ -200,8 +201,7 @@ libriscv__menv__metal_a_SOURCES = \
 	gloss/sys_unlink.c \
 	gloss/sys_utime.c \
 	gloss/sys_wait.c \
-	gloss/sys_write.c \
-	gloss/crt0.S
+	gloss/sys_write.c
 
 endif
 
@@ -225,11 +225,6 @@ check_PROGRAMS       += hello
 hello_SOURCES         = test/hello.c
 hello_CFLAGS          = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 hello_LDFLAGS         = -L. -Wl,--gc-sections -Wl,-Map=hello.map
-
-check_PROGRAMS       += pll_set_hz
-pll_set_hz_SOURCES    = test/pll_set_hz.c
-pll_set_hz_CFLAGS     = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-pll_set_hz_LDFLAGS    = -L. -Wl,--gc-sections -Wl,-Map=pll_set_hz.map
 
 # Extra clean targets
 clean-local:
