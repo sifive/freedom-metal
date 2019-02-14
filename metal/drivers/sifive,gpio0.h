@@ -8,35 +8,36 @@
 
 struct __metal_driver_sifive_gpio0;
 
-long __metal_driver_sifive_gpio0_disable_input(const struct __metal_driver_sifive_gpio0 *gpio, long source);
+int __metal_driver_sifive_gpio0_disable_input(const struct __metal_driver_sifive_gpio0 *gpio, long source);
 long __metal_driver_sifive_gpio0_output(const struct __metal_driver_sifive_gpio0 *gpio);
-long __metal_driver_sifive_gpio0_enable_output(const struct __metal_driver_sifive_gpio0 *gpio, long source);
-long __metal_driver_sifive_gpio0_output_set(const struct __metal_driver_sifive_gpio0 *gpio, long value);
-long __metal_driver_sifive_gpio0_output_clear(const struct __metal_driver_sifive_gpio0 *gpio, long value);
-long __metal_driver_sifive_gpio0_output_toggle(const struct __metal_driver_sifive_gpio0 *gpio, long value);
-long __metal_driver_sifive_gpio0_enable_io(const struct __metal_driver_sifive_gpio0 *, long source, long dest);
+int __metal_driver_sifive_gpio0_enable_output(const struct __metal_driver_sifive_gpio0 *gpio, long source);
+int __metal_driver_sifive_gpio0_output_set(const struct __metal_driver_sifive_gpio0 *gpio, long value);
+int __metal_driver_sifive_gpio0_output_clear(const struct __metal_driver_sifive_gpio0 *gpio, long value);
+int __metal_driver_sifive_gpio0_output_toggle(const struct __metal_driver_sifive_gpio0 *gpio, long value);
+int __metal_driver_sifive_gpio0_enable_io(const struct __metal_driver_sifive_gpio0 *, long source, long dest);
 
 struct __metal_driver_vtable_sifive_gpio0 {
-    long (*disable_input)(const struct __metal_driver_sifive_gpio0 *, long source);
+    int (*disable_input)(const struct __metal_driver_sifive_gpio0 *, long source);
     long (*output)(const struct __metal_driver_sifive_gpio0 *);
-    long (*enable_output)(const struct __metal_driver_sifive_gpio0 *, long source);
-    long (*output_set)(const struct __metal_driver_sifive_gpio0 *, long value);
-    long (*output_clear)(const struct __metal_driver_sifive_gpio0 *, long value);
-    long (*output_toggle)(const struct __metal_driver_sifive_gpio0 *, long value);
-    long (*enable_io)(const struct __metal_driver_sifive_gpio0 *, long source, long dest);
+    int (*enable_output)(const struct __metal_driver_sifive_gpio0 *, long source);
+    int (*output_set)(const struct __metal_driver_sifive_gpio0 *, long value);
+    int (*output_clear)(const struct __metal_driver_sifive_gpio0 *, long value);
+    int (*output_toggle)(const struct __metal_driver_sifive_gpio0 *, long value);
+    int (*enable_io)(const struct __metal_driver_sifive_gpio0 *, long source, long dest);
 };
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_gpio0) = {
-    .disable_input = __metal_driver_sifive_gpio0_disable_input,
-    .output        = __metal_driver_sifive_gpio0_output,
-    .enable_output = __metal_driver_sifive_gpio0_enable_output,
-    .output_set    = __metal_driver_sifive_gpio0_output_set,
-    .output_clear  = __metal_driver_sifive_gpio0_output_clear,
-    .output_toggle = __metal_driver_sifive_gpio0_output_toggle,
-    .enable_io = __metal_driver_sifive_gpio0_enable_io,
+    .gpio.disable_input = __metal_driver_sifive_gpio0_disable_input,
+    .gpio.output        = __metal_driver_sifive_gpio0_output,
+    .gpio.enable_output = __metal_driver_sifive_gpio0_enable_output,
+    .gpio.output_set    = __metal_driver_sifive_gpio0_output_set,
+    .gpio.output_clear  = __metal_driver_sifive_gpio0_output_clear,
+    .gpio.output_toggle = __metal_driver_sifive_gpio0_output_toggle,
+    .gpio.enable_io = __metal_driver_sifive_gpio0_enable_io,
 };
 
 struct __metal_driver_sifive_gpio0 {
+    struct metal_gpio gpio;
     const struct __metal_driver_vtable_sifive_gpio0 *vtable;
     const long base;
     const long size;
