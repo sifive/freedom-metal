@@ -84,6 +84,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive,gpio-switches.h \
 	metal/drivers/sifive,gpio0.h \
 	metal/drivers/sifive,local-external-interrupts0.h \
+	metal/drivers/sifive,spi0.h \
 	metal/drivers/sifive,test0.h \
 	metal/drivers/sifive,uart0.h \
 	metal/button.h \
@@ -97,6 +98,7 @@ nobase_include_HEADERS = \
 	metal/machine.h \
 	metal/pmp.h \
 	metal/shutdown.h \
+	metal/spi.h \
 	metal/switch.h \
 	metal/timer.h \
 	metal/tty.h \
@@ -141,14 +143,15 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive,fe310-g000,hfxosc.c \
 	src/drivers/sifive,fe310-g000,pll.c \
 	src/drivers/sifive,fe310-g000,prci.c \
+	src/drivers/sifive,global-external-interrupts0.c \
 	src/drivers/sifive,gpio-buttons.c \
 	src/drivers/sifive,gpio-leds.c \
 	src/drivers/sifive,gpio-switches.c \
 	src/drivers/sifive,gpio0.c \
+	src/drivers/sifive,local-external-interrupts0.c \
+	src/drivers/sifive,spi0.c \
 	src/drivers/sifive,test0.c \
 	src/drivers/sifive,uart0.c \
-	src/drivers/sifive,global-external-interrupts0.c \
-	src/drivers/sifive,local-external-interrupts0.c \
 	src/button.c \
 	src/clock.c \
 	src/cpu.c \
@@ -157,6 +160,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/led.c \
 	src/pmp.c \
 	src/shutdown.c \
+	src/spi.c \
 	src/switch.c \
 	src/timer.c \
 	src/tty.c \
