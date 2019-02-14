@@ -9,21 +9,21 @@ access to instruction memory.
 Freedom Metal provides the ability to designate functions to run out of
 the ITIM by decorating the functions with the following "decorator":
 
-.. doxygendefine:: MEE_PLACE_IN_ITIM
+.. doxygendefine:: METAL_PLACE_IN_ITIM
    :project: metal
 
 For example:
 
 .. code-block:: C
 
-   MEE_PLACE_IN_ITIM
+   METAL_PLACE_IN_ITIM
    void my_itim_func() {
       /* This code will run out of the ITIM */
    }
 
 Caveats
 -------
-The ``MEE_PLACE_IN_ITIM`` decorator tells the toolchain to link the
+The ``METAL_PLACE_IN_ITIM`` decorator tells the toolchain to link the
 decorated function into the ITIM memory. However, compiler optimizations
 such as function inlining may cause execution to never transfer to
 instructions fetched from the ITIM.
@@ -34,7 +34,7 @@ tell the compiler to not inline the function:
 .. code-block:: C
 
    __attribute__((noinline))
-   MEE_PLACE_IN_ITIM
+   METAL_PLACE_IN_ITIM
    void my_itim_func() {
       /* This code will run out of the ITIM */
    }
