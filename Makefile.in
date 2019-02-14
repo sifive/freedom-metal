@@ -96,7 +96,7 @@ POST_UNINSTALL = :
 # --with-builtin-libgloss is passed to configure.
 @WITH_BUILTIN_LIBGLOSS_TRUE@am__append_1 = libriscv__menv__metal.a
 check_PROGRAMS = return_pass$(EXEEXT) return_fail$(EXEEXT) \
-	hello$(EXEEXT) pll_set_hz$(EXEEXT)
+	hello$(EXEEXT)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_compile_flag.m4 \
@@ -148,20 +148,21 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libriscv__menv__metal_a_AR = $(AR) $(ARFLAGS)
 libriscv__menv__metal_a_LIBADD =
-am__libriscv__menv__metal_a_SOURCES_DIST = gloss/nanosleep.c \
-	gloss/sys_access.c gloss/sys_chdir.c gloss/sys_chmod.c \
-	gloss/sys_chown.c gloss/sys_close.c gloss/sys_execve.c \
-	gloss/sys_exit.c gloss/sys_faccessat.c gloss/sys_fork.c \
-	gloss/sys_fstat.c gloss/sys_fstatat.c gloss/sys_ftime.c \
-	gloss/sys_getcwd.c gloss/sys_getpid.c gloss/sys_gettimeofday.c \
-	gloss/sys_isatty.c gloss/sys_kill.c gloss/sys_link.c \
-	gloss/sys_lseek.c gloss/sys_lstat.c gloss/sys_open.c \
-	gloss/sys_openat.c gloss/sys_read.c gloss/sys_sbrk.c \
-	gloss/sys_stat.c gloss/sys_sysconf.c gloss/sys_times.c \
-	gloss/sys_unlink.c gloss/sys_utime.c gloss/sys_wait.c \
-	gloss/sys_write.c gloss/crt0.S
+am__libriscv__menv__metal_a_SOURCES_DIST = gloss/crt0.S \
+	gloss/nanosleep.c gloss/sys_access.c gloss/sys_chdir.c \
+	gloss/sys_chmod.c gloss/sys_chown.c gloss/sys_close.c \
+	gloss/sys_execve.c gloss/sys_exit.c gloss/sys_faccessat.c \
+	gloss/sys_fork.c gloss/sys_fstat.c gloss/sys_fstatat.c \
+	gloss/sys_ftime.c gloss/sys_getcwd.c gloss/sys_getpid.c \
+	gloss/sys_gettimeofday.c gloss/sys_isatty.c gloss/sys_kill.c \
+	gloss/sys_link.c gloss/sys_lseek.c gloss/sys_lstat.c \
+	gloss/sys_open.c gloss/sys_openat.c gloss/sys_read.c \
+	gloss/sys_sbrk.c gloss/sys_stat.c gloss/sys_sysconf.c \
+	gloss/sys_times.c gloss/sys_unlink.c gloss/sys_utime.c \
+	gloss/sys_wait.c gloss/sys_write.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@am_libriscv__menv__metal_a_OBJECTS =  \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.$(OBJEXT) \
@@ -193,41 +194,40 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_unlink.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_utime.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.$(OBJEXT) \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.$(OBJEXT) \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT)
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.$(OBJEXT)
 libriscv__menv__metal_a_OBJECTS =  \
 	$(am_libriscv__menv__metal_a_OBJECTS)
 libriscv__mmachine__@MACHINE_NAME@_a_AR = $(AR) $(ARFLAGS)
 libriscv__mmachine__@MACHINE_NAME@_a_LIBADD =
 am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-fixed-clock.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfxosc.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.$(OBJEXT) \
-	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-tty.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-led.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-button.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-led.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-uart.$(OBJEXT) \
-	src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT)
+	src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-tty.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-uart.$(OBJEXT)
 libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS =  \
 	$(am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS)
 am_hello_OBJECTS = test/hello-hello.$(OBJEXT)
@@ -235,11 +235,6 @@ hello_OBJECTS = $(am_hello_OBJECTS)
 hello_LDADD = $(LDADD)
 hello_LINK = $(CCLD) $(hello_CFLAGS) $(CFLAGS) $(hello_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am_pll_set_hz_OBJECTS = test/pll_set_hz-pll_set_hz.$(OBJEXT)
-pll_set_hz_OBJECTS = $(am_pll_set_hz_OBJECTS)
-pll_set_hz_LDADD = $(LDADD)
-pll_set_hz_LINK = $(CCLD) $(pll_set_hz_CFLAGS) $(CFLAGS) \
-	$(pll_set_hz_LDFLAGS) $(LDFLAGS) -o $@
 am_return_fail_OBJECTS = test/return_fail-return_fail.$(OBJEXT)
 return_fail_OBJECTS = $(am_return_fail_OBJECTS)
 return_fail_LDADD = $(LDADD)
@@ -290,12 +285,10 @@ am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libriscv__menv__metal_a_SOURCES) \
 	$(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
-	$(hello_SOURCES) $(pll_set_hz_SOURCES) $(return_fail_SOURCES) \
-	$(return_pass_SOURCES)
+	$(hello_SOURCES) $(return_fail_SOURCES) $(return_pass_SOURCES)
 DIST_SOURCES = $(am__libriscv__menv__metal_a_SOURCES_DIST) \
 	$(libriscv__mmachine__@MACHINE_NAME@_a_SOURCES) \
-	$(hello_SOURCES) $(pll_set_hz_SOURCES) $(return_fail_SOURCES) \
-	$(return_pass_SOURCES)
+	$(hello_SOURCES) $(return_fail_SOURCES) $(return_pass_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -463,37 +456,37 @@ spec_DATA = riscv__mmachine__@MACHINE_NAME@.specs \
 nobase_include_HEADERS = \
 	metal/machine/@MACHINE_NAME@.h \
 	metal/drivers/fixed-clock.h \
+	metal/drivers/riscv,clint0.h \
+	metal/drivers/riscv,cpu.h \
+	metal/drivers/riscv,plic0.h \
+	metal/drivers/sifive,clic0.h \
 	metal/drivers/sifive,fe310-g000,hfrosc.h \
 	metal/drivers/sifive,fe310-g000,hfxosc.h \
 	metal/drivers/sifive,fe310-g000,pll.h \
 	metal/drivers/sifive,fe310-g000,prci.h \
-	metal/drivers/sifive,gpio0.h \
-	metal/drivers/sifive,uart0.h \
-	metal/drivers/sifive,test0.h \
-	metal/drivers/sifive,local-external-interrupts0.h \
 	metal/drivers/sifive,global-external-interrupts0.h \
-	metal/drivers/sifive,gpio-leds.h \
 	metal/drivers/sifive,gpio-buttons.h \
+	metal/drivers/sifive,gpio-leds.h \
 	metal/drivers/sifive,gpio-switches.h \
-	metal/drivers/riscv,cpu.h \
-	metal/drivers/sifive,clic0.h \
-	metal/drivers/riscv,clint0.h \
-	metal/drivers/riscv,plic0.h \
-	metal/compiler.h \
-	metal/clock.h \
-	metal/itim.h \
-	metal/io.h \
-	metal/machine.h \
-	metal/shutdown.h \
-	metal/pmp.h \
-	metal/tty.h \
-	metal/uart.h \
-	metal/timer.h \
-	metal/cpu.h \
-	metal/led.h \
+	metal/drivers/sifive,gpio0.h \
+	metal/drivers/sifive,local-external-interrupts0.h \
+	metal/drivers/sifive,test0.h \
+	metal/drivers/sifive,uart0.h \
 	metal/button.h \
+	metal/clock.h \
+	metal/compiler.h \
+	metal/cpu.h \
+	metal/interrupt.h \
+	metal/io.h \
+	metal/itim.h \
+	metal/led.h \
+	metal/machine.h \
+	metal/pmp.h \
+	metal/shutdown.h \
 	metal/switch.h \
-	metal/interrupt.h
+	metal/timer.h \
+	metal/tty.h \
+	metal/uart.h
 
 
 # Quash an automake warning.
@@ -506,36 +499,37 @@ libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAM
 libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
+	src/drivers/riscv,clint0.c \
+	src/drivers/riscv,cpu.c \
+	src/drivers/riscv,plic0.c \
+	src/drivers/sifive,clic0.c \
 	src/drivers/sifive,fe310-g000,hfrosc.c \
 	src/drivers/sifive,fe310-g000,hfxosc.c \
-	src/drivers/sifive,fe310-g000,prci.c \
 	src/drivers/sifive,fe310-g000,pll.c \
-	src/drivers/sifive,test0.c \
-	src/drivers/sifive,gpio0.c \
-        src/drivers/sifive,local-external-interrupts0.c \
-        src/drivers/sifive,global-external-interrupts0.c \
-	src/drivers/riscv,cpu.c \
-	src/drivers/sifive,uart0.c \
-	src/drivers/sifive,gpio-leds.c \
+	src/drivers/sifive,fe310-g000,prci.c \
 	src/drivers/sifive,gpio-buttons.c \
+	src/drivers/sifive,gpio-leds.c \
 	src/drivers/sifive,gpio-switches.c \
-	src/drivers/sifive,clic0.c \
-	src/drivers/riscv,clint0.c \
-	src/drivers/riscv,plic0.c \
-	src/clock.c \
-	src/tty.c \
-	src/shutdown.c \
-	src/timer.c \
-	src/cpu.c \
-	src/led.c \
+	src/drivers/sifive,gpio0.c \
+	src/drivers/sifive,test0.c \
+	src/drivers/sifive,uart0.c \
+	src/drivers/sifive,global-external-interrupts0.c \
+	src/drivers/sifive,local-external-interrupts0.c \
 	src/button.c \
-	src/switch.c \
+	src/clock.c \
+	src/cpu.c \
+	src/entry.S \
 	src/interrupt.c \
+	src/led.c \
 	src/pmp.c \
-	src/uart.c \
-	src/entry.S
+	src/shutdown.c \
+	src/switch.c \
+	src/timer.c \
+	src/tty.c \
+	src/uart.c
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libriscv__menv__metal_a_SOURCES = \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.c \
@@ -567,8 +561,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_unlink.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_utime.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.c \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.c \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.c
 
 return_pass_SOURCES = test/return_pass.c
 return_pass_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
@@ -579,9 +572,6 @@ return_fail_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=return_fail.map
 hello_SOURCES = test/hello.c
 hello_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 hello_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=hello.map
-pll_set_hz_SOURCES = test/pll_set_hz.c
-pll_set_hz_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-pll_set_hz_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=pll_set_hz.map
 all: all-am
 
 .SUFFIXES:
@@ -656,6 +646,8 @@ gloss/$(am__dirstamp):
 gloss/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) gloss/$(DEPDIR)
 	@: > gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/nanosleep.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/sys_access.$(OBJEXT): gloss/$(am__dirstamp) \
@@ -720,8 +712,6 @@ gloss/sys_wait.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/sys_write.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
-gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
-	gloss/$(DEPDIR)/$(am__dirstamp)
 
 libriscv__menv__metal.a: $(libriscv__menv__metal_a_OBJECTS) $(libriscv__menv__metal_a_DEPENDENCIES) $(EXTRA_libriscv__menv__metal_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libriscv__menv__metal.a
@@ -736,52 +726,52 @@ src/drivers/$(DEPDIR)/$(am__dirstamp):
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-fixed-clock.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfxosc.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.$(OBJEXT):  \
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.$(OBJEXT):  \
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.$(OBJEXT):  \
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.$(OBJEXT):  \
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/$(am__dirstamp):
@@ -790,29 +780,29 @@ src/$(am__dirstamp):
 src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/$(DEPDIR)
 	@: > src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-button.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT):  \
-	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-tty.$(OBJEXT):  \
-	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT):  \
-	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-led.$(OBJEXT):  \
-	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-button.$(OBJEXT):  \
-	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT):  \
+src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-led.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-uart.$(OBJEXT):  \
+src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT):  \
+src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-tty.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-uart.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 
 libriscv__mmachine__@MACHINE_NAME@.a: $(libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS) $(libriscv__mmachine__@MACHINE_NAME@_a_DEPENDENCIES) $(EXTRA_libriscv__mmachine__@MACHINE_NAME@_a_DEPENDENCIES) 
@@ -834,12 +824,6 @@ test/hello-hello.$(OBJEXT): test/$(am__dirstamp) \
 hello$(EXEEXT): $(hello_OBJECTS) $(hello_DEPENDENCIES) $(EXTRA_hello_DEPENDENCIES) 
 	@rm -f hello$(EXEEXT)
 	$(AM_V_CCLD)$(hello_LINK) $(hello_OBJECTS) $(hello_LDADD) $(LIBS)
-test/pll_set_hz-pll_set_hz.$(OBJEXT): test/$(am__dirstamp) \
-	test/$(DEPDIR)/$(am__dirstamp)
-
-pll_set_hz$(EXEEXT): $(pll_set_hz_OBJECTS) $(pll_set_hz_DEPENDENCIES) $(EXTRA_pll_set_hz_DEPENDENCIES) 
-	@rm -f pll_set_hz$(EXEEXT)
-	$(AM_V_CCLD)$(pll_set_hz_LINK) $(pll_set_hz_OBJECTS) $(pll_set_hz_LDADD) $(LIBS)
 test/return_fail-return_fail.$(OBJEXT): test/$(am__dirstamp) \
 	test/$(DEPDIR)/$(am__dirstamp)
 
@@ -926,7 +910,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/hello-hello.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/pll_set_hz-pll_set_hz.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/return_fail-return_fail.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/return_pass-return_pass.Po@am__quote@
 
@@ -990,6 +973,62 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-fixed-clock.obj: src/drivers/fi
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-fixed-clock.obj `if test -f 'src/drivers/fixed-clock.c'; then $(CYGPATH_W) 'src/drivers/fixed-clock.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/fixed-clock.c'; fi`
 
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o: src/drivers/riscv,clint0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o `test -f 'src/drivers/riscv,clint0.c' || echo '$(srcdir)/'`src/drivers/riscv,clint0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,clint0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o `test -f 'src/drivers/riscv,clint0.c' || echo '$(srcdir)/'`src/drivers/riscv,clint0.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj: src/drivers/riscv,clint0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj `if test -f 'src/drivers/riscv,clint0.c'; then $(CYGPATH_W) 'src/drivers/riscv,clint0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,clint0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,clint0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj `if test -f 'src/drivers/riscv,clint0.c'; then $(CYGPATH_W) 'src/drivers/riscv,clint0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,clint0.c'; fi`
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o: src/drivers/riscv,cpu.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o `test -f 'src/drivers/riscv,cpu.c' || echo '$(srcdir)/'`src/drivers/riscv,cpu.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,cpu.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o `test -f 'src/drivers/riscv,cpu.c' || echo '$(srcdir)/'`src/drivers/riscv,cpu.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj: src/drivers/riscv,cpu.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj `if test -f 'src/drivers/riscv,cpu.c'; then $(CYGPATH_W) 'src/drivers/riscv,cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,cpu.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,cpu.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj `if test -f 'src/drivers/riscv,cpu.c'; then $(CYGPATH_W) 'src/drivers/riscv,cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,cpu.c'; fi`
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o: src/drivers/riscv,plic0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o `test -f 'src/drivers/riscv,plic0.c' || echo '$(srcdir)/'`src/drivers/riscv,plic0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,plic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o `test -f 'src/drivers/riscv,plic0.c' || echo '$(srcdir)/'`src/drivers/riscv,plic0.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj: src/drivers/riscv,plic0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj `if test -f 'src/drivers/riscv,plic0.c'; then $(CYGPATH_W) 'src/drivers/riscv,plic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,plic0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,plic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj `if test -f 'src/drivers/riscv,plic0.c'; then $(CYGPATH_W) 'src/drivers/riscv,plic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,plic0.c'; fi`
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o: src/drivers/sifive,clic0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o `test -f 'src/drivers/sifive,clic0.c' || echo '$(srcdir)/'`src/drivers/sifive,clic0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,clic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o `test -f 'src/drivers/sifive,clic0.c' || echo '$(srcdir)/'`src/drivers/sifive,clic0.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj: src/drivers/sifive,clic0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj `if test -f 'src/drivers/sifive,clic0.c'; then $(CYGPATH_W) 'src/drivers/sifive,clic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,clic0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,clic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj `if test -f 'src/drivers/sifive,clic0.c'; then $(CYGPATH_W) 'src/drivers/sifive,clic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,clic0.c'; fi`
+
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.o: src/drivers/sifive,fe310-g000,hfrosc.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.o `test -f 'src/drivers/sifive,fe310-g000,hfrosc.c' || echo '$(srcdir)/'`src/drivers/sifive,fe310-g000,hfrosc.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfrosc.Po
@@ -1018,20 +1057,6 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfxosc.obj: s
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,hfxosc.obj `if test -f 'src/drivers/sifive,fe310-g000,hfxosc.c'; then $(CYGPATH_W) 'src/drivers/sifive,fe310-g000,hfxosc.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,fe310-g000,hfxosc.c'; fi`
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o: src/drivers/sifive,fe310-g000,prci.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o `test -f 'src/drivers/sifive,fe310-g000,prci.c' || echo '$(srcdir)/'`src/drivers/sifive,fe310-g000,prci.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,fe310-g000,prci.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o `test -f 'src/drivers/sifive,fe310-g000,prci.c' || echo '$(srcdir)/'`src/drivers/sifive,fe310-g000,prci.c
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj: src/drivers/sifive,fe310-g000,prci.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj `if test -f 'src/drivers/sifive,fe310-g000,prci.c'; then $(CYGPATH_W) 'src/drivers/sifive,fe310-g000,prci.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,fe310-g000,prci.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,fe310-g000,prci.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj `if test -f 'src/drivers/sifive,fe310-g000,prci.c'; then $(CYGPATH_W) 'src/drivers/sifive,fe310-g000,prci.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,fe310-g000,prci.c'; fi`
-
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.o: src/drivers/sifive,fe310-g000,pll.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.o `test -f 'src/drivers/sifive,fe310-g000,pll.c' || echo '$(srcdir)/'`src/drivers/sifive,fe310-g000,pll.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.Po
@@ -1046,103 +1071,19 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.obj: src/
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,pll.obj `if test -f 'src/drivers/sifive,fe310-g000,pll.c'; then $(CYGPATH_W) 'src/drivers/sifive,fe310-g000,pll.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,fe310-g000,pll.c'; fi`
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o: src/drivers/sifive,test0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o `test -f 'src/drivers/sifive,test0.c' || echo '$(srcdir)/'`src/drivers/sifive,test0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,test0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o: src/drivers/sifive,fe310-g000,prci.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o `test -f 'src/drivers/sifive,fe310-g000,prci.c' || echo '$(srcdir)/'`src/drivers/sifive,fe310-g000,prci.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,fe310-g000,prci.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o `test -f 'src/drivers/sifive,test0.c' || echo '$(srcdir)/'`src/drivers/sifive,test0.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.o `test -f 'src/drivers/sifive,fe310-g000,prci.c' || echo '$(srcdir)/'`src/drivers/sifive,fe310-g000,prci.c
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj: src/drivers/sifive,test0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj `if test -f 'src/drivers/sifive,test0.c'; then $(CYGPATH_W) 'src/drivers/sifive,test0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,test0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,test0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj: src/drivers/sifive,fe310-g000,prci.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj `if test -f 'src/drivers/sifive,fe310-g000,prci.c'; then $(CYGPATH_W) 'src/drivers/sifive,fe310-g000,prci.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,fe310-g000,prci.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,fe310-g000,prci.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj `if test -f 'src/drivers/sifive,test0.c'; then $(CYGPATH_W) 'src/drivers/sifive,test0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,test0.c'; fi`
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o: src/drivers/sifive,gpio0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o `test -f 'src/drivers/sifive,gpio0.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o `test -f 'src/drivers/sifive,gpio0.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio0.c
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj: src/drivers/sifive,gpio0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj `if test -f 'src/drivers/sifive,gpio0.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj `if test -f 'src/drivers/sifive,gpio0.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio0.c'; fi`
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o: src/drivers/sifive,local-external-interrupts0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o `test -f 'src/drivers/sifive,local-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,local-external-interrupts0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,local-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o `test -f 'src/drivers/sifive,local-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,local-external-interrupts0.c
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj: src/drivers/sifive,local-external-interrupts0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj `if test -f 'src/drivers/sifive,local-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,local-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,local-external-interrupts0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,local-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj `if test -f 'src/drivers/sifive,local-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,local-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,local-external-interrupts0.c'; fi`
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o: src/drivers/sifive,global-external-interrupts0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o `test -f 'src/drivers/sifive,global-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,global-external-interrupts0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,global-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o `test -f 'src/drivers/sifive,global-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,global-external-interrupts0.c
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj: src/drivers/sifive,global-external-interrupts0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj `if test -f 'src/drivers/sifive,global-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,global-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,global-external-interrupts0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,global-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj `if test -f 'src/drivers/sifive,global-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,global-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,global-external-interrupts0.c'; fi`
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o: src/drivers/riscv,cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o `test -f 'src/drivers/riscv,cpu.c' || echo '$(srcdir)/'`src/drivers/riscv,cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,cpu.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.o `test -f 'src/drivers/riscv,cpu.c' || echo '$(srcdir)/'`src/drivers/riscv,cpu.c
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj: src/drivers/riscv,cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj `if test -f 'src/drivers/riscv,cpu.c'; then $(CYGPATH_W) 'src/drivers/riscv,cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,cpu.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,cpu.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,cpu.obj `if test -f 'src/drivers/riscv,cpu.c'; then $(CYGPATH_W) 'src/drivers/riscv,cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,cpu.c'; fi`
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o: src/drivers/sifive,uart0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o `test -f 'src/drivers/sifive,uart0.c' || echo '$(srcdir)/'`src/drivers/sifive,uart0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,uart0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o `test -f 'src/drivers/sifive,uart0.c' || echo '$(srcdir)/'`src/drivers/sifive,uart0.c
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj: src/drivers/sifive,uart0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj `if test -f 'src/drivers/sifive,uart0.c'; then $(CYGPATH_W) 'src/drivers/sifive,uart0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,uart0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,uart0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj `if test -f 'src/drivers/sifive,uart0.c'; then $(CYGPATH_W) 'src/drivers/sifive,uart0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,uart0.c'; fi`
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o: src/drivers/sifive,gpio-leds.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o `test -f 'src/drivers/sifive,gpio-leds.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio-leds.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio-leds.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o `test -f 'src/drivers/sifive,gpio-leds.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio-leds.c
-
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj: src/drivers/sifive,gpio-leds.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj `if test -f 'src/drivers/sifive,gpio-leds.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio-leds.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio-leds.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio-leds.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj `if test -f 'src/drivers/sifive,gpio-leds.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio-leds.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio-leds.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,fe310-g000,prci.obj `if test -f 'src/drivers/sifive,fe310-g000,prci.c'; then $(CYGPATH_W) 'src/drivers/sifive,fe310-g000,prci.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,fe310-g000,prci.c'; fi`
 
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.o: src/drivers/sifive,gpio-buttons.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.o `test -f 'src/drivers/sifive,gpio-buttons.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio-buttons.c
@@ -1158,6 +1099,20 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.obj: src/dr
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-buttons.obj `if test -f 'src/drivers/sifive,gpio-buttons.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio-buttons.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio-buttons.c'; fi`
 
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o: src/drivers/sifive,gpio-leds.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o `test -f 'src/drivers/sifive,gpio-leds.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio-leds.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio-leds.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.o `test -f 'src/drivers/sifive,gpio-leds.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio-leds.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj: src/drivers/sifive,gpio-leds.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj `if test -f 'src/drivers/sifive,gpio-leds.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio-leds.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio-leds.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio-leds.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-leds.obj `if test -f 'src/drivers/sifive,gpio-leds.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio-leds.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio-leds.c'; fi`
+
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.o: src/drivers/sifive,gpio-switches.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.o `test -f 'src/drivers/sifive,gpio-switches.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio-switches.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.Po
@@ -1172,131 +1127,75 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.obj: src/d
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio-switches.obj `if test -f 'src/drivers/sifive,gpio-switches.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio-switches.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio-switches.c'; fi`
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o: src/drivers/sifive,clic0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o `test -f 'src/drivers/sifive,clic0.c' || echo '$(srcdir)/'`src/drivers/sifive,clic0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,clic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o: src/drivers/sifive,gpio0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o `test -f 'src/drivers/sifive,gpio0.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.o `test -f 'src/drivers/sifive,clic0.c' || echo '$(srcdir)/'`src/drivers/sifive,clic0.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.o `test -f 'src/drivers/sifive,gpio0.c' || echo '$(srcdir)/'`src/drivers/sifive,gpio0.c
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj: src/drivers/sifive,clic0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj `if test -f 'src/drivers/sifive,clic0.c'; then $(CYGPATH_W) 'src/drivers/sifive,clic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,clic0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,clic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj: src/drivers/sifive,gpio0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj `if test -f 'src/drivers/sifive,gpio0.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,gpio0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,clic0.obj `if test -f 'src/drivers/sifive,clic0.c'; then $(CYGPATH_W) 'src/drivers/sifive,clic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,clic0.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,gpio0.obj `if test -f 'src/drivers/sifive,gpio0.c'; then $(CYGPATH_W) 'src/drivers/sifive,gpio0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,gpio0.c'; fi`
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o: src/drivers/riscv,clint0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o `test -f 'src/drivers/riscv,clint0.c' || echo '$(srcdir)/'`src/drivers/riscv,clint0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,clint0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o: src/drivers/sifive,test0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o `test -f 'src/drivers/sifive,test0.c' || echo '$(srcdir)/'`src/drivers/sifive,test0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,test0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.o `test -f 'src/drivers/riscv,clint0.c' || echo '$(srcdir)/'`src/drivers/riscv,clint0.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.o `test -f 'src/drivers/sifive,test0.c' || echo '$(srcdir)/'`src/drivers/sifive,test0.c
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj: src/drivers/riscv,clint0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj `if test -f 'src/drivers/riscv,clint0.c'; then $(CYGPATH_W) 'src/drivers/riscv,clint0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,clint0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,clint0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj: src/drivers/sifive,test0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj `if test -f 'src/drivers/sifive,test0.c'; then $(CYGPATH_W) 'src/drivers/sifive,test0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,test0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,test0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,clint0.obj `if test -f 'src/drivers/riscv,clint0.c'; then $(CYGPATH_W) 'src/drivers/riscv,clint0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,clint0.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,test0.obj `if test -f 'src/drivers/sifive,test0.c'; then $(CYGPATH_W) 'src/drivers/sifive,test0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,test0.c'; fi`
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o: src/drivers/riscv,plic0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o `test -f 'src/drivers/riscv,plic0.c' || echo '$(srcdir)/'`src/drivers/riscv,plic0.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,plic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o: src/drivers/sifive,uart0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o `test -f 'src/drivers/sifive,uart0.c' || echo '$(srcdir)/'`src/drivers/sifive,uart0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,uart0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.o `test -f 'src/drivers/riscv,plic0.c' || echo '$(srcdir)/'`src/drivers/riscv,plic0.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.o `test -f 'src/drivers/sifive,uart0.c' || echo '$(srcdir)/'`src/drivers/sifive,uart0.c
 
-src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj: src/drivers/riscv,plic0.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj `if test -f 'src/drivers/riscv,plic0.c'; then $(CYGPATH_W) 'src/drivers/riscv,plic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,plic0.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/riscv,plic0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj: src/drivers/sifive,uart0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj `if test -f 'src/drivers/sifive,uart0.c'; then $(CYGPATH_W) 'src/drivers/sifive,uart0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,uart0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,uart0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-riscv,plic0.obj `if test -f 'src/drivers/riscv,plic0.c'; then $(CYGPATH_W) 'src/drivers/riscv,plic0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/riscv,plic0.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,uart0.obj `if test -f 'src/drivers/sifive,uart0.c'; then $(CYGPATH_W) 'src/drivers/sifive,uart0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,uart0.c'; fi`
 
-src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o: src/clock.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o `test -f 'src/clock.c' || echo '$(srcdir)/'`src/clock.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/clock.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o: src/drivers/sifive,global-external-interrupts0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o `test -f 'src/drivers/sifive,global-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,global-external-interrupts0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,global-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o `test -f 'src/clock.c' || echo '$(srcdir)/'`src/clock.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.o `test -f 'src/drivers/sifive,global-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,global-external-interrupts0.c
 
-src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj: src/clock.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj `if test -f 'src/clock.c'; then $(CYGPATH_W) 'src/clock.c'; else $(CYGPATH_W) '$(srcdir)/src/clock.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/clock.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj: src/drivers/sifive,global-external-interrupts0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj `if test -f 'src/drivers/sifive,global-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,global-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,global-external-interrupts0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,global-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj `if test -f 'src/clock.c'; then $(CYGPATH_W) 'src/clock.c'; else $(CYGPATH_W) '$(srcdir)/src/clock.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,global-external-interrupts0.obj `if test -f 'src/drivers/sifive,global-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,global-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,global-external-interrupts0.c'; fi`
 
-src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o: src/tty.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o `test -f 'src/tty.c' || echo '$(srcdir)/'`src/tty.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/tty.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o: src/drivers/sifive,local-external-interrupts0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o `test -f 'src/drivers/sifive,local-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,local-external-interrupts0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,local-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o `test -f 'src/tty.c' || echo '$(srcdir)/'`src/tty.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.o `test -f 'src/drivers/sifive,local-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive,local-external-interrupts0.c
 
-src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj: src/tty.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj `if test -f 'src/tty.c'; then $(CYGPATH_W) 'src/tty.c'; else $(CYGPATH_W) '$(srcdir)/src/tty.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/tty.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj' libtool=no @AMDEPBACKSLASH@
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj: src/drivers/sifive,local-external-interrupts0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj `if test -f 'src/drivers/sifive,local-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,local-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,local-external-interrupts0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive,local-external-interrupts0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj `if test -f 'src/tty.c'; then $(CYGPATH_W) 'src/tty.c'; else $(CYGPATH_W) '$(srcdir)/src/tty.c'; fi`
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o: src/shutdown.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o `test -f 'src/shutdown.c' || echo '$(srcdir)/'`src/shutdown.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/shutdown.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o `test -f 'src/shutdown.c' || echo '$(srcdir)/'`src/shutdown.c
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj: src/shutdown.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj `if test -f 'src/shutdown.c'; then $(CYGPATH_W) 'src/shutdown.c'; else $(CYGPATH_W) '$(srcdir)/src/shutdown.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/shutdown.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj `if test -f 'src/shutdown.c'; then $(CYGPATH_W) 'src/shutdown.c'; else $(CYGPATH_W) '$(srcdir)/src/shutdown.c'; fi`
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o: src/timer.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o `test -f 'src/timer.c' || echo '$(srcdir)/'`src/timer.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/timer.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o `test -f 'src/timer.c' || echo '$(srcdir)/'`src/timer.c
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj: src/timer.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj `if test -f 'src/timer.c'; then $(CYGPATH_W) 'src/timer.c'; else $(CYGPATH_W) '$(srcdir)/src/timer.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/timer.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj `if test -f 'src/timer.c'; then $(CYGPATH_W) 'src/timer.c'; else $(CYGPATH_W) '$(srcdir)/src/timer.c'; fi`
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o: src/cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o `test -f 'src/cpu.c' || echo '$(srcdir)/'`src/cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cpu.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o `test -f 'src/cpu.c' || echo '$(srcdir)/'`src/cpu.c
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj: src/cpu.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj `if test -f 'src/cpu.c'; then $(CYGPATH_W) 'src/cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/cpu.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cpu.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj `if test -f 'src/cpu.c'; then $(CYGPATH_W) 'src/cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/cpu.c'; fi`
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-led.o: src/led.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-led.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.o `test -f 'src/led.c' || echo '$(srcdir)/'`src/led.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/led.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-led.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.o `test -f 'src/led.c' || echo '$(srcdir)/'`src/led.c
-
-src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj: src/led.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj `if test -f 'src/led.c'; then $(CYGPATH_W) 'src/led.c'; else $(CYGPATH_W) '$(srcdir)/src/led.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/led.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj `if test -f 'src/led.c'; then $(CYGPATH_W) 'src/led.c'; else $(CYGPATH_W) '$(srcdir)/src/led.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive,local-external-interrupts0.obj `if test -f 'src/drivers/sifive,local-external-interrupts0.c'; then $(CYGPATH_W) 'src/drivers/sifive,local-external-interrupts0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive,local-external-interrupts0.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-button.o: src/button.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-button.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-button.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-button.o `test -f 'src/button.c' || echo '$(srcdir)/'`src/button.c
@@ -1312,19 +1211,33 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-button.obj: src/button.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-button.obj `if test -f 'src/button.c'; then $(CYGPATH_W) 'src/button.c'; else $(CYGPATH_W) '$(srcdir)/src/button.c'; fi`
 
-src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o: src/switch.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o `test -f 'src/switch.c' || echo '$(srcdir)/'`src/switch.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/switch.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o' libtool=no @AMDEPBACKSLASH@
+src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o: src/clock.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o `test -f 'src/clock.c' || echo '$(srcdir)/'`src/clock.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/clock.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o `test -f 'src/switch.c' || echo '$(srcdir)/'`src/switch.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.o `test -f 'src/clock.c' || echo '$(srcdir)/'`src/clock.c
 
-src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj: src/switch.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj `if test -f 'src/switch.c'; then $(CYGPATH_W) 'src/switch.c'; else $(CYGPATH_W) '$(srcdir)/src/switch.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/switch.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj' libtool=no @AMDEPBACKSLASH@
+src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj: src/clock.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj `if test -f 'src/clock.c'; then $(CYGPATH_W) 'src/clock.c'; else $(CYGPATH_W) '$(srcdir)/src/clock.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/clock.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj `if test -f 'src/switch.c'; then $(CYGPATH_W) 'src/switch.c'; else $(CYGPATH_W) '$(srcdir)/src/switch.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-clock.obj `if test -f 'src/clock.c'; then $(CYGPATH_W) 'src/clock.c'; else $(CYGPATH_W) '$(srcdir)/src/clock.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o: src/cpu.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o `test -f 'src/cpu.c' || echo '$(srcdir)/'`src/cpu.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cpu.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.o `test -f 'src/cpu.c' || echo '$(srcdir)/'`src/cpu.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj: src/cpu.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj `if test -f 'src/cpu.c'; then $(CYGPATH_W) 'src/cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/cpu.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cpu.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj `if test -f 'src/cpu.c'; then $(CYGPATH_W) 'src/cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/cpu.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.o: src/interrupt.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.o `test -f 'src/interrupt.c' || echo '$(srcdir)/'`src/interrupt.c
@@ -1340,6 +1253,20 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.obj: src/interrupt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.obj `if test -f 'src/interrupt.c'; then $(CYGPATH_W) 'src/interrupt.c'; else $(CYGPATH_W) '$(srcdir)/src/interrupt.c'; fi`
 
+src/libriscv__mmachine__@MACHINE_NAME@_a-led.o: src/led.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-led.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.o `test -f 'src/led.c' || echo '$(srcdir)/'`src/led.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/led.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-led.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.o `test -f 'src/led.c' || echo '$(srcdir)/'`src/led.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj: src/led.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj `if test -f 'src/led.c'; then $(CYGPATH_W) 'src/led.c'; else $(CYGPATH_W) '$(srcdir)/src/led.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/led.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-led.obj `if test -f 'src/led.c'; then $(CYGPATH_W) 'src/led.c'; else $(CYGPATH_W) '$(srcdir)/src/led.c'; fi`
+
 src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.o: src/pmp.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-pmp.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.o `test -f 'src/pmp.c' || echo '$(srcdir)/'`src/pmp.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-pmp.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-pmp.Po
@@ -1353,6 +1280,62 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.obj: src/pmp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/pmp.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.obj `if test -f 'src/pmp.c'; then $(CYGPATH_W) 'src/pmp.c'; else $(CYGPATH_W) '$(srcdir)/src/pmp.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o: src/shutdown.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o `test -f 'src/shutdown.c' || echo '$(srcdir)/'`src/shutdown.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/shutdown.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o `test -f 'src/shutdown.c' || echo '$(srcdir)/'`src/shutdown.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj: src/shutdown.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj `if test -f 'src/shutdown.c'; then $(CYGPATH_W) 'src/shutdown.c'; else $(CYGPATH_W) '$(srcdir)/src/shutdown.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/shutdown.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.obj `if test -f 'src/shutdown.c'; then $(CYGPATH_W) 'src/shutdown.c'; else $(CYGPATH_W) '$(srcdir)/src/shutdown.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o: src/switch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o `test -f 'src/switch.c' || echo '$(srcdir)/'`src/switch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/switch.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o `test -f 'src/switch.c' || echo '$(srcdir)/'`src/switch.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj: src/switch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj `if test -f 'src/switch.c'; then $(CYGPATH_W) 'src/switch.c'; else $(CYGPATH_W) '$(srcdir)/src/switch.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/switch.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj `if test -f 'src/switch.c'; then $(CYGPATH_W) 'src/switch.c'; else $(CYGPATH_W) '$(srcdir)/src/switch.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o: src/timer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o `test -f 'src/timer.c' || echo '$(srcdir)/'`src/timer.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/timer.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o `test -f 'src/timer.c' || echo '$(srcdir)/'`src/timer.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj: src/timer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj `if test -f 'src/timer.c'; then $(CYGPATH_W) 'src/timer.c'; else $(CYGPATH_W) '$(srcdir)/src/timer.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/timer.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.obj `if test -f 'src/timer.c'; then $(CYGPATH_W) 'src/timer.c'; else $(CYGPATH_W) '$(srcdir)/src/timer.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o: src/tty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o `test -f 'src/tty.c' || echo '$(srcdir)/'`src/tty.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/tty.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.o `test -f 'src/tty.c' || echo '$(srcdir)/'`src/tty.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj: src/tty.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj `if test -f 'src/tty.c'; then $(CYGPATH_W) 'src/tty.c'; else $(CYGPATH_W) '$(srcdir)/src/tty.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/tty.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-tty.obj `if test -f 'src/tty.c'; then $(CYGPATH_W) 'src/tty.c'; else $(CYGPATH_W) '$(srcdir)/src/tty.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-uart.o: src/uart.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-uart.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-uart.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-uart.o `test -f 'src/uart.c' || echo '$(srcdir)/'`src/uart.c
@@ -1381,20 +1364,6 @@ test/hello-hello.obj: test/hello.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test/hello.c' object='test/hello-hello.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_CFLAGS) $(CFLAGS) -c -o test/hello-hello.obj `if test -f 'test/hello.c'; then $(CYGPATH_W) 'test/hello.c'; else $(CYGPATH_W) '$(srcdir)/test/hello.c'; fi`
-
-test/pll_set_hz-pll_set_hz.o: test/pll_set_hz.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pll_set_hz_CFLAGS) $(CFLAGS) -MT test/pll_set_hz-pll_set_hz.o -MD -MP -MF test/$(DEPDIR)/pll_set_hz-pll_set_hz.Tpo -c -o test/pll_set_hz-pll_set_hz.o `test -f 'test/pll_set_hz.c' || echo '$(srcdir)/'`test/pll_set_hz.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) test/$(DEPDIR)/pll_set_hz-pll_set_hz.Tpo test/$(DEPDIR)/pll_set_hz-pll_set_hz.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test/pll_set_hz.c' object='test/pll_set_hz-pll_set_hz.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pll_set_hz_CFLAGS) $(CFLAGS) -c -o test/pll_set_hz-pll_set_hz.o `test -f 'test/pll_set_hz.c' || echo '$(srcdir)/'`test/pll_set_hz.c
-
-test/pll_set_hz-pll_set_hz.obj: test/pll_set_hz.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pll_set_hz_CFLAGS) $(CFLAGS) -MT test/pll_set_hz-pll_set_hz.obj -MD -MP -MF test/$(DEPDIR)/pll_set_hz-pll_set_hz.Tpo -c -o test/pll_set_hz-pll_set_hz.obj `if test -f 'test/pll_set_hz.c'; then $(CYGPATH_W) 'test/pll_set_hz.c'; else $(CYGPATH_W) '$(srcdir)/test/pll_set_hz.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) test/$(DEPDIR)/pll_set_hz-pll_set_hz.Tpo test/$(DEPDIR)/pll_set_hz-pll_set_hz.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test/pll_set_hz.c' object='test/pll_set_hz-pll_set_hz.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(pll_set_hz_CFLAGS) $(CFLAGS) -c -o test/pll_set_hz-pll_set_hz.obj `if test -f 'test/pll_set_hz.c'; then $(CYGPATH_W) 'test/pll_set_hz.c'; else $(CYGPATH_W) '$(srcdir)/test/pll_set_hz.c'; fi`
 
 test/return_fail-return_fail.o: test/return_fail.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(return_fail_CFLAGS) $(CFLAGS) -MT test/return_fail-return_fail.o -MD -MP -MF test/$(DEPDIR)/return_fail-return_fail.Tpo -c -o test/return_fail-return_fail.o `test -f 'test/return_fail.c' || echo '$(srcdir)/'`test/return_fail.c
