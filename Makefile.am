@@ -226,11 +226,6 @@ hello_SOURCES         = test/hello.c
 hello_CFLAGS          = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 hello_LDFLAGS         = -L. -Wl,--gc-sections -Wl,-Map=hello.map
 
-check_PROGRAMS       += pll_set_hz
-pll_set_hz_SOURCES    = test/pll_set_hz.c
-pll_set_hz_CFLAGS     = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-pll_set_hz_LDFLAGS    = -L. -Wl,--gc-sections -Wl,-Map=pll_set_hz.map
-
 # Extra clean targets
 clean-local:
 	-rm -rf @MACHINE_NAME@.mk
