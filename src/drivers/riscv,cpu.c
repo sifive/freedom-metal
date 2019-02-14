@@ -126,12 +126,13 @@ void __metal_exception_handler (void) {
         intc = (struct __metal_driver_riscv_cpu_intc *)cpu->interrupt_controller;
         id = mcause & METAL_MCAUSE_CAUSE;
         if (mcause & METAL_MCAUSE_INTR) {
-            if ((id < METAL_INTERRUPT_ID_LC0) || (mtvec & METAL_MTVEC_DIRECT)) {
+            if ((id < METAL_INTERRUPT_ID_LC0) ||
+               ((mtvec & METAL_MTVEC_MASK) == METAL_MTVEC_DIRECT)) {
                 priv = intc->metal_int_table[id].exint_data;
                 intc->metal_int_table[id].handler(id, priv);
 		return;
             }
-            if (mtvec & METAL_MTVEC_CLIC) {
+            if ((mtvec & METAL_MTVEC_MASK) == METAL_MTVEC_CLIC) {
     		uintptr_t mtvt;
     		metal_interrupt_handler_t mtvt_handler;
 

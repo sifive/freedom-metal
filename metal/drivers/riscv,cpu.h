@@ -21,6 +21,7 @@
 #define METAL_MTVEC_CLIC           0x02
 #define METAL_MTVEC_CLIC_VECTORED  0x03
 #define METAL_MTVEC_CLIC_RESERVED  0x3C
+#define METAL_MTVEC_MASK           0x3F
 #if __riscv_xlen == 32
 #define METAL_MCAUSE_INTR          0x80000000UL
 #define METAL_MCAUSE_CAUSE         0x000003FFUL
