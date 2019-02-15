@@ -193,30 +193,30 @@ struct __metal_driver_riscv_cpu_intc {
 
 /* CPU driver*/
 struct __metal_driver_vtable_cpu {
-  struct metal_cpu_vtable cpu_vtable;
+  const struct metal_cpu_vtable cpu_vtable;
 };
 
-unsigned long long  __metal_driver_cpu_timer_get(struct metal_cpu *cpu);
-unsigned long long  __metal_driver_cpu_timebase_get(struct metal_cpu *cpu);
+unsigned long long  __metal_driver_cpu_timer_get(const struct metal_cpu *cpu);
+unsigned long long  __metal_driver_cpu_timebase_get(const struct metal_cpu *cpu);
 unsigned long long
-      __metal_driver_cpu_mtime_get(struct metal_cpu *cpu);
-int  __metal_driver_cpu_mtimecmp_set(struct metal_cpu *cpu, unsigned long long time);
+      __metal_driver_cpu_mtime_get(const struct metal_cpu *cpu);
+int  __metal_driver_cpu_mtimecmp_set(const struct metal_cpu *cpu, unsigned long long time);
 struct metal_interrupt*
-     __metal_driver_cpu_timer_controller_interrupt(struct metal_cpu *cpu);
-int  __metal_driver_cpu_get_timer_interrupt_id(struct metal_cpu *cpu);
+     __metal_driver_cpu_timer_controller_interrupt(const struct metal_cpu *cpu);
+int  __metal_driver_cpu_get_timer_interrupt_id(const struct metal_cpu *cpu);
 struct metal_interrupt*
-     __metal_driver_cpu_sw_controller_interrupt(struct metal_cpu *cpu);
-int  __metal_driver_cpu_get_sw_interrupt_id(struct metal_cpu *cpu);
-int  __metal_driver_cpu_set_sw_ipi(struct metal_cpu *cpu, int hartid);
-int  __metal_driver_cpu_clear_sw_ipi(struct metal_cpu *cpu, int hartid);
-int  __metal_driver_cpu_get_msip(struct metal_cpu *cpu, int hartid);
+     __metal_driver_cpu_sw_controller_interrupt(const struct metal_cpu *cpu);
+int  __metal_driver_cpu_get_sw_interrupt_id(const struct metal_cpu *cpu);
+int  __metal_driver_cpu_set_sw_ipi(const struct metal_cpu *cpu, int hartid);
+int  __metal_driver_cpu_clear_sw_ipi(const struct metal_cpu *cpu, int hartid);
+int  __metal_driver_cpu_get_msip(const struct metal_cpu *cpu, int hartid);
 struct metal_interrupt*
-     __metal_driver_cpu_controller_interrupt(struct metal_cpu *cpu);
-int  __metal_driver_cpu_exception_register(struct metal_cpu *cpu, int ecode,
+     __metal_driver_cpu_controller_interrupt(const struct metal_cpu *cpu);
+int  __metal_driver_cpu_exception_register(const struct metal_cpu *cpu, int ecode,
 					 metal_exception_handler_t isr);
-int  __metal_driver_cpu_get_instruction_length(struct metal_cpu *cpu, uintptr_t epc);
-uintptr_t  __metal_driver_cpu_get_exception_pc(struct metal_cpu *cpu);
-int  __metal_driver_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t epc);
+int  __metal_driver_cpu_get_instruction_length(const struct metal_cpu *cpu, uintptr_t epc);
+uintptr_t  __metal_driver_cpu_get_exception_pc(const struct metal_cpu *cpu);
+int  __metal_driver_cpu_set_exception_pc(const struct metal_cpu *cpu, uintptr_t epc);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_cpu) = {
     .cpu_vtable.timer_get     = __metal_driver_cpu_timer_get,
@@ -238,7 +238,7 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_cpu) = {
 };
 
 struct __metal_driver_cpu {
-    struct metal_cpu cpu;
+    const struct metal_cpu cpu;
     const struct __metal_driver_vtable_cpu *vtable;
     const int timebase;    
     struct metal_interrupt *interrupt_controller;

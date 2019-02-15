@@ -12,7 +12,7 @@
  * timer on a system. */
 int metal_timer_get_cyclecount(int hartid, unsigned long long *mcc)
 {
-    struct metal_cpu *cpu = metal_cpu_get(hartid);
+    const struct metal_cpu *cpu = metal_cpu_get(hartid);
 
     if ( cpu ) {
         *mcc = metal_cpu_get_timer(cpu);
@@ -23,7 +23,7 @@ int metal_timer_get_cyclecount(int hartid, unsigned long long *mcc)
 
 int metal_timer_get_timebase_frequency(int hartid, unsigned long long *timebase)
 {
-    struct metal_cpu *cpu = metal_cpu_get(hartid);
+    const struct metal_cpu *cpu = metal_cpu_get(hartid);
 
     if ( cpu ) {
         *timebase = metal_cpu_get_timebase(cpu);
@@ -34,7 +34,7 @@ int metal_timer_get_timebase_frequency(int hartid, unsigned long long *timebase)
 
 int metal_timer_get_machine_time(int hartid)
 {
-    struct metal_cpu *cpu = metal_cpu_get(hartid);
+    const struct metal_cpu *cpu = metal_cpu_get(hartid);
        
     if ( cpu ) {
        return metal_cpu_get_mtime(cpu);
@@ -44,7 +44,7 @@ int metal_timer_get_machine_time(int hartid)
 
 int metal_timer_set_machine_time(int hartid, unsigned long long time)
 {
-    struct metal_cpu *cpu = metal_cpu_get(hartid);
+    const struct metal_cpu *cpu = metal_cpu_get(hartid);
 
     if ( cpu ) {
        return metal_cpu_set_mtimecmp(cpu, time);
