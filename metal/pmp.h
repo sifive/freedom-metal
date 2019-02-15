@@ -73,7 +73,7 @@ struct metal_pmp {
 /*!
  * @brief Get the PMP device handle
  */
-struct metal_pmp *metal_pmp_get_device(void);
+const struct metal_pmp *metal_pmp_get_device(void);
 
 /*!
  * @brief Initialize the PMP
@@ -87,7 +87,7 @@ struct metal_pmp *metal_pmp_get_device(void);
  * If any regions are fused to preset values by the implementation or locked,
  * the PMP region will silently remain uninitialized.
  */
-void metal_pmp_init(struct metal_pmp *pmp);
+void metal_pmp_init(const struct metal_pmp *pmp);
 
 /*!
  * @brief Configure a PMP region
@@ -97,7 +97,7 @@ void metal_pmp_init(struct metal_pmp *pmp);
  * @param address The desired address of the PMP region
  * @return 0 upon success
  */
-int metal_pmp_set_region(struct metal_pmp *pmp, unsigned int region, struct metal_pmp_config config, size_t address);
+int metal_pmp_set_region(const struct metal_pmp *pmp, unsigned int region, const struct metal_pmp_config config, size_t address);
 
 /*! 
  * @brief Get the configuration for a PMP region
@@ -107,7 +107,7 @@ int metal_pmp_set_region(struct metal_pmp *pmp, unsigned int region, struct meta
  * @param address Variable to store the PMP region address
  * @return 0 if the region is read successfully
  */
-int metal_pmp_get_region(struct metal_pmp *pmp, unsigned int region, struct metal_pmp_config *config, size_t *address);
+int metal_pmp_get_region(const struct metal_pmp *pmp, unsigned int region, struct metal_pmp_config *config, size_t *address);
 
 /*!
  * @brief Lock a PMP region
@@ -115,7 +115,7 @@ int metal_pmp_get_region(struct metal_pmp *pmp, unsigned int region, struct meta
  * @param region The PMP region to lock
  * @return 0 if the region is successfully locked
  */
-int metal_pmp_lock(struct metal_pmp *pmp, unsigned int region);
+int metal_pmp_lock(const struct metal_pmp *pmp, unsigned int region);
 
 /*!
  * @brief Set the address for a PMP region
@@ -124,7 +124,7 @@ int metal_pmp_lock(struct metal_pmp *pmp, unsigned int region);
  * @param address The desired address of the PMP region
  * @return 0 if the address is successfully set
  */
-int metal_pmp_set_address(struct metal_pmp *pmp, unsigned int region, size_t address);
+int metal_pmp_set_address(const struct metal_pmp *pmp, unsigned int region, size_t address);
 
 /*!
  * @brief Get the address of a PMP region
@@ -132,7 +132,7 @@ int metal_pmp_set_address(struct metal_pmp *pmp, unsigned int region, size_t add
  * @param region The PMP region to read
  * @return The address of the PMP region, or 0 if the region could not be read
  */
-size_t metal_pmp_get_address(struct metal_pmp *pmp, unsigned int region);
+size_t metal_pmp_get_address(const struct metal_pmp *pmp, unsigned int region);
 
 /*!
  * @brief Set the addressing mode of a PMP region
@@ -141,7 +141,7 @@ size_t metal_pmp_get_address(struct metal_pmp *pmp, unsigned int region);
  * @param mode The PMP addressing mode to set
  * @return 0 if the addressing mode is successfully set
  */
-int metal_pmp_set_address_mode(struct metal_pmp *pmp, unsigned int region, enum metal_pmp_address_mode mode);
+int metal_pmp_set_address_mode(const struct metal_pmp *pmp, unsigned int region, enum metal_pmp_address_mode mode);
 
 /*!
  * @brief Get the addressing mode of a PMP region
@@ -149,7 +149,7 @@ int metal_pmp_set_address_mode(struct metal_pmp *pmp, unsigned int region, enum 
  * @param region The PMP region to read
  * @return The address mode of the PMP region
  */
-enum metal_pmp_address_mode metal_pmp_get_address_mode(struct metal_pmp *pmp, unsigned int region);
+enum metal_pmp_address_mode metal_pmp_get_address_mode(const struct metal_pmp *pmp, unsigned int region);
 
 /*!
  * @brief Set the executable bit for a PMP region
@@ -158,7 +158,7 @@ enum metal_pmp_address_mode metal_pmp_get_address_mode(struct metal_pmp *pmp, un
  * @param X The desired value of the executable bit
  * @return 0 if the executable bit is successfully set
  */
-int metal_pmp_set_executable(struct metal_pmp *pmp, unsigned int region, int X);
+int metal_pmp_set_executable(const struct metal_pmp *pmp, unsigned int region, int X);
 
 /*!
  * @brief Get the executable bit for a PMP region
@@ -166,7 +166,7 @@ int metal_pmp_set_executable(struct metal_pmp *pmp, unsigned int region, int X);
  * @param region The PMP region to read
  * @return the value of the executable bit
  */
-int metal_pmp_get_executable(struct metal_pmp *pmp, unsigned int region);
+int metal_pmp_get_executable(const struct metal_pmp *pmp, unsigned int region);
 
 /*!
  * @brief Set the writable bit for a PMP region
@@ -175,7 +175,7 @@ int metal_pmp_get_executable(struct metal_pmp *pmp, unsigned int region);
  * @param W The desired value of the writable bit
  * @return 0 if the writable bit is successfully set
  */
-int metal_pmp_set_writeable(struct metal_pmp *pmp, unsigned int region, int W);
+int metal_pmp_set_writeable(const struct metal_pmp *pmp, unsigned int region, int W);
 
 /*!
  * @brief Get the writable bit for a PMP region
@@ -183,7 +183,7 @@ int metal_pmp_set_writeable(struct metal_pmp *pmp, unsigned int region, int W);
  * @param region The PMP region to read
  * @return the value of the writable bit
  */
-int metal_pmp_get_writeable(struct metal_pmp *pmp, unsigned int region);
+int metal_pmp_get_writeable(const struct metal_pmp *pmp, unsigned int region);
 
 /*!
  * @brief Set the readable bit for a PMP region
@@ -192,7 +192,7 @@ int metal_pmp_get_writeable(struct metal_pmp *pmp, unsigned int region);
  * @param R The desired value of the readable bit
  * @return 0 if the readable bit is successfully set
  */
-int metal_pmp_set_readable(struct metal_pmp *pmp, unsigned int region, int R);
+int metal_pmp_set_readable(const struct metal_pmp *pmp, unsigned int region, int R);
 
 /*!
  * @brief Set the readable bit for a PMP region
@@ -200,6 +200,6 @@ int metal_pmp_set_readable(struct metal_pmp *pmp, unsigned int region, int R);
  * @param region The PMP region to read
  * @return the value of the readable bit
  */
-int metal_pmp_get_readable(struct metal_pmp *pmp, unsigned int region);
+int metal_pmp_get_readable(const struct metal_pmp *pmp, unsigned int region);
 
 #endif
