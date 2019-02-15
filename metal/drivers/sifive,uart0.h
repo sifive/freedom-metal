@@ -45,7 +45,7 @@ struct __metal_driver_sifive_uart0 {
     struct __metal_driver_sifive_gpio0 *pinmux;
     const unsigned long pinmux_output_selector;
     const unsigned long pinmux_source_selector;
-    struct metal_interrupt *interrupt_parent;
+    const struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_line;
 };

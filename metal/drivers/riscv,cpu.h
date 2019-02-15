@@ -181,14 +181,19 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
     .controller_vtable.command_request    = __metal_driver_riscv_cpu_controller_command_request,
 };
 
-struct __metal_driver_riscv_cpu_intc {
-    const struct metal_interrupt controller;
-    const struct __metal_driver_vtable_riscv_cpu_intc *vtable;
+
+struct __metal_driver_riscv_cpu_intc_data {
     int init_done;
-    int interrupt_controller;
     uintptr_t metal_mtvec_table[METAL_MAX_MI];
     __metal_interrupt_data metal_int_table[METAL_MAX_MI];
     metal_exception_handler_t metal_exception_table[METAL_MAX_ME];
+};
+
+struct __metal_driver_riscv_cpu_intc {
+    const struct metal_interrupt controller;
+    const struct __metal_driver_vtable_riscv_cpu_intc *vtable;
+    const int interrupt_controller;
+    struct __metal_driver_riscv_cpu_intc_data *data;
 };
 
 /* CPU driver*/

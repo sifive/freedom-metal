@@ -32,12 +32,16 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_clint0) = {
     .clint_vtable.command_request    = __metal_driver_riscv_clint0_command_request,
 };
 
+struct __metal_driver_riscv_clint0_data {
+    int init_done;
+};
+
 struct __metal_driver_riscv_clint0 {
     const struct metal_interrupt controller;
     const struct __metal_driver_vtable_riscv_clint0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
-    int init_done;
+    struct __metal_driver_riscv_clint0_data *data;
     const struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_lines[];

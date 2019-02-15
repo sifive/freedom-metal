@@ -9,7 +9,7 @@ void __metal_driver_sifive_local_external_interrupt_init(const struct metal_inte
     struct __metal_driver_sifive_local_external_interrupts0 *local0;
 
     local0 = (struct __metal_driver_sifive_local_external_interrupts0 *)(controller);
-    if ( !local0->init_done ) {
+    if ( !local0->data->init_done ) {
         const struct metal_interrupt *intc = local0->interrupt_parent;
 
 	/* Register its interruptswith with parent controller, aka all external to default isr */
@@ -18,7 +18,7 @@ void __metal_driver_sifive_local_external_interrupt_init(const struct metal_inte
 					   local0->interrupt_lines[i],
 					   NULL, local0);
 	}
-        local0->init_done = 1;
+        local0->data->init_done = 1;
     }
 }
 

@@ -69,22 +69,27 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
 
 #define __METAL_MACHINE_MACROS
 #include <metal/machine.h>
+
+struct __metal_driver_sifive_clic0_data {
+    int init_done;
+    metal_interrupt_handler_t metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
+    __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
+};
+
 struct __metal_driver_sifive_clic0 {
     const struct metal_interrupt controller;
     const struct __metal_driver_vtable_sifive_clic0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
-    int init_done;
     const struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     /* Hardcode max of 3 direct interrupts to core for now, SW, Timer, Ext */
     const int interrupt_lines[3];
-    int max_levels;
-    int num_subinterrupts;
-    int num_intbits;
-    int interrupt_controller;
-    metal_interrupt_handler_t metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
-    __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
+    const int max_levels;
+    const int num_subinterrupts;
+    const int num_intbits;
+    const int interrupt_controller;
+    struct __metal_driver_sifive_clic0_data *data;
 };
 #undef __METAL_MACHINE_MACROS
 

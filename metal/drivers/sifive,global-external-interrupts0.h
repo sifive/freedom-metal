@@ -28,10 +28,14 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_global_external_interrupts0)
     .global0_vtable.command_request    = __metal_driver_sifive_global_external_command_request,
 };
 
+struct __metal_driver_sifive_global_external_interrupts0_data {
+    int init_done;
+};
+
 struct __metal_driver_sifive_global_external_interrupts0 {
     const struct metal_interrupt irc;
     const struct __metal_driver_vtable_sifive_global_external_interrupts0 *vtable;
-    int init_done;
+    struct __metal_driver_sifive_global_external_interrupts0_data *data;
     const struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_lines[];

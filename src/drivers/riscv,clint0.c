@@ -36,7 +36,7 @@ void __metal_driver_riscv_clint0_init (const struct metal_interrupt *controller)
     struct __metal_driver_riscv_clint0 *clint =
                               (struct __metal_driver_riscv_clint0 *)(controller);
 
-    if ( !clint->init_done ) {
+    if ( !clint->data->init_done ) {
         const struct metal_interrupt *intc = clint->interrupt_parent;
 
 	/* Register its interrupts with with parent controller, aka sw and timerto its default isr */
@@ -45,7 +45,7 @@ void __metal_driver_riscv_clint0_init (const struct metal_interrupt *controller)
 					     clint->interrupt_lines[i],
 					     NULL, clint);
 	}
-	clint->init_done = 1;
+	clint->data->init_done = 1;
     }	
 }
 

@@ -304,8 +304,8 @@ void __metal_clic0_handler (int id, void *priv)
     struct __metal_driver_sifive_clic0 *clic = priv;
 
     idx = id - METAL_INTERRUPT_ID_LC0;
-    if ( (idx < clic->num_subinterrupts) && (clic->metal_mtvt_table[idx]) ) {
-        clic->metal_mtvt_table[idx](id, clic->metal_exint_table[idx].exint_data);
+    if ( (idx < clic->num_subinterrupts) && (clic->data->metal_mtvt_table[idx]) ) {
+        clic->data->metal_mtvt_table[idx](id, clic->data->metal_exint_table[idx].exint_data);
     }
 }
 
@@ -318,7 +318,7 @@ void __metal_driver_sifive_clic0_init (const struct metal_interrupt *controller)
     struct __metal_driver_sifive_clic0 *clic =
                               (struct __metal_driver_sifive_clic0 *)(controller);
 
-    if ( !clic->init_done ) {
+    if ( !clic->data->init_done ) {
         int level;
         struct __metal_clic_cfg cfg = __metal_clic_defaultcfg;
         const struct metal_interrupt *intc = clic->interrupt_parent;
@@ -345,13 +345,13 @@ void __metal_driver_sifive_clic0_init (const struct metal_interrupt *controller)
 
         level = (1 << cfg.nlbits) - 1;
         for (int i = 0; i < clic->num_subinterrupts; i++) {
-            clic->metal_mtvt_table[i] = NULL;
-            clic->metal_exint_table[i].sub_int = NULL;
-            clic->metal_exint_table[i].exint_data = NULL;
+            clic->data->metal_mtvt_table[i] = NULL;
+            clic->data->metal_exint_table[i].sub_int = NULL;
+            clic->data->metal_exint_table[i].exint_data = NULL;
             __metal_clic0_interrupt_disable(clic, i);
             __metal_clic0_interrupt_set_level(clic, i, level);
         }
-	clic->init_done = 1;
+	clic->data->init_done = 1;
     }	
 }
 
@@ -376,11 +376,11 @@ int __metal_driver_sifive_clic0_register (const struct metal_interrupt *controll
     id -= METAL_INTERRUPT_ID_LC0;
     if (id < clic->num_subinterrupts) {
         if ( isr) {
-            clic->metal_mtvt_table[id] = isr;
-            clic->metal_exint_table[id].exint_data = priv;        
+            clic->data->metal_mtvt_table[id] = isr;
+            clic->data->metal_exint_table[id].exint_data = priv;        
         } else {
-            clic->metal_mtvt_table[id] = __metal_clic0_default_handler;
-            clic->metal_exint_table[id].sub_int = priv;
+            clic->data->metal_mtvt_table[id] = __metal_clic0_default_handler;
+            clic->data->metal_exint_table[id].sub_int = priv;
         }
         rc = 0;
     }
@@ -413,7 +413,7 @@ int __metal_driver_sifive_clic0_enable_interrupt_vector(const struct metal_inter
             return 0;
         }
         if (mode == METAL_HARDWARE_VECTOR_MODE) {
-            __metal_controller_interrupt_vector(mode, &clic->metal_mtvt_table);
+            __metal_controller_interrupt_vector(mode, &clic->data->metal_mtvt_table);
             return 0;
         }
     }

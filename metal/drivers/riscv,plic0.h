@@ -26,6 +26,11 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_plic0) = {
     .plic_vtable.interrupt_disable  = __metal_driver_riscv_plic0_disable,
 };
 
+struct __metal_driver_riscv_plic0_data {
+    int init_done;
+    __metal_interrupt_data metal_exint_table[];
+};
+
 struct __metal_driver_riscv_plic0 {
     const struct metal_interrupt controller;
     const struct __metal_driver_vtable_riscv_plic0 *vtable;
@@ -33,11 +38,10 @@ struct __metal_driver_riscv_plic0 {
     const unsigned long control_size;
     const struct metal_interrupt *interrupt_parent;
     const int interrupt_line;
-    int max_priority;
-    int num_interrupts;
-    int init_done;
-    int interrupt_controller;
-    __metal_interrupt_data metal_exint_table[];
+    const int max_priority;
+    const int num_interrupts;
+    const int interrupt_controller;
+    struct __metal_driver_riscv_plic0_data *data;
 };
 
 
