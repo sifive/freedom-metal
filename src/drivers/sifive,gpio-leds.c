@@ -4,7 +4,7 @@
 #include <string.h>
 #include <metal/drivers/sifive,gpio-leds.h>
 
-int  __metal_driver_led_exist (struct metal_led *led, char *label)
+int  __metal_driver_led_exist (const struct metal_led *led, char *label)
 {
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 
@@ -14,7 +14,7 @@ int  __metal_driver_led_exist (struct metal_led *led, char *label)
     return 0;
 }
 
-void __metal_driver_led_enable (struct metal_led *led)
+void __metal_driver_led_enable (const struct metal_led *led)
 {
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 
@@ -25,7 +25,7 @@ void __metal_driver_led_enable (struct metal_led *led)
     }
 }
 
-void __metal_driver_led_on (struct metal_led *led)
+void __metal_driver_led_on (const struct metal_led *led)
 {
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 
@@ -34,7 +34,7 @@ void __metal_driver_led_on (struct metal_led *led)
     }
 }
 
-void __metal_driver_led_off (struct metal_led *led)
+void __metal_driver_led_off (const struct metal_led *led)
 {
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 
@@ -43,7 +43,7 @@ void __metal_driver_led_off (struct metal_led *led)
     }
 }
 
-void __metal_driver_led_toggle (struct metal_led *led)
+void __metal_driver_led_toggle (const struct metal_led *led)
 {
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 

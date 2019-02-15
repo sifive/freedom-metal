@@ -5,7 +5,7 @@
 #include <metal/drivers/riscv,cpu.h>
 #include <metal/drivers/sifive,gpio-switches.h>
 
-int  __metal_driver_switch_exist (struct metal_switch *flip, char *label)
+int  __metal_driver_switch_exist (const struct metal_switch *flip, char *label)
 {
     struct __metal_driver_sifive_gpio_switch *swch = (void *)(flip);
 
@@ -15,15 +15,15 @@ int  __metal_driver_switch_exist (struct metal_switch *flip, char *label)
     return 0;
 }
 
-struct metal_interrupt *
-__metal_driver_switch_interrupt_controller(struct metal_switch *flip)
+const struct metal_interrupt *
+__metal_driver_switch_interrupt_controller(const struct metal_switch *flip)
 {
     struct __metal_driver_sifive_gpio_switch *swch = (void *)(flip);
 
     return swch->interrupt_parent;
 }
 
-int __metal_driver_switch_get_interrupt_id(struct metal_switch *flip)
+int __metal_driver_switch_get_interrupt_id(const struct metal_switch *flip)
 {
     int max_irq;
     struct __metal_driver_sifive_gpio_switch *swch = (void *)(flip);
