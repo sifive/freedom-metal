@@ -19,7 +19,7 @@ long __metal_driver_sifive_fe310_g000_hfrosc_get_rate_hz(const struct metal_cloc
     return metal_clock_get_rate_hz(clk->ref) / ((cfg & CONFIG_DIVIDER) + 1);
 }
 
-long __metal_driver_sifive_fe310_g000_hfrosc_set_rate_hz(struct metal_clock *clock, long rate)
+long __metal_driver_sifive_fe310_g000_hfrosc_set_rate_hz(const struct metal_clock *clock, long rate)
 {
     return __metal_driver_sifive_fe310_g000_hfrosc_get_rate_hz(clock);
 }

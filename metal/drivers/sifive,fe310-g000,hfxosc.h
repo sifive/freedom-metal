@@ -8,10 +8,10 @@
 #include <metal/drivers/sifive,fe310-g000,prci.h>
 
 long __metal_driver_sifive_fe310_g000_hfxosc_get_rate_hz(const struct metal_clock *clock);
-long __metal_driver_sifive_fe310_g000_hfxosc_set_rate_hz(struct metal_clock *clock, long rate);
+long __metal_driver_sifive_fe310_g000_hfxosc_set_rate_hz(const struct metal_clock *clock, long rate);
 
 struct __metal_driver_vtable_sifive_fe310_g000_hfxosc {
-    struct __metal_clock_vtable clock;
+    const struct __metal_clock_vtable clock;
 };
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_fe310_g000_hfxosc) = {
@@ -20,7 +20,7 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_fe310_g000_hfxosc) = {
 };
 
 struct __metal_driver_sifive_fe310_g000_hfxosc {
-    struct metal_clock clock;
+    const struct metal_clock clock;
     const struct __metal_driver_vtable_sifive_fe310_g000_hfxosc *vtable;
     const struct metal_clock *ref;
     const struct __metal_driver_sifive_fe310_g000_prci *config_base;

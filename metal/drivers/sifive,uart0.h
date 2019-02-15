@@ -38,7 +38,7 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
 struct __metal_driver_sifive_uart0 {
     struct metal_uart uart;
     const struct __metal_driver_vtable_sifive_uart0 *vtable;
-    struct metal_clock *clock;
+    const struct metal_clock *clock;
     const unsigned long control_base;
     const unsigned long control_size;
     unsigned long baud_rate;
