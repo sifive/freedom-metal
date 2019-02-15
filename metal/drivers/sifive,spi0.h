@@ -35,7 +35,7 @@ struct __metal_driver_sifive_spi0 {
     const unsigned long control_base;
     const unsigned long control_size;
     unsigned long baud_rate;
-    struct __metal_driver_sifive_gpio0 *pinmux;
+    const struct __metal_driver_sifive_gpio0 *pinmux;
     const unsigned long pinmux_output_selector;
     const unsigned long pinmux_source_selector;
 };
