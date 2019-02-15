@@ -17,13 +17,13 @@ struct __metal_driver_vtable_sifive_uart0 {
 
 struct __metal_driver_sifive_uart0;
 
-void __metal_driver_sifive_uart0_init(struct metal_uart *uart, int baud_rate);
-int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, unsigned char c);
-int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, unsigned char *c);
-int __metal_driver_sifive_uart0_get_baud_rate(struct metal_uart *guart);
-int __metal_driver_sifive_uart0_set_baud_rate(struct metal_uart *guart, int baud_rate);
-struct metal_interrupt* __metal_driver_sifive_uart0_interrupt_controller(struct metal_uart *uart);
-int __metal_driver_sifive_uart0_get_interrupt_id(struct metal_uart *uart);
+void __metal_driver_sifive_uart0_init(const struct metal_uart *uart, int baud_rate);
+int __metal_driver_sifive_uart0_putc(const struct metal_uart *uart, unsigned char c);
+int __metal_driver_sifive_uart0_getc(const struct metal_uart *uart, unsigned char *c);
+int __metal_driver_sifive_uart0_get_baud_rate(const struct metal_uart *guart);
+int __metal_driver_sifive_uart0_set_baud_rate(const struct metal_uart *guart, int baud_rate);
+struct metal_interrupt* __metal_driver_sifive_uart0_interrupt_controller(const struct metal_uart *uart);
+int __metal_driver_sifive_uart0_get_interrupt_id(const struct metal_uart *uart);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
     .uart.init          = __metal_driver_sifive_uart0_init,
@@ -35,19 +35,23 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
     .uart.get_interrupt_id     = __metal_driver_sifive_uart0_get_interrupt_id,
 };
 
+struct __metal_driver_sifive_uart0_data {
+    unsigned long baud_rate;
+};
+
 struct __metal_driver_sifive_uart0 {
-    struct metal_uart uart;
+    const struct metal_uart uart;
     const struct __metal_driver_vtable_sifive_uart0 *vtable;
     const struct metal_clock *clock;
     const unsigned long control_base;
     const unsigned long control_size;
-    unsigned long baud_rate;
     struct __metal_driver_sifive_gpio0 *pinmux;
     const unsigned long pinmux_output_selector;
     const unsigned long pinmux_source_selector;
     const struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_line;
+    struct __metal_driver_sifive_uart0_data *data;
 };
 
 
