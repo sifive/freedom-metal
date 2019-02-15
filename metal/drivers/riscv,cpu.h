@@ -136,28 +136,28 @@ typedef struct __metal_interrupt_data {
 uintptr_t __metal_myhart_id(void);
 
 struct __metal_driver_interrupt_controller_vtable {
-    void (*interrupt_init)(struct metal_interrupt *controller);
-    int (*interrupt_register)(struct metal_interrupt *controller,
+    void (*interrupt_init)(const struct metal_interrupt *controller);
+    int (*interrupt_register)(const struct metal_interrupt *controller,
 			      int id, metal_interrupt_handler_t isr, void *priv_data);
-    int (*interrupt_enable)(struct metal_interrupt *controller, int id);
-    int (*interrupt_disable)(struct metal_interrupt *controller, int id);
-    int (*command_request)(struct metal_interrupt *intr, int cmd, void *data);
+    int (*interrupt_enable)(const struct metal_interrupt *controller, int id);
+    int (*interrupt_disable)(const struct metal_interrupt *controller, int id);
+    int (*command_request)(const struct metal_interrupt *intr, int cmd, void *data);
 };
 
 struct __metal_driver_vtable_riscv_cpu_intc {
-  struct metal_interrupt_vtable controller_vtable;
+  const struct metal_interrupt_vtable controller_vtable;
 };
 
-void __metal_driver_riscv_cpu_controller_interrupt_init(struct metal_interrupt *controller);
-int __metal_driver_riscv_cpu_controller_interrupt_register(struct metal_interrupt *controller,
+void __metal_driver_riscv_cpu_controller_interrupt_init(const struct metal_interrupt *controller);
+int __metal_driver_riscv_cpu_controller_interrupt_register(const struct metal_interrupt *controller,
 							 int id, metal_interrupt_handler_t isr,
 							 void *priv_data);
-int __metal_driver_riscv_cpu_controller_interrupt_enable(struct metal_interrupt *controller, int id);
-int __metal_driver_riscv_cpu_controller_interrupt_disable(struct metal_interrupt *controller, int id);
-int __metal_driver_riscv_cpu_controller_interrupt_enable_vector(struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_enable(const struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_cpu_controller_interrupt_disable(const struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_cpu_controller_interrupt_enable_vector(const struct metal_interrupt *controller,
                                                               int id, metal_vector_mode mode);
-int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(struct metal_interrupt *controller, int id);
-int __metal_driver_riscv_cpu_controller_command_request(struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(const struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_cpu_controller_command_request(const struct metal_interrupt *controller,
 						      int cmd, void *data);
 
 void __metal_interrupt_global_enable(void);
@@ -182,7 +182,7 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
 };
 
 struct __metal_driver_riscv_cpu_intc {
-    struct metal_interrupt controller;
+    const struct metal_interrupt controller;
     const struct __metal_driver_vtable_riscv_cpu_intc *vtable;
     int init_done;
     int interrupt_controller;
@@ -201,16 +201,16 @@ unsigned long long  __metal_driver_cpu_timebase_get(const struct metal_cpu *cpu)
 unsigned long long
       __metal_driver_cpu_mtime_get(const struct metal_cpu *cpu);
 int  __metal_driver_cpu_mtimecmp_set(const struct metal_cpu *cpu, unsigned long long time);
-struct metal_interrupt*
+const struct metal_interrupt*
      __metal_driver_cpu_timer_controller_interrupt(const struct metal_cpu *cpu);
 int  __metal_driver_cpu_get_timer_interrupt_id(const struct metal_cpu *cpu);
-struct metal_interrupt*
+const struct metal_interrupt*
      __metal_driver_cpu_sw_controller_interrupt(const struct metal_cpu *cpu);
 int  __metal_driver_cpu_get_sw_interrupt_id(const struct metal_cpu *cpu);
 int  __metal_driver_cpu_set_sw_ipi(const struct metal_cpu *cpu, int hartid);
 int  __metal_driver_cpu_clear_sw_ipi(const struct metal_cpu *cpu, int hartid);
 int  __metal_driver_cpu_get_msip(const struct metal_cpu *cpu, int hartid);
-struct metal_interrupt*
+const struct metal_interrupt*
      __metal_driver_cpu_controller_interrupt(const struct metal_cpu *cpu);
 int  __metal_driver_cpu_exception_register(const struct metal_cpu *cpu, int ecode,
 					 metal_exception_handler_t isr);
@@ -241,7 +241,7 @@ struct __metal_driver_cpu {
     const struct metal_cpu cpu;
     const struct __metal_driver_vtable_cpu *vtable;
     const int timebase;    
-    struct metal_interrupt *interrupt_controller;
+    const struct metal_interrupt *interrupt_controller;
 };
 
 #endif

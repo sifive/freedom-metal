@@ -205,7 +205,7 @@ int __metal_valid_interrupt_id (int id)
 }
 
  
-int __metal_local_interrupt_enable (struct metal_interrupt *controller,
+int __metal_local_interrupt_enable (const struct metal_interrupt *controller,
 				  metal_interrupt_id_e id, int enable)
 {
     int rc = 0;
@@ -271,7 +271,7 @@ int __metal_local_interrupt_enable (struct metal_interrupt *controller,
     return rc;
 }
 
-int __metal_exception_register (struct metal_interrupt *controller,
+int __metal_exception_register (const struct metal_interrupt *controller,
                               int ecode, metal_exception_handler_t isr)
 {
     struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
@@ -283,7 +283,7 @@ int __metal_exception_register (struct metal_interrupt *controller,
     return -1;
 }
 
-void __metal_driver_riscv_cpu_controller_interrupt_init (struct metal_interrupt *controller)
+void __metal_driver_riscv_cpu_controller_interrupt_init (const struct metal_interrupt *controller)
 {
     struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
 
@@ -302,7 +302,7 @@ void __metal_driver_riscv_cpu_controller_interrupt_init (struct metal_interrupt 
     }
 }
 
-int __metal_driver_riscv_cpu_controller_interrupt_register(struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_register(const struct metal_interrupt *controller,
 							 int id, metal_interrupt_handler_t isr,
 							 void *priv)
 {
@@ -353,19 +353,19 @@ int __metal_driver_riscv_cpu_controller_interrupt_register(struct metal_interrup
     return rc;
 }
 
-int __metal_driver_riscv_cpu_controller_interrupt_enable (struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_enable (const struct metal_interrupt *controller,
                                                         int id)
 {
     return __metal_local_interrupt_enable(controller, id, METAL_ENABLE);
 }
 
-int __metal_driver_riscv_cpu_controller_interrupt_disable (struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_disable (const struct metal_interrupt *controller,
                                                          int id)
 {   
     return __metal_local_interrupt_enable(controller, id, METAL_DISABLE);
 }
 
-int __metal_driver_riscv_cpu_controller_interrupt_enable_vector(struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_enable_vector(const struct metal_interrupt *controller,
                                                              int id, metal_vector_mode mode)
 {
     struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
@@ -383,7 +383,7 @@ int __metal_driver_riscv_cpu_controller_interrupt_enable_vector(struct metal_int
     return -1;
 }
 
-int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(const struct metal_interrupt *controller,
                                                               int id)
 {
     struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
@@ -395,7 +395,7 @@ int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(struct metal_in
     return -1;
 }
 
-int __metal_driver_riscv_cpu_controller_command_request (struct metal_interrupt *controller,
+int __metal_driver_riscv_cpu_controller_command_request (const struct metal_interrupt *controller,
 						       int cmd, void *data)
 {
     /* NOP for now, unless local interrupt lines the like of clic, clint, plic */
@@ -439,7 +439,7 @@ unsigned long long __metal_driver_cpu_timebase_get(const struct metal_cpu *cpu)
 unsigned long long  __metal_driver_cpu_mtime_get (const struct metal_cpu *cpu)
 {
     unsigned long long time = 0;
-    struct metal_interrupt *tmr_intc;
+    const struct metal_interrupt *tmr_intc;
     struct __metal_driver_riscv_cpu_intc *intc;
     struct __metal_driver_cpu *_cpu = (void *)cpu;
 
@@ -457,7 +457,7 @@ unsigned long long  __metal_driver_cpu_mtime_get (const struct metal_cpu *cpu)
 int __metal_driver_cpu_mtimecmp_set (const struct metal_cpu *cpu, unsigned long long time)
 {
     int rc = -1;
-    struct metal_interrupt *tmr_intc;
+    const struct metal_interrupt *tmr_intc;
     struct __metal_driver_riscv_cpu_intc *intc;
     struct __metal_driver_cpu *_cpu = (void *)cpu;
 
@@ -472,7 +472,7 @@ int __metal_driver_cpu_mtimecmp_set (const struct metal_cpu *cpu, unsigned long 
     return rc;
 }
 
-struct metal_interrupt *
+const struct metal_interrupt *
 __metal_driver_cpu_timer_controller_interrupt(const struct metal_cpu *cpu)
 {
 #ifdef __METAL_DT_RISCV_CLINT0_HANDLE
@@ -492,7 +492,7 @@ int __metal_driver_cpu_get_timer_interrupt_id(const struct metal_cpu *cpu)
     return METAL_INTERRUPT_ID_TMR;
 }
 
-struct metal_interrupt *
+const struct metal_interrupt *
 __metal_driver_cpu_sw_controller_interrupt(const struct metal_cpu *cpu)
 {
 #ifdef __METAL_DT_RISCV_CLINT0_HANDLE
@@ -515,7 +515,7 @@ int __metal_driver_cpu_get_sw_interrupt_id(const struct metal_cpu *cpu)
 int __metal_driver_cpu_set_sw_ipi (const struct metal_cpu *cpu, int hartid)
 {
     int rc = -1;
-    struct metal_interrupt *sw_intc;
+    const struct metal_interrupt *sw_intc;
     struct __metal_driver_riscv_cpu_intc *intc;
     struct __metal_driver_cpu *_cpu = (void *)cpu;
 
@@ -533,7 +533,7 @@ int __metal_driver_cpu_set_sw_ipi (const struct metal_cpu *cpu, int hartid)
 int __metal_driver_cpu_clear_sw_ipi (const struct metal_cpu *cpu, int hartid)
 {
     int rc = -1;
-    struct metal_interrupt *sw_intc;
+    const struct metal_interrupt *sw_intc;
     struct __metal_driver_riscv_cpu_intc *intc;
     struct __metal_driver_cpu *_cpu = (void *)cpu;
 
@@ -551,7 +551,7 @@ int __metal_driver_cpu_clear_sw_ipi (const struct metal_cpu *cpu, int hartid)
 int __metal_driver_cpu_get_msip (const struct metal_cpu *cpu, int hartid)
 {
     int rc = 0;
-    struct metal_interrupt *sw_intc;
+    const struct metal_interrupt *sw_intc;
     struct __metal_driver_riscv_cpu_intc *intc;
     struct __metal_driver_cpu *_cpu = (void *)cpu;
 
@@ -566,11 +566,11 @@ int __metal_driver_cpu_get_msip (const struct metal_cpu *cpu, int hartid)
     return rc;
 }
 
-struct metal_interrupt *
+const struct metal_interrupt *
 __metal_driver_cpu_controller_interrupt(const struct metal_cpu *cpu)
 {
     struct __metal_driver_cpu *cpu0 = (void *)cpu;
-    return (struct metal_interrupt *)cpu0->interrupt_controller;
+    return (const struct metal_interrupt *)cpu0->interrupt_controller;
 }
 
 int __metal_driver_cpu_enable_interrupt(const struct metal_cpu *cpu, void *priv)

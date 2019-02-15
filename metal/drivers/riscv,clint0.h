@@ -12,16 +12,16 @@
 #define METAL_CLINT_MTIME_OFFSET        0xBFF8UL
 
 struct __metal_driver_vtable_riscv_clint0 {
-    struct metal_interrupt_vtable clint_vtable;
+    const struct metal_interrupt_vtable clint_vtable;
 };
 
-void __metal_driver_riscv_clint0_init(struct metal_interrupt *clint);
-int __metal_driver_riscv_clint0_register(struct metal_interrupt *controller,
+void __metal_driver_riscv_clint0_init(const struct metal_interrupt *clint);
+int __metal_driver_riscv_clint0_register(const struct metal_interrupt *controller,
                                        int id, metal_interrupt_handler_t isr,
                                        void *priv);
-int __metal_driver_riscv_clint0_enable(struct metal_interrupt *controller, int id);
-int __metal_driver_riscv_clint0_disable(struct metal_interrupt *controller, int id);
-int __metal_driver_riscv_clint0_command_request(struct metal_interrupt *clint,
+int __metal_driver_riscv_clint0_enable(const struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_clint0_disable(const struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_clint0_command_request(const struct metal_interrupt *clint,
                                               int command, void *data);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_clint0) = {
@@ -33,12 +33,12 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_clint0) = {
 };
 
 struct __metal_driver_riscv_clint0 {
-    struct metal_interrupt controller;
+    const struct metal_interrupt controller;
     const struct __metal_driver_vtable_riscv_clint0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
     int init_done;
-    struct metal_interrupt *interrupt_parent;
+    const struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_lines[];
 };

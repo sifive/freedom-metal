@@ -70,12 +70,12 @@ void __metal_plic0_handler (int id, void *priv)
     __metal_plic0_complete_interrupt(plic, idx);
 }
 
-void __metal_driver_riscv_plic0_init (struct metal_interrupt *controller)
+void __metal_driver_riscv_plic0_init (const struct metal_interrupt *controller)
 {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
 
     if ( !plic->init_done ) {
-        struct metal_interrupt *intc;
+        const struct metal_interrupt *intc;
 
         intc = plic->interrupt_parent;
 
@@ -104,7 +104,7 @@ void __metal_driver_riscv_plic0_init (struct metal_interrupt *controller)
     }
 }
 
-int __metal_driver_riscv_plic0_register (struct metal_interrupt *controller,
+int __metal_driver_riscv_plic0_register (const struct metal_interrupt *controller,
 			               int id, metal_interrupt_handler_t isr,
 			               void *priv)
 {
@@ -130,7 +130,7 @@ int __metal_driver_riscv_plic0_register (struct metal_interrupt *controller,
     return 0;
 }
 
-int __metal_driver_riscv_plic0_enable (struct metal_interrupt *controller, int id)
+int __metal_driver_riscv_plic0_enable (const struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
     unsigned int idx = id - METAL_INTERRUPT_ID_GL0;
@@ -143,7 +143,7 @@ int __metal_driver_riscv_plic0_enable (struct metal_interrupt *controller, int i
     return 0;
 }
 
-int __metal_driver_riscv_plic0_disable (struct metal_interrupt *controller, int id)
+int __metal_driver_riscv_plic0_disable (const struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
     unsigned int idx = id - METAL_INTERRUPT_ID_GL0;

@@ -20,11 +20,11 @@ extern inline unsigned long long metal_cpu_get_mtime(const struct metal_cpu *cpu
 
 extern inline int metal_cpu_set_mtimecmp(const struct metal_cpu *cpu, unsigned long long time);
 
-extern inline struct metal_interrupt* metal_cpu_timer_interrupt_controller(const struct metal_cpu *cpu);
+extern inline const struct metal_interrupt* metal_cpu_timer_interrupt_controller(const struct metal_cpu *cpu);
 
 extern inline int metal_cpu_timer_get_interrupt_id(const struct metal_cpu *cpu);
 
-extern inline struct metal_interrupt* metal_cpu_software_interrupt_controller(const struct metal_cpu *cpu);
+extern inline const struct metal_interrupt* metal_cpu_software_interrupt_controller(const struct metal_cpu *cpu);
 
 extern inline int metal_cpu_software_get_interrupt_id(const struct metal_cpu *cpu);
 
@@ -34,7 +34,7 @@ extern inline int metal_cpu_software_clear_ipi(const struct metal_cpu *cpu, int 
 
 extern inline int metal_cpu_get_msip(const struct metal_cpu *cpu, int hartid);
 
-extern inline struct metal_interrupt* metal_cpu_interrupt_controller(const struct metal_cpu *cpu);
+extern inline const struct metal_interrupt* metal_cpu_interrupt_controller(const struct metal_cpu *cpu);
 
 extern inline int metal_cpu_exception_register(const struct metal_cpu *cpu, int ecode, metal_exception_handler_t handler);
 
