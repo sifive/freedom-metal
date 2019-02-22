@@ -135,7 +135,7 @@ _start:
   li a0, 1     /* argc=1 */
   la a1, argv  /* argv = {"libgloss", NULL} */
   la a2, envp  /* envp = {NULL} */
-  call main
+  call slave_main
 
   /* Call exit to handle libc's cleanup routines.  Under normal contains this
    * shouldn't even get called, but I'm still not using a tail call here
@@ -163,6 +163,22 @@ _fini:
 .size _init, .-_init
 .size _fini, .-_fini
 
+/* By default, slave_main will cause secondary harts to spin forever.
+ * Users can redefine slave_main themselves to run code on secondary harts */
+.weak   slave_main
+.global slave_main
+.type   slave_main, @function
+
+slave_main:
+  csrr t0, mhartid
+  beqz t0, 2f
+1:
+  wfi
+  j 1b
+2:
+  call main
+  ret
+
 /* This shim allows main() to be passed a set of arguments that can satisfy the
  * requirements of the C API. */
 .section .rodata.libgloss.start
@@ -172,3 +188,4 @@ envp:
 .dc.a 0
 name:
 .asciz "libgloss"
+
