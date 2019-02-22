@@ -167,6 +167,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/spi.c \
 	src/switch.c \
 	src/timer.c \
+	src/trap.S \
 	src/tty.c \
 	src/uart.c
 

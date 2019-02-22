@@ -15,4 +15,6 @@
 #define __METAL_SET_FIELD(reg, mask, val) \
         (((reg) & ~(mask)) | (((val) * ((mask) & ~((mask) << 1))) & (mask)))
 
+void _metal_trap(int ecode);
+
 #endif
