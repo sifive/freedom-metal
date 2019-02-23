@@ -118,6 +118,13 @@ _start:
   call atexit
   call __libc_init_array
 
+  /* Our C code might use the floating-point, so just go ahead and
+   * unconditionally turn on the floating point unit. */
+  csrr t0, mstatus
+  li t1, 0x3000
+  or t0, t0, t1
+  csrw mstatus, t0
+
   /* This is a C runtime, so main() is defined to have some arguments.  Since
    * there's nothing sane the METAL can pass we don't bother with that but
    * instead just setup as close to a NOP as we can. */
