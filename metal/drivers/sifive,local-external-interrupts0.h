@@ -8,16 +8,16 @@
 #include <metal/drivers/riscv,cpu.h>
 
 struct __metal_driver_vtable_sifive_local_external_interrupts0 {
-    struct metal_interrupt_vtable local0_vtable;
+    const struct metal_interrupt_vtable local0_vtable;
 };
 
-void __metal_driver_sifive_local_external_interrupt_init(struct metal_interrupt *local0);
-int __metal_driver_sifive_local_external_interrupt_register(struct metal_interrupt *controller,
+void __metal_driver_sifive_local_external_interrupt_init(const struct metal_interrupt *local0);
+int __metal_driver_sifive_local_external_interrupt_register(const struct metal_interrupt *controller,
                                                           int id, metal_interrupt_handler_t isr,
                                                           void *priv);
-int __metal_driver_sifive_local_external_interrupt_enable(struct metal_interrupt *controller, int id);
-int __metal_driver_sifive_local_external_interrupt_disable(struct metal_interrupt *controller, int id);
-int __metal_driver_sifive_local_external_command_request(struct metal_interrupt *clint,
+int __metal_driver_sifive_local_external_interrupt_enable(const struct metal_interrupt *controller, int id);
+int __metal_driver_sifive_local_external_interrupt_disable(const struct metal_interrupt *controller, int id);
+int __metal_driver_sifive_local_external_command_request(const struct metal_interrupt *clint,
                                               	       int command, void *data);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_local_external_interrupts0) = {
@@ -28,11 +28,15 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_local_external_interrupts0) 
     .local0_vtable.command_request    = __metal_driver_sifive_local_external_command_request,
 };
 
-struct __metal_driver_sifive_local_external_interrupts0 {
-    struct metal_interrupt irc;
-    const struct __metal_driver_vtable_sifive_local_external_interrupts0 *vtable;
+struct __metal_driver_sifive_local_external_interrupts0_data {
     int init_done;
-    struct metal_interrupt *interrupt_parent;
+};
+
+struct __metal_driver_sifive_local_external_interrupts0 {
+    const struct metal_interrupt irc;
+    const struct __metal_driver_vtable_sifive_local_external_interrupts0 *vtable;
+    struct __metal_driver_sifive_local_external_interrupts0_data *data;
+    const struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_lines[];
 };

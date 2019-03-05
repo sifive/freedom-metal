@@ -146,12 +146,12 @@ static void metal_sifive_fe310_g000_pll_init(void) {
 
 #endif /* __METAL_DT_SIFIVE_FE310_G000__PLL_HANDLE */
 
-void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe310_g000_pll *pll) {
+void __metal_driver_sifive_fe310_g000_pll_init(const struct __metal_driver_sifive_fe310_g000_pll *pll) {
     __metal_io_u32 *pllcfg = (__metal_io_u32 *) (pll->config_base->base + pll->config_offset);
 
     /* If the PLL clock has had a _pre_rate_change_callback configured, call it */
-    if(pll->clock._pre_rate_change_callback != NULL)
-        pll->clock._pre_rate_change_callback(pll->clock._pre_rate_change_callback_priv);
+    if(pll->clock.data->_pre_rate_change_callback != NULL)
+        pll->clock.data->_pre_rate_change_callback(pll->clock.data->_pre_rate_change_callback_priv);
 
     /* If we're running off of the PLL, switch off before we start configuring it*/
     if((__METAL_ACCESS_ONCE(pllcfg) & PLL_SEL) == 0)
@@ -167,8 +167,8 @@ void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe31
     pll->vtable->clock.set_rate_hz(&(pll->clock), pll->init_rate);
 
     /* If the PLL clock has had a rate_change_callback configured, call it */
-    if(pll->clock._post_rate_change_callback != NULL)
-        pll->clock._post_rate_change_callback(pll->clock._post_rate_change_callback_priv);
+    if(pll->clock.data->_post_rate_change_callback != NULL)
+        pll->clock.data->_post_rate_change_callback(pll->clock.data->_post_rate_change_callback_priv);
 }
 
 long __metal_driver_sifive_fe310_g000_pll_get_rate_hz(const struct metal_clock *clock)
@@ -274,7 +274,7 @@ static void configure_pll(__metal_io_u32 *pllcfg, __metal_io_u32 *plloutdiv, str
     while((__METAL_ACCESS_ONCE(pllcfg) & PLL_LOCK) == 0) ;
 }
 
-long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock *clock, long rate)
+long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(const struct metal_clock *clock, long rate)
 {
     struct __metal_driver_sifive_fe310_g000_pll *clk = (void *)clock;
     __metal_io_u32 *pllcfg = (__metal_io_u32 *) (clk->config_base->base + clk->config_offset);

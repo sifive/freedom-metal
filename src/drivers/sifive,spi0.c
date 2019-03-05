@@ -50,11 +50,11 @@
 #define METAL_SPI_TXMARK_MASK         0x3
 #define METAL_SPI_TXWM                (1 << 0)
 
-#define METAL_SPI_REG(offset)   (((unsigned long)(((struct __metal_driver_sifive_spi0 *)(spi))->control_base) + offset))
+#define METAL_SPI_REG(offset)   (((unsigned long)(((const struct __metal_driver_sifive_spi0 *)(spi))->control_base) + offset))
 #define METAL_SPI_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_SPI_REG(offset)))
 #define METAL_SPI_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_SPI_REG(offset)))
 
-static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_spi_config *config)
+static int configure_spi(const struct __metal_driver_sifive_spi0 *spi, const struct metal_spi_config *config)
 {
     /* Set protocol */
     METAL_SPI_REGW(METAL_SPI_REG_FMT) &= ~(METAL_SPI_PROTO_MASK);
@@ -116,13 +116,13 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
     return 0;
 }
 
-int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
-                                      struct metal_spi_config *config,
+int __metal_driver_sifive_spi0_transfer(const struct metal_spi *gspi,
+                                      const struct metal_spi_config *config,
                                       size_t len,
                                       char *tx_buf,
                                       char *rx_buf)
 {
-    struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
+    const struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
     int rc = 0;
     int rxdata = 0;
 
@@ -162,17 +162,17 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     return 0;
 }
 
-int __metal_driver_sifive_spi0_get_baud_rate(struct metal_spi *gspi)
+int __metal_driver_sifive_spi0_get_baud_rate(const struct metal_spi *gspi)
 {
-    struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
-    return spi->baud_rate;
+    const struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
+    return spi->data->baud_rate;
 }
 
-int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_rate)
+int __metal_driver_sifive_spi0_set_baud_rate(const struct metal_spi *gspi, int baud_rate)
 {
-    struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
+    const struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
 
-    spi->baud_rate = baud_rate;
+    spi->data->baud_rate = baud_rate;
 
     if (spi->clock != NULL) {
         long clock_rate = spi->clock->vtable->get_rate_hz(spi->clock);
@@ -195,7 +195,7 @@ int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_ra
 
 static void pre_rate_change_callback(void *priv)
 {
-    struct __metal_driver_sifive_spi0 *spi = priv;
+    const struct __metal_driver_sifive_spi0 *spi = priv;
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to zero and waiting until an interrupt is pending */
@@ -207,17 +207,17 @@ static void pre_rate_change_callback(void *priv)
 
 static void post_rate_change_callback(void *priv)
 {
-    struct __metal_driver_sifive_spi0 *spi = priv;
-    metal_spi_set_baud_rate(&spi->spi, spi->baud_rate);
+    const struct __metal_driver_sifive_spi0 *spi = priv;
+    metal_spi_set_baud_rate(&spi->spi, spi->data->baud_rate);
 }
 
-void __metal_driver_sifive_spi0_init(struct metal_spi *gspi, int baud_rate)
+void __metal_driver_sifive_spi0_init(const struct metal_spi *gspi, int baud_rate)
 {
-    struct __metal_driver_sifive_spi0 *spi = (void *)(gspi);
+    const struct __metal_driver_sifive_spi0 *spi = (void *)(gspi);
 
     if(spi->clock != NULL) {
-        metal_clock_register_pre_rate_change_callback(spi->clock, &pre_rate_change_callback, spi);
-        metal_clock_register_post_rate_change_callback(spi->clock, &post_rate_change_callback, spi);
+        metal_clock_register_pre_rate_change_callback(spi->clock, &pre_rate_change_callback, (void *) spi);
+        metal_clock_register_post_rate_change_callback(spi->clock, &post_rate_change_callback, (void *) spi);
     }
 
     metal_spi_set_baud_rate(&(spi->spi), baud_rate);

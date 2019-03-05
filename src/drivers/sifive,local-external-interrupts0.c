@@ -4,13 +4,13 @@
 #include <metal/io.h>
 #include <metal/drivers/sifive,local-external-interrupts0.h>
 
-void __metal_driver_sifive_local_external_interrupt_init(struct metal_interrupt *controller)
+void __metal_driver_sifive_local_external_interrupt_init(const struct metal_interrupt *controller)
 {
     struct __metal_driver_sifive_local_external_interrupts0 *local0;
 
     local0 = (struct __metal_driver_sifive_local_external_interrupts0 *)(controller);
-    if ( !local0->init_done ) {
-        struct metal_interrupt *intc = local0->interrupt_parent;
+    if ( !local0->data->init_done ) {
+        const struct metal_interrupt *intc = local0->interrupt_parent;
 
 	/* Register its interruptswith with parent controller, aka all external to default isr */
         for (int i = 0; i < local0->num_interrupts; i++) {
@@ -18,11 +18,11 @@ void __metal_driver_sifive_local_external_interrupt_init(struct metal_interrupt 
 					   local0->interrupt_lines[i],
 					   NULL, local0);
 	}
-        local0->init_done = 1;
+        local0->data->init_done = 1;
     }
 }
 
-int __metal_driver_sifive_local_external_interrupt_register(struct metal_interrupt *controller,
+int __metal_driver_sifive_local_external_interrupt_register(const struct metal_interrupt *controller,
                                                           int id, metal_interrupt_handler_t isr,
                                                           void *priv)
 {
@@ -31,7 +31,7 @@ int __metal_driver_sifive_local_external_interrupt_register(struct metal_interru
                               (struct __metal_driver_sifive_local_external_interrupts0 *)(controller);
 
     if (id != 0) {
-        struct metal_interrupt *intc = local0->interrupt_parent;
+        const struct metal_interrupt *intc = local0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
         if (intc) {
@@ -41,14 +41,14 @@ int __metal_driver_sifive_local_external_interrupt_register(struct metal_interru
     return rc;
 }
 
-int __metal_driver_sifive_local_external_interrupt_enable(struct metal_interrupt *controller, int id)
+int __metal_driver_sifive_local_external_interrupt_enable(const struct metal_interrupt *controller, int id)
 {
     int rc = -1;
     struct __metal_driver_sifive_local_external_interrupts0 *local0 =
                               (struct __metal_driver_sifive_local_external_interrupts0 *)(controller);
 
     if (id != 0) {
-        struct metal_interrupt *intc = local0->interrupt_parent;
+        const struct metal_interrupt *intc = local0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
         if (intc) {
@@ -58,14 +58,14 @@ int __metal_driver_sifive_local_external_interrupt_enable(struct metal_interrupt
     return rc;
 }
 
-int __metal_driver_sifive_local_external_interrupt_disable(struct metal_interrupt *controller, int id)
+int __metal_driver_sifive_local_external_interrupt_disable(const struct metal_interrupt *controller, int id)
 {
     int rc = -1;
     struct __metal_driver_sifive_local_external_interrupts0 *local0 =
                               (struct __metal_driver_sifive_local_external_interrupts0 *)(controller);
 
     if (id != 0) {
-        struct metal_interrupt *intc = local0->interrupt_parent;
+        const struct metal_interrupt *intc = local0->interrupt_parent;
 
         /* Enable its interrupts with parent controller */
         if (intc) {
@@ -75,7 +75,7 @@ int __metal_driver_sifive_local_external_interrupt_disable(struct metal_interrup
     return rc;
 }
 
-int __metal_driver_sifive_local_external_command_request (struct metal_interrupt *controller,
+int __metal_driver_sifive_local_external_command_request (const struct metal_interrupt *controller,
                                                         int command, void *data)
 {
     int index;
