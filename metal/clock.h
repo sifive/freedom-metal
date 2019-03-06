@@ -18,7 +18,7 @@ struct metal_clock;
 /* The generic interface to all clocks. */
 struct __metal_clock_vtable {
     long (*get_rate_hz)(const struct metal_clock *clk);
-    long (*set_rate_hz)(const struct metal_clock *clk, long hz);
+    long (*set_rate_hz)(struct metal_clock *clk, long hz);
 };
 
 /*!
@@ -30,16 +30,6 @@ typedef void (*metal_clock_pre_rate_change_callback)(void *priv);
  * @brief Function signature of clock post-rate change callbacks
  */
 typedef void (*metal_clock_post_rate_change_callback)(void *priv);
-
-struct __metal_clock_data {
-    /* Pre-rate change callback */
-    metal_clock_pre_rate_change_callback _pre_rate_change_callback;
-    void *_pre_rate_change_callback_priv;
-
-    /* Post-rate change callback */
-    metal_clock_post_rate_change_callback _post_rate_change_callback;
-    void *_post_rate_change_callback_priv;
-};
 
 /*!
  * @struct metal_clock
@@ -55,7 +45,14 @@ struct __metal_clock_data {
  */
 struct metal_clock {
     const struct __metal_clock_vtable *vtable;
-    struct __metal_clock_data *data;
+
+    /* Pre-rate change callback */
+    metal_clock_pre_rate_change_callback _pre_rate_change_callback;
+    void *_pre_rate_change_callback_priv;
+
+    /* Post-rate change callback */
+    metal_clock_post_rate_change_callback _post_rate_change_callback;
+    void *_post_rate_change_callback_priv;
 };
 
 /*!
@@ -80,21 +77,15 @@ inline long metal_clock_get_rate_hz(const struct metal_clock *clk) { return clk-
  * Prior to and after the rate change of the clock, this will call the registered
  * pre- and post-rate change callbacks.
  */
-inline long metal_clock_set_rate_hz(const struct metal_clock *clk, long hz)
+inline long metal_clock_set_rate_hz(struct metal_clock *clk, long hz)
 {
-    if(clk->data != NULL) {
-        if(clk->data->_pre_rate_change_callback != NULL) {
-            clk->data->_pre_rate_change_callback(clk->data->_pre_rate_change_callback_priv);
-        }
-    }
+    if(clk->_pre_rate_change_callback != NULL)
+        clk->_pre_rate_change_callback(clk->_pre_rate_change_callback_priv);
 
     long out = clk->vtable->set_rate_hz(clk, hz);
 
-    if(clk->data != NULL) {
-        if (clk->data->_post_rate_change_callback != NULL) {
-            clk->data->_post_rate_change_callback(clk->data->_post_rate_change_callback_priv);
-        }
-    }
+    if (clk->_post_rate_change_callback != NULL)
+        clk->_post_rate_change_callback(clk->_post_rate_change_callback_priv);
 
     return out;
 }
@@ -106,12 +97,10 @@ inline long metal_clock_set_rate_hz(const struct metal_clock *clk, long hz)
  * @param cb The callback to be registered
  * @param priv Private data for the callback handler
  */
-inline void metal_clock_register_pre_rate_change_callback(const struct metal_clock *clk, metal_clock_pre_rate_change_callback cb, void *priv)
+inline void metal_clock_register_pre_rate_change_callback(struct metal_clock *clk, metal_clock_pre_rate_change_callback cb, void *priv)
 {
-    if(clk->data != NULL) {
-        clk->data->_pre_rate_change_callback = cb;
-        clk->data->_pre_rate_change_callback_priv = priv;
-    }
+    clk->_pre_rate_change_callback = cb;
+    clk->_pre_rate_change_callback_priv = priv;
 }
 
 /*!
@@ -121,12 +110,10 @@ inline void metal_clock_register_pre_rate_change_callback(const struct metal_clo
  * @param cb The callback to be registered
  * @param priv Private data for the callback handler
  */
-inline void metal_clock_register_post_rate_change_callback(const struct metal_clock *clk, metal_clock_post_rate_change_callback cb, void *priv)
+inline void metal_clock_register_post_rate_change_callback(struct metal_clock *clk, metal_clock_post_rate_change_callback cb, void *priv)
 {
-    if(clk->data != NULL) {
-        clk->data->_post_rate_change_callback = cb;
-        clk->data->_post_rate_change_callback_priv = priv;
-    }
+    clk->_post_rate_change_callback = cb;
+    clk->_post_rate_change_callback_priv = priv;
 }
 
 #endif

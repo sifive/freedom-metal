@@ -41,7 +41,7 @@ struct __metal_driver_sifive_gpio0 {
     const struct __metal_driver_vtable_sifive_gpio0 *vtable;
     const long base;
     const long size;
-    const struct metal_interrupt *interrupt_parent;
+    struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     const int interrupt_lines[];
 };

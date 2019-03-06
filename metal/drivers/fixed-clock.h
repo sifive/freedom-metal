@@ -10,11 +10,11 @@ struct __metal_driver_fixed_clock;
 #include <metal/clock.h>
 
 struct __metal_driver_vtable_fixed_clock {
-    const struct __metal_clock_vtable clock;
+    struct __metal_clock_vtable clock;
 };
 
 long __metal_driver_fixed_clock_get_rate_hz(const struct metal_clock *gclk);
-long __metal_driver_fixed_clock_set_rate_hz(const struct metal_clock *gclk, long target_hz);
+long __metal_driver_fixed_clock_set_rate_hz(struct metal_clock *gclk, long target_hz);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_fixed_clock) = {
     .clock.get_rate_hz = __metal_driver_fixed_clock_get_rate_hz,
@@ -22,9 +22,9 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_fixed_clock) = {
 };
 
 struct __metal_driver_fixed_clock {
-    const struct metal_clock clock;
+    struct metal_clock clock;
     const struct __metal_driver_vtable_fixed_clock *vtable;
-    const long rate;
+    long rate;
 };
 
 #endif

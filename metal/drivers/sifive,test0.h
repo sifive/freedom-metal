@@ -20,7 +20,7 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_test0) = {
 };
 
 struct __metal_driver_sifive_test0 {
-    const struct __metal_shutdown shutdown;
+    struct __metal_shutdown shutdown;
     const struct __metal_driver_vtable_sifive_test0 *vtable;
     const unsigned long base;
     const unsigned long size;

@@ -9,14 +9,14 @@
 #include <metal/compiler.h>
 
 struct __metal_driver_vtable_sifive_led {
-  const struct metal_led_vtable led_vtable;
+  struct metal_led_vtable led_vtable;
 };
 
-int  __metal_driver_led_exist(const struct metal_led *led, char *label);
-void __metal_driver_led_enable(const struct metal_led *led);
-void __metal_driver_led_on(const struct metal_led *led);
-void __metal_driver_led_off(const struct metal_led *led);
-void __metal_driver_led_toggle(const struct metal_led *led);
+int  __metal_driver_led_exist(struct metal_led *led, char *label);
+void __metal_driver_led_enable(struct metal_led *led);
+void __metal_driver_led_on(struct metal_led *led);
+void __metal_driver_led_off(struct metal_led *led);
+void __metal_driver_led_toggle(struct metal_led *led);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_led) = {
     .led_vtable.led_exist   = __metal_driver_led_exist,
@@ -27,9 +27,9 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_led) = {
 };
 
 struct __metal_driver_sifive_gpio_led {
-    const struct metal_led led;
+    struct metal_led led;
     const struct __metal_driver_vtable_sifive_led *vtable;
-    const struct __metal_driver_sifive_gpio0 *gpio;
+    struct __metal_driver_sifive_gpio0 *gpio;
     const char *label;
     const int pin;
 };

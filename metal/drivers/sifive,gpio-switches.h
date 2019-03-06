@@ -9,13 +9,13 @@
 #include <metal/compiler.h>
 
 struct __metal_driver_vtable_sifive_switch {
-  const struct metal_switch_vtable switch_vtable;
+  struct metal_switch_vtable switch_vtable;
 };
 
-int  __metal_driver_switch_exist(const struct metal_switch *flip, char *label);
-const struct metal_interrupt*
-     __metal_driver_switch_interrupt_controller(const struct metal_switch *flip);
-int  __metal_driver_switch_get_interrupt_id(const struct metal_switch *flip);
+int  __metal_driver_switch_exist(struct metal_switch *flip, char *label);
+struct metal_interrupt*
+     __metal_driver_switch_interrupt_controller(struct metal_switch *flip);
+int  __metal_driver_switch_get_interrupt_id(struct metal_switch *flip);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_switch) = {
     .switch_vtable.switch_exist   = __metal_driver_switch_exist,
@@ -24,10 +24,10 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_switch) = {
 };
 
 struct __metal_driver_sifive_gpio_switch {
-    const struct metal_switch flip;
+    struct metal_switch flip;
     const struct __metal_driver_vtable_sifive_switch *vtable;
-    const struct metal_interrupt *interrupt_parent;
-    const struct __metal_driver_sifive_gpio0 *gpio;
+    struct metal_interrupt *interrupt_parent;
+    struct __metal_driver_sifive_gpio0 *gpio;
     const char *label;
     const int pin;
     const int interrupt_line;

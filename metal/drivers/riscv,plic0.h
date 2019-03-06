@@ -9,15 +9,15 @@
 
 
 struct __metal_driver_vtable_riscv_plic0 {
-    const struct metal_interrupt_vtable plic_vtable;
+    struct metal_interrupt_vtable plic_vtable;
 };
 
-void __metal_driver_riscv_plic0_init(const struct metal_interrupt *controller);
-int __metal_driver_riscv_plic0_register(const struct metal_interrupt *plic,
+void __metal_driver_riscv_plic0_init(struct metal_interrupt *controller);
+int __metal_driver_riscv_plic0_register(struct metal_interrupt *plic,
 				      int id, metal_interrupt_handler_t isr,
 				      void *priv_data);
-int __metal_driver_riscv_plic0_enable(const struct metal_interrupt *controller, int id);
-int __metal_driver_riscv_plic0_disable(const struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_plic0_enable(struct metal_interrupt *controller, int id);
+int __metal_driver_riscv_plic0_disable(struct metal_interrupt *controller, int id);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_plic0) = {
     .plic_vtable.interrupt_init = __metal_driver_riscv_plic0_init,
@@ -26,22 +26,18 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_plic0) = {
     .plic_vtable.interrupt_disable  = __metal_driver_riscv_plic0_disable,
 };
 
-struct __metal_driver_riscv_plic0_data {
-    int init_done;
-    __metal_interrupt_data metal_exint_table[];
-};
-
 struct __metal_driver_riscv_plic0 {
-    const struct metal_interrupt controller;
+    struct metal_interrupt controller;
     const struct __metal_driver_vtable_riscv_plic0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
-    const struct metal_interrupt *interrupt_parent;
+    struct metal_interrupt *interrupt_parent;
     const int interrupt_line;
-    const int max_priority;
-    const int num_interrupts;
-    const int interrupt_controller;
-    struct __metal_driver_riscv_plic0_data *data;
+    int max_priority;
+    int num_interrupts;
+    int init_done;
+    int interrupt_controller;
+    __metal_interrupt_data metal_exint_table[];
 };
 
 
