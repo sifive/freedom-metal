@@ -5,9 +5,9 @@
 #include <metal/pmp.h>
 
 #define CONFIG_TO_INT(_config) (*((size_t *) &(_config)))
-#define INT_TO_CONFIG(_int) (*((const struct metal_pmp_config *) &(_int)))
+#define INT_TO_CONFIG(_int) (*((struct metal_pmp_config *) &(_int)))
 
-const struct metal_pmp *metal_pmp_get_device(void)
+struct metal_pmp *metal_pmp_get_device(void)
 {
 #ifdef __METAL_DT_PMP_HANDLE
     return __METAL_DT_PMP_HANDLE;
@@ -16,9 +16,9 @@ const struct metal_pmp *metal_pmp_get_device(void)
 #endif
 }
 
-void metal_pmp_init(const struct metal_pmp *pmp)
+void metal_pmp_init(struct metal_pmp *pmp)
 {
-    const struct metal_pmp_config init_config = {
+    struct metal_pmp_config init_config = {
         .L = METAL_PMP_UNLOCKED,
         .A = METAL_PMP_OFF,
         .X = 0,
@@ -31,9 +31,9 @@ void metal_pmp_init(const struct metal_pmp *pmp)
     }
 }
 
-int metal_pmp_set_region(const struct metal_pmp *pmp,
+int metal_pmp_set_region(struct metal_pmp *pmp,
                        unsigned int region,
-                       const struct metal_pmp_config config,
+                       struct metal_pmp_config config,
                        size_t address)
 {
     struct metal_pmp_config old_config;
@@ -201,7 +201,7 @@ int metal_pmp_set_region(const struct metal_pmp *pmp,
     return 0;
 }
 
-int metal_pmp_get_region(const struct metal_pmp *pmp,
+int metal_pmp_get_region(struct metal_pmp *pmp,
                        unsigned int region,
                        struct metal_pmp_config *config,
                        size_t *address)
@@ -330,7 +330,7 @@ int metal_pmp_get_region(const struct metal_pmp *pmp,
     return 0;
 }
 
-int metal_pmp_lock(const struct metal_pmp *pmp, unsigned int region)
+int metal_pmp_lock(struct metal_pmp *pmp, unsigned int region)
 {
     struct metal_pmp_config config;
     size_t address;
@@ -353,7 +353,7 @@ int metal_pmp_lock(const struct metal_pmp *pmp, unsigned int region)
 }
 
 
-int metal_pmp_set_address(const struct metal_pmp *pmp, unsigned int region, size_t address)
+int metal_pmp_set_address(struct metal_pmp *pmp, unsigned int region, size_t address)
 {
     struct metal_pmp_config config;
     size_t old_address;
@@ -369,7 +369,7 @@ int metal_pmp_set_address(const struct metal_pmp *pmp, unsigned int region, size
     return rc;
 }
 
-size_t metal_pmp_get_address(const struct metal_pmp *pmp, unsigned int region)
+size_t metal_pmp_get_address(struct metal_pmp *pmp, unsigned int region)
 {
     struct metal_pmp_config config;
     size_t address = 0;
@@ -380,7 +380,7 @@ size_t metal_pmp_get_address(const struct metal_pmp *pmp, unsigned int region)
 }
 
 
-int metal_pmp_set_address_mode(const struct metal_pmp *pmp, unsigned int region, enum metal_pmp_address_mode mode)
+int metal_pmp_set_address_mode(struct metal_pmp *pmp, unsigned int region, enum metal_pmp_address_mode mode)
 {
     struct metal_pmp_config config;
     size_t address;
@@ -398,7 +398,7 @@ int metal_pmp_set_address_mode(const struct metal_pmp *pmp, unsigned int region,
     return rc;
 }
 
-enum metal_pmp_address_mode metal_pmp_get_address_mode(const struct metal_pmp *pmp, unsigned int region)
+enum metal_pmp_address_mode metal_pmp_get_address_mode(struct metal_pmp *pmp, unsigned int region)
 {
     struct metal_pmp_config config;
     size_t address = 0;
@@ -409,7 +409,7 @@ enum metal_pmp_address_mode metal_pmp_get_address_mode(const struct metal_pmp *p
 }
 
 
-int metal_pmp_set_executable(const struct metal_pmp *pmp, unsigned int region, int X)
+int metal_pmp_set_executable(struct metal_pmp *pmp, unsigned int region, int X)
 {
     struct metal_pmp_config config;
     size_t address;
@@ -427,7 +427,7 @@ int metal_pmp_set_executable(const struct metal_pmp *pmp, unsigned int region, i
     return rc;
 }
 
-int metal_pmp_get_executable(const struct metal_pmp *pmp, unsigned int region)
+int metal_pmp_get_executable(struct metal_pmp *pmp, unsigned int region)
 {
     struct metal_pmp_config config;
     size_t address = 0;
@@ -438,7 +438,7 @@ int metal_pmp_get_executable(const struct metal_pmp *pmp, unsigned int region)
 }
 
 
-int metal_pmp_set_writeable(const struct metal_pmp *pmp, unsigned int region, int W)
+int metal_pmp_set_writeable(struct metal_pmp *pmp, unsigned int region, int W)
 {
     struct metal_pmp_config config;
     size_t address;
@@ -456,7 +456,7 @@ int metal_pmp_set_writeable(const struct metal_pmp *pmp, unsigned int region, in
     return rc;
 }
 
-int metal_pmp_get_writeable(const struct metal_pmp *pmp, unsigned int region)
+int metal_pmp_get_writeable(struct metal_pmp *pmp, unsigned int region)
 {
     struct metal_pmp_config config;
     size_t address = 0;
@@ -467,7 +467,7 @@ int metal_pmp_get_writeable(const struct metal_pmp *pmp, unsigned int region)
 }
 
 
-int metal_pmp_set_readable(const struct metal_pmp *pmp, unsigned int region, int R)
+int metal_pmp_set_readable(struct metal_pmp *pmp, unsigned int region, int R)
 {
     struct metal_pmp_config config;
     size_t address;
@@ -485,7 +485,7 @@ int metal_pmp_set_readable(const struct metal_pmp *pmp, unsigned int region, int
     return rc;
 }
 
-int metal_pmp_get_readable(const struct metal_pmp *pmp, unsigned int region)
+int metal_pmp_get_readable(struct metal_pmp *pmp, unsigned int region)
 {
     struct metal_pmp_config config;
     size_t address = 0;

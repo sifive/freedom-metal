@@ -5,7 +5,7 @@
 #include <metal/drivers/riscv,cpu.h>
 #include <metal/drivers/sifive,gpio-buttons.h>
 
-int  __metal_driver_button_exist (const struct metal_button *button, char *label)
+int  __metal_driver_button_exist (struct metal_button *button, char *label)
 {
     struct __metal_driver_sifive_gpio_button *but = (void *)(button);
 
@@ -15,15 +15,15 @@ int  __metal_driver_button_exist (const struct metal_button *button, char *label
     return 0;
 }
 
-const struct metal_interrupt *
-__metal_driver_button_interrupt_controller(const struct metal_button *button)
+struct metal_interrupt *
+__metal_driver_button_interrupt_controller(struct metal_button *button)
 {
     struct __metal_driver_sifive_gpio_button *but = (void *)(button);
 
     return but->interrupt_parent;
 }
 
-int __metal_driver_button_get_interrupt_id(const struct metal_button *button)
+int __metal_driver_button_get_interrupt_id(struct metal_button *button)
 {
     int max_irq;
     struct __metal_driver_sifive_gpio_button *but = (void *)(button);

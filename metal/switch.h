@@ -14,9 +14,9 @@
 struct metal_switch;
 
 struct metal_switch_vtable {
-    int (*switch_exist)(const struct metal_switch *sw, char *label);
-    const struct metal_interrupt* (*interrupt_controller)(const struct metal_switch *sw);
-    int (*get_interrupt_id)(const struct metal_switch *sw);
+    int (*switch_exist)(struct metal_switch *sw, char *label);
+    struct metal_interrupt* (*interrupt_controller)(struct metal_switch *sw);
+    int (*get_interrupt_id)(struct metal_switch *sw);
 };
 
 /*!
@@ -31,21 +31,21 @@ struct metal_switch {
  * @param label The DeviceTree label for the desired switch
  * @return A handle to the switch, or NULL if none is found for the requested label
  */
-const struct metal_switch* metal_switch_get(char *label);
+struct metal_switch* metal_switch_get(char *label);
 
 /*!
  * @brief Get the interrupt controller for a switch
  * @param sw The handle for the switch
  * @return The interrupt controller handle
  */
-inline const struct metal_interrupt*
-    metal_switch_interrupt_controller(const struct metal_switch *sw) { return sw->vtable->interrupt_controller(sw); }
+inline struct metal_interrupt*
+    metal_switch_interrupt_controller(struct metal_switch *sw) { return sw->vtable->interrupt_controller(sw); }
 
 /*!
  * @brief Get the interrupt id for a switch
  * @param sw The handle for the switch
  * @return The interrupt ID for the switch
  */
-inline int metal_switch_get_interrupt_id(const struct metal_switch *sw) { return sw->vtable->get_interrupt_id(sw); }
+inline int metal_switch_get_interrupt_id(struct metal_switch *sw) { return sw->vtable->get_interrupt_id(sw); }
 
 #endif

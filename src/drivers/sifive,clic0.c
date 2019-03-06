@@ -304,8 +304,8 @@ void __metal_clic0_handler (int id, void *priv)
     struct __metal_driver_sifive_clic0 *clic = priv;
 
     idx = id - METAL_INTERRUPT_ID_LC0;
-    if ( (idx < clic->num_subinterrupts) && (clic->data->metal_mtvt_table[idx]) ) {
-        clic->data->metal_mtvt_table[idx](id, clic->data->metal_exint_table[idx].exint_data);
+    if ( (idx < clic->num_subinterrupts) && (clic->metal_mtvt_table[idx]) ) {
+        clic->metal_mtvt_table[idx](id, clic->metal_exint_table[idx].exint_data);
     }
 }
 
@@ -313,15 +313,15 @@ void __metal_clic0_default_handler (int id, void *priv) {
     metal_shutdown(300);
 }
 
-void __metal_driver_sifive_clic0_init (const struct metal_interrupt *controller)
+void __metal_driver_sifive_clic0_init (struct metal_interrupt *controller)
 {
     struct __metal_driver_sifive_clic0 *clic =
                               (struct __metal_driver_sifive_clic0 *)(controller);
 
-    if ( !clic->data->init_done ) {
+    if ( !clic->init_done ) {
         int level;
         struct __metal_clic_cfg cfg = __metal_clic_defaultcfg;
-        const struct metal_interrupt *intc = clic->interrupt_parent;
+        struct metal_interrupt *intc = clic->interrupt_parent;
 
         /* Initialize ist parent controller, aka cpu_intc. */
         intc->vtable->interrupt_init(intc);
@@ -345,24 +345,24 @@ void __metal_driver_sifive_clic0_init (const struct metal_interrupt *controller)
 
         level = (1 << cfg.nlbits) - 1;
         for (int i = 0; i < clic->num_subinterrupts; i++) {
-            clic->data->metal_mtvt_table[i] = NULL;
-            clic->data->metal_exint_table[i].sub_int = NULL;
-            clic->data->metal_exint_table[i].exint_data = NULL;
+            clic->metal_mtvt_table[i] = NULL;
+            clic->metal_exint_table[i].sub_int = NULL;
+            clic->metal_exint_table[i].exint_data = NULL;
             __metal_clic0_interrupt_disable(clic, i);
             __metal_clic0_interrupt_set_level(clic, i, level);
         }
-	clic->data->init_done = 1;
+	clic->init_done = 1;
     }	
 }
 
-int __metal_driver_sifive_clic0_register (const struct metal_interrupt *controller,
+int __metal_driver_sifive_clic0_register (struct metal_interrupt *controller,
                                         int id, metal_interrupt_handler_t isr,
                                         void *priv)
 {
     int rc = -1;
     struct __metal_driver_sifive_clic0 *clic =
                               (struct __metal_driver_sifive_clic0 *)(controller);
-    const struct metal_interrupt *intc = clic->interrupt_parent;
+    struct metal_interrupt *intc = clic->interrupt_parent;
 
     /* Register its interrupts with parent controller */
     if ( id < METAL_INTERRUPT_ID_LC0) {
@@ -376,32 +376,32 @@ int __metal_driver_sifive_clic0_register (const struct metal_interrupt *controll
     id -= METAL_INTERRUPT_ID_LC0;
     if (id < clic->num_subinterrupts) {
         if ( isr) {
-            clic->data->metal_mtvt_table[id] = isr;
-            clic->data->metal_exint_table[id].exint_data = priv;        
+            clic->metal_mtvt_table[id] = isr;
+            clic->metal_exint_table[id].exint_data = priv;        
         } else {
-            clic->data->metal_mtvt_table[id] = __metal_clic0_default_handler;
-            clic->data->metal_exint_table[id].sub_int = priv;
+            clic->metal_mtvt_table[id] = __metal_clic0_default_handler;
+            clic->metal_exint_table[id].sub_int = priv;
         }
         rc = 0;
     }
     return rc;
 }
 
-int __metal_driver_sifive_clic0_enable (const struct metal_interrupt *controller, int id)
+int __metal_driver_sifive_clic0_enable (struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_sifive_clic0 *clic =
                               (struct __metal_driver_sifive_clic0 *)(controller);
     return __metal_clic0_interrupt_enable(clic, id);
 }
 
-int __metal_driver_sifive_clic0_disable (const struct metal_interrupt *controller, int id)
+int __metal_driver_sifive_clic0_disable (struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_sifive_clic0 *clic =
                               (struct __metal_driver_sifive_clic0 *)(controller);
     return __metal_clic0_interrupt_disable(clic, id);
 }
 
-int __metal_driver_sifive_clic0_enable_interrupt_vector(const struct metal_interrupt *controller,
+int __metal_driver_sifive_clic0_enable_interrupt_vector(struct metal_interrupt *controller,
                                                       int id, metal_vector_mode mode)
 {
     struct __metal_driver_sifive_clic0 *clic =
@@ -413,7 +413,7 @@ int __metal_driver_sifive_clic0_enable_interrupt_vector(const struct metal_inter
             return 0;
         }
         if (mode == METAL_HARDWARE_VECTOR_MODE) {
-            __metal_controller_interrupt_vector(mode, &clic->data->metal_mtvt_table);
+            __metal_controller_interrupt_vector(mode, &clic->metal_mtvt_table);
             return 0;
         }
     }
@@ -428,7 +428,7 @@ int __metal_driver_sifive_clic0_enable_interrupt_vector(const struct metal_inter
     return -1;
 }
 
-int __metal_driver_sifive_clic0_disable_interrupt_vector(const struct metal_interrupt *controller, int id)
+int __metal_driver_sifive_clic0_disable_interrupt_vector(struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_sifive_clic0 *clic =
                               (struct __metal_driver_sifive_clic0 *)(controller);
@@ -446,7 +446,7 @@ int __metal_driver_sifive_clic0_disable_interrupt_vector(const struct metal_inte
     return -1;
 }
 
-int __metal_driver_sifive_clic0_command_request (const struct metal_interrupt *controller,
+int __metal_driver_sifive_clic0_command_request (struct metal_interrupt *controller,
                                                int command, void *data)
 {
     int hartid;

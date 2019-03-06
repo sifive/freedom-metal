@@ -31,13 +31,13 @@ int __metal_clint0_mtime_set (struct __metal_driver_riscv_clint0 *clint, unsigne
     return 0;
 }
 
-void __metal_driver_riscv_clint0_init (const struct metal_interrupt *controller)
+void __metal_driver_riscv_clint0_init (struct metal_interrupt *controller)
 {
     struct __metal_driver_riscv_clint0 *clint =
                               (struct __metal_driver_riscv_clint0 *)(controller);
 
-    if ( !clint->data->init_done ) {
-        const struct metal_interrupt *intc = clint->interrupt_parent;
+    if ( !clint->init_done ) {
+        struct metal_interrupt *intc = clint->interrupt_parent;
 
 	/* Register its interrupts with with parent controller, aka sw and timerto its default isr */
         for (int i = 0; i < clint->num_interrupts; i++) {
@@ -45,18 +45,18 @@ void __metal_driver_riscv_clint0_init (const struct metal_interrupt *controller)
 					     clint->interrupt_lines[i],
 					     NULL, clint);
 	}
-	clint->data->init_done = 1;
+	clint->init_done = 1;
     }	
 }
 
-int __metal_driver_riscv_clint0_register (const struct metal_interrupt *controller,
+int __metal_driver_riscv_clint0_register (struct metal_interrupt *controller,
                                         int id, metal_interrupt_handler_t isr,
                                         void *priv)
 {
     int rc = -1;
     struct __metal_driver_riscv_clint0 *clint =
                               (struct __metal_driver_riscv_clint0 *)(controller);
-    const struct metal_interrupt *intc = clint->interrupt_parent;
+    struct metal_interrupt *intc = clint->interrupt_parent;
 
     /* Register its interrupts with parent controller */
     if (intc) {
@@ -65,14 +65,14 @@ int __metal_driver_riscv_clint0_register (const struct metal_interrupt *controll
     return rc;
 }
 
-int __metal_driver_riscv_clint0_enable (const struct metal_interrupt *controller, int id)
+int __metal_driver_riscv_clint0_enable (struct metal_interrupt *controller, int id)
 {
     int rc = -1;
     struct __metal_driver_riscv_clint0 *clint =
                               (struct __metal_driver_riscv_clint0 *)(controller);
 
     if ( id ) {
-        const struct metal_interrupt *intc = clint->interrupt_parent;
+        struct metal_interrupt *intc = clint->interrupt_parent;
         
         /* Enable its interrupts with parent controller */
         if (intc) {
@@ -81,14 +81,14 @@ int __metal_driver_riscv_clint0_enable (const struct metal_interrupt *controller
     }
 }
 
-int __metal_driver_riscv_clint0_disable (const struct metal_interrupt *controller, int id)
+int __metal_driver_riscv_clint0_disable (struct metal_interrupt *controller, int id)
 {
     int rc = -1;
     struct __metal_driver_riscv_clint0 *clint =
                               (struct __metal_driver_riscv_clint0 *)(controller);
 
     if ( id ) {
-        const struct metal_interrupt *intc = clint->interrupt_parent;
+        struct metal_interrupt *intc = clint->interrupt_parent;
         
         /* Disable its interrupts with parent controller */
         if (intc) {
@@ -97,7 +97,7 @@ int __metal_driver_riscv_clint0_disable (const struct metal_interrupt *controlle
     }
 }
 
-int __metal_driver_riscv_clint0_command_request (const struct metal_interrupt *controller,
+int __metal_driver_riscv_clint0_command_request (struct metal_interrupt *controller,
                                                int command, void *data)
 {
     int hartid;

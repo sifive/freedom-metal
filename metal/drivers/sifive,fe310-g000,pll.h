@@ -9,13 +9,13 @@ struct __metal_driver_sifive_fe310_g000_pll;
 #include <metal/clock.h>
 #include <metal/drivers/sifive,fe310-g000,prci.h>
 
-void __metal_driver_sifive_fe310_g000_pll_init(const struct __metal_driver_sifive_fe310_g000_pll *pll);
+void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe310_g000_pll *pll);
 long __metal_driver_sifive_fe310_g000_pll_get_rate_hz(const struct metal_clock *clock);
-long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(const struct metal_clock *clock, long rate);
+long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock *clock, long rate);
 
 struct __metal_driver_vtable_sifive_fe310_g000_pll {
-    void (*init)(const struct __metal_driver_sifive_fe310_g000_pll *pll);
-    const struct __metal_clock_vtable clock;
+    void (*init)(struct __metal_driver_sifive_fe310_g000_pll *pll);
+    struct __metal_clock_vtable clock;
 };
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_fe310_g000_pll) = {
@@ -25,7 +25,7 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_fe310_g000_pll) = {
 };
 
 struct __metal_driver_sifive_fe310_g000_pll {
-    const struct metal_clock clock;
+    struct metal_clock clock;
     const struct __metal_driver_vtable_sifive_fe310_g000_pll *vtable;
     const struct metal_clock *pllsel0;
     const struct metal_clock *pllref;

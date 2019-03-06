@@ -41,20 +41,20 @@
 #define METAL_MAX_INTERRUPT_LEVEL      ((1 << METAL_CLIC_MAX_NLBITS) - 1)
 
 struct __metal_driver_vtable_sifive_clic0 {
-    const struct metal_interrupt_vtable clic_vtable;
+    struct metal_interrupt_vtable clic_vtable;
 };
 
-void __metal_driver_sifive_clic0_init(const struct metal_interrupt *clic);
-int __metal_driver_sifive_clic0_register(const struct metal_interrupt *controller,
+void __metal_driver_sifive_clic0_init(struct metal_interrupt *clic);
+int __metal_driver_sifive_clic0_register(struct metal_interrupt *controller,
                                        int id, metal_interrupt_handler_t isr,
                                        void *priv);
-int __metal_driver_sifive_clic0_enable(const struct metal_interrupt *controller, int id);
-int __metal_driver_sifive_clic0_disable(const struct metal_interrupt *controller, int id);
-int __metal_driver_sifive_clic0_enable_interrupt_vector(const struct metal_interrupt *controller,
+int __metal_driver_sifive_clic0_enable(struct metal_interrupt *controller, int id);
+int __metal_driver_sifive_clic0_disable(struct metal_interrupt *controller, int id);
+int __metal_driver_sifive_clic0_enable_interrupt_vector(struct metal_interrupt *controller,
                                                       int id, metal_vector_mode mode);
-int __metal_driver_sifive_clic0_disable_interrupt_vector(const struct metal_interrupt *controller,
+int __metal_driver_sifive_clic0_disable_interrupt_vector(struct metal_interrupt *controller,
                                                        int id);
-int __metal_driver_sifive_clic0_command_request(const struct metal_interrupt *clic,
+int __metal_driver_sifive_clic0_command_request(struct metal_interrupt *clic,
                                               int command, void *data);
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
@@ -69,27 +69,22 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
 
 #define __METAL_MACHINE_MACROS
 #include <metal/machine.h>
-
-struct __metal_driver_sifive_clic0_data {
-    int init_done;
-    metal_interrupt_handler_t metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
-    __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
-};
-
 struct __metal_driver_sifive_clic0 {
-    const struct metal_interrupt controller;
+    struct metal_interrupt controller;
     const struct __metal_driver_vtable_sifive_clic0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
-    const struct metal_interrupt *interrupt_parent;
+    int init_done;
+    struct metal_interrupt *interrupt_parent;
     const int num_interrupts;
     /* Hardcode max of 3 direct interrupts to core for now, SW, Timer, Ext */
     const int interrupt_lines[3];
-    const int max_levels;
-    const int num_subinterrupts;
-    const int num_intbits;
-    const int interrupt_controller;
-    struct __metal_driver_sifive_clic0_data *data;
+    int max_levels;
+    int num_subinterrupts;
+    int num_intbits;
+    int interrupt_controller;
+    metal_interrupt_handler_t metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
+    __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
 };
 #undef __METAL_MACHINE_MACROS
 
