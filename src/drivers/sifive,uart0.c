@@ -121,8 +121,8 @@ void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate)
     metal_uart_set_baud_rate(&(uart->uart), baud_rate);
 
     if (uart->pinmux != NULL) {
-        uart->pinmux->vtable->enable_io(
-            uart->pinmux,
+        uart->pinmux->vtable->gpio.enable_io(
+            (struct metal_gpio *) uart->pinmux,
             uart->pinmux_output_selector,
             uart->pinmux_source_selector
         );
