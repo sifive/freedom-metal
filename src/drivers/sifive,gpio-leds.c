@@ -21,8 +21,8 @@ void __metal_driver_led_enable (struct metal_led *led)
 
     if (_led->gpio != NULL) {
 	/* Configure LED as output */
-        metal_gpio_disable_input(_led->gpio, _led->pin);
-        metal_gpio_enable_output(_led->gpio, _led->pin);
+        metal_gpio_disable_input((struct metal_gpio *) _led->gpio, _led->pin);
+        metal_gpio_enable_output((struct metal_gpio *) _led->gpio, _led->pin);
     }
 }
 
@@ -31,7 +31,7 @@ void __metal_driver_led_on (struct metal_led *led)
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 
     if (_led->gpio != NULL) {
-        metal_gpio_set_pin(_led->gpio, led_pin, 1);
+        metal_gpio_set_pin((struct metal_gpio *) _led->gpio, _led->pin, 1);
     }
 }
 
@@ -40,7 +40,7 @@ void __metal_driver_led_off (struct metal_led *led)
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 
     if (_led->gpio != NULL) {
-        metal_gpio_set_pin(_led->gpio, led_pin, 0);
+        metal_gpio_set_pin((struct metal_gpio *) _led->gpio, _led->pin, 0);
     }
 }
 
@@ -49,7 +49,7 @@ void __metal_driver_led_toggle (struct metal_led *led)
     struct __metal_driver_sifive_gpio_led *_led = (void *)(led);
 
     if (_led->gpio != NULL) {
-        metal_gpio_toggle_pin(_led->gpio, led_pin);
+        metal_gpio_toggle_pin((struct metal_gpio *) _led->gpio, _led->pin);
     }
 }
 

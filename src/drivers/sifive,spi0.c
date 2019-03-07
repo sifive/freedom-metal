@@ -223,8 +223,8 @@ void __metal_driver_sifive_spi0_init(struct metal_spi *gspi, int baud_rate)
     metal_spi_set_baud_rate(&(spi->spi), baud_rate);
 
     if (spi->pinmux != NULL) {
-        spi->pinmux->vtable->enable_io(
-            spi->pinmux,
+        spi->pinmux->vtable->gpio.enable_io(
+            (struct metal_gpio *) spi->pinmux,
             spi->pinmux_output_selector,
             spi->pinmux_source_selector
         );
