@@ -7,7 +7,7 @@
 struct metal_cpu* metal_cpu_get(int hartid)
 {
     if (hartid < __METAL_DT_MAX_HARTS) {
-        return &(__metal_cpu_table[hartid]->cpu);
+        return (struct metal_cpu *)__metal_cpu_table[hartid];
     }   
     return NULL;
 }
