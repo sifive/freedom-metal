@@ -71,9 +71,9 @@ _start:
   bge t1, t2, 2f
 
 1:
-  lw   t3, 0(t0)
+  lw   a0, 0(t0)
   addi t0, t0, 4
-  sw   t3, 0(t1)
+  sw   a0, 0(t1)
   addi t1, t1, 4
   blt  t1, t2, 1b
 2:
@@ -87,9 +87,9 @@ _start:
   bge t1, t2, 2f
 
 1:
-  lw   t3, 0(t0)
+  lw   a0, 0(t0)
   addi t0, t0, 4
-  sw   t3, 0(t1)
+  sw   a0, 0(t1)
   addi t1, t1, 4
   blt  t1, t2, 1b
 2:
