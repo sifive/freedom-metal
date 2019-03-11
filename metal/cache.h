@@ -12,7 +12,7 @@
 
 struct metal_cache;
 
-struct metal_cache_vtable {
+struct __metal_cache_vtable {
 	void (*init)(struct metal_cache *cache, int ways);
 	int (*get_enabled_ways)(struct metal_cache *cache);
 	int (*set_enabled_ways)(struct metal_cache *cache, int ways);
@@ -22,7 +22,7 @@ struct metal_cache_vtable {
  * @brief a handle for a cache
  */
 struct metal_cache {
-	const struct metal_cache_vtable *vtable;
+	const struct __metal_cache_vtable *vtable;
 };
 
 /*!
