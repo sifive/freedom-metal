@@ -12,18 +12,7 @@
 
 static int fu540_c000_l2_get_max_ways(struct __metal_driver_sifive_fu540_c000_l2 *l2);
 
-static void metal_driver_sifive_fu540_c000_l2_init(void) __attribute__((constructor));
-static void metal_driver_sifive_fu540_c000_l2_init(void)
-{
-    /* Get the number of available ways per bank */
-    uint32_t ways = __METAL_ACCESS_ONCE((__metal_io_u32 *)(l2->control_base + L2_REG_CONFIG));
-    ways = ((ways & L2_CONFIG_WAYS_MASK) >> L2_CONFIG_WAYS_SHIFT);
-
-    /* Enable all the ways */
-    __metal_driver_sifive_fu540_c000_l2_init(l2, ways);
-}
-
-void __metal_driver_sifive_fu540_c000_l2_init(struct __metal_driver_sifive_fu540_c000_l2 *l2, int ways)
+void __metal_driver_sifive_fu540_c000_l2_init(struct metal_cache *l2, int ways)
 {
     __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(l2, ways);
 }
@@ -33,9 +22,9 @@ static int fu540_c000_l2_get_max_ways(struct __metal_driver_sifive_fu540_c000_l2
     return 0;
 }
 
-int __metal_driver_sifive_fu540_c000_l2_get_enabled_ways(struct __metal_driver_sifive_fu540_c000_l2 *l2)
+int __metal_driver_sifive_fu540_c000_l2_get_enabled_ways(struct metal_cache *cache)
 {
-    /* Make sure the device handle is not null */
+    struct __metal_driver_sifive_fu540_c000_l2 *l2 = (struct __metal_driver_sifive_fu540_c000_l2 *) cache;
     if(!l2) {
         return -1;
     }
@@ -46,8 +35,9 @@ int __metal_driver_sifive_fu540_c000_l2_get_enabled_ways(struct __metal_driver_s
     return (0xFF & way_enable) + 1;
 }
 
-int __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(struct __metal_driver_sifive_fu540_c000_l2 *l2, int ways)
+int __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(struct metal_cache *cache, int ways)
 {
+    struct __metal_driver_sifive_fu540_c000_l2 *l2 = (struct __metal_driver_sifive_fu540_c000_l2 *) cache;
     if(!l2) {
         return -1;
     }

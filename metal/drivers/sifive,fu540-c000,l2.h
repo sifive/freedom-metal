@@ -9,23 +9,22 @@ struct __metal_driver_sifive_fu540_c000_l2;
 #include <stdint.h>
 #include <metal/cache.h>
 
-void __metal_driver_sifive_fu540_c000_l2_init(struct __metal_driver_sifive_fu540_c000_l2 *l2, int ways);
-void __metal_driver_sifive_fu540_c000_l2_get_enabled_ways(struct __metal_driver_sifive_fu540_c000_l2 *l2);
-void __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(struct __metal_driver_sifive_fu540_c000_l2 *l2, int ways);
+void __metal_driver_sifive_fu540_c000_l2_init(struct metal_cache *l2, int ways);
+int __metal_driver_sifive_fu540_c000_l2_get_enabled_ways(struct metal_cache *l2);
+int __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(struct metal_cache *l2, int ways);
 
 struct __metal_driver_vtable_sifive_fu540_c000_l2 {
-	void (*init)(struct __metal_driver_sifive_fu540_c000_l2 *l2, int ways);
-	int (*get_enabled_ways)(struct __metal_driver_sifive_fu540_c000_l2 *cache);
-	int (*set_enabled_ways)(struct __metal_driver_sifive_fu540_c000_l2 *cache, int ways);
-}
+	struct __metal_cache_vtable cache;
+};
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_fu540_c000_l2) = {
-	.init = __metal_driver_sifive_fu540_c000_l2_init;
-	.get_enabled_ways = __metal_driver_sifive_fu540_c000_l2_get_enabled_ways;
-	.set_enabled_ways = __metal_driver_sifive_fu540_c000_l2_set_enabled_ways;
+	.cache.init = __metal_driver_sifive_fu540_c000_l2_init,
+	.cache.get_enabled_ways = __metal_driver_sifive_fu540_c000_l2_get_enabled_ways,
+	.cache.set_enabled_ways = __metal_driver_sifive_fu540_c000_l2_set_enabled_ways,
 };
 
 struct __metal_driver_sifive_fu540_c000_l2 {
+	struct metal_cache cache;
 	const struct __metal_driver_vtable_sifive_fu540_c000_l2 *vtable;
 	const uintptr_t control_base;
 };
