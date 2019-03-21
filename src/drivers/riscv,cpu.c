@@ -286,6 +286,7 @@ int __metal_exception_register (struct metal_interrupt *controller,
 void __metal_driver_riscv_cpu_controller_interrupt_init (struct metal_interrupt *controller)
 {
     struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
+    uintptr_t val;
 
     if ( !intc->init_done ) {
         /* Default to use direct interrupt, setup sw cb table*/
@@ -298,6 +299,12 @@ void __metal_driver_riscv_cpu_controller_interrupt_init (struct metal_interrupt 
 	    intc->metal_exception_table[i] = __metal_default_exception_handler;
 	}
         __metal_controller_interrupt_vector(METAL_DIRECT_MODE, &__metal_exception_handler);
+	asm volatile ("csrr %0, misa" : "=r"(val));
+	if (val & (METAL_ISA_D_EXTENSIONS | METAL_ISA_F_EXTENSIONS | METAL_ISA_Q_EXTENSIONS)) {
+	    /* Floating point architecture, so turn on FP register saving*/
+	    asm volatile ("csrr %0, mstatus" : "=r"(val));
+	    asm volatile ("csrw mstatus, %0" :: "r"(val | METAL_MSTATUS_FS_INIT));
+	}
 	intc->init_done = 1;
     }
 }
