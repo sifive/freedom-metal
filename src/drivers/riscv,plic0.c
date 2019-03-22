@@ -39,17 +39,17 @@ void __metal_plic0_set_priority(struct __metal_driver_riscv_plic0 *plic,
 
 void __metal_plic0_enable(struct __metal_driver_riscv_plic0 *plic, int id, int enable)
 {
-    unsigned char current;
+    unsigned int current;
     unsigned long hartid = __metal_myhart_id();
 
-    current = __METAL_ACCESS_ONCE((__metal_io_u8 *)(plic->control_base +
+    current = __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
 						METAL_PLIC_ENABLE_OFFSET +
-						(id >> METAL_PLIC_SOURCE_BYTE_SHIFT)));
+						(id >> METAL_PLIC_SOURCE_SHIFT) * 4));
     __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
-				       METAL_PLIC_ENABLE_OFFSET +
-				       (id >> METAL_PLIC_SOURCE_BYTE_SHIFT))) =
-              enable ? (current | (1 << (id & METAL_PLIC_SOURCE_BYTE_MASK)))
-                     : (current & ~(1 << (id & METAL_PLIC_SOURCE_BYTE_MASK)));
+					METAL_PLIC_ENABLE_OFFSET +
+					((id >> METAL_PLIC_SOURCE_SHIFT) * 4))) =
+              enable ? (current | (1 << (id & METAL_PLIC_SOURCE_MASK)))
+                     : (current & ~(1 << (id & METAL_PLIC_SOURCE_MASK)));
 }
 
 void __metal_plic0_default_handler (int id, void *priv) {
@@ -61,10 +61,10 @@ void __metal_plic0_handler (int id, void *priv)
     struct __metal_driver_riscv_plic0 *plic = priv;
     unsigned int idx = __metal_plic0_claim_interrupt(plic);
 
-    if ( (idx <= plic->num_interrupts) &&
-	 (plic->metal_exint_table[idx].handler) ) {
-	plic->metal_exint_table[idx].handler(idx,
-				  plic->metal_exint_table[idx].exint_data);
+    if ( (idx < plic->num_interrupts) &&
+	 (plic->metal_exint_table[idx]) ) {
+	plic->metal_exint_table[idx](idx,
+				  plic->metal_exdata_table[idx].exint_data);
     }
 
     __metal_plic0_complete_interrupt(plic, idx);
@@ -82,12 +82,12 @@ void __metal_driver_riscv_plic0_init (struct metal_interrupt *controller)
 	/* Initialize ist parent controller, aka cpu_intc. */
 	intc->vtable->interrupt_init(intc);
 
-	for (int i = 0; i <= (plic->num_interrupts); i++) {
+	for (int i = 0; i < plic->num_interrupts; i++) {
 	    __metal_plic0_enable(plic, i, METAL_DISABLE);
 	    __metal_plic0_set_priority(plic, i, 0);
-	    plic->metal_exint_table[i].handler = NULL;
-	    plic->metal_exint_table[i].sub_int = NULL;
-	    plic->metal_exint_table[i].exint_data = NULL;
+	    plic->metal_exint_table[i] = NULL;
+	    plic->metal_exdata_table[i].sub_int = NULL;
+	    plic->metal_exdata_table[i].exint_data = NULL;
 	}
 
 	__metal_plic0_set_threshold(plic, 0);
@@ -96,10 +96,12 @@ void __metal_driver_riscv_plic0_init (struct metal_interrupt *controller)
         intc->vtable->interrupt_register(intc,
                                          plic->interrupt_line,
                                          NULL, plic);
-	/* Register plic handler for dispatching its device interrupts  */
+	/* Register plic handler for dispatching its device interrupts */
 	intc->vtable->interrupt_register(intc,
 					 plic->interrupt_line,
 					 __metal_plic0_handler, plic);
+	/* Enable plic (ext) interrupt with with parent controller */
+        intc->vtable->interrupt_enable(intc, plic->interrupt_line);
         plic->init_done = 1;
     }
 }
@@ -109,22 +111,19 @@ int __metal_driver_riscv_plic0_register (struct metal_interrupt *controller,
 			               void *priv)
 {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
-    unsigned int idx = id - METAL_INTERRUPT_ID_GL0;
 
-    if ( idx > plic->num_interrupts ) {
+    if (id >= plic->num_interrupts ) {
         return -1;
     }
  
     if (isr) {
-        __metal_plic0_enable(plic, idx, METAL_ENABLE);
-        __metal_plic0_set_priority(plic ,idx, 2);
-	plic->metal_exint_table[idx].handler = isr;
-	plic->metal_exint_table[idx].exint_data = priv;
+        __metal_plic0_set_priority(plic ,id, 2);
+	plic->metal_exint_table[id] = isr;
+	plic->metal_exdata_table[id].exint_data = priv;
     } else {
-        __metal_plic0_enable(plic, idx, METAL_ENABLE);
-        __metal_plic0_set_priority(plic, idx, 1);
-	plic->metal_exint_table[idx].handler = __metal_plic0_default_handler;
-	plic->metal_exint_table[idx].sub_int = priv;
+        __metal_plic0_set_priority(plic, id, 1);
+	plic->metal_exint_table[id] = __metal_plic0_default_handler;
+	plic->metal_exdata_table[id].sub_int = priv;
     }
 
     return 0;
@@ -133,24 +132,22 @@ int __metal_driver_riscv_plic0_register (struct metal_interrupt *controller,
 int __metal_driver_riscv_plic0_enable (struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
-    unsigned int idx = id - METAL_INTERRUPT_ID_GL0;
 
-    if ( idx > plic->num_interrupts ) {
+    if ( id >= plic->num_interrupts ) {
         return -1;
     }
 
-    __metal_plic0_enable(plic, idx, METAL_ENABLE);
+    __metal_plic0_enable(plic, id, METAL_ENABLE);
     return 0;
 }
 
 int __metal_driver_riscv_plic0_disable (struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
-    unsigned int idx = id - METAL_INTERRUPT_ID_GL0;
 
-    if ( idx > plic->num_interrupts ) {
+    if ( id >= plic->num_interrupts ) {
         return -1;
     }
-    __metal_plic0_enable(plic, idx, METAL_DISABLE);
+    __metal_plic0_enable(plic, id, METAL_DISABLE);
     return 0;
 }

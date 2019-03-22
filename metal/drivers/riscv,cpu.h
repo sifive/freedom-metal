@@ -16,6 +16,23 @@
 #define METAL_DISABLE              0
 #define METAL_ENABLE               1
 
+#define METAL_ISA_A_EXTENSIONS                 0x0001
+#define METAL_ISA_C_EXTENSIONS                 0x0004
+#define METAL_ISA_D_EXTENSIONS                 0x0008
+#define METAL_ISA_E_EXTENSIONS                 0x0010
+#define METAL_ISA_F_EXTENSIONS                 0x0020
+#define METAL_ISA_G_EXTENSIONS                 0x0040
+#define METAL_ISA_I_EXTENSIONS                 0x0100
+#define METAL_ISA_M_EXTENSIONS                 0x1000
+#define METAL_ISA_N_EXTENSIONS                 0x2000
+#define METAL_ISA_Q_EXTENSIONS                0x10000
+#define METAL_ISA_S_EXTENSIONS                0x40000
+#define METAL_ISA_U_EXTENSIONS               0x100000
+#define METAL_ISA_V_EXTENSIONS               0x200000
+#define METAL_ISA_XL32_EXTENSIONS          0x40000000UL
+#define METAL_ISA_XL64_EXTENSIONS  0x8000000000000000UL
+#define METAL_ISA_XL128_EXTENSIONS 0xC000000000000000UL
+
 #define METAL_MTVEC_DIRECT         0x00
 #define METAL_MTVEC_VECTORED       0x01
 #define METAL_MTVEC_CLIC           0x02
@@ -36,6 +53,9 @@
 #define METAL_MSTATUS_MIE          0x00000008UL
 #define METAL_MSTATUS_MPIE         0x00000080UL
 #define METAL_MSTATUS_MPP          0x00001800UL
+#define METAL_MSTATUS_FS_INIT      0x00002000UL
+#define METAL_MSTATUS_FS_CLEAN     0x00004000UL
+#define METAL_MSTATUS_FS_DIRTY     0x00006000UL
 #define METAL_MSTATUS_MPRV         0x00020000UL
 #define METAL_MSTATUS_MXR          0x00080000UL
 #define METAL_MINTSTATUS_MIL       0xFF000000UL
