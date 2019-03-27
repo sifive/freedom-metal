@@ -20,4 +20,15 @@
  */
 int metal_tty_putc(unsigned char c);
 
+/*!
+ * @brief Get a character from the default output device
+ *
+ * Get a character from the default output device, which for most
+ * targets is the UART serial port.
+ *
+ * @return The character read from the terminal, or EOF if no device
+ *         is available.
+ */
+char metal_tty_getc();
+
 #endif

@@ -17,6 +17,15 @@ int metal_tty_putc(unsigned char c)
     return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
 }
 
+char metal_tty_getc()
+{
+    char c;
+    if(metal_uart_getc(__METAL_DT_STDOUT_UART_HANDLE, &c) != 0) {
+        return -1;
+    }
+    return c;
+}
+
 #ifndef __METAL_DT_STDOUT_UART_BAUD
 #define __METAL_DT_STDOUT_UART_BAUD 115200
 #endif
@@ -33,5 +42,10 @@ static void metal_tty_init(void)
 int nop_putc(unsigned char c) __attribute__((section(".text.metal.nop.putc")));
 int nop_putc(unsigned char c) { return -1; }
 int metal_tty_putc(unsigned char c) __attribute__((weak, alias("nop_putc")));
+
+char nop_getc() __attribute__((section(".text.metal.nop.getc")));
+char nop_getc() { return -1; }
+char metal_tty_getc() __attribute__((weak, alias("nop_getc")));
+
 #warning "There is no default output device, metal_tty_putc() will throw away all input."
 #endif
