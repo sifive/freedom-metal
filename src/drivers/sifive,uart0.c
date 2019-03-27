@@ -54,8 +54,11 @@ int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, unsigned char c)
 
 int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, unsigned char *c)
 {
-    while ((UART_REGW(UART_REG_RXDATA) & UART_RXEMPTY) == 0) { }
-    *c = UART_REGW(UART_REG_RXDATA);
+    uint32_t ch = UART_RXEMPTY;
+    while (ch & UART_RXEMPTY) {
+        ch = UART_REGW(UART_REG_RXDATA);
+    }
+    *c = ch & 0xff;
     return 0;
 }
 
@@ -75,6 +78,7 @@ int __metal_driver_sifive_uart0_set_baud_rate(struct metal_uart *guart, int baud
         long clock_rate = uart->clock->vtable->get_rate_hz(uart->clock);
         UART_REGW(UART_REG_DIV) = clock_rate / baud_rate - 1;
         UART_REGW(UART_REG_TXCTRL) |= UART_TXEN;
+        UART_REGW(UART_REG_RXCTRL) |= UART_RXEN;
     }
     return 0;
 }
