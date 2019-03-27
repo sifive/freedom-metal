@@ -118,6 +118,17 @@ _start:
   call atexit
   call __libc_init_array
 
+  /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
+  csrr a5, misa
+  li   a4, 0x10028
+  and  a5, a5, a4
+  beqz a5, 1f
+  csrr a5, mstatus
+  lui  a4, 0x2
+  or   a5, a5, a4
+  csrw mstatus, a5
+1:
+
   /* This is a C runtime, so main() is defined to have some arguments.  Since
    * there's nothing sane the METAL can pass we don't bother with that but
    * instead just setup as close to a NOP as we can. */
