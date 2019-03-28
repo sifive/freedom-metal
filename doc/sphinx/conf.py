@@ -23,7 +23,7 @@ project = 'Freedom Metal'
 copyright = '2019, SiFive Inc.'
 author = 'SiFive Inc.'
 
-version = os.popen("git describe").read().strip()
+version = "v201903"
 release = version
 
 
