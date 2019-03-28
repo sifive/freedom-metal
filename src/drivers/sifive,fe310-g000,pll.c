@@ -127,7 +127,7 @@ static const struct pll_config_t pll_configs[] = {
  * Returns:
  *  - PLL_CONFIG_NOT_VALID if the configuration is not valid for the input frequency
  *  - the output frequency, in hertz */
-static long get_pll_config_freq(long pll_input_rate, struct pll_config_t *config)
+static long get_pll_config_freq(long pll_input_rate, const struct pll_config_t *config)
 {
     if(pll_input_rate < config->min_input_rate || pll_input_rate > config->max_input_rate)
         return PLL_CONFIG_NOT_VALID;
@@ -241,7 +241,7 @@ static int find_closest_config(long ref_hz, long rate)
 }
 
 /* Configure the PLL and wait for it to lock */
-static void configure_pll(__metal_io_u32 *pllcfg, __metal_io_u32 *plloutdiv, struct pll_config_t *config)
+static void configure_pll(__metal_io_u32 *pllcfg, __metal_io_u32 *plloutdiv, const struct pll_config_t *config)
 {
     __METAL_ACCESS_ONCE(pllcfg) &= ~(PLL_R);
     __METAL_ACCESS_ONCE(pllcfg) |= PLL_R_SHIFT(config->r);
