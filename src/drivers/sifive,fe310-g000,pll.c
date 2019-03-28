@@ -35,7 +35,7 @@ struct pll_config_t {
     long d; /* < 0 if disabled */
 };
 
-static struct pll_config_t pll_configs[] = {
+static const struct pll_config_t pll_configs[] = {
     /*
      * multiplier
      * ^  divisor
