@@ -5,6 +5,9 @@
 .PHONY: all
 all: html pdf
 
+.PHONY: clean
+clean: clean-pdf clean-html clean-xml
+
 ##########################
 # Build PDF Documentation
 ##########################
@@ -21,7 +24,6 @@ latex/FreedomMetal.tex: xml/index.xml sphinx/*
 .PHONY: clean-pdf
 clean-pdf:
 	rm -rf latex
-clean: clean-pdf
 
 ###########################
 # Build HTML Documentation
@@ -34,6 +36,10 @@ html: html/index.html
 html/index.html: xml/index.xml sphinx/*
 	sphinx-build -b html sphinx html
 
+.PHONY: clean-html
+clean-html:
+	rm -rf html/* html/.buildinfo html/.doctrees
+
 ##########################
 # Build XML Documentation
 ##########################
@@ -41,6 +47,6 @@ html/index.html: xml/index.xml sphinx/*
 xml/index.xml: ../metal/*.h
 	cd .. && doxygen
 
-.PHONY: clean
-clean:
+.PHONY: clean-xml
+clean-xml:
 	rm -rf xml
