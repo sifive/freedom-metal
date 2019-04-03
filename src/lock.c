@@ -2,17 +2,29 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/lock.h>
+#include <metal/memory.h>
 #include <metal/compiler.h>
 
 #define METAL_STORE_AMO_ACCESS_FAULT 7
 
 inline int metal_lock_init(struct metal_lock *lock) {
 #ifdef __riscv_atomic
+    /* Get a handle for the memory which holds the lock state */
+    struct metal_memory *lock_mem = metal_get_memory_from_address((uintptr_t) &(lock->_state));
+    if(!lock_mem) {
+        return 1;
+    }
+
+    /* If the memory doesn't support atomics, report an error */
+    if(!metal_memory_supports_atomics(lock_mem)) {
+        return 2;
+    }
+
     lock->_state = 0;
 
     return 0;
 #else
-    return 1;
+    return 3;
 #endif
 }
 
