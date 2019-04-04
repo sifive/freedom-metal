@@ -32,15 +32,18 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_clint0) = {
     .clint_vtable.command_request    = __metal_driver_riscv_clint0_command_request,
 };
 
+#define __METAL_MACHINE_MACROS
+#include <metal/machine.h>
 struct __metal_driver_riscv_clint0 {
     struct metal_interrupt controller;
     const struct __metal_driver_vtable_riscv_clint0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
     int init_done;
-    struct metal_interrupt *interrupt_parent;
+    struct metal_interrupt *interrupt_parents[__METAL_CLINT_NUM_PARENTS];
+    const int interrupt_lines[__METAL_CLINT_NUM_PARENTS];
     const int num_interrupts;
-    const int interrupt_lines[];
 };
+#undef __METAL_MACHINE_MACROS
 
 #endif
