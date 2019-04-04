@@ -33,8 +33,8 @@ struct __metal_driver_riscv_plic0 {
     const struct __metal_driver_vtable_riscv_plic0 *vtable;
     const unsigned long control_base;
     const unsigned long control_size;
-    struct metal_interrupt *interrupt_parent;
-    const int interrupt_line;
+    struct metal_interrupt *interrupt_parents[__METAL_PLIC_NUM_PARENTS];
+    const int interrupt_lines[__METAL_PLIC_NUM_PARENTS];
     int max_priority;
     int num_interrupts;
     int init_done;

@@ -77,31 +77,33 @@ void __metal_driver_riscv_plic0_init (struct metal_interrupt *controller)
     if ( !plic->init_done ) {
         struct metal_interrupt *intc;
 
-        intc = plic->interrupt_parent;
+	for(int parent = 0; parent < __METAL_PLIC_NUM_PARENTS; parent++) {
+	    intc = plic->interrupt_parents[parent];
 
-	/* Initialize ist parent controller, aka cpu_intc. */
-	intc->vtable->interrupt_init(intc);
+	    /* Initialize ist parent controller, aka cpu_intc. */
+	    intc->vtable->interrupt_init(intc);
 
-	for (int i = 0; i < plic->num_interrupts; i++) {
-	    __metal_plic0_enable(plic, i, METAL_DISABLE);
-	    __metal_plic0_set_priority(plic, i, 0);
-	    plic->metal_exint_table[i] = NULL;
-	    plic->metal_exdata_table[i].sub_int = NULL;
-	    plic->metal_exdata_table[i].exint_data = NULL;
+	    for (int i = 0; i < plic->num_interrupts; i++) {
+		__metal_plic0_enable(plic, i, METAL_DISABLE);
+		__metal_plic0_set_priority(plic, i, 0);
+		plic->metal_exint_table[i] = NULL;
+		plic->metal_exdata_table[i].sub_int = NULL;
+		plic->metal_exdata_table[i].exint_data = NULL;
+	    }
+
+	    __metal_plic0_set_threshold(plic, 0);
+
+	    /* Register plic (ext) interrupt with with parent controller */
+	    intc->vtable->interrupt_register(intc,
+					     plic->interrupt_lines[parent],
+					     NULL, plic);
+	    /* Register plic handler for dispatching its device interrupts */
+	    intc->vtable->interrupt_register(intc,
+					     plic->interrupt_lines[parent],
+					     __metal_plic0_handler, plic);
+	    /* Enable plic (ext) interrupt with with parent controller */
+	    intc->vtable->interrupt_enable(intc, plic->interrupt_lines[parent]);
 	}
-
-	__metal_plic0_set_threshold(plic, 0);
-
-	/* Register plic (ext) interrupt with with parent controller */
-        intc->vtable->interrupt_register(intc,
-                                         plic->interrupt_line,
-                                         NULL, plic);
-	/* Register plic handler for dispatching its device interrupts */
-	intc->vtable->interrupt_register(intc,
-					 plic->interrupt_line,
-					 __metal_plic0_handler, plic);
-	/* Enable plic (ext) interrupt with with parent controller */
-        intc->vtable->interrupt_enable(intc, plic->interrupt_line);
         plic->init_done = 1;
     }
 }
