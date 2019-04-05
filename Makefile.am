@@ -70,6 +70,7 @@ endif # PRECONFIGURED
 nobase_include_HEADERS = \
 	metal/machine/@MACHINE_NAME@.h \
 	metal/drivers/fixed-clock.h \
+	metal/drivers/fixed-factor-clock.h \
 	metal/drivers/riscv,clint0.h \
 	metal/drivers/riscv,cpu.h \
 	metal/drivers/riscv,plic0.h \
@@ -138,6 +139,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_
 
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
+	src/drivers/fixed-factor-clock.c \
 	src/drivers/riscv,clint0.c \
 	src/drivers/riscv,cpu.c \
 	src/drivers/riscv,plic0.c \
