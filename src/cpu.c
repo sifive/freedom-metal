@@ -12,6 +12,20 @@ struct metal_cpu* metal_cpu_get(int hartid)
     return NULL;
 }
 
+int metal_cpu_get_current_hartid()
+{
+#ifdef __riscv
+    int mhartid;
+    asm volatile("csrr %0, mhartid" : "=r" (mhartid));
+    return mhartid;
+#endif
+}
+
+int metal_cpu_get_num_harts()
+{
+    return __METAL_DT_MAX_HARTS;
+}
+
 extern inline unsigned long long metal_cpu_get_timer(struct metal_cpu *cpu);
 
 extern inline unsigned long long metal_cpu_get_timebase(struct metal_cpu *cpu);
