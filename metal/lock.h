@@ -35,7 +35,7 @@ struct metal_lock {
  * If the lock cannot be initialized, attempts to take or give the lock
  * will result in a Store/AMO access fault.
  */
-int metal_lock_init(struct metal_lock *lock);
+inline int metal_lock_init(struct metal_lock *lock);
 
 /*!
  * @brief Take a lock
@@ -45,7 +45,7 @@ int metal_lock_init(struct metal_lock *lock);
  * If the lock initialization failed, attempts to take a lock will result in
  * a Store/AMO access fault.
  */
-int metal_lock_take(struct metal_lock *lock);
+inline int metal_lock_take(struct metal_lock *lock);
 
 /*!
  * @brief Give back a held lock
@@ -55,6 +55,6 @@ int metal_lock_take(struct metal_lock *lock);
  * If the lock initialization failed, attempts to give a lock will result in
  * a Store/AMO access fault.
  */
-int metal_lock_give(struct metal_lock *lock);
+inline int metal_lock_give(struct metal_lock *lock);
 
 #endif /* METAL__LOCK_H */
