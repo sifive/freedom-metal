@@ -48,13 +48,21 @@ _start:
    * to define its own stack pointer.  We also align the stack pointer here
    * because the only RISC-V ABI that's currently defined mandates 16-byte
    * stack alignment. */
-  la sp, metal_segment_stack_end
+  la sp, _sp
+
+  /* Increment by hartid number of stack sizes */
+  li t0, 0
+  la t1, __stack_size
+1:
+  beq t0, a0, 1f
+  add sp, sp, t1
+  addi t0, t0, 1
+  j 1b
+1:
   andi sp, sp, -16
 
-  /* For now we only run on single-hart systems and assume that we're always on
-   * hart 0. */
-1:
-  bnez a0, 1b
+  /* If we're not hart 0, skip the initialization work */
+  bnez a0, _skip_init
 
   /* Embedded systems frequently require relocating the data segment before C
    * code can be run -- for example, the data segment may exist in flash upon
@@ -118,6 +126,8 @@ _start:
   call atexit
   call __libc_init_array
 
+_skip_init:
+
   /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
   csrr a5, misa
   li   a4, 0x10028
@@ -135,7 +145,7 @@ _start:
   li a0, 1     /* argc=1 */
   la a1, argv  /* argv = {"libgloss", NULL} */
   la a2, envp  /* envp = {NULL} */
-  call main
+  call secondary_main
 
   /* Call exit to handle libc's cleanup routines.  Under normal contains this
    * shouldn't even get called, but I'm still not using a tail call here
@@ -163,6 +173,34 @@ _fini:
 .size _init, .-_init
 .size _fini, .-_fini
 
+/* By default, secondary_main will cause secondary harts to spin forever.
+ * Users can redefine secondary_main themselves to run code on secondary harts */
+.weak   secondary_main
+.global secondary_main
+.type   secondary_main, @function
+
+secondary_main:
+  addi sp, sp, -16
+#if __riscv_xlen == 32
+  sw ra, 4(sp)
+#else
+  sd ra, 8(sp)
+#endif
+  csrr t0, mhartid
+  beqz t0, 2f
+1:
+  wfi
+  j 1b
+2:
+  call main
+#if __riscv_xlen == 32
+  lw ra, 4(sp)
+#else
+  ld ra, 8(sp)
+#endif
+  addi sp, sp, 16
+  ret
+
 /* This shim allows main() to be passed a set of arguments that can satisfy the
  * requirements of the C API. */
 .section .rodata.libgloss.start
@@ -172,3 +210,4 @@ envp:
 .dc.a 0
 name:
 .asciz "libgloss"
+

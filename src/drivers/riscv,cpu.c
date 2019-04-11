@@ -289,6 +289,22 @@ void __metal_driver_riscv_cpu_controller_interrupt_init (struct metal_interrupt 
     uintptr_t val;
 
     if ( !intc->init_done ) {
+        /* Disable and clear all interrupt sources */
+        asm volatile ("csrc mie, %0" :: "r"(-1));
+        asm volatile ("csrc mip, %0" :: "r"(-1));
+
+        /* Read the misa CSR to determine if the delegation registers exist */
+        uintptr_t misa;
+        asm volatile ("csrr %0, misa" : "=r" (misa));
+
+        /* The delegation CSRs exist if user mode interrupts (N extension) or
+         * supervisor mode (S extension) are supported */
+        if((misa & METAL_ISA_N_EXTENSIONS) || (misa & METAL_ISA_S_EXTENSIONS)) {
+            /* Disable interrupt and exception delegation */
+            asm volatile ("csrc mideleg, %0" :: "r"(-1));
+            asm volatile ("csrc medeleg, %0" :: "r"(-1));
+        }
+
         /* Default to use direct interrupt, setup sw cb table*/
         for (int i = 0; i < METAL_MAX_MI; i++) {
             intc->metal_int_table[i].handler = NULL;

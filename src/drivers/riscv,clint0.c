@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/io.h>
+#include <metal/cpu.h>
 #include <metal/drivers/riscv,clint0.h>
 
 unsigned long long __metal_clint0_mtime_get (struct __metal_driver_riscv_clint0 *clint)
@@ -31,16 +32,26 @@ int __metal_clint0_mtime_set (struct __metal_driver_riscv_clint0 *clint, unsigne
     return 0;
 }
 
+static struct metal_interrupt *_get_cpu_intc()
+{
+    int hartid = 0;
+    __asm__ volatile("csrr %[hartid], mhartid"
+                     : [hartid] "=r" (hartid) :: "memory");
+
+    struct metal_cpu *cpu = metal_cpu_get(hartid);
+
+    return metal_cpu_interrupt_controller(cpu);
+}
+
 void __metal_driver_riscv_clint0_init (struct metal_interrupt *controller)
 {
     struct __metal_driver_riscv_clint0 *clint =
                               (struct __metal_driver_riscv_clint0 *)(controller);
 
     if ( !clint->init_done ) {
-        struct metal_interrupt *intc = clint->interrupt_parent;
-
 	/* Register its interrupts with with parent controller, aka sw and timerto its default isr */
         for (int i = 0; i < clint->num_interrupts; i++) {
+            struct metal_interrupt *intc = clint->interrupt_parents[i];
             intc->vtable->interrupt_register(intc,
 					     clint->interrupt_lines[i],
 					     NULL, clint);
@@ -56,7 +67,16 @@ int __metal_driver_riscv_clint0_register (struct metal_interrupt *controller,
     int rc = -1;
     struct __metal_driver_riscv_clint0 *clint =
                               (struct __metal_driver_riscv_clint0 *)(controller);
-    struct metal_interrupt *intc = clint->interrupt_parent;
+
+    struct metal_interrupt *intc = NULL;
+    struct metal_interrupt *cpu_intc = _get_cpu_intc();
+
+    for(int i = 0; i < clint->num_interrupts; i++) {
+        if(cpu_intc == clint->interrupt_parents[i] && id == clint->interrupt_lines[i]) {
+            intc = clint->interrupt_parents[i]; 
+            break;
+        }
+    }
 
     /* Register its interrupts with parent controller */
     if (intc) {
@@ -72,7 +92,15 @@ int __metal_driver_riscv_clint0_enable (struct metal_interrupt *controller, int 
                               (struct __metal_driver_riscv_clint0 *)(controller);
 
     if ( id ) {
-        struct metal_interrupt *intc = clint->interrupt_parent;
+        struct metal_interrupt *intc = NULL;
+        struct metal_interrupt *cpu_intc = _get_cpu_intc();
+
+        for(int i = 0; i < clint->num_interrupts; i++) {
+            if(cpu_intc == clint->interrupt_parents[i] && id == clint->interrupt_lines[i]) {
+                intc = clint->interrupt_parents[i]; 
+                break;
+            }
+        }
         
         /* Enable its interrupts with parent controller */
         if (intc) {
@@ -88,7 +116,14 @@ int __metal_driver_riscv_clint0_disable (struct metal_interrupt *controller, int
                               (struct __metal_driver_riscv_clint0 *)(controller);
 
     if ( id ) {
-        struct metal_interrupt *intc = clint->interrupt_parent;
+        struct metal_interrupt *intc = NULL;
+        struct metal_interrupt *cpu_intc = _get_cpu_intc();
+
+        for(int i = 0; i < clint->num_interrupts; i++) {
+            if(cpu_intc == clint->interrupt_parents[i] && id == clint->interrupt_lines[i]) {
+                intc = clint->interrupt_parents[i]; 
+            }
+        }
         
         /* Disable its interrupts with parent controller */
         if (intc) {

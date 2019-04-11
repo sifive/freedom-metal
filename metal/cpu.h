@@ -51,6 +51,16 @@ struct metal_cpu {
  */
 struct metal_cpu* metal_cpu_get(int hartid);
 
+/*! @brief Get the hartid of the CPU hart executing this function
+ *
+ * @return The hartid of the current CPU hart */
+int metal_cpu_get_current_hartid();
+
+/*! @brief Get the number of CPU harts
+ * 
+ * @return The number of CPU harts */
+int metal_cpu_get_num_harts();
+
 /*! @brief Get the CPU cycle count timer value
  *
  * Get the value of the cycle count timer for a given CPU
