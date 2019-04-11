@@ -10,7 +10,7 @@
 /*!
  * @file memory.h
  *
- * @brief API for enumerating memories
+ * @brief API for enumerating memory blocks
  */
 
 struct _metal_memory_attributes {
@@ -22,7 +22,7 @@ struct _metal_memory_attributes {
 };
 
 /*!
- * @brief A handle for a memory
+ * @brief A handle for a memory block
  */
 struct metal_memory {
 	const uintptr_t _base_address;
@@ -31,47 +31,47 @@ struct metal_memory {
 };
 
 /*!
- * @brief Get the memory which services the given address
+ * @brief Get the memory block which services the given address
  *
- * Given a physical memory address, get a handle for the memory to which
+ * Given a physical memory address, get a handle for the memory block to which
  * that address is mapped.
  *
  * @param address The address to query
- * @return The memory handle, or NULL if the address is not mapped to a memory
+ * @return The memory block handle, or NULL if the address is not mapped to a memory block
  */
 struct metal_memory *metal_get_memory_from_address(const uintptr_t address);
 
 /*!
- * @brief Get the base address for a memory
- * @param memory The handle for the memory
- * @return The base address of the memory
+ * @brief Get the base address for a memory block
+ * @param memory The handle for the memory block
+ * @return The base address of the memory block
  */
 inline uintptr_t metal_memory_get_base_address(const struct metal_memory *memory) {
 	return memory->_base_address;
 }
 
 /*!
- * @brief Get the size of a memory
- * @param memory The handle for the memory
- * @return The size of the memory
+ * @brief Get the size of a memory block
+ * @param memory The handle for the memory block
+ * @return The size of the memory block
  */
 inline size_t metal_memory_get_size(const struct metal_memory *memory) {
 	return memory->_size;
 }
 
 /*!
- * @brief Query if a memory supports atomic operations
- * @param memory The handle for the memory
- * @return nonzero if the memory supports atomic operations
+ * @brief Query if a memory block supports atomic operations
+ * @param memory The handle for the memory block
+ * @return nonzero if the memory block supports atomic operations
  */
 inline int metal_memory_supports_atomics(const struct metal_memory *memory) {
 	return memory->_attrs.A;
 }
 
 /*!
- * @brief Query if a memory is cacheable
- * @param memory The handle for the memory
- * @return nonzero if the memory is cachable
+ * @brief Query if a memory block is cacheable
+ * @param memory The handle for the memory block
+ * @return nonzero if the memory block is cachable
  */
 inline int metal_memory_is_cachable(const struct metal_memory *memory) {
 	return memory->_attrs.C;
