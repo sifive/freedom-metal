@@ -225,6 +225,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-led.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-spi.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT) \
@@ -487,6 +488,7 @@ nobase_include_HEADERS = \
 	metal/led.h \
 	metal/machine.h \
 	metal/pmp.h \
+	metal/privilege.h \
 	metal/shutdown.h \
 	metal/spi.h \
 	metal/switch.h \
@@ -530,6 +532,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/interrupt.c \
 	src/led.c \
 	src/pmp.c \
+	src/privilege.c \
 	src/shutdown.c \
 	src/spi.c \
 	src/switch.c \
@@ -808,6 +811,8 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-led.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-spi.$(OBJEXT):  \
@@ -904,6 +909,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-led.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-pmp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-privilege.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-spi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Po@am__quote@
@@ -1327,6 +1333,20 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.obj: src/pmp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/pmp.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-pmp.obj `if test -f 'src/pmp.c'; then $(CYGPATH_W) 'src/pmp.c'; else $(CYGPATH_W) '$(srcdir)/src/pmp.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.o: src/privilege.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-privilege.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.o `test -f 'src/privilege.c' || echo '$(srcdir)/'`src/privilege.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-privilege.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-privilege.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/privilege.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.o `test -f 'src/privilege.c' || echo '$(srcdir)/'`src/privilege.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.obj: src/privilege.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-privilege.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.obj `if test -f 'src/privilege.c'; then $(CYGPATH_W) 'src/privilege.c'; else $(CYGPATH_W) '$(srcdir)/src/privilege.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-privilege.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-privilege.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/privilege.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-privilege.obj `if test -f 'src/privilege.c'; then $(CYGPATH_W) 'src/privilege.c'; else $(CYGPATH_W) '$(srcdir)/src/privilege.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o: src/shutdown.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.o `test -f 'src/shutdown.c' || echo '$(srcdir)/'`src/shutdown.c
