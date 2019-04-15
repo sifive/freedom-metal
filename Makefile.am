@@ -98,6 +98,7 @@ nobase_include_HEADERS = \
 	metal/led.h \
 	metal/machine.h \
 	metal/pmp.h \
+	metal/privilege.h \
 	metal/shutdown.h \
 	metal/spi.h \
 	metal/switch.h \
@@ -161,6 +162,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/interrupt.c \
 	src/led.c \
 	src/pmp.c \
+	src/privilege.c \
 	src/shutdown.c \
 	src/spi.c \
 	src/switch.c \
