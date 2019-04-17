@@ -84,6 +84,12 @@ AC_ARG_WITH([machine-header],
     [with_machine_header="no"]
 )
 
+AC_ARG_WITH([platform-header],
+    [AS_HELP_STRING([--with-platform-header=PATH], [Path to the platform header file])],
+    [],
+    [with_platform_header="no"]
+)
+
 AC_ARG_WITH([machine-ldscript],
     [AS_HELP_STRING([--with-machine-ldscript=PATH], [Path to the machine ldscript])],
     [],
@@ -118,6 +124,14 @@ AC_ARG_WITH([metal-header-generator],
 )
 
 AC_ARG_VAR(METAL_HEADER_GENERATOR, [The absolute path of the freedom-metal_header-generator])
+
+AC_ARG_WITH([platform-header-generator],
+    [AS_HELP_STRING([--with-platform-header-generator=PATH], [Use the given path to freedom-platform_header-generator])],
+    [],
+    [with_platform_header_generator=check]
+)
+
+AC_ARG_VAR(BARE_HEADER_GENERATOR, [The absolute path of the freedom-platform_header-generator])
 
 # Allows users to specify a path to freedom-ldscript-generator, which generates
 # linker scripts that are more suitable for embedded development than the
@@ -165,6 +179,11 @@ AS_IF([test "x$with_preconfigured" = "xyes"],
     AS_IF([test "x$with_machine_header" != "xno"],
         [AC_SUBST([MACHINE_HEADER], "$with_machine_header")],
         [AC_MSG_FAILURE([--with-machine-header is required with the --with-preconfigured option])]
+    )
+
+    AS_IF([test "x$with_platform_header" != "xno"],
+        [AC_SUBST([PLATFORM_HEADER], "$with_platform_header")],
+        [AC_MSG_FAILURE([--with-platform-header is required with the --with-preconfigured option])]
     )
 
     AS_IF([test "x$with_machine_ldscript" != "xno"],
