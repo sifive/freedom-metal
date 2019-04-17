@@ -1,29 +1,32 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/machine/platform.h>
+
+#ifdef METAL_RISCV_PLIC0
+
 #include <metal/io.h>
 #include <metal/shutdown.h>
 #include <metal/drivers/riscv,plic0.h>
 
-
 unsigned int __metal_plic0_claim_interrupt (struct __metal_driver_riscv_plic0 *plic)
 {
     return __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
-					      METAL_PLIC_CLAIM_OFFSET));
+					      METAL_RISCV_PLIC0_CLAIM));
 }
 
 void __metal_plic0_complete_interrupt(struct __metal_driver_riscv_plic0 *plic,
 				    unsigned int id)
 {
     __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
-				       METAL_PLIC_CLAIM_OFFSET)) = id;
+				       METAL_RISCV_PLIC0_CLAIM)) = id;
 }
 
 void __metal_plic0_set_threshold(struct __metal_driver_riscv_plic0 *plic,
 			       unsigned int threshold)
 {
     __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
-				       METAL_PLIC_THRESHOLD_OFFSET)) = threshold;
+				       METAL_RISCV_PLIC0_THRESHOLD)) = threshold;
 }
 
 void __metal_plic0_set_priority(struct __metal_driver_riscv_plic0 *plic,
@@ -32,7 +35,7 @@ void __metal_plic0_set_priority(struct __metal_driver_riscv_plic0 *plic,
     if ( (plic->max_priority) &&
 	 (priority < plic->max_priority) ) {
         __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
-					   METAL_PLIC_PRIORITY_OFFSET +
+					   METAL_RISCV_PLIC0_PRIORITY_BASE +
 					   (id << METAL_PLIC_SOURCE_PRIORITY_SHIFT))) = priority;
     }
 }
@@ -43,10 +46,10 @@ void __metal_plic0_enable(struct __metal_driver_riscv_plic0 *plic, int id, int e
     unsigned long hartid = __metal_myhart_id();
 
     current = __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
-						METAL_PLIC_ENABLE_OFFSET +
+						METAL_RISCV_PLIC0_ENABLE_BASE +
 						(id >> METAL_PLIC_SOURCE_SHIFT) * 4));
     __METAL_ACCESS_ONCE((__metal_io_u32 *)(plic->control_base +
-					METAL_PLIC_ENABLE_OFFSET +
+					METAL_RISCV_PLIC0_ENABLE_BASE +
 					((id >> METAL_PLIC_SOURCE_SHIFT) * 4))) =
               enable ? (current | (1 << (id & METAL_PLIC_SOURCE_MASK)))
                      : (current & ~(1 << (id & METAL_PLIC_SOURCE_MASK)));
@@ -153,3 +156,5 @@ int __metal_driver_riscv_plic0_disable (struct metal_interrupt *controller, int 
     __metal_plic0_enable(plic, id, METAL_DISABLE);
     return 0;
 }
+
+#endif /* METAL_RISCV_PLIC0 */
