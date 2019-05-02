@@ -1,26 +1,12 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/machine/platform.h>
+
+#ifdef METAL_SIFIVE_SPI0
+
 #include <metal/drivers/sifive,spi0.h>
 #include <metal/io.h>
-
-/* Register byte offsets */
-#define METAL_SPI_REG_SCKDIV  0x000 
-#define METAL_SPI_REG_SCKMODE 0x004 
-#define METAL_SPI_REG_CSID    0x010
-#define METAL_SPI_REG_CSDEF   0x014
-#define METAL_SPI_REG_CSMODE  0x018
-#define METAL_SPI_REG_DELAY0  0x028
-#define METAL_SPI_REG_DELAY1  0x02C
-#define METAL_SPI_REG_FMT     0x040
-#define METAL_SPI_REG_TXDATA  0x048
-#define METAL_SPI_REG_RXDATA  0x04C
-#define METAL_SPI_REG_TXMARK  0x050
-#define METAL_SPI_REG_RXMARK  0x054
-#define METAL_SPI_REG_FCTRL   0x060
-#define METAL_SPI_REG_FFMT    0x064
-#define METAL_SPI_REG_IE      0x070
-#define METAL_SPI_REG_IP      0x074
 
 /* Register fields */
 #define METAL_SPI_SCKDIV_MASK         0xFFF
@@ -57,16 +43,16 @@
 static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_spi_config *config)
 {
     /* Set protocol */
-    METAL_SPI_REGW(METAL_SPI_REG_FMT) &= ~(METAL_SPI_PROTO_MASK);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     switch(config->protocol) {
     case METAL_SPI_SINGLE:
-        METAL_SPI_REGW(METAL_SPI_REG_FMT) |= METAL_SPI_PROTO_SINGLE;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
         break;
     case METAL_SPI_DUAL:
-        METAL_SPI_REGW(METAL_SPI_REG_FMT) |= METAL_SPI_PROTO_DUAL;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
         break;
     case METAL_SPI_QUAD:
-        METAL_SPI_REGW(METAL_SPI_REG_FMT) |= METAL_SPI_PROTO_QUAD;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
         break;
     default:
         /* Unsupported value */
@@ -75,43 +61,43 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
 
     /* Set Polarity */
     if(config->polarity) {
-        METAL_SPI_REGW(METAL_SPI_REG_SCKMODE) |= (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |= (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
     } else {
-        METAL_SPI_REGW(METAL_SPI_REG_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
     }
 
     /* Set Phase */
     if(config->phase) {
-        METAL_SPI_REGW(METAL_SPI_REG_SCKMODE) |= (1 << METAL_SPI_SCKMODE_POL_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |= (1 << METAL_SPI_SCKMODE_POL_SHIFT);
     } else {
-        METAL_SPI_REGW(METAL_SPI_REG_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
     }
 
     /* Set Endianness */
     if(config->little_endian) {
-        METAL_SPI_REGW(METAL_SPI_REG_FMT) |= (1 << METAL_SPI_ENDIAN_LSB);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= (1 << METAL_SPI_ENDIAN_LSB);
     } else {
-        METAL_SPI_REGW(METAL_SPI_REG_FMT) &= ~(1 << METAL_SPI_ENDIAN_LSB);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(1 << METAL_SPI_ENDIAN_LSB);
     }
 
     /* Always populate receive FIFO */
-    METAL_SPI_REGW(METAL_SPI_REG_FMT) &= ~(1 << METAL_SPI_DISABLE_RX);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(1 << METAL_SPI_DISABLE_RX);
 
     /* Set CS Active */
     if(config->cs_active_high) {
-        METAL_SPI_REGW(METAL_SPI_REG_CSDEF) = 0;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 0;
     } else {
-        METAL_SPI_REGW(METAL_SPI_REG_CSDEF) = 1;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 1;
     }
 
     /* Set frame length */
-    if((METAL_SPI_REGW(METAL_SPI_REG_FMT) & METAL_SPI_FRAME_LEN_MASK) != (8 << METAL_SPI_FRAME_LEN_SHIFT)) {
-        METAL_SPI_REGW(METAL_SPI_REG_FMT) &= ~(METAL_SPI_FRAME_LEN_MASK);
-        METAL_SPI_REGW(METAL_SPI_REG_FMT) |= (8 << METAL_SPI_FRAME_LEN_SHIFT);
+    if((METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) & METAL_SPI_FRAME_LEN_MASK) != (8 << METAL_SPI_FRAME_LEN_SHIFT)) {
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_FRAME_LEN_MASK);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= (8 << METAL_SPI_FRAME_LEN_SHIFT);
     }
 
     /* Set CS line */
-    METAL_SPI_REGW(METAL_SPI_REG_CSID) = config->csid;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = config->csid;
 
     return 0;
 }
@@ -132,27 +118,27 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     }
 
     /* Hold the chip select line for all len transferred */
-    METAL_SPI_REGW(METAL_SPI_REG_CSMODE) = METAL_SPI_CSMODE_HOLD;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) = METAL_SPI_CSMODE_HOLD;
 
     for(int i = 0; i < len; i++) {
         /* Wait for TXFIFO to not be full */
-        while(METAL_SPI_REGW(METAL_SPI_REG_TXDATA) & METAL_SPI_TXDATA_FULL) ;
+        while(METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL) ;
 
         /* Transfer byte */
         if(tx_buf) {
-            METAL_SPI_REGW(METAL_SPI_REG_TXDATA) = tx_buf[i];
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
         } else {
-            METAL_SPI_REGW(METAL_SPI_REG_TXDATA) = 0;
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) = 0;
         }
 
         if(i == (len - 1)) {
             /* On the last byte, set CSMODE to auto so that the chip select
              * transitions back to high */
-            METAL_SPI_REGW(METAL_SPI_REG_CSMODE) = METAL_SPI_CSMODE_AUTO;
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) = METAL_SPI_CSMODE_AUTO;
         }
 
         /* Wait for RXFIFO to not be empty */
-        while((rxdata = METAL_SPI_REGW(METAL_SPI_REG_RXDATA)) & METAL_SPI_RXDATA_EMPTY) ;
+        while((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) & METAL_SPI_RXDATA_EMPTY) ;
 
         if(rx_buf) {
             rx_buf[i] = (char) (rxdata & 0xFF);
@@ -187,8 +173,8 @@ int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_ra
         }
 
         /* Set divider */
-        METAL_SPI_REGW(METAL_SPI_REG_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
-        METAL_SPI_REGW(METAL_SPI_REG_SCKDIV) |= (div & METAL_SPI_SCKDIV_MASK);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |= (div & METAL_SPI_SCKDIV_MASK);
     }
     return 0;
 }
@@ -200,9 +186,9 @@ static void pre_rate_change_callback(void *priv)
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to zero and waiting until an interrupt is pending */
 
-    METAL_SPI_REGW(METAL_SPI_REG_TXMARK) &= ~(METAL_SPI_TXMARK_MASK);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXMARK) &= ~(METAL_SPI_TXMARK_MASK);
 
-    while((METAL_SPI_REGW(METAL_SPI_REG_IP) & METAL_SPI_TXWM) == 0) ;
+    while((METAL_SPI_REGW(METAL_SIFIVE_SPI0_IP) & METAL_SPI_TXWM) == 0) ;
 }
 
 static void post_rate_change_callback(void *priv)
@@ -230,3 +216,5 @@ void __metal_driver_sifive_spi0_init(struct metal_spi *gspi, int baud_rate)
         );
     }
 }
+
+#endif /* METAL_SIFIVE_SPI0 */

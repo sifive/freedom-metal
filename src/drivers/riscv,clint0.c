@@ -1,6 +1,10 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/machine/platform.h>
+
+#ifdef METAL_RISCV_CLINT0
+
 #include <metal/io.h>
 #include <metal/cpu.h>
 #include <metal/drivers/riscv,clint0.h>
@@ -11,9 +15,9 @@ unsigned long long __metal_clint0_mtime_get (struct __metal_driver_riscv_clint0 
 
     /* Guard against rollover when reading */
     do {
-	hi = __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_CLINT_MTIME_OFFSET + 4));
-	lo = __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_CLINT_MTIME_OFFSET));
-    } while (__METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_CLINT_MTIME_OFFSET + 4)) != hi);
+	hi = __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_RISCV_CLINT0_MTIME + 4));
+	lo = __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_RISCV_CLINT0_MTIME));
+    } while (__METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_RISCV_CLINT0_MTIME + 4)) != hi);
 
     return (((unsigned long long)hi) << 32) | lo;
 }
@@ -26,9 +30,9 @@ int __metal_clint0_mtime_set (struct __metal_driver_riscv_clint0 *clint, unsigne
      * spurious interrupts: For that set the high word to a max
      * value first.
      */
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_CLINT_MTIMECMP_OFFSET + 4)) = 0xFFFFFFFF;
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_CLINT_MTIMECMP_OFFSET)) = (__metal_io_u32)time;
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_CLINT_MTIMECMP_OFFSET + 4)) = (__metal_io_u32)(time >> 32);
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_RISCV_CLINT0_MTIMECMP_BASE + 4)) = 0xFFFFFFFF;
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_RISCV_CLINT0_MTIMECMP_BASE)) = (__metal_io_u32)time;
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(clint->control_base + METAL_RISCV_CLINT0_MTIMECMP_BASE + 4)) = (__metal_io_u32)(time >> 32);
     return 0;
 }
 
@@ -183,3 +187,5 @@ int __metal_driver_riscv_clint0_command_request (struct metal_interrupt *control
 
     return rc;
 }
+
+#endif /* METAL_RISCV_CLINT0 */

@@ -351,6 +351,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BARE_HEADER_GENERATOR = @BARE_HEADER_GENERATOR@
 CC = @CC@
 CCAS = @CCAS@
 CCASDEPMODE = @CCASDEPMODE@
@@ -396,6 +397,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PLATFORM_HEADER = @PLATFORM_HEADER@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -462,6 +464,7 @@ spec_DATA = riscv__mmachine__@MACHINE_NAME@.specs \
 # The files that aren't automatically generated are the same for all machines.
 nobase_include_HEADERS = \
 	metal/machine/@MACHINE_NAME@.h \
+	metal/machine/platform.h \
 	metal/drivers/fixed-clock.h \
 	metal/drivers/fixed-factor-clock.h \
 	metal/drivers/riscv,clint0.h \
@@ -510,6 +513,14 @@ nobase_include_HEADERS = \
 lib_LIBRARIES = libriscv__mmachine__@MACHINE_NAME@.a $(am__append_1)
 libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
+
+# This will generate these sources before the compilation step
+BUILT_SOURCES = \
+	metal/machine/@MACHINE_NAME@.h \
+	metal/machine/platform.h \
+	riscv__menv__metal.specs \
+	riscv__mmachine__@MACHINE_NAME@.specs
+
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/fixed-factor-clock.c \
@@ -592,7 +603,8 @@ return_fail_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=return_fail.map
 hello_SOURCES = test/hello.c
 hello_CFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 hello_LDFLAGS = -L. -Wl,--gc-sections -Wl,-Map=hello.map
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .S .c .o .obj
@@ -1824,13 +1836,15 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LIBRARIES) $(DATA) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(ldsdir)" "$(DESTDIR)$(specdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -1868,6 +1882,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libLIBRARIES \
@@ -1943,7 +1958,7 @@ ps-am:
 uninstall-am: uninstall-ldsDATA uninstall-libLIBRARIES \
 	uninstall-nobase_includeHEADERS uninstall-specDATA
 
-.MAKE: check-am install-am install-strip
+.MAKE: all check check-am install install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--refresh check check-am clean \
 	clean-checkPROGRAMS clean-cscope clean-generic \
@@ -1967,20 +1982,6 @@ uninstall-am: uninstall-ldsDATA uninstall-libLIBRARIES \
 
 .PRECIOUS: Makefile
 
-
-# Every C compilation depends on the machine header.  This is a bit of a hack:
-# instead of enforcing the dependency on the .o we pretend that the C file
-# itself depends on the header.  This is the only way I could figure out that
-# would satisfy the dependency inside automake.
-%.c: metal/machine/@MACHINE_NAME@.h
-%.S: metal/machine/@MACHINE_NAME@.h
-%.o: metal/machine/@MACHINE_NAME@.h
-%.c: riscv__menv__metal.specs
-%.S: riscv__menv__metal.specs
-%.o: riscv__menv__metal.specs
-%.c: riscv__mmachine__@MACHINE_NAME@.specs
-%.S: riscv__mmachine__@MACHINE_NAME@.specs
-%.o: riscv__mmachine__@MACHINE_NAME@.specs
 
 # Every test depends on the generated linker script.
 $(check_PROGRAMS): riscv__mmachine__@MACHINE_NAME@.lds
@@ -2012,6 +2013,11 @@ riscv__menv__metal.specs: riscv__menv__metal.specs.in
 @PRECONFIGURED_TRUE@metal/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
 @PRECONFIGURED_TRUE@	@mkdir -p $(dir $@)
 @PRECONFIGURED_TRUE@	cp $< $@
+
+@PRECONFIGURED_TRUE@metal/machine/platform.h: @PLATFORM_HEADER@
+@PRECONFIGURED_TRUE@	@mkdir -p $(dir $@)
+@PRECONFIGURED_TRUE@	cp $< $@
+
 # Builds the machine-specific METAL header file, which paramaterizes the METAL for
 # one specific machine.  This is automatically picked up by GCC so users
 # automatically get the relevant definitions.  This is a two-step process:
@@ -2024,10 +2030,15 @@ riscv__menv__metal.specs: riscv__menv__metal.specs.in
 @PRECONFIGURED_FALSE@	@mkdir -p $(dir $@)
 @PRECONFIGURED_FALSE@	$< --dtb $(filter %.dtb,$^) --output $@
 
+@PRECONFIGURED_FALSE@metal/machine/platform.h: @BARE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
+@PRECONFIGURED_FALSE@	@mkdir -p $(dir $@)
+@PRECONFIGURED_FALSE@	$< -d $(filter %.dtb,$^) -o $@
+
 # Extra clean targets
 clean-local:
 	-rm -rf @MACHINE_NAME@.mk
-	-rm -rf metal/machine/@MACHINE_NAME@.h @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
+	-rm -rf metal/machine/@MACHINE_NAME@.h metal/machine/platform.h
+	-rm -rf @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
 	-rm -rf *.map *.specs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

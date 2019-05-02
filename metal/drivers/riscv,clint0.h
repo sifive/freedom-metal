@@ -7,10 +7,6 @@
 #include <metal/compiler.h>
 #include <metal/drivers/riscv,cpu.h>
 
-#define METAL_CLINT_MSIP_HART_OFFSET    0x0000UL
-#define METAL_CLINT_MTIMECMP_OFFSET     0x4000UL
-#define METAL_CLINT_MTIME_OFFSET        0xBFF8UL
-
 struct __metal_driver_vtable_riscv_clint0 {
     struct metal_interrupt_vtable clint_vtable;
 };
