@@ -305,6 +305,12 @@ void __metal_driver_riscv_cpu_controller_interrupt_init (struct metal_interrupt 
             asm volatile ("csrc medeleg, %0" :: "r"(-1));
         }
 
+        /* The satp CSR exists if supervisor mode (S extension) is supported */
+        if(misa & METAL_ISA_S_EXTENSIONS) {
+            /* Clear the entire CSR to make sure that satp.MODE = 0 */
+            asm volatile ("csrc satp, %0" :: "r"(-1));
+        }
+
         /* Default to use direct interrupt, setup sw cb table*/
         for (int i = 0; i < METAL_MAX_MI; i++) {
             intc->metal_int_table[i].handler = NULL;
