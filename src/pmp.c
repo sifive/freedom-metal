@@ -18,6 +18,10 @@ struct metal_pmp *metal_pmp_get_device(void)
 
 void metal_pmp_init(struct metal_pmp *pmp)
 {
+    if(!pmp) {
+        return;
+    }
+
     struct metal_pmp_config init_config = {
         .L = METAL_PMP_UNLOCKED,
         .A = METAL_PMP_OFF,
@@ -29,6 +33,28 @@ void metal_pmp_init(struct metal_pmp *pmp)
     for(unsigned int i = 0; i < pmp->num_regions; i++) {
         metal_pmp_set_region(pmp, i, init_config, 0);
     }
+
+    /* Detect the region granularity by writing all 1s to pmpaddr0 while
+     * pmpcfg0 = 0. */
+    if(metal_pmp_set_address(pmp, 0, -1) != 0) {
+        /* Failed to detect granularity */
+        return;
+    }
+
+    /* The least-significant set bit indicates the supported granularity */
+    uintptr_t pmpaddr0 = metal_pmp_get_address(pmp, 0);
+
+    /* Get the index of the least-significant set bit */
+    int index = 0;
+    while(((pmpaddr0 >> index) & 0x1) == 0) {
+        index += 1;
+    }
+
+    /* The granularity is equal to 2^(index + 2) bytes */
+    pmp->_granularity = 1 << (index + 2);
+
+    /* Clear pmpaddr0 */
+    metal_pmp_set_address(pmp, 0, 0);
 }
 
 int metal_pmp_set_region(struct metal_pmp *pmp,
