@@ -78,6 +78,11 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
         return 2;
     }
 
+    if(config.A == METAL_PMP_NA4 && pmp->_granularity > 4) {
+        /* The requested granularity is too small */
+        return 3;
+    }
+
     rc = metal_pmp_get_region(pmp, region, &old_config, &old_address);
     if(rc) {
         /* Error reading region */
@@ -86,7 +91,7 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
 
     if(old_config.L == METAL_PMP_LOCKED) {
         /* Cannot modify locked region */
-        return 3;
+        return 4;
     }
 
     /* Update the address first, because if the region is being locked we won't
