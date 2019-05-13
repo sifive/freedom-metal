@@ -14,5 +14,6 @@ _gettimeofday(struct timeval *tp, void *tzp)
         return -1;
     }
     tp->tv_sec = mcc / timebase;
+    tp->tv_usec = mcc % timebase * 1000000 / timebase;
     return 0;
 }
