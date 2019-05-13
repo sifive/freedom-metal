@@ -16,8 +16,30 @@ struct metal_pmp *metal_pmp_get_device(void)
 #endif
 }
 
+/* Calculate the address granularity  based on the position of the
+ * least-significant 1 set in the address */
+static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
+    if(address == 0) {
+        return 0;
+    }
+
+    /* Get the index of the least significant set bit */
+    int index = 0;
+    while(((address >> index) & 0x1) == 0) {
+        index += 1;
+    }
+
+    /* The granularity is equal to 2^(index + 2) bytes */
+    return (1 << (index + 2));
+}
+
+
 void metal_pmp_init(struct metal_pmp *pmp)
 {
+    if(!pmp) {
+        return;
+    }
+
     struct metal_pmp_config init_config = {
         .L = METAL_PMP_UNLOCKED,
         .A = METAL_PMP_OFF,
@@ -29,6 +51,19 @@ void metal_pmp_init(struct metal_pmp *pmp)
     for(unsigned int i = 0; i < pmp->num_regions; i++) {
         metal_pmp_set_region(pmp, i, init_config, 0);
     }
+
+    /* Detect the region granularity by writing all 1s to pmpaddr0 while
+     * pmpcfg0 = 0. */
+    if(metal_pmp_set_address(pmp, 0, -1) != 0) {
+        /* Failed to detect granularity */
+        return;
+    }
+
+    /* Calculate the granularity based on the value that pmpaddr0 takes on */
+    pmp->_granularity = _get_pmpaddr_granularity(metal_pmp_get_address(pmp, 0));
+
+    /* Clear pmpaddr0 */
+    metal_pmp_set_address(pmp, 0, 0);
 }
 
 int metal_pmp_set_region(struct metal_pmp *pmp,
@@ -52,6 +87,21 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
         return 2;
     }
 
+    if(config.A == METAL_PMP_NA4 && pmp->_granularity > 4) {
+        /* The requested granularity is too small */
+        return 3;
+    }
+
+    /* Calculate the granularity of the bitwise not of address because
+     * _get_pmpaddr_granularity detects the least-significant one and NAPOT
+     * mode detects the least-significant zero */
+    if(config.A == METAL_PMP_NAPOT &&
+       pmp->_granularity > _get_pmpaddr_granularity(~address))
+    {
+        /* The requested granularity is too small */
+        return 3;
+    }
+
     rc = metal_pmp_get_region(pmp, region, &old_config, &old_address);
     if(rc) {
         /* Error reading region */
@@ -60,7 +110,7 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
 
     if(old_config.L == METAL_PMP_LOCKED) {
         /* Cannot modify locked region */
-        return 3;
+        return 4;
     }
 
     /* Update the address first, because if the region is being locked we won't

@@ -68,6 +68,9 @@ struct metal_pmp {
      * @brief The number of regions in the PMP
      */
     const int num_regions;
+
+    /* The minimum granularity of the PMP region. Set by metal_pmp_init */
+    uintptr_t _granularity;
 };
 
 /*!
