@@ -7,17 +7,17 @@
 
 #include <metal/drivers/fixed-factor-clock.h>
 #include <stddef.h>
+#include <metal/machine.h>
 
 long __metal_driver_fixed_factor_clock_get_rate_hz(const struct metal_clock *gclk)
 {
-    const struct __metal_driver_fixed_factor_clock *clk = (void *)gclk;
-
+    struct metal_clock *parent = __metal_driver_fixed_factor_clock_parent(gclk);
     long parent_rate = 1;
-    if(clk->parent) {
-        parent_rate = clk->parent->vtable->get_rate_hz(clk->parent);
+    if(parent) {
+        parent_rate = parent->clock->get_rate_hz(parent);
     }
 
-    return clk->mult * parent_rate / clk->div;
+    return __metal_driver_fixed_factor_lock_mult() * parent_rate / __metal_driver_fixed_factor_clock_div();
 }
 
 long __metal_driver_fixed_factor_clock_set_rate_hz(struct metal_clock *gclk, long target_hz)
@@ -25,4 +25,8 @@ long __metal_driver_fixed_factor_clock_set_rate_hz(struct metal_clock *gclk, lon
     return __metal_driver_fixed_factor_clock_get_rate_hz(gclk);
 }
 
+__METAL_DEFINE_VTABLE(__metal_driver_vtable_fixed_factor_clock) = {
+    .clock.get_rate_hz = __metal_driver_fixed_factor_clock_get_rate_hz,
+    .clock.set_rate_hz = __metal_driver_fixed_factor_clock_set_rate_hz,
+};
 #endif /* METAL_FIXED_FACTOR_CLOCK */

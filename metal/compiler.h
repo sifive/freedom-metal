@@ -4,9 +4,11 @@
 #ifndef METAL__COMPILER_H
 #define METAL__COMPILER_H
 
-#define __METAL_DECLARE_VTABLE(type)                        \
-    asm(".weak " #type);                                  \
-    const struct type type                                \
+#define __METAL_DECLARE_VTABLE(type)                      \
+    extern const struct type type;			  
+
+#define __METAL_DEFINE_VTABLE(type)                       \
+    const struct type type                                
 
 #define __METAL_GET_FIELD(reg, mask)                        \
     (((reg) & (mask)) / ((mask) & ~((mask) << 1)))
