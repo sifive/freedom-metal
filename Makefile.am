@@ -54,8 +54,6 @@ endif # PRECONFIGURED
 # Install some METAL-specific headers, one of which is automatically generated.
 # The files that aren't automatically generated are the same for all machines.
 nobase_include_HEADERS = \
-	metal/machine/@MACHINE_NAME@.h \
-	metal/machine/platform.h \
 	metal/drivers/fixed-clock.h \
 	metal/drivers/fixed-factor-clock.h \
 	metal/drivers/riscv,clint0.h \
@@ -75,6 +73,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive,spi0.h \
 	metal/drivers/sifive,test0.h \
 	metal/drivers/sifive,uart0.h \
+	metal/machine/platform.h \
 	metal/button.h \
 	metal/clock.h \
 	metal/compiler.h \
@@ -97,7 +96,7 @@ nobase_include_HEADERS = \
 	metal/uart.h
 
 if PRECONFIGURED
-metal/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
+metal/machine.h: @MACHINE_HEADER@
 	@mkdir -p $(dir $@)
 	cp $< $@
 
@@ -114,7 +113,7 @@ else # !PRECONFIGURED
 @MACHINE_NAME@.dtb: @DTC@ @MACHINE_DTS@
 	$< $(filter %.dts,$^) -o $@ -O dtb -I dts
 
-metal/machine/@MACHINE_NAME@.h: @METAL_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
+metal/machine.h: @METAL_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
 	@mkdir -p $(dir $@)
 	$< --dtb $(filter %.dtb,$^) --output $@
 
@@ -137,7 +136,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_
 
 # This will generate these sources before the compilation step
 BUILT_SOURCES = \
-	metal/machine/@MACHINE_NAME@.h \
+	metal/machine.h \
 	metal/machine/platform.h \
 	riscv__menv__metal.specs \
 	riscv__mmachine__@MACHINE_NAME@.specs
@@ -248,6 +247,6 @@ hello_LDFLAGS         = -L. -Wl,--gc-sections -Wl,-Map=hello.map
 # Extra clean targets
 clean-local:
 	-rm -rf @MACHINE_NAME@.mk
-	-rm -rf metal/machine/@MACHINE_NAME@.h metal/machine/platform.h
+	-rm -rf metal/machine.h metal/machine/platform.h
 	-rm -rf @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
 	-rm -rf *.map *.specs
