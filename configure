@@ -4579,9 +4579,7 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
   mmachine_machine_name="-mmachine=$machine_name"
 else
-  mmachine_machine_name="-D__METAL_MACHINE_HEADER=\\\"$with_machine_header\\\""
-#    [mmachine_machine_name="-mmachine=$with_machine_name"]
-
+  :
 fi
 
 
