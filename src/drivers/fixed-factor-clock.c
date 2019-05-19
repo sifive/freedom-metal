@@ -14,10 +14,10 @@ long __metal_driver_fixed_factor_clock_get_rate_hz(const struct metal_clock *gcl
     struct metal_clock *parent = __metal_driver_fixed_factor_clock_parent(gclk);
     long parent_rate = 1;
     if(parent) {
-        parent_rate = parent->clock->get_rate_hz(parent);
+        parent_rate = parent->vtable->get_rate_hz(parent);
     }
 
-    return __metal_driver_fixed_factor_lock_mult() * parent_rate / __metal_driver_fixed_factor_clock_div();
+    return __metal_driver_fixed_factor_clock_mult(gclk) * parent_rate / __metal_driver_fixed_factor_clock_div(gclk);
 }
 
 long __metal_driver_fixed_factor_clock_set_rate_hz(struct metal_clock *gclk, long target_hz)

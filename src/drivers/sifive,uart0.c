@@ -138,8 +138,7 @@ void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate)
     }
 }
 
-//__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
-const struct __metal_driver_vtable_sifive_uart0 __metal_driver_vtable_sifive_uart0 = {
+__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
     .uart.init          = __metal_driver_sifive_uart0_init,
     .uart.putc          = __metal_driver_sifive_uart0_putc,
     .uart.getc          = __metal_driver_sifive_uart0_getc,

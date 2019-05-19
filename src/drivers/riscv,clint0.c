@@ -13,7 +13,7 @@
 unsigned long long __metal_clint0_mtime_get (struct __metal_driver_riscv_clint0 *clint)
 {
     __metal_io_u32 lo, hi;
-    unsigned long control_base = __metal_driver_sifive_clint0_control_base((struct metal_interrupt *)clint);
+    unsigned long control_base = __metal_driver_sifive_clint0_control_base(&clint->controller);
 
     /* Guard against rollover when reading */
     do {
@@ -26,7 +26,7 @@ unsigned long long __metal_clint0_mtime_get (struct __metal_driver_riscv_clint0 
 
 int __metal_clint0_mtime_set (struct __metal_driver_riscv_clint0 *clint, unsigned long long time)
 {   
-    unsigned long control_base = __metal_driver_sifive_clint0_control_base((struct metal_interrupt *)clint);
+    unsigned long control_base = __metal_driver_sifive_clint0_control_base(&clint->controller);
     /* Per spec, the RISC-V MTIME/MTIMECMP registers are 64 bit,
      * and are NOT internally latched for multiword transfers.
      * Need to be careful about sequencing to avoid triggering

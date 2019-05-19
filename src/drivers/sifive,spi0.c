@@ -7,6 +7,7 @@
 
 #include <metal/drivers/sifive,spi0.h>
 #include <metal/io.h>
+#include <metal/machine.h>
 
 /* Register fields */
 #define METAL_SPI_SCKDIV_MASK         0xFFF
@@ -42,7 +43,7 @@
 
 static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_spi_config *config)
 {
-    long control_base = __metal_driver_sifive_spio0_control_base((struct metal_spi *)spi);
+    long control_base = __metal_driver_sifive_spi0_control_base((struct metal_spi *)spi);
     /* Set protocol */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     switch(config->protocol) {
@@ -110,7 +111,7 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
                                       char *rx_buf)
 {
     struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
-    long control_base = __metal_driver_sifive_spio0_control_base(gspi);
+    long control_base = __metal_driver_sifive_spi0_control_base(gspi);
     int rc = 0;
     int rxdata = 0;
 
@@ -158,13 +159,14 @@ int __metal_driver_sifive_spi0_get_baud_rate(struct metal_spi *gspi)
 
 int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_rate)
 {
-    long control_base = __metal_driver_sifive_spio0_control_base(gspi);
-    struct metal_clock *clock = __metal_driver_sifive_spio0_clock(gspi);
+    long control_base = __metal_driver_sifive_spi0_control_base(gspi);
+    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(gspi);
+    struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
 
     spi->baud_rate = baud_rate;
 
     if (clock != NULL) {
-        long clock_rate = clock->get_rate_hz(clock);
+        long clock_rate = clock->vtable->get_rate_hz(clock);
 
         /* Calculate divider */
         long div = (clock_rate / (2 * baud_rate)) - 1;
@@ -184,7 +186,7 @@ int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_ra
 
 static void pre_rate_change_callback(void *priv)
 {
-    long control_base = __metal_driver_sifive_spio0_control_base((struct metal_spi *)priv);
+    long control_base = __metal_driver_sifive_spi0_control_base((struct metal_spi *)priv);
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to zero and waiting until an interrupt is pending */
@@ -202,9 +204,9 @@ static void post_rate_change_callback(void *priv)
 
 void __metal_driver_sifive_spi0_init(struct metal_spi *gspi, int baud_rate)
 {
-    struct metal_clock *clock = __metal_driver_sifive_spio0_clock(gspi);
-    struct __metal_driver_sifive_gpio0 *pinmux = __metal_driver_sifive_spio0_pinmux(gspi);
     struct __metal_driver_sifive_spi0 *spi = (void *)(gspi);
+    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(gspi);
+    struct __metal_driver_sifive_gpio0 *pinmux = __metal_driver_sifive_spi0_pinmux(gspi);
 
     if(clock != NULL) {
         metal_clock_register_pre_rate_change_callback(clock, &pre_rate_change_callback, spi);
@@ -214,9 +216,9 @@ void __metal_driver_sifive_spi0_init(struct metal_spi *gspi, int baud_rate)
     metal_spi_set_baud_rate(&(spi->spi), baud_rate);
 
     if (pinmux != NULL) {
-        long pinmux_output_selector = __metal_driver_sifive_spio0_pinmux_output_selector(gspi);
-        long pinmux_source_selector = __metal_driver_sifive_spio0_pinmux_source_selector(gspi);
-        pinmux->gpio.enable_io(
+        long pinmux_output_selector = __metal_driver_sifive_spi0_pinmux_output_selector(gspi);
+        long pinmux_source_selector = __metal_driver_sifive_spi0_pinmux_source_selector(gspi);
+        pinmux->gpio.vtable->enable_io(
             (struct metal_gpio *) pinmux,
             pinmux_output_selector,
             pinmux_source_selector
