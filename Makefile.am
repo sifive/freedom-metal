@@ -85,6 +85,7 @@ nobase_include_HEADERS = \
 	metal/led.h \
 	metal/lock.h \
 	metal/machine.h \
+	metal/machine-inline.h \
 	metal/memory.h \
 	metal/pmp.h \
 	metal/privilege.h \
@@ -97,6 +98,10 @@ nobase_include_HEADERS = \
 
 if PRECONFIGURED
 metal/machine.h: @MACHINE_HEADER@
+	@mkdir -p $(dir $@)
+	cp $< $@
+
+metal/machine-inline.h: @MACHINE_INLINE@
 	@mkdir -p $(dir $@)
 	cp $< $@
 
@@ -137,6 +142,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_
 # This will generate these sources before the compilation step
 BUILT_SOURCES = \
 	metal/machine.h \
+	metal/machine-inline.h \
 	metal/machine/platform.h \
 	riscv__menv__metal.specs \
 	riscv__mmachine__@MACHINE_NAME@.specs
@@ -144,6 +150,7 @@ BUILT_SOURCES = \
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/fixed-factor-clock.c \
+	src/drivers/inline.c \
 	src/drivers/riscv,clint0.c \
 	src/drivers/riscv,cpu.c \
 	src/drivers/riscv,plic0.c \
