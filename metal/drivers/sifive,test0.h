@@ -11,8 +11,6 @@ struct __metal_driver_vtable_sifive_test0 {
     const struct __metal_shutdown_vtable shutdown;
 };
 
-//struct __metal_driver_sifive_test0;
-
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_test0)
 
 struct __metal_driver_sifive_test0 {

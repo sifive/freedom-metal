@@ -14,8 +14,6 @@ struct __metal_driver_vtable_sifive_spi0 {
     const struct metal_spi_vtable spi;
 };
 
-//struct __metal_driver_sifive_spi0;
-
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_spi0)
 
 struct __metal_driver_sifive_spi0 {
