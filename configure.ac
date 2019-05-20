@@ -84,6 +84,12 @@ AC_ARG_WITH([machine-header],
     [with_machine_header="no"]
 )
 
+AC_ARG_WITH([machine-inline],
+    [AS_HELP_STRING([--with-machine-inline=PATH], [Path to the machine inline file])],
+    [],
+    [with_machine_inline="no"]
+)
+
 AC_ARG_WITH([platform-header],
     [AS_HELP_STRING([--with-platform-header=PATH], [Path to the platform header file])],
     [],
@@ -179,6 +185,11 @@ AS_IF([test "x$with_preconfigured" = "xyes"],
     AS_IF([test "x$with_machine_header" != "xno"],
         [AC_SUBST([MACHINE_HEADER], "$with_machine_header")],
         [AC_MSG_FAILURE([--with-machine-header is required with the --with-preconfigured option])]
+    )
+
+    AS_IF([test "x$with_machine_inline" != "xno"],
+        [AC_SUBST([MACHINE_INLINE], "$with_machine_inline")],
+        [AC_MSG_FAILURE([--with-machine-inline is required with the --with-preconfigured option])]
     )
 
     AS_IF([test "x$with_platform_header" != "xno"],

@@ -7,6 +7,7 @@
 
 #include <metal/drivers/sifive,spi0.h>
 #include <metal/io.h>
+#include <metal/machine.h>
 
 /* Register fields */
 #define METAL_SPI_SCKDIV_MASK         0xFFF
@@ -36,12 +37,13 @@
 #define METAL_SPI_TXMARK_MASK         0x3
 #define METAL_SPI_TXWM                (1 << 0)
 
-#define METAL_SPI_REG(offset)   (((unsigned long)(((struct __metal_driver_sifive_spi0 *)(spi))->control_base) + offset))
+#define METAL_SPI_REG(offset)   (((unsigned long)control_base + offset))
 #define METAL_SPI_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_SPI_REG(offset)))
 #define METAL_SPI_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_SPI_REG(offset)))
 
 static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_spi_config *config)
 {
+    long control_base = __metal_driver_sifive_spi0_control_base((struct metal_spi *)spi);
     /* Set protocol */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     switch(config->protocol) {
@@ -109,6 +111,7 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
                                       char *rx_buf)
 {
     struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
+    long control_base = __metal_driver_sifive_spi0_control_base(gspi);
     int rc = 0;
     int rxdata = 0;
 
@@ -156,12 +159,14 @@ int __metal_driver_sifive_spi0_get_baud_rate(struct metal_spi *gspi)
 
 int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_rate)
 {
+    long control_base = __metal_driver_sifive_spi0_control_base(gspi);
+    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(gspi);
     struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
 
     spi->baud_rate = baud_rate;
 
-    if (spi->clock != NULL) {
-        long clock_rate = spi->clock->vtable->get_rate_hz(spi->clock);
+    if (clock != NULL) {
+        long clock_rate = clock->vtable->get_rate_hz(clock);
 
         /* Calculate divider */
         long div = (clock_rate / (2 * baud_rate)) - 1;
@@ -181,7 +186,7 @@ int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_ra
 
 static void pre_rate_change_callback(void *priv)
 {
-    struct __metal_driver_sifive_spi0 *spi = priv;
+    long control_base = __metal_driver_sifive_spi0_control_base((struct metal_spi *)priv);
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to zero and waiting until an interrupt is pending */
@@ -200,21 +205,31 @@ static void post_rate_change_callback(void *priv)
 void __metal_driver_sifive_spi0_init(struct metal_spi *gspi, int baud_rate)
 {
     struct __metal_driver_sifive_spi0 *spi = (void *)(gspi);
+    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(gspi);
+    struct __metal_driver_sifive_gpio0 *pinmux = __metal_driver_sifive_spi0_pinmux(gspi);
 
-    if(spi->clock != NULL) {
-        metal_clock_register_pre_rate_change_callback(spi->clock, &pre_rate_change_callback, spi);
-        metal_clock_register_post_rate_change_callback(spi->clock, &post_rate_change_callback, spi);
+    if(clock != NULL) {
+        metal_clock_register_pre_rate_change_callback(clock, &pre_rate_change_callback, spi);
+        metal_clock_register_post_rate_change_callback(clock, &post_rate_change_callback, spi);
     }
 
     metal_spi_set_baud_rate(&(spi->spi), baud_rate);
 
-    if (spi->pinmux != NULL) {
-        spi->pinmux->vtable->gpio.enable_io(
-            (struct metal_gpio *) spi->pinmux,
-            spi->pinmux_output_selector,
-            spi->pinmux_source_selector
+    if (pinmux != NULL) {
+        long pinmux_output_selector = __metal_driver_sifive_spi0_pinmux_output_selector(gspi);
+        long pinmux_source_selector = __metal_driver_sifive_spi0_pinmux_source_selector(gspi);
+        pinmux->gpio.vtable->enable_io(
+            (struct metal_gpio *) pinmux,
+            pinmux_output_selector,
+            pinmux_source_selector
         );
     }
 }
 
+__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_spi0) = {
+    .spi.init          = __metal_driver_sifive_spi0_init,
+    .spi.transfer      = __metal_driver_sifive_spi0_transfer,
+    .spi.get_baud_rate = __metal_driver_sifive_spi0_get_baud_rate,
+    .spi.set_baud_rate = __metal_driver_sifive_spi0_set_baud_rate,
+};
 #endif /* METAL_SIFIVE_SPI0 */

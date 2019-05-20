@@ -72,4 +72,10 @@ int __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(struct metal_cache *cac
     return 0;
 }
 
+__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_fu540_c000_l2) = {
+	.cache.init = __metal_driver_sifive_fu540_c000_l2_init,
+	.cache.get_enabled_ways = __metal_driver_sifive_fu540_c000_l2_get_enabled_ways,
+	.cache.set_enabled_ways = __metal_driver_sifive_fu540_c000_l2_set_enabled_ways,
+};
+
 #endif

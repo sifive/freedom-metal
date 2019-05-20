@@ -1,16 +1,19 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/machine/platform.h>
+
+#ifdef METAL_SIFIVE_GPIO_BUTTONS
+
 #include <string.h>
 #include <metal/drivers/riscv,cpu.h>
 #include <metal/drivers/sifive,gpio-buttons.h>
+#include <metal/machine.h>
 
 int  __metal_driver_button_exist (struct metal_button *button, char *label)
 {
-    struct __metal_driver_sifive_gpio_button *but = (void *)(button);
-
-    if (strcmp(but->label, label) == 0) {
-	return 1;
+    if (strcmp(__metal_driver_sifive_gpio_button_label(button), label) == 0) {
+        return 1;
     }
     return 0;
 }
@@ -18,25 +21,35 @@ int  __metal_driver_button_exist (struct metal_button *button, char *label)
 struct metal_interrupt *
 __metal_driver_button_interrupt_controller(struct metal_button *button)
 {
-    struct __metal_driver_sifive_gpio_button *but = (void *)(button);
-
-    return but->interrupt_parent;
+    return __metal_driver_sifive_gpio_button_interrupt_controller(button);
 }
 
 int __metal_driver_button_get_interrupt_id(struct metal_button *button)
 {
-    int max_irq;
-    struct __metal_driver_sifive_gpio_button *but = (void *)(button);
+    int irq, max_irq;
+    struct metal_interrupt *irc;
 
-    if (but->interrupt_parent != NULL) {
-        max_irq = _metal_interrupt_command_request(but->interrupt_parent,
-                                                METAL_MAX_INTERRUPT_GET, NULL);
+    irq = __metal_driver_sifive_gpio_button_interrupt_line(button);
+    irc =  __metal_driver_sifive_gpio_button_interrupt_controller(button);
 
-	if (but->interrupt_line < max_irq) {
-            return _metal_interrupt_command_request(but->interrupt_parent,
+    if (irc != NULL) {
+        max_irq = _metal_interrupt_command_request(irc,
+                                                   METAL_MAX_INTERRUPT_GET,
+                                                   NULL);
+
+        if (irq < max_irq) {
+            return _metal_interrupt_command_request(irc,
                                                  METAL_INDEX_INTERRUPT_GET,
-						 (void *)&but->interrupt_line);
-	}
+                                                 (void *)&irq);
+        }
     }
     return METAL_INTERRUPT_ID_LCMX;
 }
+
+__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_button) = {
+    .button_vtable.button_exist   = __metal_driver_button_exist,
+    .button_vtable.interrupt_controller = __metal_driver_button_interrupt_controller,
+    .button_vtable.get_interrupt_id = __metal_driver_button_get_interrupt_id,
+};
+
+#endif

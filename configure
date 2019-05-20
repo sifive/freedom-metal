@@ -593,6 +593,7 @@ MMACHINE_MACHINE_NAME
 MACHINE_DTS
 MACHINE_LDSCRIPT
 PLATFORM_HEADER
+MACHINE_INLINE
 MACHINE_HEADER
 PRECONFIGURED_FALSE
 PRECONFIGURED_TRUE
@@ -709,6 +710,7 @@ with_machine_name
 with_preconfigured
 with_builtin_libgloss
 with_machine_header
+with_machine_inline
 with_platform_header
 with_machine_ldscript
 with_machine_dts
@@ -1380,6 +1382,8 @@ Optional Packages:
   --with-bultin-libgloss  Build libgloss along with the METAL
   --with-machine-header=PATH
                           Path to the machine header file
+  --with-machine-inline=PATH
+                          Path to the machine inline file
   --with-platform-header=PATH
                           Path to the platform header file
   --with-machine-ldscript=PATH
@@ -4085,6 +4089,16 @@ fi
 
 
 
+# Check whether --with-machine-inline was given.
+if test "${with_machine_inline+set}" = set; then :
+  withval=$with_machine_inline;
+else
+  with_machine_inline="no"
+
+fi
+
+
+
 # Check whether --with-platform-header was given.
 if test "${with_platform_header+set}" = set; then :
   withval=$with_platform_header;
@@ -4226,6 +4240,17 @@ else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
 as_fn_error $? "--with-machine-header is required with the --with-preconfigured option
+See \`config.log' for more details" "$LINENO" 5; }
+
+fi
+
+    if test "x$with_machine_inline" != "xno"; then :
+  MACHINE_INLINE="$with_machine_inline"
+
+else
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "--with-machine-inline is required with the --with-preconfigured option
 See \`config.log' for more details" "$LINENO" 5; }
 
 fi

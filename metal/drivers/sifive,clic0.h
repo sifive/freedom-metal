@@ -27,45 +27,13 @@ struct __metal_driver_vtable_sifive_clic0 {
     struct metal_interrupt_vtable clic_vtable;
 };
 
-void __metal_driver_sifive_clic0_init(struct metal_interrupt *clic);
-int __metal_driver_sifive_clic0_register(struct metal_interrupt *controller,
-                                       int id, metal_interrupt_handler_t isr,
-                                       void *priv);
-int __metal_driver_sifive_clic0_enable(struct metal_interrupt *controller, int id);
-int __metal_driver_sifive_clic0_disable(struct metal_interrupt *controller, int id);
-int __metal_driver_sifive_clic0_enable_interrupt_vector(struct metal_interrupt *controller,
-                                                      int id, metal_vector_mode mode);
-int __metal_driver_sifive_clic0_disable_interrupt_vector(struct metal_interrupt *controller,
-                                                       int id);
-int __metal_driver_sifive_clic0_command_request(struct metal_interrupt *clic,
-                                              int command, void *data);
-
-__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
-    .clic_vtable.interrupt_init     = __metal_driver_sifive_clic0_init,
-    .clic_vtable.interrupt_register = __metal_driver_sifive_clic0_register,
-    .clic_vtable.interrupt_enable   = __metal_driver_sifive_clic0_enable,
-    .clic_vtable.interrupt_disable  = __metal_driver_sifive_clic0_disable,
-    .clic_vtable.interrupt_vector_enable   = __metal_driver_sifive_clic0_enable_interrupt_vector,
-    .clic_vtable.interrupt_vector_disable  = __metal_driver_sifive_clic0_disable_interrupt_vector,
-    .clic_vtable.command_request    = __metal_driver_sifive_clic0_command_request,
-};
+__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0)
 
 #define __METAL_MACHINE_MACROS
 #include <metal/machine.h>
 struct __metal_driver_sifive_clic0 {
     struct metal_interrupt controller;
-    const struct __metal_driver_vtable_sifive_clic0 *vtable;
-    const unsigned long control_base;
-    const unsigned long control_size;
     int init_done;
-    struct metal_interrupt *interrupt_parent;
-    const int num_interrupts;
-    /* Hardcode max of 3 direct interrupts to core for now, SW, Timer, Ext */
-    const int interrupt_lines[3];
-    int max_levels;
-    int num_subinterrupts;
-    int num_intbits;
-    int interrupt_controller;
     metal_interrupt_handler_t metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
     __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
 };
