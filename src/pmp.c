@@ -3,6 +3,7 @@
 
 #include <metal/machine.h>
 #include <metal/pmp.h>
+#include <metal/cpu.h>
 
 #define CONFIG_TO_INT(_config) (*((size_t *) &(_config)))
 #define INT_TO_CONFIG(_int) (*((struct metal_pmp_config *) &(_int)))
@@ -33,9 +34,15 @@ static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
     return (1 << (index + 2));
 }
 
+/* Get the number of pmp regions for the current hart */
+static int _pmp_regions() {
+    struct metal_cpu *current_cpu = metal_cpu_get(metal_cpu_get_current_hartid());
 
-void metal_pmp_init(struct metal_pmp *pmp)
-{
+    return __metal_driver_cpu_num_pmp_regions(current_cpu);
+}
+
+
+void metal_pmp_init(struct metal_pmp *pmp) {
     if(!pmp) {
         return;
     }
@@ -48,7 +55,7 @@ void metal_pmp_init(struct metal_pmp *pmp)
         .R = 0,
     };
 
-    for(unsigned int i = 0; i < pmp->num_regions; i++) {
+    for(unsigned int i = 0; i < _pmp_regions(); i++) {
         metal_pmp_set_region(pmp, i, init_config, 0);
     }
 
@@ -60,7 +67,7 @@ void metal_pmp_init(struct metal_pmp *pmp)
     }
 
     /* Calculate the granularity based on the value that pmpaddr0 takes on */
-    pmp->_granularity = _get_pmpaddr_granularity(metal_pmp_get_address(pmp, 0));
+    pmp->_granularity[metal_cpu_get_current_hartid()] = _get_pmpaddr_granularity(metal_pmp_get_address(pmp, 0));
 
     /* Clear pmpaddr0 */
     metal_pmp_set_address(pmp, 0, 0);
@@ -82,12 +89,12 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
         return 1;
     }
 
-    if(region > pmp->num_regions) {
+    if(region > _pmp_regions()) {
         /* Region outside of supported range */
         return 2;
     }
 
-    if(config.A == METAL_PMP_NA4 && pmp->_granularity > 4) {
+    if(config.A == METAL_PMP_NA4 && pmp->_granularity[metal_cpu_get_current_hartid()] > 4) {
         /* The requested granularity is too small */
         return 3;
     }
@@ -96,7 +103,7 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
      * _get_pmpaddr_granularity detects the least-significant one and NAPOT
      * mode detects the least-significant zero */
     if(config.A == METAL_PMP_NAPOT &&
-       pmp->_granularity > _get_pmpaddr_granularity(~address))
+       pmp->_granularity[metal_cpu_get_current_hartid()] > _get_pmpaddr_granularity(~address))
     {
         /* The requested granularity is too small */
         return 3;
@@ -263,7 +270,7 @@ int metal_pmp_get_region(struct metal_pmp *pmp,
         return 1;
     }
 
-    if(region > pmp->num_regions) {
+    if(region > _pmp_regions()) {
         /* Region outside of supported range */
         return 2;
     }
