@@ -4,8 +4,8 @@
 #ifndef METAL__DRIVERS__SIFIVE_UART0_H
 #define METAL__DRIVERS__SIFIVE_UART0_H
 
-#include <metal/drivers/sifive,gpio0.h>
-#include <metal/drivers/riscv,plic0.h>
+#include <metal/drivers/sifive_gpio0.h>
+#include <metal/drivers/riscv_plic0.h>
 #include <metal/clock.h>
 #include <metal/io.h>
 #include <metal/uart.h>

@@ -5,7 +5,7 @@
 #define METAL__DRIVERS__RISCV_PLIC0_H
 
 #include <metal/compiler.h>
-#include <metal/drivers/riscv,cpu.h>
+#include <metal/drivers/riscv_cpu.h>
 
 #define METAL_PLIC_SOURCE_MASK            0x1F
 #define METAL_PLIC_SOURCE_SHIFT           5

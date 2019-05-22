@@ -5,7 +5,7 @@
 #define METAL__DRIVERS__SIFIVE_EXTERNAL_INTERRUPTS0_H
 
 #include <metal/compiler.h>
-#include <metal/drivers/riscv,cpu.h>
+#include <metal/drivers/riscv_cpu.h>
 
 struct __metal_driver_vtable_sifive_local_external_interrupts0 {
     struct metal_interrupt_vtable local0_vtable;

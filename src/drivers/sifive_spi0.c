@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_SPI0
 
-#include <metal/drivers/sifive,spi0.h>
+#include <metal/drivers/sifive_spi0.h>
 #include <metal/io.h>
 #include <metal/machine.h>
 

@@ -56,24 +56,24 @@ endif # PRECONFIGURED
 nobase_include_HEADERS = \
 	metal/drivers/fixed-clock.h \
 	metal/drivers/fixed-factor-clock.h \
-	metal/drivers/riscv,clint0.h \
-	metal/drivers/riscv,cpu.h \
-	metal/drivers/riscv,plic0.h \
-	metal/drivers/sifive,clic0.h \
-	metal/drivers/sifive,fe310-g000,hfrosc.h \
-	metal/drivers/sifive,fe310-g000,hfxosc.h \
-	metal/drivers/sifive,fe310-g000,pll.h \
-	metal/drivers/sifive,fe310-g000,prci.h \
-	metal/drivers/sifive,fu540-c000,l2.h \
-	metal/drivers/sifive,global-external-interrupts0.h \
-	metal/drivers/sifive,gpio-buttons.h \
-	metal/drivers/sifive,gpio-leds.h \
-	metal/drivers/sifive,gpio-switches.h \
-	metal/drivers/sifive,gpio0.h \
-	metal/drivers/sifive,local-external-interrupts0.h \
-	metal/drivers/sifive,spi0.h \
-	metal/drivers/sifive,test0.h \
-	metal/drivers/sifive,uart0.h \
+	metal/drivers/riscv_clint0.h \
+	metal/drivers/riscv_cpu.h \
+	metal/drivers/riscv_plic0.h \
+	metal/drivers/sifive_clic0.h \
+	metal/drivers/sifive_fe310-g000_hfrosc.h \
+	metal/drivers/sifive_fe310-g000_hfxosc.h \
+	metal/drivers/sifive_fe310-g000_pll.h \
+	metal/drivers/sifive_fe310-g000_prci.h \
+	metal/drivers/sifive_fu540-c000_l2.h \
+	metal/drivers/sifive_global-external-interrupts0.h \
+	metal/drivers/sifive_gpio-buttons.h \
+	metal/drivers/sifive_gpio-leds.h \
+	metal/drivers/sifive_gpio-switches.h \
+	metal/drivers/sifive_gpio0.h \
+	metal/drivers/sifive_local-external-interrupts0.h \
+	metal/drivers/sifive_spi0.h \
+	metal/drivers/sifive_test0.h \
+	metal/drivers/sifive_uart0.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
 	metal/button.h \
@@ -153,23 +153,23 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/fixed-factor-clock.c \
 	src/drivers/inline.c \
-	src/drivers/riscv,clint0.c \
-	src/drivers/riscv,cpu.c \
-	src/drivers/riscv,plic0.c \
-	src/drivers/sifive,clic0.c \
-	src/drivers/sifive,fe310-g000,hfrosc.c \
-	src/drivers/sifive,fe310-g000,hfxosc.c \
-	src/drivers/sifive,fe310-g000,pll.c \
-	src/drivers/sifive,fe310-g000,prci.c \
-	src/drivers/sifive,global-external-interrupts0.c \
-	src/drivers/sifive,gpio-buttons.c \
-	src/drivers/sifive,gpio-leds.c \
-	src/drivers/sifive,gpio-switches.c \
-	src/drivers/sifive,gpio0.c \
-	src/drivers/sifive,local-external-interrupts0.c \
-	src/drivers/sifive,spi0.c \
-	src/drivers/sifive,test0.c \
-	src/drivers/sifive,uart0.c \
+	src/drivers/riscv_clint0.c \
+	src/drivers/riscv_cpu.c \
+	src/drivers/riscv_plic0.c \
+	src/drivers/sifive_clic0.c \
+	src/drivers/sifive_fe310-g000_hfrosc.c \
+	src/drivers/sifive_fe310-g000_hfxosc.c \
+	src/drivers/sifive_fe310-g000_pll.c \
+	src/drivers/sifive_fe310-g000_prci.c \
+	src/drivers/sifive_global-external-interrupts0.c \
+	src/drivers/sifive_gpio-buttons.c \
+	src/drivers/sifive_gpio-leds.c \
+	src/drivers/sifive_gpio-switches.c \
+	src/drivers/sifive_gpio0.c \
+	src/drivers/sifive_local-external-interrupts0.c \
+	src/drivers/sifive_spi0.c \
+	src/drivers/sifive_test0.c \
+	src/drivers/sifive_uart0.c \
 	src/button.c \
 	src/clock.c \
 	src/cpu.c \

@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/machine/platform.h>
-#include <metal/drivers/sifive,fu540-c000,l2.h>
+#include <metal/drivers/sifive_fu540-c000_l2.h>
 
 #define L2_CONFIG_WAYS_SHIFT    8
 #define L2_CONFIG_WAYS_MASK     (0xFF << L2_CONFIG_WAYS_SHIFT)

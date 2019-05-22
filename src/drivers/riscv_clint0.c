@@ -7,7 +7,7 @@
 
 #include <metal/io.h>
 #include <metal/cpu.h>
-#include <metal/drivers/riscv,clint0.h>
+#include <metal/drivers/riscv_clint0.h>
 #include <metal/machine.h>
 
 unsigned long long __metal_clint0_mtime_get (struct __metal_driver_riscv_clint0 *clint)

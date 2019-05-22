@@ -4,7 +4,7 @@
 #ifndef METAL__DRIVERS__SIFIVE_SPI0_H
 #define METAL__DRIVERS__SIFIVE_SPI0_H
 
-#include <metal/drivers/sifive,gpio0.h>
+#include <metal/drivers/sifive_gpio0.h>
 #include <metal/clock.h>
 #include <metal/compiler.h>
 #include <metal/io.h>

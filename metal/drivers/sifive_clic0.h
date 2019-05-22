@@ -5,7 +5,7 @@
 #define METAL__DRIVERS__SIFIVE_CLIC0_H
 
 #include <metal/compiler.h>
-#include <metal/drivers/riscv,cpu.h>
+#include <metal/drivers/riscv_cpu.h>
 
 #define METAL_CLIC_MAX_NMBITS          2
 #define METAL_CLIC_MAX_NLBITS          8

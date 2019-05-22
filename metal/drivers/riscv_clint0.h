@@ -5,7 +5,7 @@
 #define METAL__DRIVERS__RISCV_CLINT0_H
 
 #include <metal/compiler.h>
-#include <metal/drivers/riscv,cpu.h>
+#include <metal/drivers/riscv_cpu.h>
 
 struct __metal_driver_vtable_riscv_clint0 {
     struct metal_interrupt_vtable clint_vtable;

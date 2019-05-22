@@ -5,7 +5,7 @@
 #define METAL__DRIVERS__SIFIVE_FE310_G000_HFXOSC_H
 
 #include <metal/clock.h>
-#include <metal/drivers/sifive,fe310-g000,prci.h>
+#include <metal/drivers/sifive_fe310-g000_prci.h>
 
 struct __metal_driver_vtable_sifive_fe310_g000_hfxosc {
     struct __metal_clock_vtable clock;

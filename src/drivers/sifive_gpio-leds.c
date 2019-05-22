@@ -7,7 +7,7 @@
 
 #include <string.h>
 #include <metal/gpio.h>
-#include <metal/drivers/sifive,gpio-leds.h>
+#include <metal/drivers/sifive_gpio-leds.h>
 #include <metal/machine.h>
 
 int  __metal_driver_led_exist (struct metal_led *led, char *label)

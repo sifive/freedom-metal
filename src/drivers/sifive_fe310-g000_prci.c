@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_FE310_G000_PRCI
 
-#include <metal/drivers/sifive,fe310-g000,prci.h>
+#include <metal/drivers/sifive_fe310-g000_prci.h>
 #include <metal/machine.h>
 
 long __metal_driver_sifive_fe310_g000_prci_get_reg(const struct __metal_driver_sifive_fe310_g000_prci *prci, long offset) {

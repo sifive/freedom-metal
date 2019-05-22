@@ -4,7 +4,7 @@
 #ifndef METAL__DRIVERS__SIFIVE_GPIO_LEDS_H
 #define METAL__DRIVERS__SIFIVE_GPIO_LEDS_H
 
-#include <metal/drivers/sifive,gpio0.h>
+#include <metal/drivers/sifive_gpio0.h>
 #include <metal/led.h>
 #include <metal/compiler.h>
 
