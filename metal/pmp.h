@@ -15,11 +15,11 @@
  * permissions. 
  *
  * Additional information about the use and configuration rules for PMPs
- * can be found by reading the RISC-V Privileged Architecture Specification
- * v1.10.
+ * can be found by reading the RISC-V Privileged Architecture Specification.
  */
 
 #include <stddef.h>
+#include <metal/machine.h>
 
 struct metal_pmp;
 
@@ -64,13 +64,8 @@ struct metal_pmp_config {
  * @brief A handle for the PMP device
  */
 struct metal_pmp {
-    /*!
-     * @brief The number of regions in the PMP
-     */
-    const int num_regions;
-
     /* The minimum granularity of the PMP region. Set by metal_pmp_init */
-    uintptr_t _granularity;
+    uintptr_t _granularity[METAL_MAX_CORES];
 };
 
 /*!
@@ -85,10 +80,11 @@ struct metal_pmp *metal_pmp_get_device(void);
  * The PMP initialization routine is optional and may be called as many times
  * as is desired. The effect of the initialization routine is to attempt to set
  * all regions to unlocked and disabled, as well as to clear the X, W, and R
- * bits.
+ * bits. Only the pmp configuration of the hart which executes the routine will
+ * be affected.
  *
  * If any regions are fused to preset values by the implementation or locked,
- * the PMP region will silently remain uninitialized.
+ * those PMP regions will silently remain uninitialized.
  */
 void metal_pmp_init(struct metal_pmp *pmp);
 

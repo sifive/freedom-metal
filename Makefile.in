@@ -476,6 +476,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive,fe310-g000,hfxosc.h \
 	metal/drivers/sifive,fe310-g000,pll.h \
 	metal/drivers/sifive,fe310-g000,prci.h \
+	metal/drivers/sifive,fu540-c000,l2.h \
 	metal/drivers/sifive,global-external-interrupts0.h \
 	metal/drivers/sifive,gpio-buttons.h \
 	metal/drivers/sifive,gpio-leds.h \
@@ -488,6 +489,7 @@ nobase_include_HEADERS = \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
 	metal/button.h \
+	metal/cache.h \
 	metal/clock.h \
 	metal/compiler.h \
 	metal/cpu.h \
