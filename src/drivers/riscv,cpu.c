@@ -500,8 +500,9 @@ int __metal_driver_cpu_mtimecmp_set (struct metal_cpu *cpu, unsigned long long t
     if (intc) {
         tmr_intc = intc->metal_int_table[METAL_INTERRUPT_ID_TMR].sub_int;
         if (tmr_intc) {
-            rc = tmr_intc->vtable->command_request(tmr_intc,
-                                                   METAL_TIMER_MTIME_SET, &time);
+            rc = tmr_intc->vtable->mtimecmp_set(tmr_intc,
+                                                __metal_driver_cpu_hartid(cpu),
+                                                time);
         }
     }
     return rc;
