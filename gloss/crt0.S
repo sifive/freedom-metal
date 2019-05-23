@@ -62,7 +62,8 @@ _start:
   andi sp, sp, -16
 
   /* If we're not hart 0, skip the initialization work */
-  bnez a0, _skip_init
+  la t0, __metal_boot_hart
+  bne a0, t0, _skip_init
 
   /* Embedded systems frequently require relocating the data segment before C
    * code can be run -- for example, the data segment may exist in flash upon
@@ -187,7 +188,8 @@ secondary_main:
   sd ra, 8(sp)
 #endif
   csrr t0, mhartid
-  beqz t0, 2f
+  la t1, __metal_boot_hart
+  beq t0, t1, 2f
 1:
   wfi
   j 1b

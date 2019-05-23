@@ -24,8 +24,12 @@ unsigned long long __metal_clint0_mtime_get (struct __metal_driver_riscv_clint0 
     return (((unsigned long long)hi) << 32) | lo;
 }
 
-int __metal_clint0_mtime_set (struct __metal_driver_riscv_clint0 *clint, unsigned long long time)
+int __metal_driver_riscv_clint0_mtimecmp_set(struct metal_interrupt *controller,
+                                             int hartid,
+                                             unsigned long long time)
 {   
+    struct __metal_driver_riscv_clint0 *clint =
+                              (struct __metal_driver_riscv_clint0 *)(controller);
     unsigned long control_base = __metal_driver_sifive_clint0_control_base(&clint->controller);
     /* Per spec, the RISC-V MTIME/MTIMECMP registers are 64 bit,
      * and are NOT internally latched for multiword transfers.
@@ -33,9 +37,9 @@ int __metal_clint0_mtime_set (struct __metal_driver_riscv_clint0 *clint, unsigne
      * spurious interrupts: For that set the high word to a max
      * value first.
      */
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + METAL_RISCV_CLINT0_MTIMECMP_BASE + 4)) = 0xFFFFFFFF;
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + METAL_RISCV_CLINT0_MTIMECMP_BASE)) = (__metal_io_u32)time;
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + METAL_RISCV_CLINT0_MTIMECMP_BASE + 4)) = (__metal_io_u32)(time >> 32);
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + (8 * hartid) + METAL_RISCV_CLINT0_MTIMECMP_BASE + 4)) = 0xFFFFFFFF;
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + (8 * hartid) + METAL_RISCV_CLINT0_MTIMECMP_BASE)) = (__metal_io_u32)time;
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + (8 * hartid) + METAL_RISCV_CLINT0_MTIMECMP_BASE + 4)) = (__metal_io_u32)(time >> 32);
     return 0;
 }
 
@@ -159,12 +163,6 @@ int __metal_driver_riscv_clint0_command_request (struct metal_interrupt *control
             rc = 0;
         }
         break;
-    case METAL_TIMER_MTIME_SET:
-        if (data) {
-	    __metal_clint0_mtime_set(clint, *(unsigned long long *)data);
-            rc = 0;
-        }
-        break;
     case METAL_SOFTWARE_IPI_CLEAR:
 	if (data) {
 	    hartid = *(int *)data;
@@ -202,6 +200,7 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_clint0) = {
     .clint_vtable.interrupt_enable   = __metal_driver_riscv_clint0_enable,
     .clint_vtable.interrupt_disable  = __metal_driver_riscv_clint0_disable,
     .clint_vtable.command_request    = __metal_driver_riscv_clint0_command_request,
+    .clint_vtable.mtimecmp_set       = __metal_driver_riscv_clint0_mtimecmp_set,
 };
 
 #endif /* METAL_RISCV_CLINT0 */

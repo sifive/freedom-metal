@@ -318,8 +318,13 @@ unsigned long long __metal_clic0_mtime_get (struct __metal_driver_sifive_clic0 *
     return (((unsigned long long)hi) << 32) | lo;
 }
 
-int __metal_clic0_mtime_set (struct __metal_driver_sifive_clic0 *clic, unsigned long long time)
+int __metal_driver_sifive_clic0_mtimecmp_set(struct interrupt_controller *controller,
+                                             int hartid,
+                                             unsigned long long time)
 {   
+    struct __metal_driver_sifive_clic0 *clic =
+                              (struct __metal_driver_sifive_clic0 *)(controller);
+
     unsigned long control_base = __metal_driver_sifive_clic0_control_base((struct metal_interrupt *)clic);
     /* Per spec, the RISC-V MTIME/MTIMECMP registers are 64 bit,
      * and are NOT internally latched for multiword transfers.
@@ -327,9 +332,9 @@ int __metal_clic0_mtime_set (struct __metal_driver_sifive_clic0 *clic, unsigned 
      * spurious interrupts: For that set the high word to a max
      * value first.
      */
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + METAL_SIFIVE_CLIC0_MTIMECMP_BASE + 4)) = 0xFFFFFFFF;
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + METAL_SIFIVE_CLIC0_MTIMECMP_BASE)) = (__metal_io_u32)time;
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + METAL_SIFIVE_CLIC0_MTIMECMP_BASE + 4)) = (__metal_io_u32)(time >> 32);
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + (8 * hartid) + METAL_SIFIVE_CLIC0_MTIMECMP_BASE + 4)) = 0xFFFFFFFF;
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + (8 * hartid) + METAL_SIFIVE_CLIC0_MTIMECMP_BASE)) = (__metal_io_u32)time;
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base + (8 * hartid) + METAL_SIFIVE_CLIC0_MTIMECMP_BASE + 4)) = (__metal_io_u32)(time >> 32);
     return 0;
 }
 
@@ -509,12 +514,6 @@ int __metal_driver_sifive_clic0_command_request (struct metal_interrupt *control
             rc = 0;
         }
         break;
-    case METAL_TIMER_MTIME_SET:
-        if (data) {
-	    __metal_clic0_mtime_set(clic, *(unsigned long long *)data);
-            rc = 0;
-        }
-        break;
     case METAL_SOFTWARE_IPI_CLEAR:
 	if (data) {
 	    hartid = *(int *)data;
@@ -559,6 +558,7 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
     .clic_vtable.interrupt_vector_enable   = __metal_driver_sifive_clic0_enable_interrupt_vector,
     .clic_vtable.interrupt_vector_disable  = __metal_driver_sifive_clic0_disable_interrupt_vector,
     .clic_vtable.command_request    = __metal_driver_sifive_clic0_command_request,
+    .clic_vtable.mtimecmp_set       = __metal_driver_sifive_clic0_mtimecmp_set,
 };
 
 #endif /* METAL_SIFIVE_CLIC0 */
