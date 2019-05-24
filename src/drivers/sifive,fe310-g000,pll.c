@@ -1,6 +1,10 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/machine/platform.h>
+
+#ifdef METAL_SIFIVE_FE310_G000_PLL
+
 #include <stdio.h>
 #include <limits.h>
 
@@ -119,6 +123,8 @@ static const struct pll_config_t pll_configs[] = {
 
 #define PLL_CONFIG_NOT_VALID -1
 
+void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe310_g000_pll *pll);
+
 /* Given the rate of the PLL input frequency and a PLL configuration, what
  * will the resulting PLL output frequency be?
  * Arguments:
@@ -139,15 +145,21 @@ static long get_pll_config_freq(long pll_input_rate, const struct pll_config_t *
 
 static void metal_sifive_fe310_g000_pll_init(void) __attribute__((constructor));
 static void metal_sifive_fe310_g000_pll_init(void) {
+    long init_rate = __metal_driver_sifive_fe310_g000_pll_init_rate();
     /* If the PLL init_rate is zero, don't initialize the PLL */
-    if(__METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE->init_rate != 0)
+    if(init_rate != 0)
         __metal_driver_sifive_fe310_g000_pll_init(__METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE);
 }
 
 #endif /* __METAL_DT_SIFIVE_FE310_G000__PLL_HANDLE */
 
 void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe310_g000_pll *pll) {
-    __metal_io_u32 *pllcfg = (__metal_io_u32 *) (pll->config_base->base + pll->config_offset);
+    struct metal_clock *pllref = __metal_driver_sifive_fe310_g000_pll_pllref(&(pll->clock));
+    long init_rate = __metal_driver_sifive_fe310_g000_pll_init_rate();
+    long config_offset = __metal_driver_sifive_fe310_g000_pll_config_offset();
+    long base = __metal_driver_sifive_fe310_g000_prci_base();
+
+    __metal_io_u32 *pllcfg = (__metal_io_u32 *) (base + config_offset);
 
     /* If the PLL clock has had a _pre_rate_change_callback configured, call it */
     if(pll->clock._pre_rate_change_callback != NULL)
@@ -158,13 +170,13 @@ void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe31
         __METAL_ACCESS_ONCE(pllcfg) &= ~(PLL_SEL);
 
     /* Make sure we're running off of the external oscillator for stability */
-    if(pll->pllref != NULL)
+    if(pllref != NULL)
         __METAL_ACCESS_ONCE(pllcfg) |= PLL_REFSEL;
 
     /* Configure the PLL to run at the requested init frequency.
      * Using the vtable instead of the user API because we want to control
      * when the callbacks occur. */
-    pll->vtable->clock.set_rate_hz(&(pll->clock), pll->init_rate);
+    pll->clock.vtable->set_rate_hz(&(pll->clock), init_rate);
 
     /* If the PLL clock has had a rate_change_callback configured, call it */
     if(pll->clock._post_rate_change_callback != NULL)
@@ -173,18 +185,28 @@ void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe31
 
 long __metal_driver_sifive_fe310_g000_pll_get_rate_hz(const struct metal_clock *clock)
 {
-    struct __metal_driver_sifive_fe310_g000_pll *clk = (void *)clock;
-    long cfg = clk->config_base->vtable->get_reg(clk->config_base, clk->config_offset);
-    long div = clk->config_base->vtable->get_reg(clk->divider_base, clk->divider_offset);
+    struct metal_clock *pllref = __metal_driver_sifive_fe310_g000_pll_pllref(clock);
+    struct metal_clock *pllsel0 = __metal_driver_sifive_fe310_g000_pll_pllsel0(clock);
+    long config_offset = __metal_driver_sifive_fe310_g000_pll_config_offset(clock);
+    struct __metal_driver_sifive_fe310_g000_prci *config_base =
+      __metal_driver_sifive_fe310_g000_pll_config_base(clock);
+    long divider_offset = __metal_driver_sifive_fe310_g000_pll_divider_offset(clock);
+    struct __metal_driver_sifive_fe310_g000_prci *divider_base =
+      __metal_driver_sifive_fe310_g000_pll_divider_base(clock);
+    struct __metal_driver_vtable_sifive_fe310_g000_prci *vtable =
+      __metal_driver_sifive_fe310_g000_prci_vtable();
+
+    long cfg = vtable->get_reg(config_base, config_offset);
+    long div = vtable->get_reg(divider_base, divider_offset);
 
     /* At the end of the PLL there's one big mux: it either selects the HFROSC
      * (bypassing the PLL entirely) or uses the PLL. */
     if (__METAL_GET_FIELD(cfg, PLL_SEL) == 0)
-        return metal_clock_get_rate_hz(clk->pllsel0);
+        return metal_clock_get_rate_hz(pllsel0);
 
     /* There's a clock mux before the PLL that selects between the HFROSC adn
      * the HFXOSC as the PLL's input clock. */
-    long ref_hz = metal_clock_get_rate_hz(__METAL_GET_FIELD(cfg, PLL_REFSEL) ? clk->pllref : clk->pllsel0);
+    long ref_hz = metal_clock_get_rate_hz(__METAL_GET_FIELD(cfg, PLL_REFSEL) ? pllref : pllsel0);
 
     /* It's possible to bypass the PLL, which is an internal bpyass.  This
      * still obays the PLL's input clock mu. */
@@ -276,9 +298,14 @@ static void configure_pll(__metal_io_u32 *pllcfg, __metal_io_u32 *plloutdiv, con
 
 long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock *clock, long rate)
 {
-    struct __metal_driver_sifive_fe310_g000_pll *clk = (void *)clock;
-    __metal_io_u32 *pllcfg = (__metal_io_u32 *) (clk->config_base->base + clk->config_offset);
-    __metal_io_u32 *plloutdiv = (__metal_io_u32 *) (clk->divider_base->base + clk->divider_offset);
+    struct metal_clock *pllref = __metal_driver_sifive_fe310_g000_pll_pllref(clock);
+    struct metal_clock *pllsel0 = __metal_driver_sifive_fe310_g000_pll_pllsel0(clock);
+    long config_offset = __metal_driver_sifive_fe310_g000_pll_config_offset(clock);
+    long divider_offset = __metal_driver_sifive_fe310_g000_pll_divider_offset(clock);
+    long base = __metal_driver_sifive_fe310_g000_prci_base();
+
+    __metal_io_u32 *pllcfg = (__metal_io_u32 *) (base + config_offset);
+    __metal_io_u32 *plloutdiv = (__metal_io_u32 *) (base + divider_offset);
 
     /* We can't modify the PLL if coreclk is driven by it, so switch it off */
     if (__METAL_ACCESS_ONCE(pllcfg) & PLL_SEL)
@@ -286,7 +313,7 @@ long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock *clock,
 
     /* There's a clock mux before the PLL that selects between the HFROSC and
      * the HFXOSC as the PLL's input clock. */
-    long ref_hz = metal_clock_get_rate_hz(__METAL_ACCESS_ONCE(pllcfg) & PLL_REFSEL ? clk->pllref : clk->pllsel0);
+    long ref_hz = metal_clock_get_rate_hz(__METAL_ACCESS_ONCE(pllcfg) & PLL_REFSEL ? pllref : pllsel0);
 
     /* if the desired rate is within 75%-125% of the input clock, bypass the PLL */
     if((ref_hz * 3 / 4) <= rate && (ref_hz * 5 / 4) >= rate)
@@ -317,9 +344,17 @@ long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock *clock,
 static void use_hfxosc(void) __attribute__((constructor));
 static void use_hfxosc(void)
 {
+    long init_rate = __metal_driver_sifive_fe310_g000_pll_init_rate();
     metal_clock_set_rate_hz(
-        &__METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE->clock,
-        __METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE->init_rate
+        &__METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE->clock, init_rate
     );
 }
 #endif
+
+__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_fe310_g000_pll) = {
+    .init = __metal_driver_sifive_fe310_g000_pll_init,
+    .clock.get_rate_hz = __metal_driver_sifive_fe310_g000_pll_get_rate_hz,
+    .clock.set_rate_hz = __metal_driver_sifive_fe310_g000_pll_set_rate_hz,
+};
+
+#endif /* METAL_SIFIVE_FE310_G000_PLL */

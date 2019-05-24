@@ -1,20 +1,6 @@
 # Copyright 2018 SiFive, Inc
 # SPDX-License-Identifier: Apache-2.0
 
-# Every C compilation depends on the machine header.  This is a bit of a hack:
-# instead of enforcing the dependency on the .o we pretend that the C file
-# itself depends on the header.  This is the only way I could figure out that
-# would satisfy the dependency inside automake.
-%.c: metal/machine/@MACHINE_NAME@.h
-%.S: metal/machine/@MACHINE_NAME@.h
-%.o: metal/machine/@MACHINE_NAME@.h
-%.c: riscv__menv__metal.specs
-%.S: riscv__menv__metal.specs
-%.o: riscv__menv__metal.specs
-%.c: riscv__mmachine__@MACHINE_NAME@.specs
-%.S: riscv__mmachine__@MACHINE_NAME@.specs
-%.o: riscv__mmachine__@MACHINE_NAME@.specs
-
 # Every test depends on the generated linker script.
 $(check_PROGRAMS): riscv__mmachine__@MACHINE_NAME@.lds
 
@@ -68,8 +54,8 @@ endif # PRECONFIGURED
 # Install some METAL-specific headers, one of which is automatically generated.
 # The files that aren't automatically generated are the same for all machines.
 nobase_include_HEADERS = \
-	metal/machine/@MACHINE_NAME@.h \
 	metal/drivers/fixed-clock.h \
+	metal/drivers/fixed-factor-clock.h \
 	metal/drivers/riscv,clint0.h \
 	metal/drivers/riscv,cpu.h \
 	metal/drivers/riscv,plic0.h \
@@ -78,6 +64,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive,fe310-g000,hfxosc.h \
 	metal/drivers/sifive,fe310-g000,pll.h \
 	metal/drivers/sifive,fe310-g000,prci.h \
+	metal/drivers/sifive,fu540-c000,l2.h \
 	metal/drivers/sifive,global-external-interrupts0.h \
 	metal/drivers/sifive,gpio-buttons.h \
 	metal/drivers/sifive,gpio-leds.h \
@@ -87,7 +74,10 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive,spi0.h \
 	metal/drivers/sifive,test0.h \
 	metal/drivers/sifive,uart0.h \
+	metal/machine/inline.h \
+	metal/machine/platform.h \
 	metal/button.h \
+	metal/cache.h \
 	metal/clock.h \
 	metal/compiler.h \
 	metal/cpu.h \
@@ -96,9 +86,12 @@ nobase_include_HEADERS = \
 	metal/io.h \
 	metal/itim.h \
 	metal/led.h \
+	metal/lock.h \
 	metal/machine.h \
+	metal/memory.h \
 	metal/pmp.h \
-    metal/riscv_asm.h \
+  metal/riscv_asm.h \
+	metal/privilege.h \
 	metal/shutdown.h \
 	metal/spi.h \
 	metal/switch.h \
@@ -107,9 +100,18 @@ nobase_include_HEADERS = \
 	metal/uart.h
 
 if PRECONFIGURED
-metal/machine/@MACHINE_NAME@.h: @MACHINE_HEADER@
+metal/machine.h: @MACHINE_HEADER@
 	@mkdir -p $(dir $@)
 	cp $< $@
+
+metal/machine/inline.h: @MACHINE_INLINE@
+	@mkdir -p $(dir $@)
+	cp $< $@
+
+metal/machine/platform.h: @PLATFORM_HEADER@
+	@mkdir -p $(dir $@)
+	cp $< $@
+
 else # !PRECONFIGURED
 # Builds the machine-specific METAL header file, which paramaterizes the METAL for
 # one specific machine.  This is automatically picked up by GCC so users
@@ -119,9 +121,14 @@ else # !PRECONFIGURED
 @MACHINE_NAME@.dtb: @DTC@ @MACHINE_DTS@
 	$< $(filter %.dts,$^) -o $@ -O dtb -I dts
 
-metal/machine/@MACHINE_NAME@.h: @METAL_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
+metal/machine.h: @METAL_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
 	@mkdir -p $(dir $@)
 	$< --dtb $(filter %.dtb,$^) --output $@
+
+metal/machine/platform.h: @BARE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
+	@mkdir -p $(dir $@)
+	$< -d $(filter %.dtb,$^) -o $@
+
 endif # PRECONFIGURED
 
 # Quash an automake warning.
@@ -135,8 +142,18 @@ lib_LIBRARIES += libriscv__mmachine__@MACHINE_NAME@.a
 libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS  = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
 
+# This will generate these sources before the compilation step
+BUILT_SOURCES = \
+	metal/machine.h \
+	metal/machine/inline.h \
+	metal/machine/platform.h \
+	riscv__menv__metal.specs \
+	riscv__mmachine__@MACHINE_NAME@.specs
+
 libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/fixed-clock.c \
+	src/drivers/fixed-factor-clock.c \
+	src/drivers/inline.c \
 	src/drivers/riscv,clint0.c \
 	src/drivers/riscv,cpu.c \
 	src/drivers/riscv,plic0.c \
@@ -161,11 +178,15 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/gpio.c \
 	src/interrupt.c \
 	src/led.c \
+	src/lock.c \
+	src/memory.c \
 	src/pmp.c \
+	src/privilege.c \
 	src/shutdown.c \
 	src/spi.c \
 	src/switch.c \
 	src/timer.c \
+	src/trap.S \
 	src/tty.c \
 	src/uart.c
 
@@ -236,5 +257,6 @@ hello_LDFLAGS         = -L. -Wl,--gc-sections -Wl,-Map=hello.map
 # Extra clean targets
 clean-local:
 	-rm -rf @MACHINE_NAME@.mk
-	-rm -rf metal/machine/@MACHINE_NAME@.h @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
+	-rm -rf metal/machine.h metal/machine/platform.h
+	-rm -rf @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
 	-rm -rf *.map *.specs

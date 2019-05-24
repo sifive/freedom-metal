@@ -37,6 +37,7 @@ struct metal_interrupt_vtable {
                                    int id, metal_vector_mode mode);
     int (*interrupt_vector_disable)(struct metal_interrupt *controller, int id);
     int (*command_request)(struct metal_interrupt *controller, int cmd, void *data);
+    int (*mtimecmp_set)(struct metal_interrupt *controller, int hartid, unsigned long long time);
 };
 
 /*!
