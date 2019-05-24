@@ -98,6 +98,7 @@ nobase_include_HEADERS = \
 	metal/led.h \
 	metal/machine.h \
 	metal/pmp.h \
+    metal/riscv_asm.h \
 	metal/shutdown.h \
 	metal/spi.h \
 	metal/switch.h \
