@@ -318,7 +318,7 @@ unsigned long long __metal_clic0_mtime_get (struct __metal_driver_sifive_clic0 *
     return (((unsigned long long)hi) << 32) | lo;
 }
 
-int __metal_driver_sifive_clic0_mtimecmp_set(struct interrupt_controller *controller,
+int __metal_driver_sifive_clic0_mtimecmp_set(struct metal_interrupt *controller,
                                              int hartid,
                                              unsigned long long time)
 {   
