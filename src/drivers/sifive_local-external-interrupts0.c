@@ -6,7 +6,7 @@
 #ifdef METAL_SIFIVE_LOCAL_EXTERNAL_INTERRUPTS0
 
 #include <metal/io.h>
-#include <metal/drivers/sifive,local-external-interrupts0.h>
+#include <metal/drivers/sifive_local-external-interrupts0.h>
 #include <metal/machine.h>
 
 void __metal_driver_sifive_local_external_interrupt_init(struct metal_interrupt *controller)

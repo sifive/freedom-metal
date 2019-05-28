@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <metal/io.h>
 #include <metal/shutdown.h>
-#include <metal/drivers/sifive,clic0.h>
+#include <metal/drivers/sifive_clic0.h>
 #include <metal/machine.h>
 
 typedef enum metal_priv_mode_ {

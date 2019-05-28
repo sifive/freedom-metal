@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_FE310_G000_HFROSC
 
-#include <metal/drivers/sifive,fe310-g000,hfrosc.h>
+#include <metal/drivers/sifive_fe310-g000_hfrosc.h>
 #include <metal/machine.h>
 
 #define CONFIG_DIVIDER 0x0000003FUL

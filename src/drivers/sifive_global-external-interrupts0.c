@@ -7,7 +7,7 @@
 
 #include <metal/io.h>
 #include <metal/shutdown.h>
-#include <metal/drivers/sifive,global-external-interrupts0.h>
+#include <metal/drivers/sifive_global-external-interrupts0.h>
 #include <metal/machine.h>
 
 void __metal_driver_sifive_global_external_interrupt_init(struct metal_interrupt *controller)

@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_TEST0
 
-#include <metal/drivers/sifive,test0.h>
+#include <metal/drivers/sifive_test0.h>
 #include <metal/io.h>
 #include <stdint.h>
 #include <metal/machine.h>

@@ -6,8 +6,8 @@
 #ifdef METAL_SIFIVE_GPIO_SWITCHES
 
 #include <string.h>
-#include <metal/drivers/riscv,cpu.h>
-#include <metal/drivers/sifive,gpio-switches.h>
+#include <metal/drivers/riscv_cpu.h>
+#include <metal/drivers/sifive_gpio-switches.h>
 #include <metal/machine.h>
 
 int  __metal_driver_switch_exist (struct metal_switch *flip, char *label)

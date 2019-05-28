@@ -9,7 +9,7 @@
 struct __metal_driver_sifive_fe310_g000_pll;
 
 #include <metal/clock.h>
-#include <metal/drivers/sifive,fe310-g000,prci.h>
+#include <metal/drivers/sifive_fe310-g000_prci.h>
 #include <metal/machine.h>
 
 struct __metal_driver_vtable_sifive_fe310_g000_pll {

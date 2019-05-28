@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_FE310_G000_HFXOSC
 
-#include <metal/drivers/sifive,fe310-g000,hfxosc.h>
+#include <metal/drivers/sifive_fe310-g000_hfxosc.h>
 #include <metal/machine.h>
 
 #define CONFIG_ENABLE  0x40000000UL

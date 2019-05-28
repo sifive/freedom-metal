@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_GPIO0
 
-#include <metal/drivers/sifive,gpio0.h>
+#include <metal/drivers/sifive_gpio0.h>
 #include <metal/io.h>
 #include <metal/machine.h>
 

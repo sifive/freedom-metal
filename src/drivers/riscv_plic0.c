@@ -7,7 +7,7 @@
 
 #include <metal/io.h>
 #include <metal/shutdown.h>
-#include <metal/drivers/riscv,plic0.h>
+#include <metal/drivers/riscv_plic0.h>
 #include <metal/machine.h>
 
 unsigned int __metal_plic0_claim_interrupt (struct __metal_driver_riscv_plic0 *plic)

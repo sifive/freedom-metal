@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_UART0
 
-#include <metal/drivers/sifive,uart0.h>
+#include <metal/drivers/sifive_uart0.h>
 #include <metal/machine.h>
 
 /* TXDATA Fields */

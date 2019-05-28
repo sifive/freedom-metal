@@ -6,8 +6,8 @@
 #ifdef METAL_SIFIVE_GPIO_BUTTONS
 
 #include <string.h>
-#include <metal/drivers/riscv,cpu.h>
-#include <metal/drivers/sifive,gpio-buttons.h>
+#include <metal/drivers/riscv_cpu.h>
+#include <metal/drivers/sifive_gpio-buttons.h>
 #include <metal/machine.h>
 
 int  __metal_driver_button_exist (struct metal_button *button, char *label)

@@ -4,7 +4,7 @@
 #ifndef METAL__DRIVERS__SIFIVE_FE310_G000_HFROSC_H
 #define METAL__DRIVERS__SIFIVE_FE310_G000_HFROSC_H
 
-#include <metal/drivers/sifive,fe310-g000,prci.h>
+#include <metal/drivers/sifive_fe310-g000_prci.h>
 #include <metal/compiler.h>
 #include <metal/clock.h>
 #include <metal/io.h>
