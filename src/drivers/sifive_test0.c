@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <metal/machine.h>
 
+void __metal_driver_sifive_test0_exit(const struct __metal_shutdown *sd, int code) __attribute__((noreturn));
 void __metal_driver_sifive_test0_exit(const struct __metal_shutdown *sd, int code)
 {
     long base = __metal_driver_sifive_test0_base();
