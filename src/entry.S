@@ -81,6 +81,7 @@ _enter:
 .align 2
 early_trap_vector:
     .cfi_startproc
+    csrr t0, mcause
     j early_trap_vector
     .cfi_endproc
 
