@@ -30,7 +30,7 @@
 #define METAL_SPI_DISABLE_RX          (1 << 3)
 
 #define METAL_SPI_FRAME_LEN_SHIFT     16
-#define METAL_SPI_FRAME_LEN_MASK      (0x1F << METAL_SPI_FRAME_LEN_SHIFT)
+#define METAL_SPI_FRAME_LEN_MASK      (0xF << METAL_SPI_FRAME_LEN_SHIFT)
 
 #define METAL_SPI_TXDATA_FULL         (1 << 31)
 #define METAL_SPI_RXDATA_EMPTY        (1 << 31)
@@ -77,13 +77,13 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
 
     /* Set Endianness */
     if(config->little_endian) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= (1 << METAL_SPI_ENDIAN_LSB);
+        METAL_SPI_REGW(METAL_SPI_REG_FMT) |= METAL_SPI_ENDIAN_LSB;
     } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(1 << METAL_SPI_ENDIAN_LSB);
+        METAL_SPI_REGW(METAL_SPI_REG_FMT) &= ~(METAL_SPI_ENDIAN_LSB);
     }
 
     /* Always populate receive FIFO */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(1 << METAL_SPI_DISABLE_RX);
+    METAL_SPI_REGW(METAL_SPI_REG_FMT) &= ~(METAL_SPI_DISABLE_RX);
 
     /* Set CS Active */
     if(config->cs_active_high) {
