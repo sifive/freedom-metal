@@ -28,6 +28,11 @@ _enter:
      * the boot process. */
     la t0, early_trap_vector
     csrw mtvec, t0
+    /* enable chicken bit if core is bullet series*/
+    la t0, __metal_chicken_bit
+    beqz t0, 1f
+    csrwi 0x7C1, 0
+1:
 
     /* There may be pre-initialization routines inside the MBI code that run in
      * C, so here we set up a C environment.  First we set up a stack pointer,
