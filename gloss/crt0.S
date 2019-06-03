@@ -138,6 +138,7 @@ _skip_init:
   lui  a4, 0x2
   or   a5, a5, a4
   csrw mstatus, a5
+  csrwi fcsr, 0
 1:
 
   /* This is a C runtime, so main() is defined to have some arguments.  Since
