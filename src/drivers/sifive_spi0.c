@@ -126,11 +126,6 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
                                       char *tx_buf,
                                       char *rx_buf)
 {
-    /* Transmit and receive buffer must not be empty */
-    if (tx_buf == NULL || rx_buf == NULL) {
-        return 1;
-    }
-
     struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
     long control_base = __metal_driver_sifive_spi0_control_base(gspi);
     int rc = 0;
@@ -144,34 +139,20 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
     METAL_SPI_REGW(METAL_SPI_REG_CSMODE) |= METAL_SPI_CSMODE_HOLD;
 
-    /* Increase the maximum delay between two consecutive frames, in units of clock cycles 
-     * The purpose is to prevent the spi controller from deasserting the cs pin in between
-     * consecutive frames. By default 0 frame interval is allowed between frames. The delay
-     * between each iteration in the for loop is more than one clock cycle. 0xA means the
-     * maximum allowed inter-frame interval is 10 clock cycles.*/
-    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << METAL_SPI_INTERVAL_SHIFT); */
-    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) |= (0xF << METAL_SPI_INTERVAL_SHIFT); */
-
     /* Master send bytes to the slave */
-
-    /* temp_buffer is declared because I cannot modify the value TXDATA register twice by calling &=~ and then |=
-     * instead the final value is stored in temp_buffer, and TXDATA register's value 
-     * will be set to this temporary value */
-    unsigned long temp_buffer;
-
     for(int i = 0; i < len; i++) {
         /* Wait for TXFIFO to not be full */
-        while ((temp_buffer = METAL_SPI_REGW(METAL_SPI_REG_TXDATA)) & METAL_SPI_TXDATA_FULL);
+        while (METAL_SPI_REGW(METAL_SPI_REG_TXDATA) & METAL_SPI_TXDATA_FULL);
     
         /* Transfer byte by modifying the least significant byte in the TXDATA register */
-        temp_buffer &= ~(METAL_SPI_TXRXDATA_MASK);
-        temp_buffer |= tx_buf[i];
-        METAL_SPI_REGW(METAL_SPI_REG_TXDATA) = temp_buffer;
+        if (tx_buf) {
+            METAL_SPI_REGB(METAL_SPI_REG_TXDATA) = tx_buf[i];
+        } else {
+            /* Transfer a 0 byte if the sending buffer is NULL */
+            METAL_SPI_REGB(METAL_SPI_REG_TXDATA) = 0;
+        }
     }
     
-    /* Reset the maximum interframe delay to 0 clock cycle */
-    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << METAL_SPI_INTERVAL_SHIFT); */
-
     /* Master receive bytes from the slave */
     unsigned long rxdata;
     
@@ -185,15 +166,16 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
         while((rxdata = METAL_SPI_REGW(METAL_SPI_REG_RXDATA)) & METAL_SPI_RXDATA_EMPTY) {
             if (time(NULL) > endwait) {
                 /* if timeout, immediately stop receiving more bytes */
-                goto end_receive;
+                return 1;
             }
         }
-
-        rx_buf[i] = (char) (rxdata & METAL_SPI_TXRXDATA_MASK);
+        
+        /* Only store the dequeued byte if the receive_buffer is not NULL */
+        if (rx_buf) {
+            rx_buf[i] = (char) (rxdata & METAL_SPI_TXRXDATA_MASK);
+        }
     }
 
-    end_receive:
-    
     /* On the last byte, set CSMODE to auto so that the chip select transitions back to high
      * The reason that CS pin is not deasserted after transmitting out the byte buffer is timing.
      * The code on the host side likely executes faster than the ability of FIFO to send out bytes.
