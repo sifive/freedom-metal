@@ -149,13 +149,9 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
      * between each iteration in the for loop is more than one clock cycle. 0xA means the
      * maximum allowed inter-frame interval is 10 clock cycles.*/
     /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << METAL_SPI_INTERVAL_SHIFT); */
-    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) |= (0xA << METAL_SPI_INTERVAL_SHIFT); */
+    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) |= (0xF << METAL_SPI_INTERVAL_SHIFT); */
 
     /* Master send bytes to the slave */
-
-    /* Set the transmit watermark register to enqueue the bytes before sending out */
-    /** METAL_SPI_REGW(METAL_SPI_REG_TXMARK) &= ~(METAL_SPI_TXMARK_MASK); */
-    /** METAL_SPI_REGW(METAL_SPI_REG_TXMARK) |= len; */
 
     /* temp_buffer is declared because I cannot modify the value TXDATA register twice by calling &=~ and then |=
      * instead the final value is stored in temp_buffer, and TXDATA register's value 
@@ -171,10 +167,7 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
         temp_buffer |= tx_buf[i];
         METAL_SPI_REGW(METAL_SPI_REG_TXDATA) = temp_buffer;
     }
-
-    /* On the last byte, set CSMODE to auto so that the chip select transitions back to high */
-    METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
-
+    
     /* Reset the maximum interframe delay to 0 clock cycle */
     /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << METAL_SPI_INTERVAL_SHIFT); */
 
@@ -187,6 +180,13 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
 
         rx_buf[i] = (char) (rxdata & METAL_SPI_TXRXDATA_MASK);
     }
+    
+    /* On the last byte, set CSMODE to auto so that the chip select transitions back to high
+     * The reason that CS pin is not deasserted after transmitting out the byte buffer is timing.
+     * The code on the host side likely executes faster than the ability of FIFO to send out bytes.
+     * After the host iterates through the array, fifo is likely not cleared yet. If host deasserts
+     * the CS pin immediately, the following bytes in the output FIFO will not be sent consecutively. */
+    METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
 
     return 0;
 }
