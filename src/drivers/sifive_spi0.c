@@ -38,6 +38,8 @@
 #define METAL_SPI_TXWM                1
 #define METAL_SPI_TXRXDATA_MASK       (0xFF)
 
+#define METAL_SPI_INTERVAL_SHIFT      16
+
 #define METAL_SPI_CONTROL_IO          0
 #define METAL_SPI_CONTROL_MAPPED      1
 
@@ -51,18 +53,18 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
     /* Set protocol */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     switch(config->protocol) {
-    case METAL_SPI_SINGLE:
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
-        break;
-    case METAL_SPI_DUAL:
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
-        break;
-    case METAL_SPI_QUAD:
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
-        break;
-    default:
-        /* Unsupported value */
-        return -1;
+        case METAL_SPI_SINGLE:
+            METAL_SPI_REGW(METAL_SPI_REG_FMT) |= METAL_SPI_PROTO_SINGLE;
+            break;
+        case METAL_SPI_DUAL:
+            METAL_SPI_REGW(METAL_SPI_REG_FMT) |= METAL_SPI_PROTO_DUAL;
+            break;
+        case METAL_SPI_QUAD:
+            METAL_SPI_REGW(METAL_SPI_REG_FMT) |= METAL_SPI_PROTO_QUAD;
+            break;
+        default:
+            /* Unsupported value */
+            return -1;
     }
 
     /* Set Polarity */
@@ -131,7 +133,6 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
     long control_base = __metal_driver_sifive_spi0_control_base(gspi);
     int rc = 0;
-    int rxdata = 0;
 
     rc = configure_spi(spi, config);
     if(rc != 0) {
@@ -147,8 +148,8 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
      * consecutive frames. By default 0 frame interval is allowed between frames. The delay
      * between each iteration in the for loop is more than one clock cycle. 0xA means the
      * maximum allowed inter-frame interval is 10 clock cycles.*/
-    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << 16); */
-    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) |= (0xA << 16); */
+    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << METAL_SPI_INTERVAL_SHIFT); */
+    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) |= (0xA << METAL_SPI_INTERVAL_SHIFT); */
 
     /* Master send bytes to the slave */
 
@@ -156,25 +157,31 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     /** METAL_SPI_REGW(METAL_SPI_REG_TXMARK) &= ~(METAL_SPI_TXMARK_MASK); */
     /** METAL_SPI_REGW(METAL_SPI_REG_TXMARK) |= len; */
 
-    for(int i = 0; i < len; i++) {
+    /* temp_buffer is declared because I cannot modify the value TXDATA register twice by calling &=~ and then |=
+     * instead the final value is stored in temp_buffer, and TXDATA register's value 
+     * will be set to this temporary value */
+    unsigned long temp_buffer;
 
+    for(int i = 0; i < len; i++) {
         /* Wait for TXFIFO to not be full */
-        while(METAL_SPI_REGW(METAL_SPI_REG_TXDATA) & METAL_SPI_TXDATA_FULL);
+        while ((temp_buffer = METAL_SPI_REGW(METAL_SPI_REG_TXDATA)) & METAL_SPI_TXDATA_FULL);
     
-        /* Transfer byte */
-        METAL_SPI_REGW(METAL_SPI_REG_TXDATA) &= ~(METAL_SPI_TXRXDATA_MASK);
-        METAL_SPI_REGW(METAL_SPI_REG_TXDATA) |= tx_buf[i];
+        /* Transfer byte by modifying the least significant byte in the TXDATA register */
+        temp_buffer &= ~(METAL_SPI_TXRXDATA_MASK);
+        temp_buffer |= tx_buf[i];
+        METAL_SPI_REGW(METAL_SPI_REG_TXDATA) = temp_buffer;
     }
 
     /* On the last byte, set CSMODE to auto so that the chip select transitions back to high */
     METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
 
     /* Reset the maximum interframe delay to 0 clock cycle */
-    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << 16); */
+    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << METAL_SPI_INTERVAL_SHIFT); */
 
     /* Master receive bytes from the slave */
-    for (int i = 0; i < len; i++) {
+    unsigned long rxdata;
 
+    for (int i = 0; i < len; i++) {
         /* Wait for RXFIFO to not be empty */
         while((rxdata = METAL_SPI_REGW(METAL_SPI_REG_RXDATA)) & METAL_SPI_RXDATA_EMPTY);
 
