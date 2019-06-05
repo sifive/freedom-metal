@@ -34,11 +34,9 @@
 
 #define METAL_SPI_TXDATA_FULL         (1 << 31)
 #define METAL_SPI_RXDATA_EMPTY        (1 << 31)
-#define METAL_SPI_TXMARK_MASK         3
+#define METAL_SPI_TXMARK_MASK         7
 #define METAL_SPI_TXWM                1
-#define METAL_SPI_TXRXDATA_MASK	      (0xFF)
-
-#define METAL_SPI_WATERMARK_MASK	  7
+#define METAL_SPI_TXRXDATA_MASK       (0xFF)
 
 #define METAL_SPI_CONTROL_IO          0
 #define METAL_SPI_CONTROL_MAPPED      1
@@ -114,7 +112,7 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
      * reset cores, reset $pc, set *((int *) 0x20004060) = 0, (set the flash
      * interface control register to programmable I/O mode) and then continue
      * Alternative, comment out the "flash" line in openocd.cfg */
-	METAL_SPI_REGW(METAL_SPI_REG_FCTRL) = METAL_SPI_CONTROL_IO;
+    METAL_SPI_REGW(METAL_SPI_REG_FCTRL) = METAL_SPI_CONTROL_IO;
 
     return 0;
 }
@@ -125,10 +123,10 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
                                       char *tx_buf,
                                       char *rx_buf)
 {
-	/* Transmit and receive buffer must not be empty */
-	if (tx_buf == NULL || rx_buf == NULL) {
-		return 1;
-	}
+    /* Transmit and receive buffer must not be empty */
+    if (tx_buf == NULL || rx_buf == NULL) {
+        return 1;
+    }
 
     struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
     long control_base = __metal_driver_sifive_spi0_control_base(gspi);
@@ -142,47 +140,46 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
 
     /* Hold the chip select line for all len transferred */
     METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
-	METAL_SPI_REGW(METAL_SPI_REG_CSMODE) |= METAL_SPI_CSMODE_HOLD;
+    METAL_SPI_REGW(METAL_SPI_REG_CSMODE) |= METAL_SPI_CSMODE_HOLD;
 
-	/* Increase the maximum delay between two consecutive frames, in units of clock cycles 
-	 * The purpose is to prevent the spi controller from deasserting the cs pin in between
-	 * consecutive frames. By default 0 frame interval is allowed between frames. The delay
-	 * between each iteration in the for loop is more than one clock cycle. 0xA means the
-	 * maximum allowed inter-frame interval is 10 clock cycles.*/
-	/** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << 16); */
-	/** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) |= (0xA << 16); */
+    /* Increase the maximum delay between two consecutive frames, in units of clock cycles 
+     * The purpose is to prevent the spi controller from deasserting the cs pin in between
+     * consecutive frames. By default 0 frame interval is allowed between frames. The delay
+     * between each iteration in the for loop is more than one clock cycle. 0xA means the
+     * maximum allowed inter-frame interval is 10 clock cycles.*/
+    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << 16); */
+    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) |= (0xA << 16); */
 
     /* Master send bytes to the slave */
 
-	/* Set the transmit watermark register to enqueue the bytes before sending out */
-	METAL_SPI_REGW(METAL_SPI_REG_TXMARK) &= ~(METAL_SPI_WATERMARK_MASK);
-	METAL_SPI_REGW(METAL_SPI_REG_TXMARK) |= len;
-	int temp = METAL_SPI_REGW(METAL_SPI_REG_TXMARK);
+    /* Set the transmit watermark register to enqueue the bytes before sending out */
+    /** METAL_SPI_REGW(METAL_SPI_REG_TXMARK) &= ~(METAL_SPI_TXMARK_MASK); */
+    /** METAL_SPI_REGW(METAL_SPI_REG_TXMARK) |= len; */
 
     for(int i = 0; i < len; i++) {
 
-		/* Wait for TXFIFO to not be full */
-		while(METAL_SPI_REGW(METAL_SPI_REG_TXDATA) & METAL_SPI_TXDATA_FULL);
-	
-		/* Transfer byte */
-		METAL_SPI_REGW(METAL_SPI_REG_TXDATA) &= ~(METAL_SPI_TXRXDATA_MASK);
-	    METAL_SPI_REGW(METAL_SPI_REG_TXDATA) |= tx_buf[i];
+        /* Wait for TXFIFO to not be full */
+        while(METAL_SPI_REGW(METAL_SPI_REG_TXDATA) & METAL_SPI_TXDATA_FULL);
+    
+        /* Transfer byte */
+        METAL_SPI_REGW(METAL_SPI_REG_TXDATA) &= ~(METAL_SPI_TXRXDATA_MASK);
+        METAL_SPI_REGW(METAL_SPI_REG_TXDATA) |= tx_buf[i];
     }
 
-	/* On the last byte, set CSMODE to auto so that the chip select transitions back to high */
-	METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
+    /* On the last byte, set CSMODE to auto so that the chip select transitions back to high */
+    METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
 
-	/* Reset the maximum interframe delay to 0 clock cycle */
-	/** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << 16); */
+    /* Reset the maximum interframe delay to 0 clock cycle */
+    /** METAL_SPI_REGW(METAL_SPI_REG_DELAY1) &= ~(0xFF << 16); */
 
     /* Master receive bytes from the slave */
     for (int i = 0; i < len; i++) {
 
-		/* Wait for RXFIFO to not be empty */
-		while((rxdata = METAL_SPI_REGW(METAL_SPI_REG_RXDATA)) & METAL_SPI_RXDATA_EMPTY);
+        /* Wait for RXFIFO to not be empty */
+        while((rxdata = METAL_SPI_REGW(METAL_SPI_REG_RXDATA)) & METAL_SPI_RXDATA_EMPTY);
 
-		rx_buf[i] = (char) (rxdata & METAL_SPI_TXRXDATA_MASK);
-	}
+        rx_buf[i] = (char) (rxdata & METAL_SPI_TXRXDATA_MASK);
+    }
 
     return 0;
 }
@@ -217,6 +214,7 @@ int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_ra
         METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
         METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |= (div & METAL_SPI_SCKDIV_MASK);
     }
+    
     return 0;
 }
 
