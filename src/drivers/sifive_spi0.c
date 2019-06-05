@@ -4,7 +4,6 @@
 #include <metal/machine/platform.h>
 
 #ifdef METAL_SIFIVE_SPI0
-
 #include <metal/drivers/sifive_spi0.h>
 #include <metal/io.h>
 #include <metal/machine.h>
@@ -46,6 +45,8 @@
 #define METAL_SPI_REG(offset)   (((unsigned long)control_base + offset))
 #define METAL_SPI_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_SPI_REG(offset)))
 #define METAL_SPI_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_SPI_REG(offset)))
+
+#define METAL_SPI_RXDATA_TIMEOUT      1
 
 static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_spi_config *config)
 {
@@ -173,19 +174,32 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
 
     /* Master receive bytes from the slave */
     unsigned long rxdata;
+    
+    /* Declare time_t variables to break out of infinite while loop */
+    time_t endwait; 
 
     for (int i = 0; i < len; i++) {
-        /* Wait for RXFIFO to not be empty */
-        while((rxdata = METAL_SPI_REGW(METAL_SPI_REG_RXDATA)) & METAL_SPI_RXDATA_EMPTY);
+        /* Wait for RXFIFO to not be empty, but break the nested loops if timeout, this timeout method 
+         * needs refining, preferably taking into account the device specs */
+        endwait = time(NULL) + METAL_SPI_RXDATA_TIMEOUT;
+        while((rxdata = METAL_SPI_REGW(METAL_SPI_REG_RXDATA)) & METAL_SPI_RXDATA_EMPTY) {
+            if (time(NULL) > endwait) {
+                /* if timeout, immediately stop receiving more bytes */
+                goto end_receive;
+            }
+        }
 
         rx_buf[i] = (char) (rxdata & METAL_SPI_TXRXDATA_MASK);
     }
+
+    end_receive:
     
     /* On the last byte, set CSMODE to auto so that the chip select transitions back to high
      * The reason that CS pin is not deasserted after transmitting out the byte buffer is timing.
      * The code on the host side likely executes faster than the ability of FIFO to send out bytes.
      * After the host iterates through the array, fifo is likely not cleared yet. If host deasserts
-     * the CS pin immediately, the following bytes in the output FIFO will not be sent consecutively. */
+     * the CS pin immediately, the following bytes in the output FIFO will not be sent consecutively. 
+     * There needs to be a better way to handle this. */
     METAL_SPI_REGW(METAL_SPI_REG_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
 
     return 0;
@@ -231,12 +245,7 @@ static void pre_rate_change_callback(void *priv)
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to zero and waiting until an interrupt is pending */
-<<<<<<< HEAD:src/drivers/sifive_spi0.c
-
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXMARK) &= ~(METAL_SPI_TXMARK_MASK);
-=======
-    METAL_SPI_REGW(METAL_SPI_REG_TXMARK) &= ~(METAL_SPI_TXMARK_MASK);
->>>>>>> Dequeue the receive FIFO after sending all data:src/drivers/sifive,spi0.c
 
     while((METAL_SPI_REGW(METAL_SIFIVE_SPI0_IP) & METAL_SPI_TXWM) == 0) ;
 }
