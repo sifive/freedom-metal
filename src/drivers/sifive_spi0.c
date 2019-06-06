@@ -53,16 +53,16 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
 {
     long control_base = __metal_driver_sifive_spi0_control_base((struct metal_spi *)spi);
     /* Set protocol */
-    METAL_SPI_REGB(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     switch(config->protocol) {
         case METAL_SPI_SINGLE:
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
             break;
         case METAL_SPI_DUAL:
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
             break;
         case METAL_SPI_QUAD:
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
             break;
         default:
             /* Unsupported value */
@@ -71,33 +71,33 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
 
     /* Set Polarity */
     if(config->polarity) {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_SCKMODE) |= (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |= (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
     } else {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
     }
 
     /* Set Phase */
     if(config->phase) {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_SCKMODE) |= (1 << METAL_SPI_SCKMODE_POL_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |= (1 << METAL_SPI_SCKMODE_POL_SHIFT);
     } else {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &= ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
     }
 
     /* Set Endianness */
     if(config->little_endian) {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_ENDIAN_LSB;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_ENDIAN_LSB;
     } else {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_ENDIAN_LSB);
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_ENDIAN_LSB);
     }
 
     /* Always populate receive FIFO */
-    METAL_SPI_REGB(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_DISABLE_RX);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_DISABLE_RX);
 
     /* Set CS Active */
     if(config->cs_active_high) {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_CSDEF) = 0;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 0;
     } else {
-        METAL_SPI_REGB(METAL_SIFIVE_SPI0_CSDEF) = 1;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 1;
     }
 
     /* Set frame length */
@@ -107,7 +107,7 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
     }
 
     /* Set CS line */
-    METAL_SPI_REGB(METAL_SIFIVE_SPI0_CSID) = config->csid;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = config->csid;
 
     /* Toggle off memory-mapped SPI flash mode, toggle on programmable IO mode
      * It seems that with this line uncommented, the debugger cannot have access 
@@ -116,7 +116,7 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
      * reset cores, reset $pc, set *((int *) 0x20004060) = 0, (set the flash
      * interface control register to programmable I/O mode) and then continue
      * Alternative, comment out the "flash" line in openocd.cfg */
-    METAL_SPI_REGB(METAL_SIFIVE_SPI0_FCTRL) = METAL_SPI_CONTROL_IO;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FCTRL) = METAL_SPI_CONTROL_IO;
 
     return 0;
 }
@@ -137,8 +137,8 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     }
 
     /* Hold the chip select line for all len transferred */
-    METAL_SPI_REGB(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
-    METAL_SPI_REGB(METAL_SIFIVE_SPI0_CSMODE) |= METAL_SPI_CSMODE_HOLD;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= METAL_SPI_CSMODE_HOLD;
 
     /* Master send bytes to the slave */
     for(int i = 0; i < len; i++) {
@@ -167,7 +167,7 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
         while((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) & METAL_SPI_RXDATA_EMPTY) {
             if (time(NULL) > endwait) {
                 /* if timeout, deassert the CS */
-                METAL_SPI_REGB(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
+                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
                 
                 /* if timeout, immediately stop receiving more bytes */
                 return 1;
@@ -186,7 +186,7 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
      * After the host iterates through the array, fifo is likely not cleared yet. If host deasserts
      * the CS pin immediately, the following bytes in the output FIFO will not be sent consecutively. 
      * There needs to be a better way to handle this. */
-    METAL_SPI_REGB(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
 
     return 0;
 }
