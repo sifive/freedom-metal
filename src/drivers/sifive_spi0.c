@@ -140,8 +140,14 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= METAL_SPI_CSMODE_HOLD;
 
-    /* Master send bytes to the slave */
+    unsigned long rxdata;
+    
+    /* Declare time_t variables to break out of infinite while loop */
+    time_t endwait;
+
     for(int i = 0; i < len; i++) {
+        /* Master send bytes to the slave */
+
         /* Wait for TXFIFO to not be full */
         while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL);
     
@@ -152,28 +158,24 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
             /* Transfer a 0 byte if the sending buffer is NULL */
             METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
         }
-    }
-    
-    /* Master receive bytes from the slave */
-    unsigned long rxdata;
-    
-    /* Declare time_t variables to break out of infinite while loop */
-    time_t endwait; 
 
-    for (int i = 0; i < len; i++) {
-        /* Wait for RXFIFO to not be empty, but break the nested loops if timeout, this timeout method 
-         * needs refining, preferably taking into account the device specs */
+        /* Master receives bytes from the RX FIFO */
+
+        /* Wait for RXFIFO to not be empty, but break the nested loops if timeout
+         * this timeout method  needs refining, preferably taking into account 
+         * the device specs */
         endwait = time(NULL) + METAL_SPI_RXDATA_TIMEOUT;
-        while((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) & METAL_SPI_RXDATA_EMPTY) {
+
+        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) & METAL_SPI_RXDATA_EMPTY) {
             if (time(NULL) > endwait) {
-                /* if timeout, deassert the CS */
+                /* If timeout, deassert the CS */
                 METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
-                
-                /* if timeout, immediately stop receiving more bytes */
+
+                /* If timeout, return error code 1 immediately */
                 return 1;
             }
         }
-        
+
         /* Only store the dequeued byte if the receive_buffer is not NULL */
         if (rx_buf) {
             rx_buf[i] = (char) (rxdata & METAL_SPI_TXRXDATA_MASK);
