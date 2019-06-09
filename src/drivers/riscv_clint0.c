@@ -176,6 +176,18 @@ int __metal_driver_riscv_clint0_command_request (struct metal_interrupt *control
 	    hartid = *(int *)data;
             __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base +
 					       (hartid * 4))) = METAL_ENABLE;
+	    /* Callers of this function assume it's blocking, in the sense that
+	     * the IPI is guarnteed to have been delivered before the function
+	     * returns.  We can't really guarnteed it's delivered, but we can
+	     * read back the control register after writing it in at least an
+	     * attempt to provide some semblence of ordering here.  The fence
+	     * ensures the read is order after the write -- it wouldn't be
+	     * necessary under RVWMO because this is the same address, but we
+	     * don't have an IO memory model so I'm being a bit overkill here.
+	     */
+	    __METAL_IO_FENCE(o,i);
+            rc = __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base +
+					       (hartid * 4)));
             rc = 0;
         }
         break;
