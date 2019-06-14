@@ -38,26 +38,42 @@ int __metal_driver_sifive_uart0_get_interrupt_id(struct metal_uart *uart)
     return (__metal_driver_sifive_uart0_interrupt_line(uart) + METAL_INTERRUPT_ID_GL0);
 }
 
-int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, unsigned char c)
+
+int __metal_driver_sifive_uart0_txready(struct metal_uart *uart)
+{
+  long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+
+  return !((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
+}
+
+
+int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, int c)
 {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
-    while ((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL) != 0) { }
-    UART_REGW(METAL_SIFIVE_UART0_TXDATA) = c;
+    while (!__metal_driver_sifive_uart0_txready(uart)) {
+		/* wait */
+	}
+	UART_REGW(METAL_SIFIVE_UART0_TXDATA) = c;
     return 0;
 }
 
-int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, unsigned char *c)
-{
-    uint32_t ch = UART_RXEMPTY;
-    long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
-    while (ch & UART_RXEMPTY) {
-        ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
+int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, int *c)
+{
+    uint32_t ch;
+	long control_base = __metal_driver_sifive_uart0_control_base(uart);
+    /* No seperate status register, we get status and the byte at same time */
+    ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);;
+    if( ch & UART_RXEMPTY ){
+      *c = -1; /* aka: EOF in most of the world */
+    } else {
+      *c = ch & 0x0ff;
     }
-    *c = ch & 0xff;
     return 0;
 }
+
 
 int __metal_driver_sifive_uart0_get_baud_rate(struct metal_uart *guart)
 {
