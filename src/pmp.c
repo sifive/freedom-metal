@@ -17,11 +17,19 @@ struct metal_pmp *metal_pmp_get_device(void)
 #endif
 }
 
-/* Calculate the address granularity  based on the position of the
- * least-significant 1 set in the address */
-static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
+/* This function calculates the minimum granularity from the address
+ * that pmpaddr takes on after writing all ones to pmpaddr when pmpcfg = 0.
+ *
+ * Detect the address granularity based on the position of the
+ * least-significant 1 set in the address.
+ *
+ * For example, if the value read from pmpaddr is 0x3ffffc00, the
+ * least-significant set bit is in bit 10 (counting from 0), resulting
+ * in a detected granularity of 2^(10 + 2) = 4096.
+ */
+static uintptr_t _get_detected_granularity(uintptr_t address) {
     if(address == 0) {
-        return 0;
+        return (uintptr_t) -1;
     }
 
     /* Get the index of the least significant set bit */
@@ -32,6 +40,27 @@ static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
 
     /* The granularity is equal to 2^(index + 2) bytes */
     return (1 << (index + 2));
+}
+
+/* This function calculates the granularity requested by the user's provided
+ * value for pmpaddr.
+ *
+ * Calculate the requested granularity based on the position of the
+ * least-significant unset bit.
+ *
+ * For example, if the requested address is 0x20009ff, the least-significant
+ * unset bit is at index 9 (counting from 0), resulting in a requested
+ * granularity of 2^(9 + 3) = 4096.
+ */
+static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
+    /* Get the index of the least significant unset bit */
+    int index = 0;
+    while(((address >> index) & 0x1) == 1) {
+        index += 1;
+    }
+
+    /* The granularity is equal to 2^(index + 3) bytes */
+    return (1 << (index + 3));
 }
 
 /* Get the number of pmp regions for the current hart */
@@ -67,7 +96,7 @@ void metal_pmp_init(struct metal_pmp *pmp) {
     }
 
     /* Calculate the granularity based on the value that pmpaddr0 takes on */
-    pmp->_granularity[metal_cpu_get_current_hartid()] = _get_pmpaddr_granularity(metal_pmp_get_address(pmp, 0));
+    pmp->_granularity[metal_cpu_get_current_hartid()] = _get_detected_granularity(metal_pmp_get_address(pmp, 0));
 
     /* Clear pmpaddr0 */
     metal_pmp_set_address(pmp, 0, 0);
@@ -99,11 +128,8 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
         return 3;
     }
 
-    /* Calculate the granularity of the bitwise not of address because
-     * _get_pmpaddr_granularity detects the least-significant one and NAPOT
-     * mode detects the least-significant zero */
     if(config.A == METAL_PMP_NAPOT &&
-       pmp->_granularity[metal_cpu_get_current_hartid()] > _get_pmpaddr_granularity(~address))
+       pmp->_granularity[metal_cpu_get_current_hartid()] > _get_pmpaddr_granularity(address))
     {
         /* The requested granularity is too small */
         return 3;
