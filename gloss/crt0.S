@@ -129,6 +129,10 @@ _start:
 
 _skip_init:
 
+  /* Synchronize harts so that secondary harts wait until hart 0 finishes
+     initializing */
+  call _synchronize_harts
+
   /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
   csrr a5, misa
   li   a4, 0x10028

@@ -197,6 +197,7 @@ lib_LIBRARIES += libriscv__menv__metal.a
 
 libriscv__menv__metal_a_SOURCES = \
 	gloss/crt0.S \
+	gloss/synchronize_harts.c \
 	gloss/nanosleep.c \
 	gloss/sys_access.c \
 	gloss/sys_chdir.c \
