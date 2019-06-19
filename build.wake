@@ -97,6 +97,7 @@ global def runFreedomMetalInstall options =
     relative runDir meeInline.getPathName,
     relative runDir platformHeader.getPathName,
     relative runDir meeLdScript.getPathName,
+    relative runDir outputDir,
     Nil
 
   def inputs = mkdir outputDir, wrapperScript, meeHeader, meeLdScript, installedFreedomMetal
