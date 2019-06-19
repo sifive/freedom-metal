@@ -1,5 +1,11 @@
 #!/bin/bash -x
 
+set -e
+
+if [ "$#" -ne 7 ]; then
+    echo "Illegal number of parameters"
+fi
+
 host=$1
 machine_name=$2
 machine_header=$3
@@ -15,7 +21,7 @@ machine_ldscript=$(pwd)/$machine_ldscript
 install_dir=$(pwd)/${install_dir}
 
 export RISCV_PATH=$RISCV
-make clean
+
 autoreconf -i
 ./configure \
   --host=$host \
@@ -30,5 +36,11 @@ autoreconf -i
   --with-machine-ldscript=$machine_ldscript \
   --with-builtin-libgloss \
   --prefix=
-make
-make DESTDIR=$install_dir install
+make \
+  RANLIB="riscv64-unknown-elf-ranlib -D" \
+  ARFLAGS=Dcr
+make  \
+  RANLIB="riscv64-unknown-elf-ranlib -D" \
+  ARFLAGS=Dcr \
+  DESTDIR=$install_dir \
+  install
