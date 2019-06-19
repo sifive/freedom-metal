@@ -3,7 +3,8 @@
 set -e
 
 if [ "$#" -ne 7 ]; then
-    echo "Illegal number of parameters"
+  echo "Illegal number of parameters" >&2
+  exit 1
 fi
 
 host=$1
