@@ -17,7 +17,7 @@ long __metal_driver_sifive_fe310_g000_hfxosc_get_rate_hz(const struct metal_cloc
     long config_offset = __metal_driver_sifive_fe310_g000_hfxosc_config_offset(clock);
     struct __metal_driver_sifive_fe310_g000_prci *config_base =
       __metal_driver_sifive_fe310_g000_hfxosc_config_base(clock);
-    struct __metal_driver_vtable_sifive_fe310_g000_prci *vtable =
+    const struct __metal_driver_vtable_sifive_fe310_g000_prci *vtable =
       __metal_driver_sifive_fe310_g000_prci_vtable();
     long cfg = vtable->get_reg(config_base, config_offset);
 
