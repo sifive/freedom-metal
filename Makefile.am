@@ -1,4 +1,4 @@
-# Copyright 2018 SiFive, Inc
+# Copyright 2018-2019 SiFive, Inc
 # SPDX-License-Identifier: Apache-2.0
 
 # Every test depends on the generated linker script.
