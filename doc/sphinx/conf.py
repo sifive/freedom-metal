@@ -23,7 +23,7 @@ project = 'Freedom Metal'
 copyright = '2019, SiFive Inc.'
 author = 'SiFive Inc.'
 
-version = "v201903"
+version = "v201905"
 release = version
 
 
