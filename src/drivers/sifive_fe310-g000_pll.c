@@ -193,7 +193,7 @@ long __metal_driver_sifive_fe310_g000_pll_get_rate_hz(const struct metal_clock *
     long divider_offset = __metal_driver_sifive_fe310_g000_pll_divider_offset(clock);
     struct __metal_driver_sifive_fe310_g000_prci *divider_base =
       __metal_driver_sifive_fe310_g000_pll_divider_base(clock);
-    struct __metal_driver_vtable_sifive_fe310_g000_prci *vtable =
+    const struct __metal_driver_vtable_sifive_fe310_g000_prci *vtable =
       __metal_driver_sifive_fe310_g000_prci_vtable();
 
     long cfg = vtable->get_reg(config_base, config_offset);
