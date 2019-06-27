@@ -87,6 +87,24 @@ _start:
   blt  t1, t2, 1b
 2:
 
+  /* Zero the ITIM segment. */
+  la t1, metal_segment_itim_target_start
+  addi t2, t1, 8
+
+  bge t1, t2, 2f
+
+1:
+#if __riscv_xlen == 32
+  sw   x0, 0(t1)
+  addi t1, t1, 4
+  blt  t1, t2, 1b
+#else
+  sd   x0, 0(t1)
+  addi t1, t1, 8
+  blt  t1, t2, 1b
+#endif
+2:
+
   /* Copy the ITIM section */
   la t0, metal_segment_itim_source_start
   la t1, metal_segment_itim_target_start
