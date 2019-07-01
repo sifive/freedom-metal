@@ -10,8 +10,8 @@
  * UART on a system. */
 int metal_tty_putc(int c)
 {
-    if (c == '\n') {
-    metal_tty_putc_raw( '\r' );
+    if (c == __METAL_LF_CHAR) {
+    metal_tty_putc_raw(__METAL_CR_CHAR);
     }
   return metal_tty_putc_raw( c );
 }

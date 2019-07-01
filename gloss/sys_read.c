@@ -3,7 +3,8 @@
 #include <errno.h>
 #include <unistd.h>
 
-/* Known Bugs:
+/*
+ * Known Bugs:
  * ======
  * The content of tty_buffer has to be filled before calling
  * metal_tty_putc(). This is because metal_tty_putc() always
@@ -22,7 +23,8 @@
  *
  * This happens after 
  * __metal_driver_sifive_uart0_txready(uart)
- * is called in src/drivers/sifive_uart0.c. */
+ * is called in src/drivers/sifive_uart0.c. 
+ */
 
 /* Parameters for the circular input buffer */
 #define TTY_BUFFER_LEN (127)
@@ -36,10 +38,12 @@ static uint8_t end_index;
 #define BUFFER_LEN (end_index > start_index ? \
                     end_index - start_index : \
                     end_index + WRAP_LEN - start_index)
-/* This macro backs up start_index and end_index
+/*
+ * This macro backs up start_index and end_index
  * on the stack. This is only a temporary solution to the 
- * bugs described above */
-#define BACKUP_INDICES(statement) \
+ * bugs described above 
+ */
+#define SAVE_INDICES(statement) \
     start_backup = start_index; \
     end_backup = end_index; \
     statement \
@@ -60,45 +64,44 @@ static void present_buffer(void) {
     c = int_buffer;
     /* Prevent overflowing the buffer */
     if (BUFFER_LEN == TTY_BUFFER_LEN) {
-        if (c == 010 || c == 0177) {
+        if (c == __METAL_BS_CHAR || c == __METAL_DEL_CHAR) {
             DECREASE_INDEX(end_index);
-            BACKUP_INDICES(metal_tty_putc(010);
-                           metal_tty_putc(' ');
-                           metal_tty_putc(010);)
+            SAVE_INDICES(metal_tty_putc(__METAL_BS_CHAR);
+                           metal_tty_putc(__METAL_SP_CHAR);
+                           metal_tty_putc(__METAL_BS_CHAR);)
             continue;
-        } else if (c != '\r' && c != '\n') {
+        } else if (c != __METAL_CR_CHAR && c != __METAL_LF_CHAR) {
             continue;
         } else {
-            BACKUP_INDICES(metal_tty_putc(c);
-                           metal_tty_putc_raw('\n');)
-            tty_buffer[end_index] = '\n';
+            SAVE_INDICES(metal_tty_putc(c);
+                           metal_tty_putc_raw(__METAL_LF_CHAR);)
+            tty_buffer[end_index] = __METAL_LF_CHAR;
             return;
         }
     }
     switch(c) {
       /* Entered newline character, end the buffer presentation */
-      case '\r':
-      case '\n':
-        BACKUP_INDICES(metal_tty_putc(c);
-                       metal_tty_putc_raw('\n');)
-        tty_buffer[end_index] = '\n';
+      case __METAL_CR_CHAR:
+      case __METAL_LF_CHAR:
+        SAVE_INDICES(metal_tty_putc(c);
+                       metal_tty_putc_raw(__METAL_LF_CHAR);)
+        tty_buffer[end_index] = __METAL_LF_CHAR;
         return;
 
-      /* Backspace */
-      case 010:
-      /* Del */
-      case 0177:
+      /* Del and Backspace character */
+      case __METAL_BS_CHAR:
+      case __METAL_DEL_CHAR:
         if (BUFFER_LEN) {
           DECREASE_INDEX(end_index);
-          BACKUP_INDICES(metal_tty_putc(010);
-                         metal_tty_putc(' ');
-                         metal_tty_putc(010);)
+          SAVE_INDICES(metal_tty_putc(__METAL_BS_CHAR);
+                         metal_tty_putc(__METAL_SP_CHAR);
+                         metal_tty_putc(__METAL_BS_CHAR);)
         }
         break;
         
       /* Other "normal" input */  
       default:
-        BACKUP_INDICES(metal_tty_putc(c);)
+        SAVE_INDICES(metal_tty_putc(c);)
         tty_buffer[end_index] = c;
         INCREASE_INDEX(end_index);
         break;

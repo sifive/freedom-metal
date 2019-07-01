@@ -5,6 +5,15 @@
 #define METAL__TTY_H
 
 /*!
+ * @brief Define a few special characters
+ */
+#define __METAL_BS_CHAR (010)
+#define __METAL_LF_CHAR (012)
+#define __METAL_CR_CHAR (015)
+#define __METAL_SP_CHAR (040)
+#define __METAL_DEL_CHAR (0177)
+
+/*!
  * @file tty.h
  * @brief API for emulated serial teriminals
  */
