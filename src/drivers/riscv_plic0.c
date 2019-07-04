@@ -3,6 +3,8 @@
 
 #include <metal/machine/platform.h>
 
+#define PLIC0_MAX_INTERRUPTS 1024
+
 #ifdef METAL_RISCV_PLIC0
 
 #include <metal/io.h>
@@ -89,18 +91,25 @@ void __metal_driver_riscv_plic0_init (struct metal_interrupt *controller)
 
 	for(int parent = 0; parent < __METAL_PLIC_NUM_PARENTS; parent++) {
 	    num_interrupts = __metal_driver_sifive_plic0_num_interrupts(controller);
+            assert(num_interrupts < PLIC0_MAX_INTERRUPTS);
 	    intc = __metal_driver_sifive_plic0_interrupt_parents(controller, parent);
 	    line = __metal_driver_sifive_plic0_interrupt_lines(controller, parent);
 
 	    /* Initialize ist parent controller, aka cpu_intc. */
 	    intc->vtable->interrupt_init(intc);
 
-	    for (int i = 0; i < num_interrupts; i++) {
+            /* Disable every interrupt on the PLIC. */
+	    for (int i = 0; i < PLIC0_MAX_INTERRUPTS; i++) {
 		__metal_plic0_enable(plic, i, METAL_DISABLE);
 		__metal_plic0_set_priority(plic, i, 0);
-		plic->metal_exint_table[i] = NULL;
-		plic->metal_exdata_table[i].sub_int = NULL;
-		plic->metal_exdata_table[i].exint_data = NULL;
+
+                /* Initialize NULL handlers for the interrupts that we've
+                 * allocated handler space for. */
+                if (i < num_interrupts) {
+                    plic->metal_exint_table[i] = NULL;
+                    plic->metal_exdata_table[i].sub_int = NULL;
+                    plic->metal_exdata_table[i].exint_data = NULL;
+                }
 	    }
 
 	    __metal_plic0_set_threshold(plic, 0);
