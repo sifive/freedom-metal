@@ -119,6 +119,10 @@ _start:
 #endif
 2:
 
+  /* Fence all subsequent instruction fetches until after the ITIM writes
+     complete */
+  fence.i
+
   /* Zero the BSS segment. */
   la t1, metal_segment_bss_target_start
   la t2, metal_segment_bss_target_end
