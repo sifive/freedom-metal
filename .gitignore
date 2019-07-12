@@ -19,3 +19,18 @@
 /return_pass
 /return_fail
 *.specs
+
+# Editor - Various Merge tools
+*.bak
+# Editor - Emacs
+*~
+\#*\#
+# Editor - VIM
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+# ctags
+tags
+
