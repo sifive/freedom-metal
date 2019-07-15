@@ -113,7 +113,7 @@ struct metal_register_file {
 #endif /* __riscv_flen */
 };
 
-typedef void (*metal_privilege_entry_point_t)();
+typedef void (*metal_privilege_entry_point_t)(void);
 
 void metal_privilege_drop_to_mode(enum metal_privilege_mode mode,
 				  struct metal_register_file regfile,
