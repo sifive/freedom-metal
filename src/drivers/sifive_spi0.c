@@ -227,18 +227,19 @@ int __metal_driver_sifive_spi0_set_baud_rate(struct metal_spi *gspi, int baud_ra
     return 0;
 }
 
-static void pre_rate_change_callback(void *priv)
+static void pre_rate_change_callback_func(void *priv)
 {
     long control_base = __metal_driver_sifive_spi0_control_base((struct metal_spi *)priv);
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
-     * to zero and waiting until an interrupt is pending */
+     * to one and waiting until an interrupt is pending (indicating an empty TXFIFO) */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXMARK) &= ~(METAL_SPI_TXMARK_MASK);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXMARK) |= (METAL_SPI_TXMARK_MASK & 1);
 
     while((METAL_SPI_REGW(METAL_SIFIVE_SPI0_IP) & METAL_SPI_TXWM) == 0) ;
 }
 
-static void post_rate_change_callback(void *priv)
+static void post_rate_change_callback_func(void *priv)
 {
     struct __metal_driver_sifive_spi0 *spi = priv;
     metal_spi_set_baud_rate(&spi->spi, spi->baud_rate);
@@ -251,8 +252,13 @@ void __metal_driver_sifive_spi0_init(struct metal_spi *gspi, int baud_rate)
     struct __metal_driver_sifive_gpio0 *pinmux = __metal_driver_sifive_spi0_pinmux(gspi);
 
     if(clock != NULL) {
-        metal_clock_register_pre_rate_change_callback(clock, &pre_rate_change_callback, spi);
-        metal_clock_register_post_rate_change_callback(clock, &post_rate_change_callback, spi);
+        spi->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
+        spi->pre_rate_change_callback.priv = spi;
+        metal_clock_register_pre_rate_change_callback(clock, &(spi->pre_rate_change_callback));
+
+        spi->post_rate_change_callback.callback = &post_rate_change_callback_func;
+        spi->post_rate_change_callback.priv = spi;
+        metal_clock_register_post_rate_change_callback(clock, &(spi->post_rate_change_callback));
     }
 
     metal_spi_set_baud_rate(&(spi->spi), baud_rate);

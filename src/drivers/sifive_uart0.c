@@ -82,7 +82,7 @@ int __metal_driver_sifive_uart0_set_baud_rate(struct metal_uart *guart, int baud
     return 0;
 }
 
-static void pre_rate_change_callback(void *priv)
+static void pre_rate_change_callback_func(void *priv)
 {
     struct __metal_driver_sifive_uart0 *uart = priv;
     long control_base = __metal_driver_sifive_uart0_control_base((struct metal_uart *)priv);
@@ -108,7 +108,7 @@ static void pre_rate_change_callback(void *priv)
         asm("nop");
 }
 
-static void post_rate_change_callback(void *priv)
+static void post_rate_change_callback_func(void *priv)
 {
     struct __metal_driver_sifive_uart0 *uart = priv;
     metal_uart_set_baud_rate(&uart->uart, uart->baud_rate);
@@ -121,8 +121,13 @@ void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate)
     struct __metal_driver_sifive_gpio0 *pinmux = __metal_driver_sifive_uart0_pinmux(guart);
 
     if(clock != NULL) {
-        metal_clock_register_pre_rate_change_callback(clock, &pre_rate_change_callback, guart);
-        metal_clock_register_post_rate_change_callback(clock, &post_rate_change_callback, guart);
+        uart->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
+        uart->pre_rate_change_callback.priv = guart;
+        metal_clock_register_pre_rate_change_callback(clock, &(uart->pre_rate_change_callback));
+
+        uart->post_rate_change_callback.callback = &post_rate_change_callback_func;
+        uart->post_rate_change_callback.priv = guart;
+        metal_clock_register_post_rate_change_callback(clock, &(uart->post_rate_change_callback));
     }
 
     metal_uart_set_baud_rate(&(uart->uart), baud_rate);
