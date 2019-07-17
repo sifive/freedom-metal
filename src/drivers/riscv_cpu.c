@@ -440,7 +440,7 @@ extern inline int __metal_controller_interrupt_is_selective_vectored(void);
 
 /* CPU driver !!! */
 
-unsigned long long __metal_driver_cpu_timer_get(struct metal_cpu *cpu)
+unsigned long long __metal_driver_cpu_mcycle_get(struct metal_cpu *cpu)
 {
     unsigned long long val = 0;
 
@@ -670,7 +670,7 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
 };
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_cpu) = {
-    .cpu_vtable.timer_get     = __metal_driver_cpu_timer_get,
+    .cpu_vtable.mcycle_get     = __metal_driver_cpu_mcycle_get,
     .cpu_vtable.timebase_get  = __metal_driver_cpu_timebase_get,
     .cpu_vtable.mtime_get = __metal_driver_cpu_mtime_get,
     .cpu_vtable.mtimecmp_set = __metal_driver_cpu_mtimecmp_set,

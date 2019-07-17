@@ -20,7 +20,7 @@ struct metal_cpu;
 typedef void (*metal_exception_handler_t) (struct metal_cpu *cpu, int ecode);
 
 struct metal_cpu_vtable {
-    unsigned long long (*timer_get)(struct metal_cpu *cpu);
+    unsigned long long (*mcycle_get)(struct metal_cpu *cpu);
     unsigned long long (*timebase_get)(struct metal_cpu *cpu);
     unsigned long long (*mtime_get)(struct metal_cpu *cpu);
     int (*mtimecmp_set)(struct metal_cpu *cpu, unsigned long long time);
@@ -69,7 +69,7 @@ int metal_cpu_get_num_harts(void);
  * @return The value of the CPU cycle count timer
  */
 inline unsigned long long metal_cpu_get_timer(struct metal_cpu *cpu)
-{ return cpu->vtable->timer_get(cpu); }
+{ return cpu->vtable->mcycle_get(cpu); }
 
 /*! @brief Get the timebase of the CPU
  *
