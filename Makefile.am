@@ -74,6 +74,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_spi0.h \
 	metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_uart0.h \
+	metal/drivers/sifive_wdog0.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
 	metal/button.h \
@@ -96,7 +97,8 @@ nobase_include_HEADERS = \
 	metal/switch.h \
 	metal/timer.h \
 	metal/tty.h \
-	metal/uart.h
+	metal/uart.h \
+	metal/watchdog.h
 
 if PRECONFIGURED
 metal/machine.h: @MACHINE_HEADER@
@@ -170,6 +172,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_spi0.c \
 	src/drivers/sifive_test0.c \
 	src/drivers/sifive_uart0.c \
+	src/drivers/sifive_wdog0.c \
 	src/button.c \
 	src/cache.c \
 	src/clock.c \
@@ -188,7 +191,8 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/timer.c \
 	src/trap.S \
 	src/tty.c \
-	src/uart.c
+	src/uart.c \
+	src/watchdog.c
 
 # Freedom METAL has its own libgloss implementation that is only built in
 # --with-builtin-libgloss is passed to configure.
