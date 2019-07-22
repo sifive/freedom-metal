@@ -162,8 +162,7 @@ void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe31
     __metal_io_u32 *pllcfg = (__metal_io_u32 *) (base + config_offset);
 
     /* If the PLL clock has had a _pre_rate_change_callback configured, call it */
-    if(pll->clock._pre_rate_change_callback != NULL)
-        pll->clock._pre_rate_change_callback(pll->clock._pre_rate_change_callback_priv);
+    _metal_clock_call_all_callbacks(pll->clock._pre_rate_change_callback);
 
     /* If we're running off of the PLL, switch off before we start configuring it*/
     if((__METAL_ACCESS_ONCE(pllcfg) & PLL_SEL) == 0)
@@ -179,8 +178,7 @@ void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe31
     pll->clock.vtable->set_rate_hz(&(pll->clock), init_rate);
 
     /* If the PLL clock has had a rate_change_callback configured, call it */
-    if(pll->clock._post_rate_change_callback != NULL)
-        pll->clock._post_rate_change_callback(pll->clock._post_rate_change_callback_priv);
+    _metal_clock_call_all_callbacks(pll->clock._post_rate_change_callback);
 }
 
 long __metal_driver_sifive_fe310_g000_pll_get_rate_hz(const struct metal_clock *clock)
