@@ -171,6 +171,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_test0.c \
 	src/drivers/sifive_uart0.c \
 	src/button.c \
+	src/cache.c \
 	src/clock.c \
 	src/cpu.c \
 	src/entry.S \

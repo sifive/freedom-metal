@@ -55,4 +55,18 @@ inline int metal_cache_set_enabled_ways(struct metal_cache *cache, int ways) {
 	return cache->vtable->set_enabled_ways(cache, ways);
 }
 
+/*!
+ * @brief Check if dcache is supported on the core
+ * @param hartid The core to check
+ * @return 1 if dcache is present
+ */
+int metal_dcache_l1_available(int hartid);
+
+/*!
+ * @brief Flush dcache for L1 on the requested core
+ * @param hartid The core to flush
+ * @return None
+ */
+void metal_dcache_l1_flush(int hartid);
+
 #endif
