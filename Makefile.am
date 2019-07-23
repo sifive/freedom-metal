@@ -62,6 +62,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_clic0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
 	metal/drivers/sifive_fe310-g000_hfxosc.h \
+	metal/drivers/sifive_fe310-g000_lfrosc.h \
 	metal/drivers/sifive_fe310-g000_pll.h \
 	metal/drivers/sifive_fe310-g000_prci.h \
 	metal/drivers/sifive_fu540-c000_l2.h \
@@ -161,6 +162,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_clic0.c \
 	src/drivers/sifive_fe310-g000_hfrosc.c \
 	src/drivers/sifive_fe310-g000_hfxosc.c \
+	src/drivers/sifive_fe310-g000_lfrosc.c \
 	src/drivers/sifive_fe310-g000_pll.c \
 	src/drivers/sifive_fe310-g000_prci.c \
 	src/drivers/sifive_global-external-interrupts0.c \
