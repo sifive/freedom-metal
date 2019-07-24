@@ -26,7 +26,7 @@ int metal_tty_getc(int *c)
    do {
         metal_uart_getc( __METAL_DT_STDOUT_UART_HANDLE, c );
         /* -1 means no key pressed, getc waits */
-    } while( c == -1 )
+    } while( -1 == *c )
         ;
     return 0;
 }
