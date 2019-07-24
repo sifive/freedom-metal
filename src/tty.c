@@ -2,19 +2,33 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/uart.h>
+#include <metal/tty.h>
 #include <metal/machine.h>
 
 #if defined(__METAL_DT_STDOUT_UART_HANDLE)
 /* This implementation serves as a small shim that interfaces with the first
  * UART on a system. */
-int metal_tty_putc(unsigned char c)
+int metal_tty_putc(int c)
 {
     if (c == '\n') {
-        int out = metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, '\r');
-        if (out != 0)
-            return out;
+        metal_tty_putc_raw( '\r' );
     }
+    return metal_tty_putc_raw( c );
+}
+
+int metal_tty_putc_raw(int c)
+{
     return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
+}
+
+int metal_tty_getc(int *c)
+{
+   do {
+        metal_uart_getc( __METAL_DT_STDOUT_UART_HANDLE, c );
+        /* -1 means no key pressed, getc waits */
+    } while( -1 == *c )
+        ;
+    return 0;
 }
 
 #ifndef __METAL_DT_STDOUT_UART_BAUD
