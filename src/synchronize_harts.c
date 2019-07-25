@@ -16,7 +16,7 @@
  * the libc contstructors.
  */
 __attribute__((section(".init")))
-void _synchronize_harts() {
+void __metal_synchronize_harts() {
 #if __METAL_DT_MAX_HARTS > 1
 
     int hart = metal_cpu_get_current_hartid();
