@@ -175,7 +175,7 @@ inline int __metal_controller_interrupt_is_selective_vectored (void)
 {
     uintptr_t val;
 
-    asm volatile ("csrr %0, mtvec" : "=r"(val));
+    __asm__ volatile ("csrr %0, mtvec" : "=r"(val));
     return ((val & METAL_MTVEC_CLIC_VECTORED) == METAL_MTVEC_CLIC);
 }
 

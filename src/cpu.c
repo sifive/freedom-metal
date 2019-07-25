@@ -16,7 +16,7 @@ int metal_cpu_get_current_hartid()
 {
 #ifdef __riscv
     int mhartid;
-    asm volatile("csrr %0, mhartid" : "=r" (mhartid));
+    __asm__ volatile("csrr %0, mhartid" : "=r" (mhartid));
     return mhartid;
 #endif
 }

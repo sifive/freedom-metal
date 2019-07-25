@@ -151,67 +151,67 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
     if(old_address != address) {
         switch(region) {
         case 0:
-            asm("csrw pmpaddr0, %[addr]"
+            __asm__("csrw pmpaddr0, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 1:
-            asm("csrw pmpaddr1, %[addr]"
+            __asm__("csrw pmpaddr1, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 2:
-            asm("csrw pmpaddr2, %[addr]"
+            __asm__("csrw pmpaddr2, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 3:
-            asm("csrw pmpaddr3, %[addr]"
+            __asm__("csrw pmpaddr3, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 4:
-            asm("csrw pmpaddr4, %[addr]"
+            __asm__("csrw pmpaddr4, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 5:
-            asm("csrw pmpaddr5, %[addr]"
+            __asm__("csrw pmpaddr5, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 6:
-            asm("csrw pmpaddr6, %[addr]"
+            __asm__("csrw pmpaddr6, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 7:
-            asm("csrw pmpaddr7, %[addr]"
+            __asm__("csrw pmpaddr7, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 8:
-            asm("csrw pmpaddr8, %[addr]"
+            __asm__("csrw pmpaddr8, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 9:
-            asm("csrw pmpaddr9, %[addr]"
+            __asm__("csrw pmpaddr9, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 10:
-            asm("csrw pmpaddr10, %[addr]"
+            __asm__("csrw pmpaddr10, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 11:
-            asm("csrw pmpaddr11, %[addr]"
+            __asm__("csrw pmpaddr11, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 12:
-            asm("csrw pmpaddr12, %[addr]"
+            __asm__("csrw pmpaddr12, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 13:
-            asm("csrw pmpaddr13, %[addr]"
+            __asm__("csrw pmpaddr13, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 14:
-            asm("csrw pmpaddr14, %[addr]"
+            __asm__("csrw pmpaddr14, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         case 15:
-            asm("csrw pmpaddr15, %[addr]"
+            __asm__("csrw pmpaddr15, %[addr]"
                     :: [addr] "r" (address) :);
             break;
         }
@@ -225,31 +225,31 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
         
         switch(region / 4) {
         case 0:
-            asm("csrc pmpcfg0, %[mask]"
+            __asm__("csrc pmpcfg0, %[mask]"
                     :: [mask] "r" (cfgmask) :);
 
-            asm("csrs pmpcfg0, %[cfg]"
+            __asm__("csrs pmpcfg0, %[cfg]"
                     :: [cfg] "r" (pmpcfg) :);
             break;
         case 1:
-            asm("csrc pmpcfg1, %[mask]"
+            __asm__("csrc pmpcfg1, %[mask]"
                     :: [mask] "r" (cfgmask) :);
 
-            asm("csrs pmpcfg1, %[cfg]"
+            __asm__("csrs pmpcfg1, %[cfg]"
                     :: [cfg] "r" (pmpcfg) :);
             break;
         case 2:
-            asm("csrc pmpcfg2, %[mask]"
+            __asm__("csrc pmpcfg2, %[mask]"
                     :: [mask] "r" (cfgmask) :);
 
-            asm("csrs pmpcfg2, %[cfg]"
+            __asm__("csrs pmpcfg2, %[cfg]"
                     :: [cfg] "r" (pmpcfg) :);
             break;
         case 3:
-            asm("csrc pmpcfg3, %[mask]"
+            __asm__("csrc pmpcfg3, %[mask]"
                     :: [mask] "r" (cfgmask) :);
 
-            asm("csrs pmpcfg3, %[cfg]"
+            __asm__("csrs pmpcfg3, %[cfg]"
                     :: [cfg] "r" (pmpcfg) :);
             break;
         }
@@ -262,17 +262,17 @@ int metal_pmp_set_region(struct metal_pmp *pmp,
         
         switch(region / 8) {
         case 0:
-            asm("csrc pmpcfg0, %[mask]"
+            __asm__("csrc pmpcfg0, %[mask]"
                     :: [mask] "r" (cfgmask) :);
 
-            asm("csrs pmpcfg0, %[cfg]"
+            __asm__("csrs pmpcfg0, %[cfg]"
                     :: [cfg] "r" (pmpcfg) :);
             break;
         case 1:
-            asm("csrc pmpcfg2, %[mask]"
+            __asm__("csrc pmpcfg2, %[mask]"
                     :: [mask] "r" (cfgmask) :);
 
-            asm("csrs pmpcfg2, %[cfg]"
+            __asm__("csrs pmpcfg2, %[cfg]"
                     :: [cfg] "r" (pmpcfg) :);
             break;
         }
@@ -304,19 +304,19 @@ int metal_pmp_get_region(struct metal_pmp *pmp,
 #if __riscv_xlen==32
     switch(region / 4) {
     case 0:
-        asm("csrr %[cfg], pmpcfg0"
+        __asm__("csrr %[cfg], pmpcfg0"
                 : [cfg] "=r" (pmpcfg) ::);
         break;
     case 1:
-        asm("csrr %[cfg], pmpcfg1"
+        __asm__("csrr %[cfg], pmpcfg1"
                 : [cfg] "=r" (pmpcfg) ::);
         break;
     case 2:
-        asm("csrr %[cfg], pmpcfg2"
+        __asm__("csrr %[cfg], pmpcfg2"
                 : [cfg] "=r" (pmpcfg) ::);
         break;
     case 3:
-        asm("csrr %[cfg], pmpcfg3"
+        __asm__("csrr %[cfg], pmpcfg3"
                 : [cfg] "=r" (pmpcfg) ::);
         break;
     }
@@ -326,11 +326,11 @@ int metal_pmp_get_region(struct metal_pmp *pmp,
 #elif __riscv_xlen==64
     switch(region / 8) {
     case 0:
-        asm("csrr %[cfg], pmpcfg0"
+        __asm__("csrr %[cfg], pmpcfg0"
                 : [cfg] "=r" (pmpcfg) ::);
         break;
     case 1:
-        asm("csrr %[cfg], pmpcfg2"
+        __asm__("csrr %[cfg], pmpcfg2"
                 : [cfg] "=r" (pmpcfg) ::);
         break;
     }
@@ -345,67 +345,67 @@ int metal_pmp_get_region(struct metal_pmp *pmp,
 
     switch(region) {
     case 0:
-        asm("csrr %[addr], pmpaddr0"
+        __asm__("csrr %[addr], pmpaddr0"
                 : [addr] "=r" (*address) ::);
         break;
     case 1:
-        asm("csrr %[addr], pmpaddr1"
+        __asm__("csrr %[addr], pmpaddr1"
                 : [addr] "=r" (*address) ::);
         break;
     case 2:
-        asm("csrr %[addr], pmpaddr2"
+        __asm__("csrr %[addr], pmpaddr2"
                 : [addr] "=r" (*address) ::);
         break;
     case 3:
-        asm("csrr %[addr], pmpaddr3"
+        __asm__("csrr %[addr], pmpaddr3"
                 : [addr] "=r" (*address) ::);
         break;
     case 4:
-        asm("csrr %[addr], pmpaddr4"
+        __asm__("csrr %[addr], pmpaddr4"
                 : [addr] "=r" (*address) ::);
         break;
     case 5:
-        asm("csrr %[addr], pmpaddr5"
+        __asm__("csrr %[addr], pmpaddr5"
                 : [addr] "=r" (*address) ::);
         break;
     case 6:
-        asm("csrr %[addr], pmpaddr6"
+        __asm__("csrr %[addr], pmpaddr6"
                 : [addr] "=r" (*address) ::);
         break;
     case 7:
-        asm("csrr %[addr], pmpaddr7"
+        __asm__("csrr %[addr], pmpaddr7"
                 : [addr] "=r" (*address) ::);
         break;
     case 8:
-        asm("csrr %[addr], pmpaddr8"
+        __asm__("csrr %[addr], pmpaddr8"
                 : [addr] "=r" (*address) ::);
         break;
     case 9:
-        asm("csrr %[addr], pmpaddr9"
+        __asm__("csrr %[addr], pmpaddr9"
                 : [addr] "=r" (*address) ::);
         break;
     case 10:
-        asm("csrr %[addr], pmpaddr10"
+        __asm__("csrr %[addr], pmpaddr10"
                 : [addr] "=r" (*address) ::);
         break;
     case 11:
-        asm("csrr %[addr], pmpaddr11"
+        __asm__("csrr %[addr], pmpaddr11"
                 : [addr] "=r" (*address) ::);
         break;
     case 12:
-        asm("csrr %[addr], pmpaddr12"
+        __asm__("csrr %[addr], pmpaddr12"
                 : [addr] "=r" (*address) ::);
         break;
     case 13:
-        asm("csrr %[addr], pmpaddr13"
+        __asm__("csrr %[addr], pmpaddr13"
                 : [addr] "=r" (*address) ::);
         break;
     case 14:
-        asm("csrr %[addr], pmpaddr14"
+        __asm__("csrr %[addr], pmpaddr14"
                 : [addr] "=r" (*address) ::);
         break;
     case 15:
-        asm("csrr %[addr], pmpaddr15"
+        __asm__("csrr %[addr], pmpaddr15"
                 : [addr] "=r" (*address) ::);
         break;
     }
