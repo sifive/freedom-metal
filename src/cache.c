@@ -59,11 +59,29 @@ int metal_dcache_l1_available(int hartid) {
     return 0;
 }
 
-void metal_dcache_l1_flush(int hartid)
+/*!
+ * @brief CFlush instruction is a custom instruction implemented as a
+ * state machine in L1 Data Cache (D$) with funct3=0, (for core with data caches)
+ * It is an I type: .insn i opcode, func3, rd, rs1, simm12(signed immediate 12bs)
+ * 31     28 27    24 23    20 19     16 15   12 11     8 7      4 3      0
+ * |--------|--------|--------|--------|--------|--------|--------|--------|
+ * +-------------+------------+----------+------+--------+-----------------+
+ * |sign immediate12b (simm12)|   rs1    | func3|    rd  |      opcode     |
+ * |-1-1-1-1 -1-1-0-0 -0-0-0-0|-x-x-x-x-x|0-0-0-|-0-0-0-0|-0-1-1-1 -0-0-1-1|
+ * +--------------------------+----------+------+--------+-----------------+
+ * 31     -0x40              20          15  0  12   x0  7      0x73       0
+ * +--------+--------+--------+----------+------+--------+--------+--------+
+ * where,
+ * rs1 = 0x0, CFLUSH writes back and invalidates all lines in the L1 D$
+ * rs1 != x0, CFLUSH writes back and invalidates the L1 D$ line containing the
+ *            virtual address in integer register rs1.
+ */
+void metal_dcache_l1_flush(int hartid, uintptr_t address)
 {
    if (metal_dcache_l1_available(hartid)) {
-        __asm__ __volatile__ (".word 0xfc000073" : : : "memory"); // CFLUSH.D.L1
-        __asm__ __volatile__ ("fence w ,r" ::: "memory");         // FENCE
+        // Using ‘.insn’ pseudo directive: '.insn i opcode, func3, rd, rs1, simm12'
+        __asm__ __volatile__ (".insn i 0x73, 0, x0, %0, -0x40" : : "r" (address));
+        __asm__ __volatile__ ("fence.i");         // FENCE
     }
 }
 
