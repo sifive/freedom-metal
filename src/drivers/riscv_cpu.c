@@ -270,7 +270,7 @@ int __metal_local_interrupt_enable (struct metal_interrupt *controller,
             __metal_interrupt_local_disable(id);
         }
         break;
-    defaut:
+    default:
         rc = -1;
     }
     return rc;
@@ -380,7 +380,7 @@ int __metal_driver_riscv_cpu_controller_interrupt_register(struct metal_interrup
             intc->metal_int_table[id].handler = __metal_default_interrupt_handler;
             intc->metal_int_table[id].sub_int = priv;
 	  break;
-	defaut:
+	default:
 	  rc = -12;
 	}
     }
