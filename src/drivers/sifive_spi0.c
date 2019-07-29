@@ -145,7 +145,7 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     /* Declare time_t variables to break out of infinite while loop */
     time_t endwait;
 
-    for(int i = 0; i < len; i++) {
+    for(size_t i = 0; i < len; i++) {
         /* Master send bytes to the slave */
 
         /* Wait for TXFIFO to not be full */

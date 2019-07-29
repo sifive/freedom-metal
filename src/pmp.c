@@ -64,7 +64,7 @@ static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
 }
 
 /* Get the number of pmp regions for the current hart */
-static int _pmp_regions() {
+static unsigned int _pmp_regions() {
     struct metal_cpu *current_cpu = metal_cpu_get(metal_cpu_get_current_hartid());
 
     return __metal_driver_cpu_num_pmp_regions(current_cpu);
