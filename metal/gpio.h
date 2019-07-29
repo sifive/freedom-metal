@@ -29,7 +29,7 @@ struct __metal_gpio_vtable {
     int (*config_int)(struct metal_gpio *, long pins, int intr_type);
     int (*clear_int)(struct metal_gpio *, long pins, int intr_type);
     struct metal_interrupt* (*interrupt_controller)(struct metal_gpio *gpio);
-    int (*get_interrupt_id)(struct metal_gpio *gpio, long pins);
+    int (*get_interrupt_id)(struct metal_gpio *gpio, int pin);
 };
 
 #define METAL_GPIO_INT_DISABLE       0
