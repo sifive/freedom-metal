@@ -325,7 +325,7 @@ void __metal_driver_riscv_cpu_controller_interrupt_init (struct metal_interrupt 
 	for (int i = 0; i < METAL_MAX_ME; i++) {
 	    intc->metal_exception_table[i] = __metal_default_exception_handler;
 	}
-        __metal_controller_interrupt_vector(METAL_DIRECT_MODE, &__metal_exception_handler);
+        __metal_controller_interrupt_vector(METAL_DIRECT_MODE, (void *)(uintptr_t)&__metal_exception_handler);
 	__asm__ volatile ("csrr %0, misa" : "=r"(val));
 	if (val & (METAL_ISA_D_EXTENSIONS | METAL_ISA_F_EXTENSIONS | METAL_ISA_Q_EXTENSIONS)) {
 	    /* Floating point architecture, so turn on FP register saving*/
@@ -406,11 +406,11 @@ int __metal_driver_riscv_cpu_controller_interrupt_enable_vector(struct metal_int
 
     if (id == METAL_INTERRUPT_ID_BASE) {
         if (mode == METAL_DIRECT_MODE) {
-            __metal_controller_interrupt_vector(mode, &__metal_exception_handler);
+            __metal_controller_interrupt_vector(mode, (void *)(uintptr_t)&__metal_exception_handler);
             return 0;
         }   
         if (mode == METAL_VECTOR_MODE) {
-            __metal_controller_interrupt_vector(mode, &intc->metal_mtvec_table);
+            __metal_controller_interrupt_vector(mode, (void *)&intc->metal_mtvec_table);
             return 0;
         }
     }
@@ -421,7 +421,7 @@ int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(struct metal_in
                                                               int id)
 {
     if (id == METAL_INTERRUPT_ID_BASE) {
-        __metal_controller_interrupt_vector(METAL_DIRECT_MODE, &__metal_exception_handler);
+        __metal_controller_interrupt_vector(METAL_DIRECT_MODE, (void *)(uintptr_t)&__metal_exception_handler);
         return 0;
     }
     return -1;
