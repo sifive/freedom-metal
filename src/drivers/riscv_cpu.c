@@ -513,7 +513,7 @@ __metal_driver_cpu_timer_controller_interrupt(struct metal_cpu *cpu)
 #ifdef __METAL_DT_SIFIVE_CLIC0_HANDLE
     return __METAL_DT_SIFIVE_CLIC0_HANDLE;
 #else
-#warning "There is no interrupt controller for Timer interrupt"
+#pragma message("There is no interrupt controller for Timer interrupt")
     return NULL;
 #endif
 #endif
@@ -533,7 +533,7 @@ __metal_driver_cpu_sw_controller_interrupt(struct metal_cpu *cpu)
 #ifdef __METAL_DT_SIFIVE_CLIC0_HANDLE
     return __METAL_DT_SIFIVE_CLIC0_HANDLE;
 #else
-#warning "There is no interrupt controller for Software interrupt"
+#pragma message("There is no interrupt controller for Software interrupt")
     return NULL;
 #endif
 #endif

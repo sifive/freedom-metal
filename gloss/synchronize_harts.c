@@ -29,7 +29,7 @@ void _synchronize_harts() {
     msip_base = __metal_driver_sifive_clic0_control_base(__METAL_DT_RISCV_CLIC0_HANDLE);
     msip_base += METAL_RISCV_CLIC0_MSIP_BASE;
 #else
-#warning No handle for CLINT or CLIC found, harts may be unsynchronized after init!
+#pragma message(No handle for CLINT or CLIC found, harts may be unsynchronized after init!)
 #endif
 
     /* Disable machine interrupts as a precaution */
