@@ -5,6 +5,7 @@
 #define METAL__GPIO_H
 
 #include <metal/compiler.h>
+#include <metal/interrupt.h>
 
 /*!
  * @file gpio.h
