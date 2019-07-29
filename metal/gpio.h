@@ -217,7 +217,6 @@ inline int metal_gpio_enable_pinmux(struct metal_gpio *gpio, int pin, int io_fun
  * @brief Disables the pinmux for a GPIO pin
  * @param gpio The handle for the GPIO interface
  * @param pin The bitmask for the pin to disable pinmux on
- * @param io_function The IO function to set
  * @return 0 if the pinmux is successfully set
  */
 inline int metal_gpio_disable_pinmux(struct metal_gpio *gpio, int pin) {
@@ -274,6 +273,7 @@ inline struct metal_interrupt*
  * @brief Get the interrupt id for a gpio
  *
  * @param gpio The handle for the gpio
+ * @param pin The bitmask for the pin to get gpio interrupt id
  * @return The interrupt id corresponding to a gpio.
  */
 inline int metal_gpio_get_interrupt_id(struct metal_gpio *gpio, int pin) {
