@@ -33,7 +33,7 @@ struct metal_cache {
  * Initializes a cache with the requested number of ways enabled.
  */
 __inline__ void metal_cache_init(struct metal_cache *cache, int ways) {
-	return cache->vtable->init(cache, ways);
+	cache->vtable->init(cache, ways);
 }
 
 /*!

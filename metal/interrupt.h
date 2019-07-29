@@ -58,7 +58,7 @@ struct metal_interrupt {
  */
 __inline__ void metal_interrupt_init(struct metal_interrupt *controller)
 {
-    return controller->vtable->interrupt_init(controller);
+    controller->vtable->interrupt_init(controller);
 }
 
 
