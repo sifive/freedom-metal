@@ -436,7 +436,7 @@ int __metal_driver_riscv_cpu_controller_command_request (struct metal_interrupt 
     return 0;
 }
 
-extern inline int __metal_controller_interrupt_is_selective_vectored(void);
+extern __inline__ int __metal_controller_interrupt_is_selective_vectored(void);
 
 /* CPU driver !!! */
 

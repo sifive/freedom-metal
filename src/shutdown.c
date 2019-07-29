@@ -4,7 +4,7 @@
 #include <metal/machine.h>
 #include <metal/shutdown.h>
 
-extern inline void __metal_shutdown_exit(const struct __metal_shutdown *sd, int code);
+extern __inline__ void __metal_shutdown_exit(const struct __metal_shutdown *sd, int code);
 
 #if defined(__METAL_DT_SHUTDOWN_HANDLE)
 void metal_shutdown(int code)

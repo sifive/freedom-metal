@@ -171,7 +171,7 @@ struct __metal_driver_vtable_riscv_cpu_intc {
 void __metal_interrupt_global_enable(void);
 void __metal_interrupt_global_disable(void);
 void __metal_controller_interrupt_vector(metal_vector_mode mode, void *vec_table);
-inline int __metal_controller_interrupt_is_selective_vectored (void)
+__inline__ int __metal_controller_interrupt_is_selective_vectored (void)
 {
     uintptr_t val;
 
