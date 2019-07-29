@@ -29,12 +29,16 @@
  * a magic number to WDOGKEY */
 #define WDOG_UNLOCK(base) (WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGKEY) = METAL_SIFIVE_WDOG0_MAGIC_KEY)
 
+/* Unlock the watchdog and then perform a register access */
+#define WDOG_UNLOCK_REGW(base, offset) \
+    WDOG_UNLOCK(base);\
+    WDOG_REGW(base, offset)
+
 int __metal_driver_sifive_wdog0_feed(const struct metal_watchdog *const wdog)
 {
     const uintptr_t base = (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
-    WDOG_UNLOCK(base);
-    WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGFEED) = METAL_SIFIVE_WDOG0_MAGIC_FOOD;
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGFEED) = METAL_SIFIVE_WDOG0_MAGIC_FOOD;
 
     return 0;
 }
@@ -64,8 +68,7 @@ long int __metal_driver_sifive_wdog0_set_rate(const struct metal_watchdog *const
     if (rate >= clock_rate) {
         /* We can't scale the rate above the driving clock. Clear the scale
          * field and return the driving clock rate */
-        WDOG_UNLOCK(base);
-        WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_SCALE_MASK);
+        WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_SCALE_MASK);
         return clock_rate;
     }
 
@@ -85,10 +88,8 @@ long int __metal_driver_sifive_wdog0_set_rate(const struct metal_watchdog *const
         }
     }
 
-    WDOG_UNLOCK(base);
-    WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_SCALE_MASK);
-    WDOG_UNLOCK(base);
-    WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= (METAL_WDOGCFG_SCALE_MASK & min_scale);
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_SCALE_MASK);
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= (METAL_WDOGCFG_SCALE_MASK & min_scale);
 
     return clock_rate / (1 << min_scale);
 }
@@ -116,8 +117,7 @@ long int __metal_driver_sifive_wdog0_set_timeout(const struct metal_watchdog *co
     wdogcmp &= ~(METAL_WDOGCMP_MASK);
     wdogcmp |= set_timeout;
 
-    WDOG_UNLOCK(base);
-    WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCMP) = wdogcmp;
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCMP) = wdogcmp;
 
     return set_timeout;
 }
@@ -128,8 +128,7 @@ int __metal_driver_sifive_wdog0_set_result(const struct metal_watchdog *const wd
     const uintptr_t base = (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
     /* Turn off reset enable and counter reset */
-    WDOG_UNLOCK(base);
-    WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_RSTEN | METAL_WDOGCFG_ZEROCMP);
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_RSTEN | METAL_WDOGCFG_ZEROCMP);
 
     switch (result) {
     default:
@@ -137,12 +136,10 @@ int __metal_driver_sifive_wdog0_set_result(const struct metal_watchdog *const wd
         break;
     case METAL_WATCHDOG_INTERRUPT:
         /* Reset counter to zero after match */
-        WDOG_UNLOCK(base);
-        WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_ZEROCMP;
+        WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_ZEROCMP;
         break;
     case METAL_WATCHDOG_FULL_RESET:
-        WDOG_UNLOCK(base);
-        WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_RSTEN;
+        WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_RSTEN;
         break;
     }
 
@@ -154,8 +151,7 @@ int __metal_driver_sifive_wdog0_run(const struct metal_watchdog *const wdog,
 {
     const uintptr_t base = (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
-    WDOG_UNLOCK(base);
-    WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_ENALWAYS | METAL_WDOGCFG_COREAWAKE);
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_ENALWAYS | METAL_WDOGCFG_COREAWAKE);
 
     switch (option) {
     default:
@@ -165,15 +161,13 @@ int __metal_driver_sifive_wdog0_run(const struct metal_watchdog *const wdog,
         /* Feed the watchdog before starting to reset counter */
         __metal_driver_sifive_wdog0_feed(wdog);
 
-        WDOG_UNLOCK(base);
-        WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_ENALWAYS;
+        WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_ENALWAYS;
         break;
     case METAL_WATCHDOG_RUN_AWAKE:
         /* Feed the watchdog before starting to reset counter */
         __metal_driver_sifive_wdog0_feed(wdog);
 
-        WDOG_UNLOCK(base);
-        WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_COREAWAKE;
+        WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |= METAL_WDOGCFG_COREAWAKE;
         break;
     }
 
@@ -195,8 +189,7 @@ int __metal_driver_sifive_wdog0_clear_interrupt(const struct metal_watchdog *con
     const uintptr_t base = (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
     /* Clear the interrupt pending bit */
-    WDOG_UNLOCK(base);
-    WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_IP);
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &= ~(METAL_WDOGCFG_IP);
 
     return 0;
 }
