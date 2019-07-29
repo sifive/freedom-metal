@@ -14,11 +14,11 @@
  */
 
 struct _metal_memory_attributes {
-	int R : 1;
-	int W : 1;
-	int X : 1;
-	int C : 1;
-	int A : 1;
+	unsigned int R : 1;
+	unsigned int W : 1;
+	unsigned int X : 1;
+	unsigned int C : 1;
+	unsigned int A : 1;
 };
 
 /*!
