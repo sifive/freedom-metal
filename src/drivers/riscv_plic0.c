@@ -48,7 +48,6 @@ void __metal_plic0_set_priority(struct __metal_driver_riscv_plic0 *plic,
 void __metal_plic0_enable(struct __metal_driver_riscv_plic0 *plic, int id, int enable)
 {
     unsigned int current;
-    unsigned long hartid = __metal_myhart_id();
     unsigned long control_base = __metal_driver_sifive_plic0_control_base((struct metal_interrupt *)plic);
 
     current = __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base +
