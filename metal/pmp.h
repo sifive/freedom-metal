@@ -42,11 +42,11 @@ enum metal_pmp_address_mode {
  */
 struct metal_pmp_config {
     /*! @brief Sets whether reads to the PMP region succeed */
-    int R : 1;
+    unsigned int R : 1;
     /*! @brief Sets whether writes to the PMP region succeed */
-    int W : 1;
+    unsigned int W : 1;
     /*! @brief Sets whether the PMP region is executable */
-    int X : 1;
+    unsigned int X : 1;
 
     /*! @brief Sets the addressing mode of the PMP region */
     enum metal_pmp_address_mode A : 2;
