@@ -18,7 +18,7 @@
 enum metal_privilege_mode {
 	METAL_PRIVILEGE_USER = 0,
 	METAL_PRIVILEGE_SUPERVISOR = 1,
-	METAL_PRIVELEGE_MACHINE = 3,
+	METAL_PRIVILEGE_MACHINE = 3,
 };
 
 #if __riscv_xlen == 32
