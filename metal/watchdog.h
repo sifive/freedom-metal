@@ -18,18 +18,18 @@ struct metal_watchdog;
  * @brief List of watchdog timer count behaviors
  */
 enum metal_watchdog_run_option {
-  METAL_WATCHDOG_STOP = 0,
-  METAL_WATCHDOG_RUN_ALWAYS,
-  METAL_WATCHDOG_RUN_AWAKE,
+  METAL_WATCHDOG_STOP = 0,   /*!< Stop the watchdog */
+  METAL_WATCHDOG_RUN_ALWAYS, /*!< Run the watchdog continuously, even during sleep */
+  METAL_WATCHDOG_RUN_AWAKE,  /*!< Run the watchdog only while the CPU is awake */
 };
 
 /*!
  * @brief List of behaviors when a watchdog triggers
  */
 enum metal_watchdog_result {
-  METAL_WATCHDOG_NO_RESULT = 0,
-  METAL_WATCHDOG_INTERRUPT,
-  METAL_WATCHDOG_FULL_RESET,
+  METAL_WATCHDOG_NO_RESULT = 0, /*!< When the watchdog triggers, do nothing */
+  METAL_WATCHDOG_INTERRUPT,     /*!< When the watchdog triggers, fire an interrupt */
+  METAL_WATCHDOG_FULL_RESET,    /*!< When the watchdog triggers, cause a full system reset */
 };
 
 
