@@ -281,3 +281,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_spi0) = {
     .spi.set_baud_rate = __metal_driver_sifive_spi0_set_baud_rate,
 };
 #endif /* METAL_SIFIVE_SPI0 */
+
+typedef int no_empty_translation_units;

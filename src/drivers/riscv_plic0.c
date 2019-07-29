@@ -169,3 +169,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_plic0) = {
 };
 
 #endif /* METAL_RISCV_PLIC0 */
+
+typedef int no_empty_translation_units;

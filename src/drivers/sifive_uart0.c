@@ -169,3 +169,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
 };
 
 #endif /* METAL_SIFIVE_UART0 */
+
+typedef int no_empty_translation_units;

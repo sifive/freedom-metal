@@ -220,3 +220,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_clint0) = {
 };
 
 #endif /* METAL_RISCV_CLINT0 */
+
+typedef int no_empty_translation_units;

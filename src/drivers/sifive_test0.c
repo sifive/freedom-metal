@@ -26,3 +26,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_test0) = {
     .shutdown.exit       = &__metal_driver_sifive_test0_exit,
 };
 #endif /* METAL_SIFIVE_TEST0 */
+
+typedef int no_empty_translation_units;
