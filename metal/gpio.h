@@ -54,7 +54,7 @@ struct metal_gpio {
  * @param device_num The GPIO device index
  * @return The GPIO device handle, or NULL if there is no device at that index
  */
-struct metal_gpio *metal_gpio_get_device(int device_num);
+struct metal_gpio *metal_gpio_get_device(unsigned int device_num);
 
 /*!
  * @brief enable input on a pin

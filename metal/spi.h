@@ -42,7 +42,7 @@ struct metal_spi {
 /*! @brief Get a handle for a SPI device
  * @param device_num The index of the desired SPI device
  * @return A handle to the SPI device, or NULL if the device does not exist*/
-struct metal_spi *metal_spi_get_device(int device_num);
+struct metal_spi *metal_spi_get_device(unsigned int device_num);
 
 /*! @brief Initialize a SPI device with a certain baud rate
  * @param spi The handle for the SPI device to initialize

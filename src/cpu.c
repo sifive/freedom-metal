@@ -4,7 +4,7 @@
 #include <metal/cpu.h>
 #include <metal/machine.h>
 
-struct metal_cpu* metal_cpu_get(int hartid)
+struct metal_cpu* metal_cpu_get(unsigned int hartid)
 {
     if (hartid < __METAL_DT_MAX_HARTS) {
         return (struct metal_cpu *)__metal_cpu_table[hartid];

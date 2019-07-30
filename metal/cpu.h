@@ -49,7 +49,7 @@ struct metal_cpu {
  * @param hartid The ID of the desired CPU hart
  * @return A pointer to the CPU device handle
  */
-struct metal_cpu* metal_cpu_get(int hartid);
+struct metal_cpu* metal_cpu_get(unsigned int hartid);
 
 /*! @brief Get the hartid of the CPU hart executing this function
  *

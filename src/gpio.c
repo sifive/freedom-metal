@@ -20,7 +20,7 @@ extern __inline__ int metal_gpio_get_interrupt_id(struct metal_gpio *gpio, int p
 extern __inline__ int metal_gpio_config_interrupt(struct metal_gpio *gpio, int pin, int intr_type);
 extern __inline__ int metal_gpio_clear_interrupt(struct metal_gpio *gpio, int pin, int intr_type);
 
-struct metal_gpio *metal_gpio_get_device(int device_num)
+struct metal_gpio *metal_gpio_get_device(unsigned int device_num)
 {
     if(device_num > __MEE_DT_MAX_GPIOS) {
 	return NULL;
