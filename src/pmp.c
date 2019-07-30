@@ -5,8 +5,8 @@
 #include <metal/pmp.h>
 #include <metal/cpu.h>
 
-#define CONFIG_TO_INT(_config) (*((size_t *) &(_config)))
-#define INT_TO_CONFIG(_int) (*((struct metal_pmp_config *) &(_int)))
+#define CONFIG_TO_INT(_config) (*((char *) &(_config)))
+#define INT_TO_CONFIG(_int) (*((struct metal_pmp_config *)(char *) &(_int)))
 
 struct metal_pmp *metal_pmp_get_device(void)
 {
@@ -290,6 +290,7 @@ int metal_pmp_get_region(struct metal_pmp *pmp,
                        size_t *address)
 {
     size_t pmpcfg = 0;
+    char *pmpcfg_convert = (char *)&pmpcfg;
 
     if(!pmp || !config || !address) {
         /* NULL pointers are invalid arguments */
@@ -341,7 +342,7 @@ int metal_pmp_get_region(struct metal_pmp *pmp,
 #error XLEN is not set to supported value for PMP driver
 #endif
 
-    *config = INT_TO_CONFIG(pmpcfg);
+    *config = INT_TO_CONFIG(*pmpcfg_convert);
 
     switch(region) {
     case 0:
