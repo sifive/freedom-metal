@@ -9,6 +9,7 @@
  *
  * @brief API for configuring caches
  */
+#include <stdint.h>
 
 struct metal_cache;
 
@@ -64,9 +65,10 @@ int metal_dcache_l1_available(int hartid);
 
 /*!
  * @brief Flush dcache for L1 on the requested core
- * @param hartid The core to flush
+ * @param hartid  The core to flush
+ * @param address The virtual address of cacheline to invalidate
  * @return None
  */
-void metal_dcache_l1_flush(int hartid);
+void metal_dcache_l1_flush(int hartid, uintptr_t address);
 
 #endif
