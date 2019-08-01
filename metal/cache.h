@@ -33,8 +33,8 @@ struct metal_cache {
  *
  * Initializes a cache with the requested number of ways enabled.
  */
-inline void metal_cache_init(struct metal_cache *cache, int ways) {
-	return cache->vtable->init(cache, ways);
+__inline__ void metal_cache_init(struct metal_cache *cache, int ways) {
+	cache->vtable->init(cache, ways);
 }
 
 /*!
@@ -42,7 +42,7 @@ inline void metal_cache_init(struct metal_cache *cache, int ways) {
  * @param cache The handle for the cache
  * @return The current number of enabled cache ways
  */
-inline int metal_cache_get_enabled_ways(struct metal_cache *cache) {
+__inline__ int metal_cache_get_enabled_ways(struct metal_cache *cache) {
 	return cache->vtable->get_enabled_ways(cache);
 }
 
@@ -52,7 +52,7 @@ inline int metal_cache_get_enabled_ways(struct metal_cache *cache) {
  * @param ways The number of ways to enabled
  * @return 0 if the ways are successfully enabled
  */
-inline int metal_cache_set_enabled_ways(struct metal_cache *cache, int ways) {
+__inline__ int metal_cache_set_enabled_ways(struct metal_cache *cache, int ways) {
 	return cache->vtable->set_enabled_ways(cache, ways);
 }
 

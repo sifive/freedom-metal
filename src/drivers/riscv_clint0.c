@@ -120,6 +120,8 @@ int __metal_driver_riscv_clint0_enable (struct metal_interrupt *controller, int 
             rc = intc->vtable->interrupt_enable(intc, id);
         }
     }
+
+    return rc;
 }
 
 int __metal_driver_riscv_clint0_disable (struct metal_interrupt *controller, int id)
@@ -145,6 +147,8 @@ int __metal_driver_riscv_clint0_disable (struct metal_interrupt *controller, int
             rc = intc->vtable->interrupt_disable(intc, id);
         }
     }
+
+    return rc;
 }
 
 int __metal_driver_riscv_clint0_command_request (struct metal_interrupt *controller,
@@ -216,3 +220,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_clint0) = {
 };
 
 #endif /* METAL_RISCV_CLINT0 */
+
+typedef int no_empty_translation_units;

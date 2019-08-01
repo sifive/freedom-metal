@@ -56,9 +56,9 @@ struct metal_interrupt {
  *
  * @param controller The handle for the interrupt controller
  */
-inline void metal_interrupt_init(struct metal_interrupt *controller)
+__inline__ void metal_interrupt_init(struct metal_interrupt *controller)
 {
-    return controller->vtable->interrupt_init(controller);
+    controller->vtable->interrupt_init(controller);
 }
 
 
@@ -70,7 +70,7 @@ inline void metal_interrupt_init(struct metal_interrupt *controller)
  * @param priv_data Private data for the interrupt handler
  * @return 0 upon success
  */
-inline int metal_interrupt_register_handler(struct metal_interrupt *controller,
+__inline__ int metal_interrupt_register_handler(struct metal_interrupt *controller,
                                           int id,
                                           metal_interrupt_handler_t handler,
                                           void *priv_data)
@@ -84,7 +84,7 @@ inline int metal_interrupt_register_handler(struct metal_interrupt *controller,
  * @param id The interrupt ID to enable
  * @return 0 upon success
  */
-inline int metal_interrupt_enable(struct metal_interrupt *controller, int id)
+__inline__ int metal_interrupt_enable(struct metal_interrupt *controller, int id)
 {
     return controller->vtable->interrupt_enable(controller, id);
 }
@@ -95,7 +95,7 @@ inline int metal_interrupt_enable(struct metal_interrupt *controller, int id)
  * @param id The interrupt ID to disable
  * @return 0 upon success
  */
-inline int metal_interrupt_disable(struct metal_interrupt *controller, int id)
+__inline__ int metal_interrupt_disable(struct metal_interrupt *controller, int id)
 {
     return controller->vtable->interrupt_disable(controller, id);
 }
@@ -107,7 +107,7 @@ inline int metal_interrupt_disable(struct metal_interrupt *controller, int id)
  * @param mode The interrupt mode type to enable
  * @return 0 upon success
  */
-inline int metal_interrupt_vector_enable(struct metal_interrupt *controller,
+__inline__ int metal_interrupt_vector_enable(struct metal_interrupt *controller,
                                        int id, metal_vector_mode mode)
 {
     return controller->vtable->interrupt_vector_enable(controller, id, mode);
@@ -119,13 +119,13 @@ inline int metal_interrupt_vector_enable(struct metal_interrupt *controller,
  * @param id The interrupt ID to disable
  * @return 0 upon success
  */
-inline int metal_interrupt_vector_disable(struct metal_interrupt *controller, int id)
+__inline__ int metal_interrupt_vector_disable(struct metal_interrupt *controller, int id)
 {
     return controller->vtable->interrupt_vector_disable(controller, id);
 }
 
 /* Utilities function to controll, manages devices via a given interrupt controller */
-inline int _metal_interrupt_command_request(struct metal_interrupt *controller,
+__inline__ int _metal_interrupt_command_request(struct metal_interrupt *controller,
 					 int cmd, void *data)
 {
     return controller->vtable->command_request(controller, cmd, data);

@@ -133,7 +133,7 @@ void __metal_driver_sifive_fe310_g000_pll_init(struct __metal_driver_sifive_fe31
  * Returns:
  *  - PLL_CONFIG_NOT_VALID if the configuration is not valid for the input frequency
  *  - the output frequency, in hertz */
-static long get_pll_config_freq(long pll_input_rate, const struct pll_config_t *config)
+static long get_pll_config_freq(unsigned long pll_input_rate, const struct pll_config_t *config)
 {
     if(pll_input_rate < config->min_input_rate || pll_input_rate > config->max_input_rate)
         return PLL_CONFIG_NOT_VALID;
@@ -356,3 +356,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_fe310_g000_pll) = {
 };
 
 #endif /* METAL_SIFIVE_FE310_G000_PLL */
+
+typedef int no_empty_translation_units;

@@ -40,7 +40,6 @@ struct __metal_clic_cfg __metal_clic0_configuration (struct __metal_driver_sifiv
 {
     volatile unsigned char val;
     struct __metal_clic_cfg cliccfg;
-    uintptr_t hartid = __metal_myhart_id();
     unsigned long control_base = __metal_driver_sifive_clic0_control_base((struct metal_interrupt *)clic);
 
     if ( cfg ) {
@@ -369,7 +368,7 @@ void __metal_driver_sifive_clic0_init (struct metal_interrupt *controller)
         /* Initialize ist parent controller, aka cpu_intc. */
         intc->vtable->interrupt_init(intc);
         __metal_controller_interrupt_vector(METAL_SELECTIVE_VECTOR_MODE,
-                                          &__metal_clic0_handler);
+                                          (void *)(uintptr_t)&__metal_clic0_handler);
 
         /*
          * Register its interrupts with with parent controller,
@@ -458,7 +457,7 @@ int __metal_driver_sifive_clic0_enable_interrupt_vector(struct metal_interrupt *
 
     if (id == METAL_INTERRUPT_ID_BASE) {
         if (mode == METAL_SELECTIVE_VECTOR_MODE) {
-            __metal_controller_interrupt_vector(mode, &__metal_clic0_handler);
+            __metal_controller_interrupt_vector(mode, (void *)(uintptr_t)&__metal_clic0_handler);
             return 0;
         }
         if (mode == METAL_HARDWARE_VECTOR_MODE) {
@@ -485,7 +484,7 @@ int __metal_driver_sifive_clic0_disable_interrupt_vector(struct metal_interrupt 
                               (struct __metal_driver_sifive_clic0 *)(controller);
 
     if (id == METAL_INTERRUPT_ID_BASE) {
-        __metal_controller_interrupt_vector(METAL_SELECTIVE_VECTOR_MODE, &__metal_clic0_handler);
+        __metal_controller_interrupt_vector(METAL_SELECTIVE_VECTOR_MODE, (void *)(uintptr_t)&__metal_clic0_handler);
         return 0;
     }
     num_subinterrupts = __metal_driver_sifive_clic0_num_subinterrupts(controller);
@@ -562,3 +561,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
 };
 
 #endif /* METAL_SIFIVE_CLIC0 */
+
+typedef int no_empty_translation_units;

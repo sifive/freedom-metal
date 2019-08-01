@@ -37,7 +37,7 @@ void __metal_plic0_set_priority(struct __metal_driver_riscv_plic0 *plic,
 			      int id, unsigned int priority)
 {
     unsigned long control_base = __metal_driver_sifive_plic0_control_base((struct metal_interrupt *)plic);
-    int max_priority = __metal_driver_sifive_plic0_max_priority((struct metal_interrupt *)plic);
+    unsigned int max_priority = __metal_driver_sifive_plic0_max_priority((struct metal_interrupt *)plic);
     if ( (max_priority) && (priority < max_priority) ) {
         __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base +
 					   METAL_RISCV_PLIC0_PRIORITY_BASE +
@@ -48,7 +48,6 @@ void __metal_plic0_set_priority(struct __metal_driver_riscv_plic0 *plic,
 void __metal_plic0_enable(struct __metal_driver_riscv_plic0 *plic, int id, int enable)
 {
     unsigned int current;
-    unsigned long hartid = __metal_myhart_id();
     unsigned long control_base = __metal_driver_sifive_plic0_control_base((struct metal_interrupt *)plic);
 
     current = __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base +
@@ -69,7 +68,7 @@ void __metal_plic0_handler (int id, void *priv)
 {
     struct __metal_driver_riscv_plic0 *plic = priv;
     unsigned int idx = __metal_plic0_claim_interrupt(plic);
-    int num_interrupts = __metal_driver_sifive_plic0_num_interrupts((struct metal_interrupt *)plic);
+    unsigned int num_interrupts = __metal_driver_sifive_plic0_num_interrupts((struct metal_interrupt *)plic);
 
     if ( (idx < num_interrupts) && (plic->metal_exint_table[idx]) ) {
 	plic->metal_exint_table[idx](idx,
@@ -170,3 +169,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_plic0) = {
 };
 
 #endif /* METAL_RISCV_PLIC0 */
+
+typedef int no_empty_translation_units;

@@ -47,5 +47,5 @@ static void metal_tty_init(void)
 int nop_putc(int c) __attribute__((section(".text.metal.nop.putc")));
 int nop_putc(int c) { return -1; }
 int metal_tty_putc(int c) __attribute__((weak, alias("nop_putc")));
-#warning "There is no default output device, metal_tty_putc() will throw away all input."
+#pragma message("There is no default output device, metal_tty_putc() will throw away all input.")
 #endif
