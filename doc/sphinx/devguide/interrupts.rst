@@ -37,7 +37,7 @@ initialized before any other interrupt controllers are initialized. In example:
 
 .. code-block:: C
 
-   struct metal_cpu *cpu0 = metal_get_cpu(0);
+   struct metal_cpu *cpu0 = metal_cpu_get(0);
    if(!cpu) {
       /* Unable to get CPU handle */
    }
