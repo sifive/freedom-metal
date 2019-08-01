@@ -18,7 +18,7 @@ To initialize the Freedom Metal exception handlers, initialize CPU interrupts:
 
 .. code-block:: C
 
-   struct metal_cpu *cpu0 = metal_get_cpu(0);
+   struct metal_cpu *cpu0 = metal_cpu_get(0);
    if(!cpu) {
       /* There was an error acquiring the CPU hart 0 handle */
    }
@@ -60,7 +60,7 @@ code.
 
    /* CPU Hart 0's interrupt controller must be initialized
     * if it is not already */
-   struct metal_cpu *cpu0 = metal_get_cpu(0);
+   struct metal_cpu *cpu0 = metal_cpu_get(0);
 
    int rc = metal_cpu_exception_register(cpu0,
                <my_ecode>, /* Set to your desired value */
