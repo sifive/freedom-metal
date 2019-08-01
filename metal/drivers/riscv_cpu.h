@@ -154,15 +154,6 @@ typedef struct __metal_interrupt_data {
 
 uintptr_t __metal_myhart_id(void);
 
-struct __metal_driver_interrupt_controller_vtable {
-    void (*interrupt_init)(struct metal_interrupt *controller);
-    int (*interrupt_register)(struct metal_interrupt *controller,
-			      int id, metal_interrupt_handler_t isr, void *priv_data);
-    int (*interrupt_enable)(struct metal_interrupt *controller, int id);
-    int (*interrupt_disable)(struct metal_interrupt *controller, int id);
-    int (*command_request)(struct metal_interrupt *intr, int cmd, void *data);
-};
-
 struct __metal_driver_vtable_riscv_cpu_intc {
   struct metal_interrupt_vtable controller_vtable;
 };
