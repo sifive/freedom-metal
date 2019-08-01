@@ -212,6 +212,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_lfrosc.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_pll.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_prci.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_global-external-interrupts0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_gpio-buttons.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_gpio-leds.$(OBJEXT) \
@@ -549,6 +550,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_fe310-g000_lfrosc.c \
 	src/drivers/sifive_fe310-g000_pll.c \
 	src/drivers/sifive_fe310-g000_prci.c \
+	src/drivers/sifive_fu540-c000_l2.c \
 	src/drivers/sifive_global-external-interrupts0.c \
 	src/drivers/sifive_gpio-buttons.c \
 	src/drivers/sifive_gpio-leds.c \
@@ -815,6 +817,9 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_pll.$(OBJEXT)
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_prci.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_global-external-interrupts0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -1000,6 +1005,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_lfrosc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_pll.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_prci.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_global-external-interrupts0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_gpio-buttons.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_gpio-leds.Po@am__quote@
@@ -1241,6 +1247,20 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_prci.obj: src
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive_fe310-g000_prci.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_prci.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fe310-g000_prci.obj `if test -f 'src/drivers/sifive_fe310-g000_prci.c'; then $(CYGPATH_W) 'src/drivers/sifive_fe310-g000_prci.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive_fe310-g000_prci.c'; fi`
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.o: src/drivers/sifive_fu540-c000_l2.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.o `test -f 'src/drivers/sifive_fu540-c000_l2.c' || echo '$(srcdir)/'`src/drivers/sifive_fu540-c000_l2.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive_fu540-c000_l2.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.o `test -f 'src/drivers/sifive_fu540-c000_l2.c' || echo '$(srcdir)/'`src/drivers/sifive_fu540-c000_l2.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.obj: src/drivers/sifive_fu540-c000_l2.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.obj `if test -f 'src/drivers/sifive_fu540-c000_l2.c'; then $(CYGPATH_W) 'src/drivers/sifive_fu540-c000_l2.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive_fu540-c000_l2.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive_fu540-c000_l2.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_fu540-c000_l2.obj `if test -f 'src/drivers/sifive_fu540-c000_l2.c'; then $(CYGPATH_W) 'src/drivers/sifive_fu540-c000_l2.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive_fu540-c000_l2.c'; fi`
 
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_global-external-interrupts0.o: src/drivers/sifive_global-external-interrupts0.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_global-external-interrupts0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_global-external-interrupts0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_global-external-interrupts0.o `test -f 'src/drivers/sifive_global-external-interrupts0.c' || echo '$(srcdir)/'`src/drivers/sifive_global-external-interrupts0.c
