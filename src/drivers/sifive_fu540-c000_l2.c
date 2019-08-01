@@ -16,7 +16,7 @@ static void metal_driver_sifive_fu540_c000_l2_init(void)
 {
 #ifdef __METAL_DT_SIFIVE_FU540_C000_L2_HANDLE
     /* Get the handle for the L2 cache controller */
-    struct __metal_driver_sifive_fu540_c000_l2 *l2 = __METAL_DT_SIFIVE_FU540_C000_L2_HANDLE;
+    struct metal_cache *l2 = __METAL_DT_SIFIVE_FU540_C000_L2_HANDLE;
     if(!l2) {
         return;
     }
