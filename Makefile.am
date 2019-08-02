@@ -97,6 +97,7 @@ nobase_include_HEADERS = \
 	metal/spi.h \
 	metal/switch.h \
 	metal/timer.h \
+	metal/time.h \
 	metal/tty.h \
 	metal/uart.h \
 	metal/watchdog.h
@@ -192,6 +193,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/spi.c \
 	src/switch.c \
 	src/timer.c \
+	src/time.c \
 	src/trap.S \
 	src/tty.c \
 	src/uart.c \
