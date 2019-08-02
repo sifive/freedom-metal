@@ -74,6 +74,11 @@ struct metal_pmp {
 struct metal_pmp *metal_pmp_get_device(void);
 
 /*!
+ * @brief Get the number of pmp regions for the hartid
+ */
+int metal_pmp_num_regions(int hartid);
+
+/*!
  * @brief Initialize the PMP
  * @param pmp The PMP device handle to be initialized
  *
