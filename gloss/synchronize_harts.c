@@ -15,10 +15,14 @@
  * hart 0 to finish copying the datat section, zeroing the BSS, and running
  * the libc contstructors.
  */
+__attribute__((section(".init")))
 void _synchronize_harts() {
 #if __METAL_DT_MAX_HARTS > 1
 
-    int hart = metal_cpu_get_current_hartid();
+    /* Read the current hartid */
+    int hart;
+    __asm__ volatile("csrr %0, mhartid" : "=r" (hart) :: "memory");
+
     uintptr_t msip_base = 0;
 
     /* Get the base address of the MSIP registers */
