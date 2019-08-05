@@ -73,7 +73,7 @@ long int __metal_driver_sifive_wdog0_set_rate(const struct metal_watchdog *const
     }
 
     /* Look for the closest scale value */
-    unsigned long int min_diff = ULONG_MAX;
+    long min_diff = LONG_MAX;
     unsigned int min_scale = 0;
     for (int i = 0; i < METAL_WDOGCFG_SCALE_MASK; i++) {
         const long int new_rate = clock_rate / (1 << i);
@@ -208,3 +208,6 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_wdog0) = {
 };
 
 #endif /* METAL_SIFIVE_WDOG0 */
+
+typedef int no_empty_translation_units;
+

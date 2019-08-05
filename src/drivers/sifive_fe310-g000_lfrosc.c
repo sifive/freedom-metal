@@ -48,3 +48,6 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_fe310_g000_lfrosc) = {
     .clock.set_rate_hz = &__metal_driver_sifive_fe310_g000_lfrosc_set_rate_hz,
 };
 #endif /* METAL_SIFIVE_FE310_G000_LFROSC */
+
+typedef int no_empty_translation_units;
+
