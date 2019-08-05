@@ -635,8 +635,13 @@ int __metal_driver_cpu_exception_register(struct metal_cpu *cpu, int ecode,
 
 int  __metal_driver_cpu_get_instruction_length(struct metal_cpu *cpu, uintptr_t epc)
 {
-    /* Per ISA compressed instruction has last two bits of opcode set */
-    return (*(unsigned short*)epc & 3) ? 4 : 2;
+    /**
+     * Per ISA compressed instruction has last two bits of opcode set.
+     * The encoding '00' '01' '10' are used for compressed instruction.
+     * Only enconding '11' isn't regarded as compressed instruction (>16b).
+     */
+    return ((*(unsigned short*)epc & METAL_INSN_LENGTH_MASK)
+            == METAL_INSN_NOT_COMPRESSED) ? 4 : 2;
 }
 
 uintptr_t  __metal_driver_cpu_get_exception_pc(struct metal_cpu *cpu)
