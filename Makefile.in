@@ -149,21 +149,20 @@ am__v_AR_1 =
 libriscv__menv__metal_a_AR = $(AR) $(ARFLAGS)
 libriscv__menv__metal_a_LIBADD =
 am__libriscv__menv__metal_a_SOURCES_DIST = gloss/crt0.S \
-	gloss/synchronize_harts.c gloss/nanosleep.c gloss/sys_access.c \
-	gloss/sys_chdir.c gloss/sys_chmod.c gloss/sys_chown.c \
-	gloss/sys_close.c gloss/sys_execve.c gloss/sys_exit.c \
-	gloss/sys_faccessat.c gloss/sys_fork.c gloss/sys_fstat.c \
-	gloss/sys_fstatat.c gloss/sys_ftime.c gloss/sys_getcwd.c \
-	gloss/sys_getpid.c gloss/sys_gettimeofday.c gloss/sys_isatty.c \
-	gloss/sys_kill.c gloss/sys_link.c gloss/sys_lseek.c \
-	gloss/sys_lstat.c gloss/sys_open.c gloss/sys_openat.c \
-	gloss/sys_read.c gloss/sys_sbrk.c gloss/sys_stat.c \
-	gloss/sys_sysconf.c gloss/sys_times.c gloss/sys_unlink.c \
-	gloss/sys_utime.c gloss/sys_wait.c gloss/sys_write.c
+	gloss/nanosleep.c gloss/sys_access.c gloss/sys_chdir.c \
+	gloss/sys_chmod.c gloss/sys_chown.c gloss/sys_close.c \
+	gloss/sys_execve.c gloss/sys_exit.c gloss/sys_faccessat.c \
+	gloss/sys_fork.c gloss/sys_fstat.c gloss/sys_fstatat.c \
+	gloss/sys_ftime.c gloss/sys_getcwd.c gloss/sys_getpid.c \
+	gloss/sys_gettimeofday.c gloss/sys_isatty.c gloss/sys_kill.c \
+	gloss/sys_link.c gloss/sys_lseek.c gloss/sys_lstat.c \
+	gloss/sys_open.c gloss/sys_openat.c gloss/sys_read.c \
+	gloss/sys_sbrk.c gloss/sys_stat.c gloss/sys_sysconf.c \
+	gloss/sys_times.c gloss/sys_unlink.c gloss/sys_utime.c \
+	gloss/sys_wait.c gloss/sys_write.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@am_libriscv__menv__metal_a_OBJECTS =  \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT) \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/synchronize_harts.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.$(OBJEXT) \
@@ -240,6 +239,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-spi.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-time.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-trap.$(OBJEXT) \
@@ -584,6 +584,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/shutdown.c \
 	src/spi.c \
 	src/switch.c \
+	src/synchronize_harts.c \
 	src/timer.c \
 	src/time.c \
 	src/trap.S \
@@ -593,7 +594,6 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libriscv__menv__metal_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/synchronize_harts.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.c \
@@ -712,8 +712,6 @@ gloss/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) gloss/$(DEPDIR)
 	@: > gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
-	gloss/$(DEPDIR)/$(am__dirstamp)
-gloss/synchronize_harts.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/nanosleep.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
@@ -900,6 +898,8 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-spi.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-time.$(OBJEXT):  \
@@ -957,7 +957,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/nanosleep.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/synchronize_harts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_access.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_chdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_chmod.Po@am__quote@
@@ -1005,6 +1004,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-spi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-time.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-trap.Po@am__quote@
@@ -1644,6 +1644,20 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj: src/switch.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/switch.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.obj `if test -f 'src/switch.c'; then $(CYGPATH_W) 'src/switch.c'; else $(CYGPATH_W) '$(srcdir)/src/switch.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.o: src/synchronize_harts.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.o `test -f 'src/synchronize_harts.c' || echo '$(srcdir)/'`src/synchronize_harts.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/synchronize_harts.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.o `test -f 'src/synchronize_harts.c' || echo '$(srcdir)/'`src/synchronize_harts.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.obj: src/synchronize_harts.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.obj `if test -f 'src/synchronize_harts.c'; then $(CYGPATH_W) 'src/synchronize_harts.c'; else $(CYGPATH_W) '$(srcdir)/src/synchronize_harts.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/synchronize_harts.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.obj `if test -f 'src/synchronize_harts.c'; then $(CYGPATH_W) 'src/synchronize_harts.c'; else $(CYGPATH_W) '$(srcdir)/src/synchronize_harts.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o: src/timer.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-timer.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-timer.o `test -f 'src/timer.c' || echo '$(srcdir)/'`src/timer.c
