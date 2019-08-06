@@ -43,8 +43,8 @@ unsigned int __metal_plic0_get_threshold(struct metal_interrupt *controller)
 
 int __metal_plic0_set_priority(struct metal_interrupt *controller, int id, unsigned int priority)
 {
-    unsigned long control_base = __metal_driver_sifive_plic0_control_base((struct metal_interrupt *)plic);
-    unsigned int max_priority = __metal_driver_sifive_plic0_max_priority((struct metal_interrupt *)plic);
+    unsigned long control_base = __metal_driver_sifive_plic0_control_base((struct metal_interrupt *)controller);
+    unsigned int max_priority = __metal_driver_sifive_plic0_max_priority((struct metal_interrupt *)controller);
     if ( (max_priority) && (priority < max_priority) ) {
         __METAL_ACCESS_ONCE((__metal_io_u32 *)(control_base +
 					   METAL_RISCV_PLIC0_PRIORITY_BASE +
