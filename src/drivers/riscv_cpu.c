@@ -141,7 +141,7 @@ void __metal_exception_handler (void) {
     		uintptr_t mtvt;
     		metal_interrupt_handler_t mtvt_handler;
 
-                __asm__ volatile ("csrr %0, mtvt" : "=r"(mtvt));
+                __asm__ volatile ("csrr %0, 0x307" : "=r"(mtvt));
                	priv = intc->metal_int_table[METAL_INTERRUPT_ID_SW].sub_int;
                	mtvt_handler = (metal_interrupt_handler_t)mtvt;
                	mtvt_handler(id, priv);
@@ -163,11 +163,11 @@ void __metal_controller_interrupt_vector (metal_vector_mode mode, void *vec_tabl
 
     switch (mode) {
     case METAL_SELECTIVE_VECTOR_MODE:
-        __asm__ volatile ("csrw mtvt, %0" :: "r"(trap_entry | METAL_MTVEC_CLIC));
+        __asm__ volatile ("csrw 0x307, %0" :: "r"(trap_entry | METAL_MTVEC_CLIC));
         __asm__ volatile ("csrw mtvec, %0" :: "r"(val | METAL_MTVEC_CLIC));
         break;
     case METAL_HARDWARE_VECTOR_MODE:
-        __asm__ volatile ("csrw mtvt, %0" :: "r"(trap_entry | METAL_MTVEC_CLIC_VECTORED));
+        __asm__ volatile ("csrw 0x307, %0" :: "r"(trap_entry | METAL_MTVEC_CLIC_VECTORED));
         __asm__ volatile ("csrw mtvec, %0" :: "r"(val | METAL_MTVEC_CLIC_VECTORED));
         break;
     case METAL_VECTOR_MODE:
