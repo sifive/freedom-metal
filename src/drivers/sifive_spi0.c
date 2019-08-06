@@ -7,6 +7,7 @@
 #include <metal/drivers/sifive_spi0.h>
 #include <metal/io.h>
 #include <metal/machine.h>
+#include <metal/time.h>
 #include <time.h>
 
 /* Register fields */
@@ -164,10 +165,10 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
         /* Wait for RXFIFO to not be empty, but break the nested loops if timeout
          * this timeout method  needs refining, preferably taking into account 
          * the device specs */
-        endwait = time(NULL) + METAL_SPI_RXDATA_TIMEOUT;
+        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
 
         while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) & METAL_SPI_RXDATA_EMPTY) {
-            if (time(NULL) > endwait) {
+            if (metal_time() > endwait) {
                 /* If timeout, deassert the CS */
                 METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
 
