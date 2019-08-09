@@ -100,6 +100,7 @@ typedef enum {
   METAL_INTERRUPT_ID_SW   = (METAL_INTERRUPT_ID_BASE + 3),
   METAL_INTERRUPT_ID_TMR  = (METAL_INTERRUPT_ID_BASE + 7),
   METAL_INTERRUPT_ID_EXT  = (METAL_INTERRUPT_ID_BASE + 11),
+  METAL_INTERRUPT_ID_CSW  = (METAL_INTERRUPT_ID_BASE + 12),
   METAL_INTERRUPT_ID_LC0  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(0)),
   METAL_INTERRUPT_ID_LC1  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(1)),
   METAL_INTERRUPT_ID_LC2  = (METAL_INTERRUPT_ID_BASE + METAL_LOCAL_INTR(2)),
@@ -164,14 +165,8 @@ struct __metal_driver_vtable_riscv_cpu_intc {
 
 void __metal_interrupt_global_enable(void);
 void __metal_interrupt_global_disable(void);
+metal_vector_mode __metal_controller_interrupt_vector_mode(void);
 void __metal_controller_interrupt_vector(metal_vector_mode mode, void *vec_table);
-__inline__ int __metal_controller_interrupt_is_selective_vectored (void)
-{
-    uintptr_t val;
-
-    __asm__ volatile ("csrr %0, mtvec" : "=r"(val));
-    return ((val & METAL_MTVEC_CLIC_VECTORED) == METAL_MTVEC_CLIC);
-}
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_cpu_intc)
 
