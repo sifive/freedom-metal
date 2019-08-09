@@ -131,7 +131,7 @@ void __metal_exception_handler (void) {
 	  __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
         id = mcause & METAL_MCAUSE_CAUSE;
         if (mcause & METAL_MCAUSE_INTR) {
-            if ((id < METAL_INTERRUPT_ID_LC0) ||
+            if ((id < METAL_INTERRUPT_ID_CSW) ||
                ((mtvec & METAL_MTVEC_MASK) == METAL_MTVEC_DIRECT)) {
                 priv = intc->metal_int_table[id].exint_data;
                 intc->metal_int_table[id].handler(id, priv);
@@ -143,7 +143,7 @@ void __metal_exception_handler (void) {
 
                 __asm__ volatile ("csrr %0, 0x307" : "=r"(mtvt));
                	priv = intc->metal_int_table[METAL_INTERRUPT_ID_SW].sub_int;
-               	mtvt_handler = (metal_interrupt_handler_t)mtvt;
+               	mtvt_handler = (metal_interrupt_handler_t)*(uintptr_t *)mtvt;
                	mtvt_handler(id, priv);
 		return;
             }
@@ -151,6 +151,24 @@ void __metal_exception_handler (void) {
             intc->metal_exception_table[id]((struct metal_cpu *)cpu, id);
         }
     }
+}
+
+metal_vector_mode __metal_controller_interrupt_vector_mode (void)
+{
+    uintptr_t val;
+
+    asm volatile ("csrr %0, mtvec" : "=r"(val));
+    val &= METAL_MTVEC_MASK;
+
+    switch (val) {
+    case METAL_MTVEC_CLIC:
+        return METAL_SELECTIVE_VECTOR_MODE;
+    case METAL_MTVEC_CLIC_VECTORED:
+        return METAL_HARDWARE_VECTOR_MODE;
+    case METAL_MTVEC_VECTORED:
+        return METAL_VECTOR_MODE;
+    }
+    return METAL_DIRECT_MODE;
 }
 
 void __metal_controller_interrupt_vector (metal_vector_mode mode, void *vec_table)
@@ -162,12 +180,13 @@ void __metal_controller_interrupt_vector (metal_vector_mode mode, void *vec_tabl
     trap_entry = (uintptr_t)vec_table;
 
     switch (mode) {
+    case METAL_SELECTIVE_NONVECTOR_MODE:
     case METAL_SELECTIVE_VECTOR_MODE:
-        __asm__ volatile ("csrw 0x307, %0" :: "r"(trap_entry | METAL_MTVEC_CLIC));
+        __asm__ volatile ("csrw 0x307, %0" :: "r"(trap_entry));
         __asm__ volatile ("csrw mtvec, %0" :: "r"(val | METAL_MTVEC_CLIC));
         break;
     case METAL_HARDWARE_VECTOR_MODE:
-        __asm__ volatile ("csrw 0x307, %0" :: "r"(trap_entry | METAL_MTVEC_CLIC_VECTORED));
+        __asm__ volatile ("csrw 0x307, %0" :: "r"(trap_entry));
         __asm__ volatile ("csrw mtvec, %0" :: "r"(val | METAL_MTVEC_CLIC_VECTORED));
         break;
     case METAL_VECTOR_MODE:
@@ -427,14 +446,33 @@ int __metal_driver_riscv_cpu_controller_interrupt_disable_vector(struct metal_in
     return -1;
 }
 
+metal_vector_mode __metal_driver_riscv_cpu_controller_get_vector_mode (struct metal_interrupt *controller)
+{   
+    return __metal_controller_interrupt_vector_mode();
+}
+
+int __metal_driver_riscv_cpu_controller_set_vector_mode (struct metal_interrupt *controller,
+                                                         metal_vector_mode mode)
+{   
+    struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
+
+    if (mode == METAL_DIRECT_MODE) {
+        __metal_controller_interrupt_vector(mode, (void *)(uintptr_t)&__metal_exception_handler);
+            return 0;
+    }
+    if (mode == METAL_VECTOR_MODE) {
+        __metal_controller_interrupt_vector(mode, (void *)&intc->metal_mtvec_table);
+        return 0;
+    }
+    return -1;
+}
+
 int __metal_driver_riscv_cpu_controller_command_request (struct metal_interrupt *controller,
 						       int cmd, void *data)
 {
     /* NOP for now, unless local interrupt lines the like of clic, clint, plic */
     return 0;
 }
-
-extern __inline__ int __metal_controller_interrupt_is_selective_vectored(void);
 
 /* CPU driver !!! */
 
@@ -658,12 +696,12 @@ int  __metal_driver_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t mepc)
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
-    .controller_vtable.interrupt_init = __metal_driver_riscv_cpu_controller_interrupt_init,
+    .controller_vtable.interrupt_init     = __metal_driver_riscv_cpu_controller_interrupt_init,
     .controller_vtable.interrupt_register = __metal_driver_riscv_cpu_controller_interrupt_register,
     .controller_vtable.interrupt_enable   = __metal_driver_riscv_cpu_controller_interrupt_enable,
     .controller_vtable.interrupt_disable  = __metal_driver_riscv_cpu_controller_interrupt_disable,
-    .controller_vtable.interrupt_vector_enable   = __metal_driver_riscv_cpu_controller_interrupt_enable_vector,
-    .controller_vtable.interrupt_vector_disable  = __metal_driver_riscv_cpu_controller_interrupt_disable_vector,
+    .controller_vtable.interrupt_get_vector_mode = __metal_driver_riscv_cpu_controller_get_vector_mode,
+    .controller_vtable.interrupt_set_vector_mode = __metal_driver_riscv_cpu_controller_set_vector_mode,
     .controller_vtable.command_request    = __metal_driver_riscv_cpu_controller_command_request,
 };
 
