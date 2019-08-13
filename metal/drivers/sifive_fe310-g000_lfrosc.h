@@ -4,8 +4,8 @@
 #ifndef METAL__DRIVERS__SIFIVE_FE310_G000_LFROSC_H
 #define METAL__DRIVERS__SIFIVE_FE310_G000_LFROSC_H
 
-#include <metal/compiler.h>
 #include <metal/clock.h>
+#include <metal/compiler.h>
 #include <metal/io.h>
 
 struct __metal_driver_vtable_sifive_fe310_g000_lfrosc {
