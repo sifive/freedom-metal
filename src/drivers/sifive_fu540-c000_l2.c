@@ -13,8 +13,6 @@
 #define L2_CONFIG_WAYS_SHIFT    8
 #define L2_CONFIG_WAYS_MASK     (0xFF << L2_CONFIG_WAYS_SHIFT)
 
-extern inline int metal_cache_get_enabled_ways(struct metal_cache *cache);
-extern inline int metal_cache_set_enabled_ways(struct metal_cache *cache, int ways);
 void __metal_driver_sifive_fu540_c000_l2_init(struct metal_cache *l2, int ways);
 
 static void metal_driver_sifive_fu540_c000_l2_init(void) __attribute__((constructor));
