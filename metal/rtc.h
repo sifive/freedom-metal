@@ -23,12 +23,16 @@ enum metal_rtc_run_option {
 
 struct metal_rtc_vtable {
     uint64_t (*get_rate)(const struct metal_rtc *const rtc);
-    uint64_t (*set_rate)(const struct metal_rtc *const rtc, const uint64_t rate);
+    uint64_t (*set_rate)(const struct metal_rtc *const rtc,
+                         const uint64_t rate);
     uint64_t (*get_compare)(const struct metal_rtc *const rtc);
-    uint64_t (*set_compare)(const struct metal_rtc *const rtc, const uint64_t compare);
+    uint64_t (*set_compare)(const struct metal_rtc *const rtc,
+                            const uint64_t compare);
     uint64_t (*get_count)(const struct metal_rtc *const rtc);
-    uint64_t (*set_count)(const struct metal_rtc *const rtc, const uint64_t count);
-    int (*run)(const struct metal_rtc *const rtc, const enum metal_rtc_run_option option);
+    uint64_t (*set_count)(const struct metal_rtc *const rtc,
+                          const uint64_t count);
+    int (*run)(const struct metal_rtc *const rtc,
+               const enum metal_rtc_run_option option);
     struct metal_interrupt *(*get_interrupt)(const struct metal_rtc *const rtc);
     int (*get_interrupt_id)(const struct metal_rtc *const rtc);
 };
@@ -52,7 +56,8 @@ inline uint64_t metal_rtc_get_rate(const struct metal_rtc *const rtc) {
  * @brief Set (if possible) the rate of the RTC
  * @return The new rate of the RTC (not guaranteed to be the same as requested)
  */
-inline uint64_t metal_rtc_set_rate(const struct metal_rtc *const rtc, const uint64_t rate) {
+inline uint64_t metal_rtc_set_rate(const struct metal_rtc *const rtc,
+                                   const uint64_t rate) {
     return rtc->vtable->set_rate(rtc, rate);
 }
 
@@ -66,12 +71,14 @@ inline uint64_t metal_rtc_get_compare(const struct metal_rtc *const rtc) {
 
 /*!
  * @brief Set the compare value of the RTC
- * @return The set compare value (not guaranteed to be exactly the requested value)
+ * @return The set compare value (not guaranteed to be exactly the requested
+ * value)
  *
- * The RTC device might impose limits on the maximum compare value or the granularity
- * of the compare value.
+ * The RTC device might impose limits on the maximum compare value or the
+ * granularity of the compare value.
  */
-inline uint64_t metal_rtc_set_compare(const struct metal_rtc *const rtc, const uint64_t compare) {
+inline uint64_t metal_rtc_set_compare(const struct metal_rtc *const rtc,
+                                      const uint64_t compare) {
     return rtc->vtable->set_compare(rtc, compare);
 }
 
@@ -85,11 +92,13 @@ inline uint64_t metal_rtc_get_count(const struct metal_rtc *const rtc) {
 
 /*!
  * @brief Set the current count of the RTC
- * @return The set value of the count (not guaranteed to be exactly the requested value)
+ * @return The set value of the count (not guaranteed to be exactly the
+ * requested value)
  *
  * The RTC device might impose limits on the maximum value of the count
  */
-inline uint64_t metal_rtc_set_count(const struct metal_rtc *const rtc, const uint64_t count) {
+inline uint64_t metal_rtc_set_count(const struct metal_rtc *const rtc,
+                                    const uint64_t count) {
     return rtc->vtable->set_count(rtc, count);
 }
 
@@ -97,7 +106,8 @@ inline uint64_t metal_rtc_set_count(const struct metal_rtc *const rtc, const uin
  * @brief Start or stop the RTC
  * @return 0 if the RTC was successfully started/stopped
  */
-inline int metal_rtc_run(const struct metal_rtc *const rtc, const enum metal_rtc_run_option option) {
+inline int metal_rtc_run(const struct metal_rtc *const rtc,
+                         const enum metal_rtc_run_option option) {
     return rtc->vtable->run(rtc, option);
 }
 
@@ -105,7 +115,8 @@ inline int metal_rtc_run(const struct metal_rtc *const rtc, const enum metal_rtc
  * @brief Get the interrupt handle for the RTC compare
  * @return The interrupt handle
  */
-inline struct metal_interrupt *metal_rtc_get_interrupt(const struct metal_rtc *const rtc) {
+inline struct metal_interrupt *
+metal_rtc_get_interrupt(const struct metal_rtc *const rtc) {
     return rtc->vtable->get_interrupt(rtc);
 }
 
@@ -124,4 +135,3 @@ inline int metal_rtc_get_interrupt_id(const struct metal_rtc *const rtc) {
 struct metal_rtc *metal_rtc_get_device(int index);
 
 #endif
-

@@ -8,7 +8,7 @@
 #include <metal/compiler.h>
 
 struct __metal_driver_vtable_sifive_fu540_c000_l2 {
-	struct __metal_cache_vtable cache;
+    struct __metal_cache_vtable cache;
 };
 
 struct __metal_driver_sifive_fu540_c000_l2;
@@ -16,8 +16,7 @@ struct __metal_driver_sifive_fu540_c000_l2;
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_fu540_c000_l2)
 
 struct __metal_driver_sifive_fu540_c000_l2 {
-	struct metal_cache cache;
+    struct metal_cache cache;
 };
 
 #endif
-

@@ -4,8 +4,8 @@
 #ifndef METAL__DRIVERS__SIFIVE_RTC0_H
 #define METAL__DRIVERS__SIFIVE_RTC0_H
 
-#include <metal/io.h>
 #include <metal/compiler.h>
+#include <metal/io.h>
 
 #include <metal/clock.h>
 #include <metal/interrupt.h>
@@ -24,4 +24,3 @@ struct __metal_driver_sifive_rtc0 {
 };
 
 #endif
-
