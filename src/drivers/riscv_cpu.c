@@ -171,7 +171,7 @@ void __metal_exception_handler(void) {
 metal_vector_mode __metal_controller_interrupt_vector_mode(void) {
     uintptr_t val;
 
-    asm volatile("csrr %0, mtvec" : "=r"(val));
+    __asm__ volatile("csrr %0, mtvec" : "=r"(val));
     val &= METAL_MTVEC_MASK;
 
     switch (val) {
