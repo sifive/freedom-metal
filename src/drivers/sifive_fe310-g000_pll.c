@@ -8,8 +8,9 @@
 #include <limits.h>
 #include <stdio.h>
 
-#include <metal/drivers/sifive_fe310-g000_pll.h>
 #include <metal/machine.h>
+
+#include <metal/drivers/sifive_fe310-g000_pll.h>
 #include <stdlib.h>
 
 #define PLL_R 0x00000007UL
