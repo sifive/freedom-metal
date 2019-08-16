@@ -4,9 +4,9 @@
 #ifndef METAL__DRIVERS__SIFIVE_TRACE_H
 #define METAL__DRIVERS__SIFIVE_TRACE_H
 
+#include <metal/compiler.h>
 #include <metal/io.h>
 #include <metal/uart.h>
-#include <metal/compiler.h>
 
 struct __metal_driver_vtable_sifive_trace {
     const struct metal_uart_vtable uart;
