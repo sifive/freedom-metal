@@ -326,48 +326,20 @@ void __metal_driver_riscv_cpu_controller_interrupt_init(
     uintptr_t val;
 
     if (!intc->init_done) {
-        /* Disable and clear all interrupt sources */
-        __asm__ volatile("csrc mie, %0" ::"r"(-1));
-        __asm__ volatile("csrc mip, %0" ::"r"(-1));
-
-        /* Read the misa CSR to determine if the delegation registers exist */
-        uintptr_t misa;
-        __asm__ volatile("csrr %0, misa" : "=r"(misa));
-
-        /* The delegation CSRs exist if user mode interrupts (N extension) or
-         * supervisor mode (S extension) are supported */
-        if ((misa & METAL_ISA_N_EXTENSIONS) ||
-            (misa & METAL_ISA_S_EXTENSIONS)) {
-            /* Disable interrupt and exception delegation */
-            __asm__ volatile("csrc mideleg, %0" ::"r"(-1));
-            __asm__ volatile("csrc medeleg, %0" ::"r"(-1));
-        }
-
-        /* The satp CSR exists if supervisor mode (S extension) is supported */
-        if (misa & METAL_ISA_S_EXTENSIONS) {
-            /* Clear the entire CSR to make sure that satp.MODE = 0 */
-            __asm__ volatile("csrc satp, %0" ::"r"(-1));
-        }
-
         /* Default to use direct interrupt, setup sw cb table*/
         for (int i = 0; i < METAL_MAX_MI; i++) {
             intc->metal_int_table[i].handler = NULL;
             intc->metal_int_table[i].sub_int = NULL;
             intc->metal_int_table[i].exint_data = NULL;
         }
+
         for (int i = 0; i < METAL_MAX_ME; i++) {
             intc->metal_exception_table[i] = __metal_default_exception_handler;
         }
+
         __metal_controller_interrupt_vector(
             METAL_DIRECT_MODE, (void *)(uintptr_t)&__metal_exception_handler);
-        __asm__ volatile("csrr %0, misa" : "=r"(val));
-        if (val & (METAL_ISA_D_EXTENSIONS | METAL_ISA_F_EXTENSIONS |
-                   METAL_ISA_Q_EXTENSIONS)) {
-            /* Floating point architecture, so turn on FP register saving*/
-            __asm__ volatile("csrr %0, mstatus" : "=r"(val));
-            __asm__ volatile(
-                "csrw mstatus, %0" ::"r"(val | METAL_MSTATUS_FS_INIT));
-        }
+
         intc->init_done = 1;
     }
 }
