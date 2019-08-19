@@ -242,6 +242,13 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
 	src/watchdog.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
+libmetal_pico_a_AR = $(AR) $(ARFLAGS)
+libmetal_pico_a_LIBADD =
+am_libmetal_pico_a_OBJECTS = gloss/crt0.$(OBJEXT) \
+	pico/iob.$(OBJEXT) gloss/sys_exit.$(OBJEXT) pico/times.$(OBJEXT) \
+	gloss/sys_sbrk.$(OBJEXT) pico/sysconf.$(OBJEXT)
+libmetal_pico_a_OBJECTS =  \
+	$(am_libmetal_pico_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -276,9 +283,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_a_SOURCES)
+SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_a_SOURCES) \
+	$(libmetal_pico_a_SOURCES)
 DIST_SOURCES = $(am__libmetal_gloss_a_SOURCES_DIST) \
-	$(libmetal_a_SOURCES)
+	$(libmetal_a_SOURCES) $(libmetal_pico_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -472,7 +480,11 @@ BUILT_SOURCES = \
 ########################################################
 # libmetal
 ########################################################
-lib_LIBRARIES = libmetal.a $(am__append_1)
+
+########################################################
+# libmetal-pico
+########################################################
+lib_LIBRARIES = libmetal.a libmetal-pico.a $(am__append_1)
 libmetal_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/fixed-factor-clock.c \
@@ -530,6 +542,14 @@ libmetal_a_SOURCES = \
 	src/uart.c \
 	src/vector.S \
 	src/watchdog.c
+
+libmetal_pico_a_SOURCES = \
+	gloss/crt0.S \
+	pico/iob.c \
+	gloss/sys_exit.c \
+	pico/times.c \
+	gloss/sys_sbrk.c \
+	pico/sysconf.c
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libmetal_gloss_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
@@ -832,10 +852,34 @@ libmetal.a: $(libmetal_a_OBJECTS) $(libmetal_a_DEPENDENCIES) $(EXTRA_libmetal_a_
 	$(AM_V_at)-rm -f libmetal.a
 	$(AM_V_AR)$(libmetal_a_AR) libmetal.a $(libmetal_a_OBJECTS) $(libmetal_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libmetal.a
+pico/$(am__dirstamp):
+	@$(MKDIR_P) pico
+	@: > pico/$(am__dirstamp)
+pico/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) pico/$(DEPDIR)
+	@: > pico/$(DEPDIR)/$(am__dirstamp)
+gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+pico/iob.$(OBJEXT): pico/$(am__dirstamp) \
+	pico/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_exit.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+pico/times.$(OBJEXT): pico/$(am__dirstamp) \
+	pico/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_sbrk.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+pico/sysconf.$(OBJEXT): pico/$(am__dirstamp) \
+	pico/$(DEPDIR)/$(am__dirstamp)
+
+libmetal-pico.a: $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_DEPENDENCIES) $(EXTRA_libmetal_pico_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libmetal-pico.a
+	$(AM_V_AR)$(libmetal_pico_a_AR) libmetal-pico.a $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libmetal-pico.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f gloss/*.$(OBJEXT)
+	-rm -f pico/*.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
 	-rm -f src/drivers/*.$(OBJEXT)
 
@@ -875,6 +919,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_utime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/crt0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/iob.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/sysconf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/times.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Po@am__quote@
@@ -1246,6 +1296,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f gloss/$(DEPDIR)/$(am__dirstamp)
 	-rm -f gloss/$(am__dirstamp)
+	-rm -f pico/$(DEPDIR)/$(am__dirstamp)
+	-rm -f pico/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
 	-rm -f src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -1261,7 +1313,7 @@ clean-am: clean-generic clean-libLIBRARIES clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf gloss/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) pico/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1309,7 +1361,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf gloss/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) pico/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

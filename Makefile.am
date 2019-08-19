@@ -153,6 +153,20 @@ libmetal_a_SOURCES = \
 	src/watchdog.c
 
 ########################################################
+# libmetal-pico
+########################################################
+
+lib_LIBRARIES += libmetail-pico.a
+
+libmetal_pico_a_SOURCES = \
+	gloss/crt0.S \
+	pico/iob.c \
+	gloss/sys_exit.c \
+	pico/times.c \
+	gloss/sys_sbrk.c \
+	pico/sysconf.c
+
+########################################################
 # libgloss
 ########################################################
 
