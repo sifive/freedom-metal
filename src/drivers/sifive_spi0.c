@@ -117,7 +117,7 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi,
     }
 
     /* Set CS line */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = config->csid;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = 1 << (config->csid);
 
     /* Toggle off memory-mapped SPI flash mode, toggle on programmable IO mode
      * It seems that with this line uncommented, the debugger cannot have access
