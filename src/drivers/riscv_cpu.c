@@ -337,9 +337,6 @@ void __metal_driver_riscv_cpu_controller_interrupt_init(
             intc->metal_exception_table[i] = __metal_default_exception_handler;
         }
 
-        __metal_controller_interrupt_vector(
-            METAL_DIRECT_MODE, (void *)(uintptr_t)&__metal_exception_handler);
-
         intc->init_done = 1;
     }
 }
