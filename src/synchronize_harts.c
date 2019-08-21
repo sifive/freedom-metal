@@ -19,7 +19,9 @@
 __attribute__((section(".init"))) void __metal_synchronize_harts() {
 #if __METAL_DT_MAX_HARTS > 1
 
-    int hart = metal_cpu_get_current_hartid();
+    int hart;
+    __asm__ volatile("csrr %0, mhartid" : "=r"(hart)::);
+
     uintptr_t msip_base = 0;
 
     /* Get the base address of the MSIP registers */
