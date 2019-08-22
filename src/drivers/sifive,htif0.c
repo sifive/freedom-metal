@@ -61,10 +61,17 @@ void __metal_driver_sifive_htif0_init(struct metal_uart *uart, int baud_rate)
 
 void __metal_driver_sifive_htif0_exit(const struct __metal_shutdown *sd, int code)
 {
-    while (1) {
-        fromhost = 0;
-        tohost = 1;
-    };
+    volatile uint64_t magic_mem[8];
+    magic_mem[0] = 93; // SYS_exit
+    magic_mem[1] = code;
+    magic_mem[2] = 0;
+    magic_mem[3] = 0;
+
+    do_tohost_fromhost(0, 0, (uintptr_t)magic_mem);
+
+    while(1) {
+        // loop forever
+    }
 }
 
 int __metal_driver_sifive_htif0_putc(struct metal_uart *htif, unsigned char c)
