@@ -8,6 +8,7 @@
 #include <limits.h>
 #include <stdio.h>
 
+#include <metal/init.h>
 #include <metal/machine.h>
 
 #include <metal/drivers/sifive_fe310-g000_pll.h>
@@ -146,8 +147,7 @@ static long get_pll_config_freq(unsigned long pll_input_rate,
 
 #ifdef __METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE
 
-static void metal_sifive_fe310_g000_pll_init(void) __attribute__((constructor));
-static void metal_sifive_fe310_g000_pll_init(void) {
+METAL_CONSTRUCTOR(metal_sifive_fe310_g000_pll_init) {
     long init_rate = __metal_driver_sifive_fe310_g000_pll_init_rate();
     /* If the PLL init_rate is zero, don't initialize the PLL */
     if (init_rate != 0)
@@ -347,8 +347,7 @@ long __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock *clock,
 }
 
 #ifdef __METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE
-static void use_hfxosc(void) __attribute__((constructor));
-static void use_hfxosc(void) {
+METAL_CONSTRUCTOR(use_hfxosc) {
     long init_rate = __metal_driver_sifive_fe310_g000_pll_init_rate();
     metal_clock_set_rate_hz(&__METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE->clock,
                             init_rate);
