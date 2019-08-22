@@ -85,6 +85,7 @@ nobase_include_HEADERS = \
 	metal/compiler.h \
 	metal/cpu.h \
 	metal/gpio.h \
+	metal/init.h \
 	metal/interrupt.h \
 	metal/io.h \
 	metal/itim.h \
@@ -186,6 +187,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/cpu.c \
 	src/entry.S \
 	src/gpio.c \
+	src/init.c \
 	src/interrupt.c \
 	src/led.c \
 	src/lock.c \
