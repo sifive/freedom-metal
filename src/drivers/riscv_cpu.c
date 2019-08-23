@@ -320,10 +320,10 @@ int __metal_exception_register(struct metal_interrupt *controller, int ecode,
     return -1;
 }
 
+extern void early_trap_vector(void);
 void __metal_driver_riscv_cpu_controller_interrupt_init(
     struct metal_interrupt *controller) {
     struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
-    uintptr_t val;
 
     if (!intc->init_done) {
         /* Default to use direct interrupt, setup sw cb table*/
@@ -337,9 +337,18 @@ void __metal_driver_riscv_cpu_controller_interrupt_init(
             intc->metal_exception_table[i] = __metal_default_exception_handler;
         }
 
-        __metal_controller_interrupt_vector(
-            METAL_DIRECT_MODE, (void *)(uintptr_t)&__metal_exception_handler);
-
+        /*
+         * Set the real trap handler if the value of mtvec is equal to
+         * early_trap_vector. If mtvec is not equal to early_trap_vector,
+         * that means user has own trap handler, then we don't overwrite it.
+         */
+        uintptr_t mtvec;
+        __asm__ volatile("csrr %0, mtvec" : "=r"(mtvec));
+        if (mtvec == (uintptr_t)&early_trap_vector) {
+            __metal_controller_interrupt_vector(
+                METAL_DIRECT_MODE,
+                (void *)(uintptr_t)&__metal_exception_handler);
+        }
         intc->init_done = 1;
     }
 }
