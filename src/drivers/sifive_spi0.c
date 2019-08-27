@@ -55,19 +55,25 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
     long control_base = __metal_driver_sifive_spi0_control_base((struct metal_spi *)spi);
     /* Set protocol */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
-    switch(config->protocol) {
-        case METAL_SPI_SINGLE:
-            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
-            break;
-        case METAL_SPI_DUAL:
+    switch (config->protocol) {
+    case METAL_SPI_SINGLE:
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
+        break;
+    case METAL_SPI_DUAL:
+        if (config->multi_wire == MULTI_WIRE_ALL)
             METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
-            break;
-        case METAL_SPI_QUAD:
+        else
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
+        break;
+    case METAL_SPI_QUAD:
+        if (config->multi_wire == MULTI_WIRE_ALL)
             METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
-            break;
-        default:
-            /* Unsupported value */
-            return -1;
+        else
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
+        break;
+    default:
+        /* Unsupported value */
+        return -1;
     }
 
     /* Set Polarity */
@@ -122,6 +128,28 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi, struct metal_sp
     return 0;
 }
 
+static void spi_mode_switch(struct __metal_driver_sifive_spi0 *spi,
+                            struct metal_spi_config *config,
+                            unsigned int trans_stage) {
+    long control_base =
+        __metal_driver_sifive_spi0_control_base((struct metal_spi *)spi);
+
+    if (config->multi_wire == trans_stage) {
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
+        switch (config->protocol) {
+        case METAL_SPI_DUAL:
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
+            break;
+        case METAL_SPI_QUAD:
+            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
+            break;
+        default:
+            /* Unsupported value */
+            return;
+        }
+    }
+}
+
 int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
                                       struct metal_spi_config *config,
                                       size_t len,
@@ -131,6 +159,7 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
     long control_base = __metal_driver_sifive_spi0_control_base(gspi);
     int rc = 0;
+    size_t i = 0;
 
     rc = configure_spi(spi, config);
     if(rc != 0) {
@@ -146,7 +175,97 @@ int __metal_driver_sifive_spi0_transfer(struct metal_spi *gspi,
     /* Declare time_t variables to break out of infinite while loop */
     time_t endwait;
 
-    for(size_t i = 0; i < len; i++) {
+    for (i = 0; i < config->cmd_num; i++) {
+
+        while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
+            ;
+
+        if (tx_buf) {
+            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
+        } else {
+            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
+        }
+
+        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
+
+        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
+               METAL_SPI_RXDATA_EMPTY) {
+            if (metal_time() > endwait) {
+                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &=
+                    ~(METAL_SPI_CSMODE_MASK);
+
+                return 1;
+            }
+        }
+
+        if (rx_buf) {
+            rx_buf[i] = (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+        }
+    }
+
+    /* switch to Dual/Quad mode */
+    spi_mode_switch(spi, config, MULTI_WIRE_ADDR_DATA);
+
+    /* Send Addr data */
+    for (; i < (config->cmd_num + config->addr_num); i++) {
+
+        while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
+            ;
+
+        if (tx_buf) {
+            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
+        } else {
+            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
+        }
+
+        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
+
+        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
+               METAL_SPI_RXDATA_EMPTY) {
+            if (metal_time() > endwait) {
+                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &=
+                    ~(METAL_SPI_CSMODE_MASK);
+
+                return 1;
+            }
+        }
+
+        if (rx_buf) {
+            rx_buf[i] = (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+        }
+    }
+
+    /* Send Dummy data */
+    for (; i < (config->cmd_num + config->addr_num + config->dummy_num); i++) {
+
+        while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
+            ;
+
+        if (tx_buf) {
+            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
+        } else {
+            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
+        }
+
+        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
+
+        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
+               METAL_SPI_RXDATA_EMPTY) {
+            if (metal_time() > endwait) {
+                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &=
+                    ~(METAL_SPI_CSMODE_MASK);
+                return 1;
+            }
+        }
+        if (rx_buf) {
+            rx_buf[i] = (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+        }
+    }
+
+    /* switch to Dual/Quad mode */
+    spi_mode_switch(spi, config, MULTI_WIRE_DATA_ONLY);
+
+    for (; i < len; i++) {
         /* Master send bytes to the slave */
 
         /* Wait for TXFIFO to not be full */
