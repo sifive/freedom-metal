@@ -248,6 +248,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/libriscv__mmachine__@MACHINE_NAME@_a-trap.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-tty.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-uart.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-vector.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-watchdog.$(OBJEXT)
 libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS =  \
 	$(am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS)
@@ -598,6 +599,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/trap.S \
 	src/tty.c \
 	src/uart.c \
+	src/vector.S \
 	src/watchdog.c
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libriscv__menv__metal_a_SOURCES = \
@@ -923,6 +925,8 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-tty.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-uart.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-vector.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-watchdog.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 
@@ -1024,6 +1028,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-trap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-tty.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-uart.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-vector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-watchdog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-fixed-clock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-fixed-factor-clock.Po@am__quote@
@@ -1097,6 +1102,20 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-trap.obj: src/trap.S
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='src/trap.S' object='src/libriscv__mmachine__@MACHINE_NAME@_a-trap.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS) $(CCASFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-trap.obj `if test -f 'src/trap.S'; then $(CYGPATH_W) 'src/trap.S'; else $(CYGPATH_W) '$(srcdir)/src/trap.S'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-vector.o: src/vector.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS) $(CCASFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-vector.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-vector.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-vector.o `test -f 'src/vector.S' || echo '$(srcdir)/'`src/vector.S
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-vector.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-vector.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='src/vector.S' object='src/libriscv__mmachine__@MACHINE_NAME@_a-vector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS) $(CCASFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-vector.o `test -f 'src/vector.S' || echo '$(srcdir)/'`src/vector.S
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-vector.obj: src/vector.S
+@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS) $(CCASFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-vector.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-vector.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-vector.obj `if test -f 'src/vector.S'; then $(CYGPATH_W) 'src/vector.S'; else $(CYGPATH_W) '$(srcdir)/src/vector.S'; fi`
+@am__fastdepCCAS_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-vector.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-vector.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='src/vector.S' object='src/libriscv__mmachine__@MACHINE_NAME@_a-vector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS) $(CCASFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-vector.obj `if test -f 'src/vector.S'; then $(CYGPATH_W) 'src/vector.S'; else $(CYGPATH_W) '$(srcdir)/src/vector.S'; fi`
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\

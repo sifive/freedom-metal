@@ -207,6 +207,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/trap.S \
 	src/tty.c \
 	src/uart.c \
+	src/vector.S \
 	src/watchdog.c
 
 # Freedom METAL has its own libgloss implementation that is only built in

@@ -6,6 +6,7 @@
 #include <metal/shutdown.h>
 #include <stdint.h>
 
+extern void __metal_vector_table();
 unsigned long long __metal_driver_cpu_mtime_get(struct metal_cpu *cpu);
 int __metal_driver_cpu_mtimecmp_set(struct metal_cpu *cpu,
                                     unsigned long long time);
@@ -106,6 +107,25 @@ void __metal_default_interrupt_handler(int id, void *priv) {
     metal_shutdown(200);
 }
 
+/* The metal_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_interrupt_vector_handler (void) {
+    metal_shutdown(300);
+}
+
+/* The metal_software_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_software_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_SW].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_SW].handler(METAL_INTERRUPT_ID_SW, priv);
+    }
+}
+
 void __metal_default_sw_handler(int id, void *priv) {
     uintptr_t mcause;
     struct __metal_driver_riscv_cpu_intc *intc;
@@ -120,12 +140,40 @@ void __metal_default_sw_handler(int id, void *priv) {
     }
 }
 
+/* The metal_timer_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_timer_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_TMR].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_TMR].handler(METAL_INTERRUPT_ID_TMR, priv);
+    }
+}
+
 void __metal_default_timer_handler(int id, void *priv) {
     struct metal_cpu *cpu = __metal_driver_cpu_get(__metal_myhart_id());
     unsigned long long time = __metal_driver_cpu_mtime_get(cpu);
 
     /* Set a 10 cycle timer */
     __metal_driver_cpu_mtimecmp_set(cpu, time + 10);
+}
+
+/* The metal_external_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_external_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_EXT].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_EXT].handler(METAL_INTERRUPT_ID_EXT, priv);
+    }
 }
 
 void __metal_exception_handler(void) __attribute__((interrupt, aligned(128)));
@@ -168,7 +216,232 @@ void __metal_exception_handler(void) {
     }
 }
 
-metal_vector_mode __metal_controller_interrupt_vector_mode(void) {
+/* The metal_lc0_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc0_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC0].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC0].handler(METAL_INTERRUPT_ID_LC0, priv);
+    }
+}
+
+/* The metal_lc1_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc1_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC1].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC1].handler(METAL_INTERRUPT_ID_LC1, priv);
+    }
+}
+
+/* The metal_lc2_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc2_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC2].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC2].handler(METAL_INTERRUPT_ID_LC2, priv);
+    }
+}
+
+/* The metal_lc3_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc3_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC3].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC3].handler(METAL_INTERRUPT_ID_LC3, priv);
+    }
+}
+
+/* The metal_lc4_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc4_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC4].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC4].handler(METAL_INTERRUPT_ID_LC4, priv);
+    }
+}
+
+/* The metal_lc5_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc5_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC5].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC5].handler(METAL_INTERRUPT_ID_LC5, priv);
+    }
+}
+
+/* The metal_lc6_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc6_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC6].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC6].handler(METAL_INTERRUPT_ID_LC6, priv);
+    }
+}
+
+/* The metal_lc7_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc7_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC7].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC7].handler(METAL_INTERRUPT_ID_LC7, priv);
+    }
+}
+
+/* The metal_lc8_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc8_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC8].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC8].handler(METAL_INTERRUPT_ID_LC8, priv);
+    }
+}
+
+/* The metal_lc9_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc9_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC9].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC9].handler(METAL_INTERRUPT_ID_LC9, priv);
+    }
+}
+
+/* The metal_lc10_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc10_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC10].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC10].handler(METAL_INTERRUPT_ID_LC10, priv);
+    }
+}
+
+/* The metal_lc11_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc11_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC11].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC11].handler(METAL_INTERRUPT_ID_LC11, priv);
+    }
+}
+
+/* The metal_lc12_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc12_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC12].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC12].handler(METAL_INTERRUPT_ID_LC12, priv);
+    }
+}
+
+/* The metal_lc13_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc13_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC13].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC13].handler(METAL_INTERRUPT_ID_LC13, priv);
+    }
+}
+
+/* The metal_lc14_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc14_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC14].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC14].handler(METAL_INTERRUPT_ID_LC14, priv);
+    }
+}
+
+/* The metal_lc15_interrupt_vector_handler() function can be redefined. */
+void __attribute__((weak, interrupt)) metal_lc15_interrupt_vector_handler (void) {
+    void *priv;
+    struct __metal_driver_riscv_cpu_intc *intc;
+    struct __metal_driver_cpu *cpu = __metal_cpu_table[__metal_myhart_id()];
+
+    if ( cpu ) {
+        intc = (struct __metal_driver_riscv_cpu_intc *)
+          __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
+        priv = intc->metal_int_table[METAL_INTERRUPT_ID_LC15].exint_data;
+        intc->metal_int_table[METAL_INTERRUPT_ID_LC15].handler(METAL_INTERRUPT_ID_LC15, priv);
+    }
+}
+
+metal_vector_mode __metal_controller_interrupt_vector_mode(void)
+{
     uintptr_t val;
 
     __asm__ volatile("csrr %0, mtvec" : "=r"(val));
@@ -459,7 +732,7 @@ int __metal_driver_riscv_cpu_controller_set_vector_mode(
     }
     if (mode == METAL_VECTOR_MODE) {
         __metal_controller_interrupt_vector(mode,
-                                            (void *)&intc->metal_mtvec_table);
+                                            (void *)__metal_vector_table);
         return 0;
     }
     return -1;
