@@ -6,6 +6,7 @@
 #ifdef METAL_SIFIVE_FU540_C000_L2
 
 #include <metal/drivers/sifive_fu540-c000_l2.h>
+#include <metal/init.h>
 #include <metal/io.h>
 #include <metal/machine.h>
 #include <stdint.h>
@@ -15,9 +16,7 @@
 
 void __metal_driver_sifive_fu540_c000_l2_init(struct metal_cache *l2, int ways);
 
-static void metal_driver_sifive_fu540_c000_l2_init(void)
-    __attribute__((constructor));
-static void metal_driver_sifive_fu540_c000_l2_init(void) {
+METAL_CONSTRUCTOR(metal_driver_sifive_fu540_c000_l2_init) {
 #ifdef __METAL_DT_SIFIVE_FU540_C000_L2_HANDLE
     /* Get the handle for the L2 cache controller */
     struct metal_cache *l2 = __METAL_DT_SIFIVE_FU540_C000_L2_HANDLE;
