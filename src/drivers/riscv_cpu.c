@@ -471,12 +471,15 @@ unsigned long long __metal_driver_cpu_mcycle_get(struct metal_cpu *cpu) {
 #if __riscv_xlen == 32
     unsigned long hi, hi1, lo;
 
-    __asm__ volatile("csrr %0, mcycleh" : "=r"(hi));
-    __asm__ volatile("csrr %0, mcycle" : "=r"(lo));
-    __asm__ volatile("csrr %0, mcycleh" : "=r"(hi1));
-    if (hi == hi1) {
-        val = ((unsigned long long)hi << 32) | lo;
-    }
+    do {
+        __asm__ volatile("csrr %0, mcycleh" : "=r"(hi));
+        __asm__ volatile("csrr %0, mcycle" : "=r"(lo));
+        __asm__ volatile("csrr %0, mcycleh" : "=r"(hi1));
+        /* hi != hi1 means mcycle overflow during we get value,
+         * so we must retry. */
+    } while (hi != hi1);
+
+    val = ((unsigned long long)hi << 32) | lo;
 #else
     __asm__ volatile("csrr %0, mcycle" : "=r"(val));
 #endif
