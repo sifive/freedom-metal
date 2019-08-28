@@ -228,6 +228,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-trap.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-gpio.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-init.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-interrupt.$(OBJEXT) \
@@ -575,6 +576,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/clock.c \
 	src/cpu.c \
 	src/entry.S \
+	src/trap.S \
 	src/gpio.c \
 	src/init.c \
 	src/interrupt.c \
@@ -879,6 +881,8 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-trap.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-gpio.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-init.$(OBJEXT):  \
@@ -908,8 +912,6 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.$(OBJEXT):  \
 src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-time.$(OBJEXT):  \
-	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/libriscv__mmachine__@MACHINE_NAME@_a-trap.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-tty.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)

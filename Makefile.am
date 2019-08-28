@@ -186,6 +186,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/clock.c \
 	src/cpu.c \
 	src/entry.S \
+	src/trap.S \
 	src/gpio.c \
 	src/init.c \
 	src/interrupt.c \
