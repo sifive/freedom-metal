@@ -74,6 +74,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
+	metal/drivers/synopsys_i2c.h \
 	metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_wdog0.h \
@@ -97,6 +98,7 @@ nobase_include_HEADERS = \
 	metal/rtc.h \
 	metal/shutdown.h \
 	metal/spi.h \
+	metal/i2c.h \
 	metal/switch.h \
 	metal/timer.h \
 	metal/time.h \
@@ -177,6 +179,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
+	src/drivers/synopsys_i2c.c \
 	src/drivers/sifive_test0.c \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
@@ -195,6 +198,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/rtc.c \
 	src/shutdown.c \
 	src/spi.c \
+	src/i2c.c \
 	src/switch.c \
 	src/synchronize_harts.c \
 	src/timer.c \

@@ -220,6 +220,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_local-external-interrupts0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_rtc0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_spi0.$(OBJEXT) \
+  src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_uart0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.$(OBJEXT) \
@@ -238,6 +239,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/libriscv__mmachine__@MACHINE_NAME@_a-rtc.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-spi.$(OBJEXT) \
+  src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-timer.$(OBJEXT) \
@@ -495,6 +497,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
+  metal/drivers/synopsys_i2c.h \
 	metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_wdog0.h \
@@ -518,6 +521,7 @@ nobase_include_HEADERS = \
 	metal/rtc.h \
 	metal/shutdown.h \
 	metal/spi.h \
+  metal/i2c.h \
 	metal/switch.h \
 	metal/timer.h \
 	metal/time.h \
@@ -565,6 +569,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
+  src/drivers/synopsys_i2c.c \
 	src/drivers/sifive_test0.c \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
@@ -583,6 +588,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/rtc.c \
 	src/shutdown.c \
 	src/spi.c \
+  src/i2c.c \
 	src/switch.c \
 	src/synchronize_harts.c \
 	src/timer.c \
@@ -851,6 +857,9 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_rtc0.$(OBJEXT):  \
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_spi0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.$(OBJEXT):  \
+  src/drivers/$(am__dirstamp) \
+  src/drivers/$(DEPDIR)/$(am__dirstamp)  
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -896,6 +905,8 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-spi.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.$(OBJEXT):  \
+  src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)  
 src/libriscv__mmachine__@MACHINE_NAME@_a-switch.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.$(OBJEXT):  \
@@ -1003,6 +1014,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-rtc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-shutdown.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-spi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-i2c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synchronize_harts.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-time.Po@am__quote@
@@ -1032,6 +1044,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_local-external-interrupts0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_rtc0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_spi0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_uart0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.Po@am__quote@
@@ -1393,6 +1406,22 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_spi0.obj: src/drivers/si
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_spi0.obj `if test -f 'src/drivers/sifive_spi0.c'; then $(CYGPATH_W) 'src/drivers/sifive_spi0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive_spi0.c'; fi`
 
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.o: src/drivers/synopsys_i2c.c
+@am__fastdepCC_TRUE@  $(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.o `test -f 'src/drivers/synopsys_i2c.c' || echo '$(srcdir)/'`src/drivers/synopsys_i2c.c
+@am__fastdepCC_TRUE@  $(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ $(AM_V_CC)source='src/drivers/synopsys_i2c.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@ $(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.o `test -f 'src/drivers/synopsys_i2c.c' || echo '$(srcdir)/'`src/drivers/synopsys_i2c.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.obj: src/drivers/synopsys_i2c.c
+@am__fastdepCC_TRUE@  $(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.obj `if test -f 'src/drivers/synopsys_i2c.c'; then $(CYGPATH_W) 'src/drivers/synopsys_i2c.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/synopsys_i2c.c'; fi`
+@am__fastdepCC_TRUE@  $(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ $(AM_V_CC)source='src/drivers/synopsys_i2c.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@ $(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-synopsys_i2c.obj `if test -f 'src/drivers/synopsys_i2c.c'; then $(CYGPATH_W) 'src/drivers/synopsys_i2c.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/synopsys_i2c.c'; fi`
+
+
+
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.o: src/drivers/sifive_test0.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.o `test -f 'src/drivers/sifive_test0.c' || echo '$(srcdir)/'`src/drivers/sifive_test0.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_test0.Po
@@ -1630,6 +1659,20 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-spi.obj: src/spi.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/spi.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-spi.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-spi.obj `if test -f 'src/spi.c'; then $(CYGPATH_W) 'src/spi.c'; else $(CYGPATH_W) '$(srcdir)/src/spi.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.o: src/i2c.c
+@am__fastdepCC_TRUE@  $(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-i2c.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.o `test -f 'src/i2c.c' || echo '$(srcdir)/'`src/i2c.c
+@am__fastdepCC_TRUE@  $(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-i2c.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-i2c.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ $(AM_V_CC)source='src/i2c.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@ $(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.o `test -f 'src/i2c.c' || echo '$(srcdir)/'`src/i2c.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.obj: src/i2c.c
+@am__fastdepCC_TRUE@  $(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-i2c.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.obj `if test -f 'src/i2c.c'; then $(CYGPATH_W) 'src/i2c.c'; else $(CYGPATH_W) '$(srcdir)/src/i2c.c'; fi`
+@am__fastdepCC_TRUE@  $(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-i2c.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-i2c.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ $(AM_V_CC)source='src/i2c.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@ DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@ $(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-i2c.obj `if test -f 'src/i2c.c'; then $(CYGPATH_W) 'src/i2c.c'; else $(CYGPATH_W) '$(srcdir)/src/i2c.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o: src/switch.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-switch.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-switch.o `test -f 'src/switch.c' || echo '$(srcdir)/'`src/switch.c
