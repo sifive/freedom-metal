@@ -26,8 +26,8 @@ void __metal_plic0_complete_interrupt(struct __metal_driver_riscv_plic0 *plic,
         (__metal_io_u32 *)(control_base + METAL_RISCV_PLIC0_CLAIM)) = id;
 }
 
-int __metal_plic0_set_threshold(struct metal_interrupt *controller,
-                                unsigned int threshold) {
+int __metal_driver_riscv_plic0_set_threshold(struct metal_interrupt *controller,
+                                             unsigned int threshold) {
     unsigned long control_base =
         __metal_driver_sifive_plic0_control_base(controller);
     __METAL_ACCESS_ONCE(
@@ -36,7 +36,8 @@ int __metal_plic0_set_threshold(struct metal_interrupt *controller,
     return 0;
 }
 
-unsigned int __metal_plic0_get_threshold(struct metal_interrupt *controller) {
+unsigned int
+__metal_driver_riscv_plic0_get_threshold(struct metal_interrupt *controller) {
     unsigned long control_base =
         __metal_driver_sifive_plic0_control_base(controller);
 
@@ -44,8 +45,8 @@ unsigned int __metal_plic0_get_threshold(struct metal_interrupt *controller) {
         (__metal_io_u32 *)(control_base + METAL_RISCV_PLIC0_THRESHOLD));
 }
 
-int __metal_plic0_set_priority(struct metal_interrupt *controller, int id,
-                               unsigned int priority) {
+int __metal_driver_riscv_plic0_set_priority(struct metal_interrupt *controller,
+                                            int id, unsigned int priority) {
     unsigned long control_base = __metal_driver_sifive_plic0_control_base(
         (struct metal_interrupt *)controller);
     unsigned int max_priority = __metal_driver_sifive_plic0_max_priority(
@@ -60,7 +61,8 @@ int __metal_plic0_set_priority(struct metal_interrupt *controller, int id,
     return -1;
 }
 
-unsigned int __metal_plic0_get_priority(struct metal_interrupt *controller,
+unsigned int
+__metal_driver_riscv_plic0_get_priority(struct metal_interrupt *controller,
                                         int id) {
     unsigned long control_base =
         __metal_driver_sifive_plic0_control_base(controller);
@@ -122,13 +124,13 @@ void __metal_driver_riscv_plic0_init(struct metal_interrupt *controller) {
 
             for (int i = 0; i < num_interrupts; i++) {
                 __metal_plic0_enable(plic, i, METAL_DISABLE);
-                __metal_plic0_set_priority(controller, i, 0);
+                __metal_driver_riscv_plic0_set_priority(controller, i, 0);
                 plic->metal_exint_table[i] = NULL;
                 plic->metal_exdata_table[i].sub_int = NULL;
                 plic->metal_exdata_table[i].exint_data = NULL;
             }
 
-            __metal_plic0_set_threshold(controller, 0);
+            __metal_driver_riscv_plic0_set_threshold(controller, 0);
 
             /* Register plic (ext) interrupt with with parent controller */
             intc->vtable->interrupt_register(intc, line, NULL, plic);
@@ -152,11 +154,11 @@ int __metal_driver_riscv_plic0_register(struct metal_interrupt *controller,
     }
 
     if (isr) {
-        __metal_plic0_set_priority(controller, id, 2);
+        __metal_driver_riscv_plic0_set_priority(controller, id, 2);
         plic->metal_exint_table[id] = isr;
         plic->metal_exdata_table[id].exint_data = priv;
     } else {
-        __metal_plic0_set_priority(controller, id, 1);
+        __metal_driver_riscv_plic0_set_priority(controller, id, 1);
         plic->metal_exint_table[id] = __metal_plic0_default_handler;
         plic->metal_exdata_table[id].sub_int = priv;
     }
@@ -192,10 +194,14 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_plic0) = {
     .plic_vtable.interrupt_register = __metal_driver_riscv_plic0_register,
     .plic_vtable.interrupt_enable = __metal_driver_riscv_plic0_enable,
     .plic_vtable.interrupt_disable = __metal_driver_riscv_plic0_disable,
-    .plic_vtable.interrupt_get_threshold = __metal_plic0_get_threshold,
-    .plic_vtable.interrupt_set_threshold = __metal_plic0_set_threshold,
-    .plic_vtable.interrupt_get_priority = __metal_plic0_get_priority,
-    .plic_vtable.interrupt_set_priority = __metal_plic0_set_priority,
+    .plic_vtable.interrupt_get_threshold =
+        __metal_driver_riscv_plic0_get_threshold,
+    .plic_vtable.interrupt_set_threshold =
+        __metal_driver_riscv_plic0_set_threshold,
+    .plic_vtable.interrupt_get_priority =
+        __metal_driver_riscv_plic0_get_priority,
+    .plic_vtable.interrupt_set_priority =
+        __metal_driver_riscv_plic0_set_priority,
 };
 
 #endif /* METAL_RISCV_PLIC0 */
