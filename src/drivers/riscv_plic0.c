@@ -26,8 +26,8 @@ void __metal_plic0_complete_interrupt(struct __metal_driver_riscv_plic0 *plic,
         (__metal_io_u32 *)(control_base + METAL_RISCV_PLIC0_CLAIM)) = id;
 }
 
-int __metal_driver_riscv_plic0_set_threshold(struct metal_interrupt *controller,
-                                             unsigned int threshold) {
+int __metal_plic0_set_threshold(struct metal_interrupt *controller,
+                                unsigned int threshold) {
     unsigned long control_base =
         __metal_driver_sifive_plic0_control_base(controller);
     __METAL_ACCESS_ONCE(
@@ -36,8 +36,7 @@ int __metal_driver_riscv_plic0_set_threshold(struct metal_interrupt *controller,
     return 0;
 }
 
-unsigned int
-__metal_driver_riscv_plic0_get_threshold(struct metal_interrupt *controller) {
+unsigned int __metal_plic0_get_threshold(struct metal_interrupt *controller) {
     unsigned long control_base =
         __metal_driver_sifive_plic0_control_base(controller);
 
@@ -187,6 +186,16 @@ int __metal_driver_riscv_plic0_disable(struct metal_interrupt *controller,
     }
     __metal_plic0_enable(plic, id, METAL_DISABLE);
     return 0;
+}
+
+int __metal_driver_riscv_plic0_set_threshold(struct metal_interrupt *controller,
+                                             unsigned int threshold) {
+    return __metal_plic0_set_threshold(controller, threshold);
+}
+
+unsigned int
+__metal_driver_riscv_plic0_get_threshold(struct metal_interrupt *controller) {
+    return __metal_plic0_get_threshold(controller);
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_plic0) = {
