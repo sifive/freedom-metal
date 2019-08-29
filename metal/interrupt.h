@@ -41,6 +41,22 @@ typedef enum metal_intr_priv_mode_ {
 } metal_intr_priv_mode;
 
 /*!
+ * @brief The bitmask of hart context
+ */
+typedef struct metal_affinity_ {
+    unsigned long bitmask;
+} metal_affinity;
+
+#define for_each_metal_affinity(bit, metal_affinity)                           \
+    for (bit = 0; metal_affinity.bitmask; bit++, metal_affinity.bitmask >>= 1)
+
+#define metal_affinity_set_val(metal_affinity, val)                            \
+    metal_affinity.bitmask = val;
+
+#define metal_affinity_set_bit(metal_affinity, bit, val)                       \
+    metal_affinity.bitmask |= ((val & 0x1) << bit);
+
+/*!
  * @brief Function signature for interrupt callback handlers
  */
 typedef void (*metal_interrupt_handler_t)(int, void *);
@@ -80,6 +96,15 @@ struct metal_interrupt_vtable {
                            void *data);
     int (*mtimecmp_set)(struct metal_interrupt *controller, int hartid,
                         unsigned long long time);
+    metal_affinity (*interrupt_affinity_enable)(
+        struct metal_interrupt *controller, metal_affinity bitmask, int id);
+    metal_affinity (*interrupt_affinity_disable)(
+        struct metal_interrupt *controller, metal_affinity bitmask, int id);
+    metal_affinity (*interrupt_affinity_set_threshold)(
+        struct metal_interrupt *controller, metal_affinity bitmask,
+        unsigned int threshold);
+    unsigned int (*interrupt_affinity_get_threshold)(
+        struct metal_interrupt *controller, int context_id);
 };
 
 /*!
@@ -324,4 +349,59 @@ _metal_interrupt_command_request(struct metal_interrupt *controller, int cmd,
     return controller->vtable->command_request(controller, cmd, data);
 }
 
+/*!
+ * @brief Enable an interrupt for the hart contexts
+ * @param controller The handle for the interrupt controller
+ * @param bitmask The bit mask of hart contexts to enable
+ * @param id The interrupt ID to enable
+ * @return The result of each hart context. 0 upon success at relevant bit.
+ */
+__inline__ metal_affinity
+metal_interrupt_affinity_enable(struct metal_interrupt *controller,
+                                metal_affinity bitmask, int id) {
+    return controller->vtable->interrupt_affinity_enable(controller, bitmask,
+                                                         id);
+}
+
+/*!
+ * @brief Disable an interrupt for the hart contexts
+ * @param controller The handle for the interrupt controller
+ * @param bitmask The bit mask of hart contexts to disable
+ * @param id The interrupt ID to disable
+ * @return The result of each hart context. 0 upon success at relevant bit.
+ */
+__inline__ metal_affinity
+metal_interrupt_affinity_disable(struct metal_interrupt *controller,
+                                 metal_affinity bitmask, int id) {
+    return controller->vtable->interrupt_affinity_disable(controller, bitmask,
+                                                          id);
+}
+
+/*!
+ * @brief Set interrupt threshold level for the hart contexts
+ * @param controller The handle for the interrupt controller
+ * @param bitmask The bit mask of hart contexts to set threshold
+ * @param threshold The interrupt threshold level
+ * @return The result of each hart context. 0 upon success at relevant bit.
+ */
+__inline__ metal_affinity
+metal_interrupt_affinity_set_threshold(struct metal_interrupt *controller,
+                                       metal_affinity bitmask,
+                                       unsigned int level) {
+    return controller->vtable->interrupt_affinity_set_threshold(controller,
+                                                                bitmask, level);
+}
+
+/*!
+ * @brief Get an interrupt threshold level from the hart context
+ * @param controller The handle for the interrupt controller
+ * @param context_id The hart context ID to get threshold
+ * @return The interrupt threshold level
+ */
+__inline__ unsigned int
+metal_interrupt_affinity_get_threshold(struct metal_interrupt *controller,
+                                       int context_id) {
+    return controller->vtable->interrupt_affinity_get_threshold(controller,
+                                                                context_id);
+}
 #endif
