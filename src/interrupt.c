@@ -66,17 +66,25 @@ extern __inline__ int metal_interrupt_enable(struct metal_interrupt *controller,
 
 extern __inline__ int metal_interrupt_disable(struct metal_interrupt *controller, int id);
 
-extern __inline__ unsigned int metal_interrupt_get_threshold(struct metal_interrupt *controller);
-
-extern __inline__ int metal_interrupt_set_threshold(struct metal_interrupt *controller, unsigned int threshold);
-
-extern __inline__ unsigned int metal_interrupt_get_priority(struct metal_interrupt *controller, int id);
-
-extern __inline__ int metal_interrupt_set_priority(struct metal_interrupt *controller, int id, unsigned int priority);
-
 extern __inline__ int metal_interrupt_vector_enable(struct metal_interrupt *controller, int id);
 
 extern __inline__ int metal_interrupt_vector_disable(struct metal_interrupt *controller, int id);
 
 extern __inline__ int _metal_interrupt_command_request(struct metal_interrupt *controller,
                                          	int cmd, void *data);
+
+extern __inline__ metal_affinity
+metal_interrupt_affinity_enable(struct metal_interrupt *controller,
+                                metal_affinity bitmask, int id);
+
+extern __inline__ metal_affinity
+metal_interrupt_affinity_disable(struct metal_interrupt *controller,
+                                 metal_affinity bitmask, int id);
+
+extern __inline__ metal_affinity
+metal_interrupt_affinity_set_threshold(struct metal_interrupt *controller,
+                                       metal_affinity bitmask,
+                                       unsigned int level);
+extern __inline__ unsigned int
+metal_interrupt_affinity_get_threshold(struct metal_interrupt *controller,
+                                       int contextid);
