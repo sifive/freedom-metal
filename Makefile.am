@@ -75,6 +75,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
 	metal/drivers/sifive_test0.h \
+	metal/drivers/sifive_trace.h \
 	metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_wdog0.h \
 	metal/machine/inline.h \
@@ -179,6 +180,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
 	src/drivers/sifive_test0.c \
+	src/drivers/sifive_trace.c \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
 	src/button.c \
