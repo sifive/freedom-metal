@@ -17,7 +17,7 @@ extern metal_destructor_t metal_destructors_end;
 void metal_init(void) {
     /* Make sure the constructors only run once */
     static int init_done = 0;
-    if (!init_done) {
+    if (init_done) {
         return;
     }
     init_done = 1;
@@ -39,7 +39,7 @@ void metal_init(void) {
 void metal_fini(void) {
     /* Make sure the destructors only run once */
     static int fini_done = 0;
-    if (!fini_done) {
+    if (fini_done) {
         return;
     }
     fini_done = 1;
