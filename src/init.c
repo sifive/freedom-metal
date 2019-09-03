@@ -22,7 +22,7 @@ void metal_init(void) {
     }
     init_done = 1;
 
-    if (metal_constructors_end <= metal_constructors_start) {
+    if (&metal_constructors_end <= &metal_constructors_start) {
         return;
     }
 
@@ -44,7 +44,7 @@ void metal_fini(void) {
     }
     fini_done = 1;
 
-    if (metal_destructors_end <= metal_destructors_start) {
+    if (&metal_destructors_end <= &metal_destructors_start) {
         return;
     }
 
