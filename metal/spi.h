@@ -21,6 +21,18 @@ struct metal_spi_config {
     unsigned int cs_active_high : 1;
     /*! @brief The chip select ID to activate for the SPI transfer */
     unsigned int csid;
+    /*! @brief The spi command frame number (cycles = num * frame_len) */
+    unsigned int cmd_num;
+    /*! @brief The spi address frame number */
+    unsigned int addr_num;
+    /*! @brief The spi dummy frame number */
+    unsigned int dummy_num;
+    /*! @brief The Dual/Quad spi mode selection.*/
+    enum {
+        MULTI_WIRE_ALL,
+        MULTI_WIRE_DATA_ONLY,
+        MULTI_WIRE_ADDR_DATA
+    } multi_wire;
 };
 
 struct metal_spi_vtable {
