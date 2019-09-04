@@ -1,3 +1,6 @@
+
+#ifdef METAL_SYNOPSYS_I2C_V2_02A_STANDARD
+
 #include <metal/machine/platform.h>
 #include <metal/drivers/synopsys_i2c.h>
 #include <metal/io.h>
@@ -262,3 +265,4 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_synopsys_i2c) = {
 
 
 
+#endif
