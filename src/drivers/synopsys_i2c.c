@@ -1,7 +1,8 @@
 
+#include <metal/machine/platform.h>
+
 #ifdef METAL_SYNOPSYS_I2C_V2_02A_STANDARD
 
-#include <metal/machine/platform.h>
 #include <metal/drivers/synopsys_i2c.h>
 #include <metal/io.h>
 #include <metal/machine.h>
