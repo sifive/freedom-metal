@@ -328,21 +328,24 @@ void __attribute__((weak, interrupt)) metal_interrupt_vector_handler(void);
  * @param None
  * @return None
  */
-void __attribute__((weak, interrupt)) metal_software_interrupt_vector_handler(void);
+void __attribute__((weak, interrupt))
+metal_software_interrupt_vector_handler(void);
 
 /*!
  * @brief Metal Timer interrupt vector handler, that can be overriden by user
  * @param None
  * @return None
  */
-void __attribute__((weak, interrupt)) metal_timer_interrupt_vector_handler(void);
+void __attribute__((weak, interrupt))
+metal_timer_interrupt_vector_handler(void);
 
 /*!
  * @brief Metal External interrupt vector handler, that can be overriden by user
  * @param None
  * @return None
  */
-void __attribute__((weak, interrupt)) metal_external_interrupt_vector_handler(void);
+void __attribute__((weak, interrupt))
+metal_external_interrupt_vector_handler(void);
 
 /*!
  * @brief Metal Local 0 interrupt vector handler, that can be overriden by user
@@ -392,7 +395,7 @@ void __attribute__((weak, interrupt)) metal_lc5_interrupt_vector_handler(void);
  * @return None
  */
 void __attribute__((weak, interrupt)) metal_lc6_interrupt_vector_handler(void);
-    
+
 /*!
  * @brief Metal Local 7 interrupt vector handler, that can be overriden by user
  * @param None
@@ -456,10 +459,11 @@ void __attribute__((weak, interrupt)) metal_lc14_interrupt_vector_handler(void);
  */
 void __attribute__((weak, interrupt)) metal_lc15_interrupt_vector_handler(void);
 
-/* Utilities function to controll, manages devices via a given interrupt controller */
-__inline__ int _metal_interrupt_command_request(struct metal_interrupt *controller,
-					 int cmd, void *data)
-{
+/* Utilities function to controll, manages devices via a given interrupt
+ * controller */
+__inline__ int
+_metal_interrupt_command_request(struct metal_interrupt *controller, int cmd,
+                                 void *data) {
     return controller->vtable->command_request(controller, cmd, data);
 }
 
