@@ -207,11 +207,25 @@ void __metal_driver_synopsys_i2c_init(struct metal_i2c *i2c,struct metal_i2c_con
 
 		I2C_REG_RW_BIT(METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_CON,5,1);
 
+		if(cfg->speed_mode == METAL_I2C_STANDARD_SPEED){
 		
-
+			write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_SS_SCL_LCNT,cfg->low_count);
+			write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_SS_SCL_HCNT,cfg->high_count);
+		}
+		else if(cfg->speed_mode == METAL_I2C_FAST_SPEED)
+		{
+			write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_FS_SCL_LCNT,cfg->low_count);
+			write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_FS_SCL_HCNT,cfg->high_count);
+		}
+		else if(cfg->speed_mode == METAL_I2C_HIGH_SPEED)
+		{
+			write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_HS_SCL_LCNT,cfg->low_count);
+			write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_HS_SCL_HCNT,cfg->high_count);	
+		}
 
 		write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_TX_TL,cfg->transmitter_threshold);
 		write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_RX_TL,cfg->receiver_threshold);
+
 
 	__metal_driver_synopsys_i2c_set_address_mode((struct metal_i2c *)(i2c),cfg);			
 	__metal_driver_synopsys_i2c_set_target_address((struct metal_i2c *)(i2c),cfg,cfg->target_address);	
