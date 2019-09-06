@@ -1,7 +1,10 @@
+#ifndef __SEGGER_LIBC__
 #include <sys/types.h>
-
-/* brk is handled entirely within the C library.  This limits METAL programs that
- * use the C library to be disallowed from dynamically allocating memory
+#else
+#include <stddef.h>
+#endif
+/* brk is handled entirely within the C library.  This limits METAL programs
+ * that use the C library to be disallowed from dynamically allocating memory
  * without talking to the C library, but that sounds like a sane way to go
  * about it.  Note that there is no error checking anywhere in this file, users
  * will simply get the relevant error when actually trying to use the memory
