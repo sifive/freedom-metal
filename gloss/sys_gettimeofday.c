@@ -1,6 +1,9 @@
 #include <errno.h>
+#include <time.h>
+#ifndef __SEGGER_LIBC__
 #include <metal/timer.h>
 #include <sys/time.h>
+#endif
 
 int
 _gettimeofday(struct timeval *tp, void *tzp)

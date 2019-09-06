@@ -1,11 +1,13 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/cpu.h>
+#include <metal/machine.h>
+#include <metal/timer.h>
+#ifndef __SEGGER_LIBC__
 #include <sys/time.h>
 #include <sys/times.h>
-#include <metal/cpu.h>
-#include <metal/timer.h>
-#include <metal/machine.h>
+#endif
 
 #if defined(__METAL_DT_MAX_HARTS)
 /* This implementation serves as a small shim that interfaces with the first
