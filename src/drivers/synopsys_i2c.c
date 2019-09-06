@@ -256,15 +256,38 @@ int __metal_driver_synopsys_i2c_write_transfer(struct metal_i2c *i2c,struct meta
 }			
 
 int __metal_driver_synopsys_i2c_read_transfer(struct metal_i2c *i2c,struct metal_i2c_config *cfg,int len,unsigned char *rx_buf)
-{
-	if(!(read_register_bit(i2c,METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_CON,0)))		{
-				for(int i=0;i<len;i++)
+{	
+
+	if(cfg->operation_mode == METAL_I2C_MASTER)
+	{
+		for(int i=0;i<len;i++)
 				{
-					rx_buf[i] = (unsigned char)read_register(i2c,METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_DATA_CMD);
+
+					write_register((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_DATA_CMD,set_bit(0x0,8,1));
 				}
-				return 1;
-		}
-   
+		for(int i =0;i<len; i++)
+				{
+					while(!(read_register_bit((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_RAW_INTR_STAT,2)))
+					{}
+
+					rx_buf[i] = (unsigned char)read_register(i2c,METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_DATA_CMD);
+
+				}		
+
+				
+	}
+	if(cfg->operation_mode == METAL_I2C_SLAVE)
+		{
+				if(!(read_register_bit(i2c,METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_CON,0)))		
+					{
+							for(int i=0;i<len;i++)
+							{	
+								while((!read_register_bit((struct metal_i2c *)(i2c),METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_RAW_INTR_STAT,4))){}
+								rx_buf[i] = (unsigned char)read_register(i2c,METAL_SYNOPSYS_I2C_V2_02A_STANDARD_IC_DATA_CMD);
+							}
+							return 1;
+					}
+		}	   
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_synopsys_i2c) = {
