@@ -4,6 +4,7 @@
 #ifndef METAL__LOCK_H
 #define METAL__LOCK_H
 
+#include <metal/machine.h>
 #include <metal/memory.h>
 #include <metal/compiler.h>
 
@@ -14,6 +15,9 @@
 
 /* TODO: How can we make the exception code platform-independant? */
 #define _METAL_STORE_AMO_ACCESS_FAULT 7
+
+#define METAL_LOCK_BACKOFF_CYCLES 32
+#define METAL_LOCK_BACKOFF_EXPONENT 2
 
 /*!
  * @def METAL_LOCK_DECLARE
@@ -75,11 +79,26 @@ __inline__ int metal_lock_take(struct metal_lock *lock) {
     int old = 1;
     int new = 1;
 
-    while(old != 0) {
+    int backoff = 1;
+    const int max_backoff = METAL_LOCK_BACKOFF_CYCLES * METAL_MAX_CORES;
+
+    while(1) {
         __asm__ volatile("amoswap.w.aq %[old], %[new], (%[state])"
                          : [old] "=r" (old)
                          : [new] "r" (new), [state] "r" (&(lock->_state))
                          : "memory");
+
+        if (old == 0) {
+            break;
+        }
+
+        for (int i = 0; i < backoff; i++) {
+            __asm__ volatile("");
+        }
+
+        if (backoff < max_backoff) {
+            backoff *= METAL_LOCK_BACKOFF_EXPONENT;
+        }
     }
 
     return 0;
