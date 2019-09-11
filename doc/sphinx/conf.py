@@ -23,7 +23,7 @@ project = 'Freedom Metal'
 copyright = '2019, SiFive Inc.'
 author = 'SiFive Inc.'
 
-version = "v201905"
+version = "v201908"
 release = version
 
 
@@ -71,6 +71,10 @@ exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+
+# This tells Sphinx to ignore the `__inline__` function attribute, fixing
+# errors related to parsing the function signature of functions marked `__inline__`.
+cpp_id_attributes = ["__inline__"]
 
 
 # -- Options for HTML output -------------------------------------------------
