@@ -72,6 +72,10 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+# This tells Sphinx to ignore the `__inline__` function attribute, fixing
+# errors related to parsing the function signature of functions marked `__inline__`.
+cpp_id_attributes = ["__inline__"]
+
 
 # -- Options for HTML output -------------------------------------------------
 
