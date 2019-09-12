@@ -8,8 +8,8 @@ extern __inline__ int metal_i2s_set_data_resolution(struct metal_i2s *i2s,struct
 extern __inline__ int metal_i2s_set_ws_length(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 extern __inline__ int metal_i2s_set_sclk_gating(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 extern __inline__ int metal_i2s_intr_mask(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
-//extern __inline__ struct metal_interrupt* metal_i2c_get_interrupt_controller(struct metal_i2c *i2c);
-//extern __inline__ int metal_i2c_get_interrupt_id(struct metal_i2c *i2c);
+extern __inline__ struct metal_interrupt* metal_i2s_get_interrupt_controller(struct metal_i2s *i2s, struct metal_i2s_config *cfg);
+extern __inline__ int metal_i2s_get_interrupt_id(struct metal_i2s *i2s, struct metal_i2s_config *cfg);
 
 struct metal_i2s *metal_i2s_get_master_device(unsigned int device_num)
 {

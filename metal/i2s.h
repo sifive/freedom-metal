@@ -61,8 +61,8 @@ struct metal_i2s_vtable
 	int (*set_ws_length)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 	int (*set_sclk_gating)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 	int (*intr_mask)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
-//	struct metal_interrupt* (*get_interrupt_controller)(struct metal_i2c *i2c);
-//	int (*get_interrupt_id)(struct metal_i2c *i2c);
+	struct metal_interrupt* (*get_interrupt_controller)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
+	int (*get_interrupt_id)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 
 };
 
@@ -108,15 +108,15 @@ __inline__ int metal_i2s_intr_mask(struct metal_i2s *i2s,struct metal_i2s_config
 	return i2s->vtable->intr_mask(i2s,cfg);
 }
 
-//__inline__ struct metal_interrupt* metal_i2c_get_interrupt_controller(struct metal_i2c *i2c)
-//{
-//	return i2c->vtable->get_interrupt_controller(i2c);
-//}
+__inline__ struct metal_interrupt* metal_i2s_get_interrupt_controller(struct metal_i2s *i2s,struct metal_i2s_config *cfg)
+{
+	return i2s->vtable->get_interrupt_controller(i2s, cfg);
+}
 
-//__inline__ int metal_i2c_get_interrupt_id(struct metal_i2c *i2c)
-//{
-//	return i2c->vtable-> get_interrupt_id(i2c);
-//}
+__inline__ int metal_i2s_get_interrupt_id(struct metal_i2s *i2s,struct metal_i2s_config *cfg)
+{
+	return i2s->vtable-> get_interrupt_id(i2s, cfg);
+}
 struct metal_i2s *metal_i2s_get_master_device(unsigned int device_num);
 
 struct metal_i2s *metal_i2s_get_slave_device(unsigned int device_num);

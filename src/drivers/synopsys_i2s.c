@@ -773,7 +773,7 @@ int __metal_driver_synopsys_i2s_intr_mask(struct metal_i2s *i2s,struct metal_i2s
 	{
 		if(cfg->no_of_channels==1)
 		{
-          I2S_REG_RW_BIT_RANGE(SYNOPSYS_I2S_V1_11A_IMR_0,0,5,63);
+          I2S_REG_RW_BIT_RANGE(SYNOPSYS_I2S_V1_11A_IMR_0,0,5,0);
 		}
 		else if(cfg->no_of_channels==2)
 		{
@@ -984,6 +984,22 @@ int __metal_driver_synopsys_i2s_slave_rx(struct metal_i2s *i2s,struct metal_i2s_
 	
 }
 
+struct metal_interrupt *__metal_driver_synopsys_i2s_get_interrupt_controller(struct metal_i2s *i2s, struct metal_i2s_config *config) 
+{
+	if (config->master) 
+		return __metal_driver_synopsys_i2s_master_interrupt_parent(i2s);
+	else 
+		return __metal_driver_synopsys_i2s_slave_interrupt_parent(i2s);
+}
+
+int __metal_driver_synopsys_i2s_get_interrupt_id(struct metal_i2s *i2s, struct metal_i2s_config *config) 
+{
+	if (config->master) 
+		return __metal_driver_synopsys_i2s_master_interrupt_line(i2s);
+	else 
+		return __metal_driver_synopsys_i2s_slave_interrupt_line(i2s);
+}
+
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_synopsys_i2s) =
 {
@@ -995,8 +1011,8 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_synopsys_i2s) =
 	.i2s.set_ws_length 	    = __metal_driver_synopsys_i2s_set_ws_length,
 	.i2s.set_sclk_gating    = __metal_driver_synopsys_i2s_set_sclk_gating,
 	.i2s.intr_mask          = __metal_driver_synopsys_i2s_intr_mask,
-	//.i2c.get_interrupt_controller = __metal_driver_synopsis_i2c_get_interrupt_controller,
-	//.i2c.get_interrupt_id   = __metal_driver_synopsis_i2c_get_interrupt_id
+	.i2s.get_interrupt_controller = __metal_driver_synopsys_i2s_get_interrupt_controller,
+	.i2s.get_interrupt_id   = __metal_driver_synopsys_i2s_get_interrupt_id
 };
 
 #endif
