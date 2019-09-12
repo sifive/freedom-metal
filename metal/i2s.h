@@ -43,7 +43,7 @@ struct metal_i2s_config
 
     unsigned int rx_block_en; //disable= 0
 
-    unsigned int intr_mask_en; //disable=0
+    unsigned int intr_unmask_en; //disable=0
     //fifo_depth=8
     //interrupt_polarity=1
     //interrupt_signals=0 (global interrupt output)
@@ -60,9 +60,9 @@ struct metal_i2s_vtable
 	int (*set_data_resolution)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 	int (*set_ws_length)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 	int (*set_sclk_gating)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
-	int (*intr_mask)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 	struct metal_interrupt* (*get_interrupt_controller)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 	int (*get_interrupt_id)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
+	int (*set_fifo_trigger_level)(struct metal_i2s *i2s,struct metal_i2s_config *cfg);
 
 };
 
@@ -103,9 +103,9 @@ __inline__ int metal_i2s_set_sclk_gating(struct metal_i2s *i2s,struct metal_i2s_
 	return i2s->vtable->set_sclk_gating(i2s,cfg);
 }
 
-__inline__ int metal_i2s_intr_mask(struct metal_i2s *i2s,struct metal_i2s_config *cfg)
+__inline__ int metal_i2s_set_fifo_trigger_level(struct metal_i2s *i2s,struct metal_i2s_config *cfg)
 {
-	return i2s->vtable->intr_mask(i2s,cfg);
+	return i2s->vtable->set_fifo_trigger_level(i2s,cfg);
 }
 
 __inline__ struct metal_interrupt* metal_i2s_get_interrupt_controller(struct metal_i2s *i2s,struct metal_i2s_config *cfg)
