@@ -44,20 +44,22 @@ struct metal_i2c_config
 
 	unsigned int high_count; // need to be automated using "clock" field in the device tree
 
+	unsigned int mask_all_interrupts;
 };
 
 
 
 struct metal_i2c_vtable 
 {
-	
+	void (*enable_i2c)(struct metal_i2c *i2c);
+	void (*disable_i2c)(struct metal_i2c *i2c);
 	void (*init)(struct metal_i2c *i2c,struct metal_i2c_config *cfg);
-	int (*write_transfer)(struct metal_i2c *i2c,struct metal_i2c_config *cfg,int len,unsigned char *tx_buf);
+	int (*write_transfer)(struct metal_i2c *i2c,unsigned char *tx_buf);
 	int (*read_transfer)(struct metal_i2c *i2c,struct metal_i2c_config *cfg,int len,unsigned char *rx_buf);
 	int (*set_target_address)(struct metal_i2c *i2c,struct metal_i2c_config *cfg,unsigned int address);
 	int (*set_speed_mode)(struct metal_i2c *i2c,struct metal_i2c_config *cfg);
 	int (*set_address_mode)(struct metal_i2c *i2c,struct metal_i2c_config *cfg);
-//	struct metal_interrupt* (*get_interrupt_controller)(struct metal_i2c *i2c);
+	struct metal_interrupt* (*get_interrupt_controller)(struct metal_i2c *i2c);
 //	int (*get_interrupt_id)(struct metal_i2c *i2c);
 
 };
@@ -68,15 +70,24 @@ struct metal_i2c
 	const struct metal_i2c_vtable *vtable;	
 };
 
+__inline__ void metal_i2c_enable(struct metal_i2c *i2c)
+{
+	i2c->vtable->enable_i2c(i2c);
+}
+
+__inline__ void metal_i2c_disable(struct metal_i2c *i2c)
+{
+	i2c->vtable->disable_i2c(i2c);
+}
 
 __inline__ void metal_i2c_init(struct metal_i2c *i2c,struct metal_i2c_config *cfg)
 {
 	i2c->vtable->init(i2c,cfg);
 }
 
-__inline__ int metal_i2c_write_transfer(struct metal_i2c *i2c,struct metal_i2c_config *cfg,int len,unsigned char *tx_buf)
+__inline__ int metal_i2c_write_transfer(struct metal_i2c *i2c,unsigned char *tx_buf)
 {
-	return i2c->vtable->write_transfer(i2c,cfg,len,tx_buf);
+	return i2c->vtable->write_transfer(i2c,tx_buf);
 }
 
 __inline__ int metal_i2c_read_transfer(struct metal_i2c *i2c,struct metal_i2c_config *cfg,int len,unsigned char *rx_buf)
@@ -99,16 +110,16 @@ __inline__ int metal_i2c_set_target_address(struct metal_i2c *i2c,struct metal_i
 	return i2c->vtable->set_target_address(i2c,cfg,address);
 }
 
-//__inline__ struct metal_interrupt* metal_i2c_get_interrupt_controller(struct metal_i2c *i2c)
-//{
-//	return i2c->vtable->get_interrupt_controller(i2c);
-//}
+__inline__ struct metal_interrupt* metal_i2c_get_interrupt_controller(struct metal_i2c *i2c)
+{
+	return i2c->vtable->get_interrupt_controller(i2c);
+}
 
 //__inline__ int metal_i2c_get_interrupt_id(struct metal_i2c *i2c)
 //{
 //	return i2c->vtable-> get_interrupt_id(i2c);
 //}
 
-struct metal_i2c *metal_i2c_get_device(unsigned int device_num);
+
 
 #endif
