@@ -140,6 +140,8 @@ int __metal_driver_riscv_clint0_set_vector_mode(
         case METAL_DIRECT_MODE:
             rc = intc->vtable->interrupt_set_vector_mode(intc, mode);
             break;
+        default:
+            break;
         }
     }
     return rc;
