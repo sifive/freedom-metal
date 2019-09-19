@@ -571,7 +571,6 @@ metal_vector_mode __metal_driver_riscv_cpu_controller_get_vector_mode(
 
 int __metal_driver_riscv_cpu_controller_set_vector_mode(
     struct metal_interrupt *controller, metal_vector_mode mode) {
-    struct __metal_driver_riscv_cpu_intc *intc = (void *)(controller);
 
     if (mode == METAL_DIRECT_MODE) {
         __metal_controller_interrupt_vector(
@@ -579,7 +578,8 @@ int __metal_driver_riscv_cpu_controller_set_vector_mode(
         return 0;
     }
     if (mode == METAL_VECTOR_MODE) {
-        __metal_controller_interrupt_vector(mode, (void *)__metal_vector_table);
+        __metal_controller_interrupt_vector(
+            mode, (void *)(uintptr_t)__metal_vector_table);
         return 0;
     }
     return -1;
