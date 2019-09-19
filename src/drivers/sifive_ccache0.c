@@ -6,6 +6,7 @@
 #ifdef METAL_SIFIVE_CCACHE0
 
 #include <metal/drivers/sifive_ccache0.h>
+#include <metal/init.h>
 #include <metal/io.h>
 #include <metal/machine.h>
 #include <stdint.h>
@@ -15,8 +16,7 @@
 
 void __metal_driver_sifive_ccache0_init(struct metal_cache *l2, int ways);
 
-static void metal_driver_sifive_ccache0_init(void) __attribute__((constructor));
-static void metal_driver_sifive_ccache0_init(void) {
+METAL_CONSTRUCTOR(metal_driver_sifive_ccache0_init) {
 #ifdef __METAL_DT_SIFIVE_CCACHE0_HANDLE
     /* Get the handle for the L2 cache controller */
     struct metal_cache *l2 = __METAL_DT_SIFIVE_CCACHE0_HANDLE;
