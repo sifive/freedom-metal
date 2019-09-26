@@ -30,8 +30,7 @@ _times(struct tms *buf)
     _gettimeofday (&t, 0);
 
     unsigned long long timebase;
-    rv = metal_timer_get_timebase_frequency(0, &timebase);
-    if (rv != 0) {
+    if (rv = metal_timer_get_timebase_frequency(0, &timebase)) {
         return -1;
     }
 

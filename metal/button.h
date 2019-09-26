@@ -45,7 +45,7 @@ struct metal_button* metal_button_get(char *label);
  * @return A pointer to the interrupt controller responsible for handling
  * button interrupts.
  */
-__inline__ struct metal_interrupt*
+inline struct metal_interrupt*
     metal_button_interrupt_controller(struct metal_button *button) { return button->vtable->interrupt_controller(button); }
 
 /*!
@@ -54,6 +54,6 @@ __inline__ struct metal_interrupt*
  * @param button The handle for the button
  * @return The interrupt id corresponding to a button.
  */
-__inline__ int metal_button_get_interrupt_id(struct metal_button *button) { return button->vtable->get_interrupt_id(button); }
+inline int metal_button_get_interrupt_id(struct metal_button *button) { return button->vtable->get_interrupt_id(button); }
 
 #endif

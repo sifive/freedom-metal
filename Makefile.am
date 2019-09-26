@@ -59,11 +59,9 @@ nobase_include_HEADERS = \
 	metal/drivers/riscv_clint0.h \
 	metal/drivers/riscv_cpu.h \
 	metal/drivers/riscv_plic0.h \
-	metal/drivers/sifive_ccache0.h \
 	metal/drivers/sifive_clic0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
 	metal/drivers/sifive_fe310-g000_hfxosc.h \
-	metal/drivers/sifive_fe310-g000_lfrosc.h \
 	metal/drivers/sifive_fe310-g000_pll.h \
 	metal/drivers/sifive_fe310-g000_prci.h \
 	metal/drivers/sifive_fu540-c000_l2.h \
@@ -73,12 +71,9 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
-	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
 	metal/drivers/sifive_test0.h \
-	metal/drivers/sifive_trace.h \
 	metal/drivers/sifive_uart0.h \
-	metal/drivers/sifive_wdog0.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
 	metal/button.h \
@@ -96,15 +91,12 @@ nobase_include_HEADERS = \
 	metal/memory.h \
 	metal/pmp.h \
 	metal/privilege.h \
-	metal/rtc.h \
 	metal/shutdown.h \
 	metal/spi.h \
 	metal/switch.h \
 	metal/timer.h \
-	metal/time.h \
 	metal/tty.h \
-	metal/uart.h \
-	metal/watchdog.h
+	metal/uart.h
 
 if PRECONFIGURED
 metal/machine.h: @MACHINE_HEADER@
@@ -164,28 +156,21 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/riscv_clint0.c \
 	src/drivers/riscv_cpu.c \
 	src/drivers/riscv_plic0.c \
-	src/drivers/sifive_ccache0.c \
 	src/drivers/sifive_clic0.c \
 	src/drivers/sifive_fe310-g000_hfrosc.c \
 	src/drivers/sifive_fe310-g000_hfxosc.c \
-	src/drivers/sifive_fe310-g000_lfrosc.c \
 	src/drivers/sifive_fe310-g000_pll.c \
 	src/drivers/sifive_fe310-g000_prci.c \
-	src/drivers/sifive_fu540-c000_l2.c \
 	src/drivers/sifive_global-external-interrupts0.c \
 	src/drivers/sifive_gpio-buttons.c \
 	src/drivers/sifive_gpio-leds.c \
 	src/drivers/sifive_gpio-switches.c \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
-	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
 	src/drivers/sifive_test0.c \
-	src/drivers/sifive_trace.c \
 	src/drivers/sifive_uart0.c \
-	src/drivers/sifive_wdog0.c \
 	src/button.c \
-	src/cache.c \
 	src/clock.c \
 	src/cpu.c \
 	src/entry.S \
@@ -196,18 +181,13 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/memory.c \
 	src/pmp.c \
 	src/privilege.c \
-	src/rtc.c \
 	src/shutdown.c \
 	src/spi.c \
 	src/switch.c \
-	src/synchronize_harts.c \
 	src/timer.c \
-	src/time.c \
 	src/trap.S \
 	src/tty.c \
-	src/uart.c \
-	src/vector.S \
-	src/watchdog.c
+	src/uart.c
 
 # Freedom METAL has its own libgloss implementation that is only built in
 # --with-builtin-libgloss is passed to configure.
@@ -217,6 +197,7 @@ lib_LIBRARIES += libriscv__menv__metal.a
 
 libriscv__menv__metal_a_SOURCES = \
 	gloss/crt0.S \
+	gloss/synchronize_harts.c \
 	gloss/nanosleep.c \
 	gloss/sys_access.c \
 	gloss/sys_chdir.c \

@@ -20,7 +20,7 @@ struct metal_cpu;
 typedef void (*metal_exception_handler_t) (struct metal_cpu *cpu, int ecode);
 
 struct metal_cpu_vtable {
-    unsigned long long (*mcycle_get)(struct metal_cpu *cpu);
+    unsigned long long (*timer_get)(struct metal_cpu *cpu);
     unsigned long long (*timebase_get)(struct metal_cpu *cpu);
     unsigned long long (*mtime_get)(struct metal_cpu *cpu);
     int (*mtimecmp_set)(struct metal_cpu *cpu, unsigned long long time);
@@ -49,17 +49,17 @@ struct metal_cpu {
  * @param hartid The ID of the desired CPU hart
  * @return A pointer to the CPU device handle
  */
-struct metal_cpu* metal_cpu_get(unsigned int hartid);
+struct metal_cpu* metal_cpu_get(int hartid);
 
 /*! @brief Get the hartid of the CPU hart executing this function
  *
  * @return The hartid of the current CPU hart */
-int metal_cpu_get_current_hartid(void);
+int metal_cpu_get_current_hartid();
 
 /*! @brief Get the number of CPU harts
  * 
  * @return The number of CPU harts */
-int metal_cpu_get_num_harts(void);
+int metal_cpu_get_num_harts();
 
 /*! @brief Get the CPU cycle count timer value
  *
@@ -68,8 +68,8 @@ int metal_cpu_get_num_harts(void);
  * @param cpu The CPU device handle
  * @return The value of the CPU cycle count timer
  */
-__inline__ unsigned long long metal_cpu_get_timer(struct metal_cpu *cpu)
-{ return cpu->vtable->mcycle_get(cpu); }
+inline unsigned long long metal_cpu_get_timer(struct metal_cpu *cpu)
+{ return cpu->vtable->timer_get(cpu); }
 
 /*! @brief Get the timebase of the CPU
  *
@@ -78,7 +78,7 @@ __inline__ unsigned long long metal_cpu_get_timer(struct metal_cpu *cpu)
  * @param cpu The CPU device handle
  * @return The value of the cycle count timer timebase
  */
-__inline__ unsigned long long metal_cpu_get_timebase(struct metal_cpu *cpu)
+inline unsigned long long metal_cpu_get_timebase(struct metal_cpu *cpu)
 { return cpu->vtable->timebase_get(cpu); }
 
 /*! @brief Get the value of the mtime RTC
@@ -90,7 +90,7 @@ __inline__ unsigned long long metal_cpu_get_timebase(struct metal_cpu *cpu)
  * @param cpu The CPU device handle
  * @return The value of mtime, or 0 if failure
  */
-__inline__ unsigned long long metal_cpu_get_mtime(struct metal_cpu *cpu)
+inline unsigned long long metal_cpu_get_mtime(struct metal_cpu *cpu)
 { return cpu->vtable->mtime_get(cpu); }
 
 /*! @brief Set the value of the RTC mtimecmp RTC
@@ -103,7 +103,7 @@ __inline__ unsigned long long metal_cpu_get_mtime(struct metal_cpu *cpu)
  * @param time The value to set the compare register to
  * @return The value of mtimecmp or -1 if error
  */
-__inline__ int metal_cpu_set_mtimecmp(struct metal_cpu *cpu, unsigned long long time)
+inline int metal_cpu_set_mtimecmp(struct metal_cpu *cpu, unsigned long long time)
 { return cpu->vtable->mtimecmp_set(cpu, time); }
 
 /*! @brief Get a reference to RTC timer interrupt controller
@@ -115,7 +115,7 @@ __inline__ int metal_cpu_set_mtimecmp(struct metal_cpu *cpu, unsigned long long 
  * @param cpu The CPU device handle
  * @return A pointer to the timer interrupt handle
  */
-__inline__ struct metal_interrupt* metal_cpu_timer_interrupt_controller(struct metal_cpu *cpu)
+inline struct metal_interrupt* metal_cpu_timer_interrupt_controller(struct metal_cpu *cpu)
 { return cpu->vtable->tmr_controller_interrupt(cpu); }
 
 /*! @brief Get the RTC timer interrupt id
@@ -125,7 +125,7 @@ __inline__ struct metal_interrupt* metal_cpu_timer_interrupt_controller(struct m
  * @param cpu The CPU device handle
  * @return The timer interrupt ID
  */
-__inline__ int metal_cpu_timer_get_interrupt_id(struct metal_cpu *cpu)
+inline int metal_cpu_timer_get_interrupt_id(struct metal_cpu *cpu)
 { return cpu->vtable->get_tmr_interrupt_id(cpu); }
 
 /*! @brief Get a reference to the software interrupt controller
@@ -137,7 +137,7 @@ __inline__ int metal_cpu_timer_get_interrupt_id(struct metal_cpu *cpu)
  * @param cpu The CPU device handle
  * @return A pointer to the software interrupt handle
  */
-__inline__ struct metal_interrupt* metal_cpu_software_interrupt_controller(struct metal_cpu *cpu)
+inline struct metal_interrupt* metal_cpu_software_interrupt_controller(struct metal_cpu *cpu)
 { return cpu->vtable->sw_controller_interrupt(cpu); }
 
 /*! @brief Get the software interrupt id
@@ -147,7 +147,7 @@ __inline__ struct metal_interrupt* metal_cpu_software_interrupt_controller(struc
  * @param cpu The CPU device handle
  * @return the software interrupt ID
  */
-__inline__ int metal_cpu_software_get_interrupt_id(struct metal_cpu *cpu)
+inline int metal_cpu_software_get_interrupt_id(struct metal_cpu *cpu)
 { return cpu->vtable->get_sw_interrupt_id(cpu); }
 
 /*!
@@ -161,7 +161,7 @@ __inline__ int metal_cpu_software_get_interrupt_id(struct metal_cpu *cpu)
  * @param hartid The CPU hart ID to be interrupted
  * @return 0 upon success
  */
-__inline__ int metal_cpu_software_set_ipi(struct metal_cpu *cpu, int hartid)
+inline int metal_cpu_software_set_ipi(struct metal_cpu *cpu, int hartid)
 { return cpu->vtable->set_sw_ipi(cpu, hartid); }
 
 /*!
@@ -175,7 +175,7 @@ __inline__ int metal_cpu_software_set_ipi(struct metal_cpu *cpu, int hartid)
  * @param hartid The CPU hart ID to clear
  * @return 0 upon success
  */
-__inline__ int metal_cpu_software_clear_ipi(struct metal_cpu *cpu, int hartid)
+inline int metal_cpu_software_clear_ipi(struct metal_cpu *cpu, int hartid)
 { return cpu->vtable->clear_sw_ipi(cpu, hartid); }
 
 /*!
@@ -190,7 +190,7 @@ __inline__ int metal_cpu_software_clear_ipi(struct metal_cpu *cpu, int hartid)
  * @param hartid The CPU hart to read
  * @return 0 upon success
  */
-__inline__ int metal_cpu_get_msip(struct metal_cpu *cpu, int hartid)
+inline int metal_cpu_get_msip(struct metal_cpu *cpu, int hartid)
 { return cpu->vtable->get_msip(cpu, hartid); }
 
 /*!
@@ -204,7 +204,7 @@ __inline__ int metal_cpu_get_msip(struct metal_cpu *cpu, int hartid)
  * @param cpu The CPU device handle
  * @return The handle for the CPU interrupt controller
  */
-__inline__ struct metal_interrupt* metal_cpu_interrupt_controller(struct metal_cpu *cpu)
+inline struct metal_interrupt* metal_cpu_interrupt_controller(struct metal_cpu *cpu)
 { return cpu->vtable->controller_interrupt(cpu); }
 
 /*!
@@ -218,7 +218,7 @@ __inline__ struct metal_interrupt* metal_cpu_interrupt_controller(struct metal_c
  * @param handler Callback function for the exception handler
  * @return 0 upon success
  */
-__inline__ int metal_cpu_exception_register(struct metal_cpu *cpu, int ecode, metal_exception_handler_t handler)
+inline int metal_cpu_exception_register(struct metal_cpu *cpu, int ecode, metal_exception_handler_t handler)
 { return cpu->vtable->exception_register(cpu, ecode, handler); }
 
 /*!
@@ -237,7 +237,7 @@ __inline__ int metal_cpu_exception_register(struct metal_cpu *cpu, int ecode, me
  * @param epc The address of the instruction to measure
  * @return the length of the instruction in bytes
  */
-__inline__ int metal_cpu_get_instruction_length(struct metal_cpu *cpu, uintptr_t epc)
+inline int metal_cpu_get_instruction_length(struct metal_cpu *cpu, uintptr_t epc)
 { return cpu->vtable->get_ilen(cpu, epc); }
 
 /*!
@@ -249,7 +249,7 @@ __inline__ int metal_cpu_get_instruction_length(struct metal_cpu *cpu, uintptr_t
  * @param cpu The CPU device handle
  * @return The value of the program counter at the time of the exception
  */
-__inline__ uintptr_t metal_cpu_get_exception_pc(struct metal_cpu *cpu)
+inline uintptr_t metal_cpu_get_exception_pc(struct metal_cpu *cpu)
 { return cpu->vtable->get_epc(cpu); }
 
 /*!
@@ -265,7 +265,7 @@ __inline__ uintptr_t metal_cpu_get_exception_pc(struct metal_cpu *cpu)
  * @param epc The address to set the exception program counter to
  * @return 0 upon success
  */
-__inline__ int metal_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t epc)
+inline int metal_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t epc)
 { return cpu->vtable->set_epc(cpu, epc); }
 
 #endif

@@ -53,5 +53,3 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_button) = {
 };
 
 #endif
-
-typedef int no_empty_translation_units;

@@ -20,7 +20,7 @@ void metal_privilege_drop_to_mode(enum metal_privilege_mode mode,
 				  metal_privilege_entry_point_t entry_point)
 {
 	uintptr_t mstatus;
-	__asm__ volatile("csrr %0, mstatus" : "=r" (mstatus));
+	asm volatile("csrr %0, mstatus" : "=r" (mstatus));
 
 	/* Set xPIE bits based on current xIE bits */
 	if(mstatus && (1 << METAL_MSTATUS_MIE_OFFSET)) {
@@ -43,15 +43,15 @@ void metal_privilege_drop_to_mode(enum metal_privilege_mode mode,
 	mstatus &= ~(METAL_MSTATUS_MPP_MASK << METAL_MSTATUS_MPP_OFFSET);
 	mstatus |= (mode << METAL_MSTATUS_MPP_OFFSET);
 
-	__asm__ volatile("csrw mstatus, %0" :: "r" (mstatus));
+	asm volatile("csrw mstatus, %0" :: "r" (mstatus));
 
 	/* Set the entry point in MEPC */
-	__asm__ volatile("csrw mepc, %0" :: "r" (entry_point));
+	asm volatile("csrw mepc, %0" :: "r" (entry_point));
 
 	/* Set the register file */
-	__asm__ volatile("mv ra, %0" :: "r" (regfile.ra));
-	__asm__ volatile("mv sp, %0" :: "r" (regfile.sp));
+	asm volatile("mv ra, %0" :: "r" (regfile.ra));
+	asm volatile("mv sp, %0" :: "r" (regfile.sp));
 
-	__asm__ volatile("mret");
+	asm volatile("mret");
 }
 

@@ -7,12 +7,10 @@ _gettimeofday(struct timeval *tp, void *tzp)
 {
     int rv;
     unsigned long long mcc, timebase;
-    rv = metal_timer_get_cyclecount(0, &mcc);
-    if (rv != 0) {
+    if (rv = metal_timer_get_cyclecount(0, &mcc)) {
         return -1;
     }
-    rv = metal_timer_get_timebase_frequency(0, &timebase);
-    if (rv != 0) {
+    if (rv = metal_timer_get_timebase_frequency(0, &timebase)) {
         return -1;
     }
     tp->tv_sec = mcc / timebase;
