@@ -18,6 +18,7 @@ struct metal_uart_vtable {
     void (*init)(struct metal_uart *uart, int baud_rate);
     int (*putc)(struct metal_uart *uart, int c);
     int (*txready)(struct metal_uart *uart);
+    int (*rxready)(struct metal_uart *uart);
     int (*getc)(struct metal_uart *uart, int *c);
     int (*get_baud_rate)(struct metal_uart *uart);
     int (*set_baud_rate)(struct metal_uart *uart, int baud_rate);
@@ -34,10 +35,34 @@ struct metal_uart_vtable {
 };
 
 /*!
+ * @brief Enum type for describing the cause of a UART callaback
+ */
+typedef enum {
+    METAL_UART_TX_DONE,
+    METAL_UART_RX_DONE,
+} metal_uart_callback_cause;
+
+/*!
+ * @brief Function signature for UART callbacks
+ */
+typedef void (*metal_uart_callback_t)(struct metal_uart *uart,
+                                      metal_uart_callback_cause);
+
+struct _metal_uart_async_buf {
+    int in_progress;
+    char *buf;
+    size_t len;
+    size_t index;
+    metal_uart_callback_t cb;
+};
+
+/*!
  * @brief Handle for a UART serial device
  */
 struct metal_uart {
     const struct metal_uart_vtable *vtable;
+    struct _metal_uart_async_buf _tx_async;
+    struct _metal_uart_async_buf _rx_async;
 };
 
 /*! @brief Get a handle for a UART device
@@ -77,6 +102,15 @@ __inline__ int metal_uart_putc(struct metal_uart *uart, int c) {
  */
 __inline__ int metal_uart_txready(struct metal_uart *uart) {
     return uart->vtable->txready(uart);
+}
+
+/*!
+ * @brief Test, determine if the uart has characters to be read
+ * @param uart The UART device handle
+ * @return 0 if the receive FIFO has characters
+ */
+__inline__ int metal_uart_rxready(struct metal_uart *uart) {
+    return uart->vtable->rxready(uart);
 }
 
 /*!
@@ -211,5 +245,56 @@ __inline__ int metal_uart_set_receive_watermark(struct metal_uart *uart,
 __inline__ size_t metal_uart_get_receive_watermark(struct metal_uart *uart) {
     return uart->vtable->get_rx_watermark(uart);
 }
+
+/*!
+ * @brief Send buffer asynchronously over UART
+ *
+ * Executes the callback when the send completes or if an error occurs
+ * during transmission.
+ *
+ * The asynchronous behavior places some expectations on the interrupt
+ * configuration of the platform:
+ *  - metal_interrupt_enable() has been called on the metal_interrupt struct
+ *    corresponding to the current CPU and the UART device being used
+ *  - metal_uart_transmit_interrupt_enable/disable will be called by the UART
+ *    driver
+ *  - metal_uart_set_transmit_watermark controlled by the user
+ *
+ * @return -1 if the UART is already busy sending a buffer, 0 if the send begins
+ */
+int metal_uart_send_async(struct metal_uart *uart, char *buf, size_t len,
+                          metal_uart_callback_t callback);
+
+/*!
+ * @brief Check if an asynchronous UART transmission is currently in-progress
+ * @return 1 if a send is in progress, otherwise 0
+ */
+int metal_uart_send_async_busy(struct metal_uart *uart);
+
+/*!
+ * @brief Receive buffer asynchronously over UART
+ *
+ * Executes the callback when the buffer has been filled or if
+ * an error occurs during receipt.
+ *
+ * The asynchronous behavior places some expectations on the interrupt
+ * configuration of the platform:
+ *  - metal_interrupt_enable() has been called on the metal_interrupt struct
+ *    corresponding to the current CPU and the UART device being used
+ *  - metal_uart_receive_interrupt_enable/disable will be called by the UART
+ *    driver
+ *  - metal_uart_set_receive_watermark controlled by the user
+ *
+ * @return -1 if the UART is already busy receiving a buffer, 0 if the receipt
+ * begins
+ */
+int metal_uart_recv_async(struct metal_uart *uart, char *buf, size_t len,
+                          metal_uart_callback_t callback);
+
+/*!
+ * @brief Check if an asynchronous UART receipt is currently in-progress
+ * @return 1 if a receipt is in progress, otherwise 0
+ */
+int metal_uart_recv_async_busy(struct metal_uart *uart);
 
 #endif

@@ -76,6 +76,14 @@ int __metal_driver_sifive_uart0_txready(struct metal_uart *uart) {
     return !((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
 }
 
+int __metal_driver_sifive_uart0_rxready(struct metal_uart *uart) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    /* The watermark interrupt pending bit is set if the RXFIFO
+     * has characters strictly greater than the current watermark setting */
+    return (UART_REGW(METAL_SIFIVE_UART0_IP) & UART_RXWM);
+}
+
 int __metal_driver_sifive_uart0_set_tx_watermark(struct metal_uart *uart,
                                                  size_t level) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
@@ -221,6 +229,8 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
     .uart.init = __metal_driver_sifive_uart0_init,
     .uart.putc = __metal_driver_sifive_uart0_putc,
     .uart.getc = __metal_driver_sifive_uart0_getc,
+    .uart.txready = __metal_driver_sifive_uart0_txready,
+    .uart.rxready = __metal_driver_sifive_uart0_rxready,
     .uart.get_baud_rate = __metal_driver_sifive_uart0_get_baud_rate,
     .uart.set_baud_rate = __metal_driver_sifive_uart0_set_baud_rate,
     .uart.controller_interrupt =
