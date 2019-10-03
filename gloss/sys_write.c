@@ -1,7 +1,7 @@
 #include <metal/tty.h>
+#include <errno.h>
 #ifndef __SEGGER_LIBC__
 #include <sys/types.h>
-#include <errno.h>
 #include <unistd.h>
 #else
 #define STDOUT_FILENO 1
