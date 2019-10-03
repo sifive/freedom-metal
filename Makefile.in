@@ -229,6 +229,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/libriscv__mmachine__@MACHINE_NAME@_a-cache.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-csr.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-trap.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-gpio.$(OBJEXT) \
@@ -512,6 +513,7 @@ nobase_include_HEADERS = \
 	metal/clock.h \
 	metal/compiler.h \
 	metal/cpu.h \
+	metal/csr.h \
 	metal/gpio.h \
 	metal/init.h \
 	metal/interrupt.h \
@@ -582,6 +584,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/cache.c \
 	src/clock.c \
 	src/cpu.c \
+	src/csr.c \
 	src/entry.S \
 	src/trap.S \
 	src/gpio.c \
@@ -893,6 +896,8 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-csr.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-entry.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-trap.$(OBJEXT):  \
@@ -1015,6 +1020,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cpu.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-csr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-entry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-gpio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-init.Po@am__quote@
@@ -1559,6 +1565,20 @@ src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj: src/cpu.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/cpu.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-cpu.obj `if test -f 'src/cpu.c'; then $(CYGPATH_W) 'src/cpu.c'; else $(CYGPATH_W) '$(srcdir)/src/cpu.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-csr.o: src/csr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-csr.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-csr.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-csr.o `test -f 'src/csr.c' || echo '$(srcdir)/'`src/csr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-csr.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-csr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/csr.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-csr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-csr.o `test -f 'src/csr.c' || echo '$(srcdir)/'`src/csr.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-csr.obj: src/csr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-csr.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-csr.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-csr.obj `if test -f 'src/csr.c'; then $(CYGPATH_W) 'src/csr.c'; else $(CYGPATH_W) '$(srcdir)/src/csr.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-csr.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-csr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/csr.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-csr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-csr.obj `if test -f 'src/csr.c'; then $(CYGPATH_W) 'src/csr.c'; else $(CYGPATH_W) '$(srcdir)/src/csr.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-gpio.o: src/gpio.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-gpio.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-gpio.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-gpio.o `test -f 'src/gpio.c' || echo '$(srcdir)/'`src/gpio.c
