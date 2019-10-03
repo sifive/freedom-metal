@@ -32,6 +32,11 @@ struct metal_uart {
     const struct metal_uart_vtable *vtable;
 };
 
+/*! @brief Get a handle for a UART device
+ * @param device_num The index of the desired UART device
+ * @return A handle to the UART device, or NULL if the device does not exist*/
+struct metal_uart *metal_uart_get_device(unsigned int device_num);
+
 /*!
  * @brief Initialize UART device
 
