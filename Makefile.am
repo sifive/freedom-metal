@@ -72,7 +72,6 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_gpio-leds.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h \
-	metal/drivers/sifive,htif0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
@@ -80,6 +79,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_trace.h \
 	metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_wdog0.h \
+	metal/drivers/ucb_htif0.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
 	metal/button.h \
@@ -179,7 +179,6 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_gpio-leds.c \
 	src/drivers/sifive_gpio-switches.c \
 	src/drivers/sifive_gpio0.c \
-	src/drivers/sifive,htif0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
@@ -187,6 +186,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_trace.c \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
+	src/drivers/ucb_htif0.c \
 	src/button.c \
 	src/cache.c \
 	src/clock.c \
