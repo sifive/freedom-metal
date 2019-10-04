@@ -20,8 +20,12 @@
 #define UART_NSTOP (1 << 1)
 #define UART_TXCNT(count) ((0x7 & count) << 16)
 
+/* RXCTRL Fields */
+#define UART_RXCNT(count) ((0x7 & count) << 16)
+
 /* IP Fields */
 #define UART_TXWM (1 << 0)
+#define UART_RXWM (1 << 1)
 
 #define UART_REG(offset) (((unsigned long)control_base + offset))
 #define UART_REGB(offset)                                                      \
@@ -35,14 +39,69 @@ __metal_driver_sifive_uart0_interrupt_controller(struct metal_uart *uart) {
 }
 
 int __metal_driver_sifive_uart0_get_interrupt_id(struct metal_uart *uart) {
-    return (__metal_driver_sifive_uart0_interrupt_line(uart) +
-            METAL_INTERRUPT_ID_GL0);
+    return __metal_driver_sifive_uart0_interrupt_line(uart);
+}
+
+int __metal_driver_sifive_uart0_tx_interrupt_enable(struct metal_uart *uart) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_TXWM;
+    return 0;
+}
+
+int __metal_driver_sifive_uart0_tx_interrupt_disable(struct metal_uart *uart) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_TXWM;
+    return 0;
+}
+
+int __metal_driver_sifive_uart0_rx_interrupt_enable(struct metal_uart *uart) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_RXWM;
+    return 0;
+}
+
+int __metal_driver_sifive_uart0_rx_interrupt_disable(struct metal_uart *uart) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_RXWM;
+    return 0;
 }
 
 int __metal_driver_sifive_uart0_txready(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     return !((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
+}
+
+int __metal_driver_sifive_uart0_set_tx_watermark(struct metal_uart *uart,
+                                                 size_t level) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXCNT(level);
+    return 0;
+}
+
+size_t __metal_driver_sifive_uart0_get_tx_watermark(struct metal_uart *uart) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    return ((UART_REGW(METAL_SIFIVE_UART0_TXCTRL) >> 16) & 0x7);
+}
+
+int __metal_driver_sifive_uart0_set_rx_watermark(struct metal_uart *uart,
+                                                 size_t level) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXCNT(level);
+    return 0;
+}
+
+size_t __metal_driver_sifive_uart0_get_rx_watermark(struct metal_uart *uart) {
+    long control_base = __metal_driver_sifive_uart0_control_base(uart);
+
+    return ((UART_REGW(METAL_SIFIVE_UART0_RXCTRL) >> 16) & 0x7);
 }
 
 int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, int c) {
@@ -167,6 +226,16 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
     .uart.controller_interrupt =
         __metal_driver_sifive_uart0_interrupt_controller,
     .uart.get_interrupt_id = __metal_driver_sifive_uart0_get_interrupt_id,
+    .uart.tx_interrupt_enable = __metal_driver_sifive_uart0_tx_interrupt_enable,
+    .uart.tx_interrupt_disable =
+        __metal_driver_sifive_uart0_tx_interrupt_disable,
+    .uart.rx_interrupt_enable = __metal_driver_sifive_uart0_rx_interrupt_enable,
+    .uart.rx_interrupt_disable =
+        __metal_driver_sifive_uart0_rx_interrupt_disable,
+    .uart.set_tx_watermark = __metal_driver_sifive_uart0_set_tx_watermark,
+    .uart.get_tx_watermark = __metal_driver_sifive_uart0_get_tx_watermark,
+    .uart.set_rx_watermark = __metal_driver_sifive_uart0_set_rx_watermark,
+    .uart.get_rx_watermark = __metal_driver_sifive_uart0_get_rx_watermark,
 };
 
 #endif /* METAL_SIFIVE_UART0 */
