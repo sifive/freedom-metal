@@ -93,7 +93,7 @@ size_t __metal_driver_sifive_uart0_get_tx_watermark(struct metal_uart *uart) {
 int __metal_driver_sifive_uart0_set_rx_watermark(struct metal_uart *uart,
                                                  size_t level) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
-    
+
     UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXCNT(level);
     return 0;
 }
@@ -227,9 +227,11 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
         __metal_driver_sifive_uart0_interrupt_controller,
     .uart.get_interrupt_id = __metal_driver_sifive_uart0_get_interrupt_id,
     .uart.tx_interrupt_enable = __metal_driver_sifive_uart0_tx_interrupt_enable,
-    .uart.tx_interrupt_disable = __metal_driver_sifive_uart0_tx_interrupt_disable,
+    .uart.tx_interrupt_disable =
+        __metal_driver_sifive_uart0_tx_interrupt_disable,
     .uart.rx_interrupt_enable = __metal_driver_sifive_uart0_rx_interrupt_enable,
-    .uart.rx_interrupt_disable = __metal_driver_sifive_uart0_rx_interrupt_disable,
+    .uart.rx_interrupt_disable =
+        __metal_driver_sifive_uart0_rx_interrupt_disable,
     .uart.set_tx_watermark = __metal_driver_sifive_uart0_set_tx_watermark,
     .uart.get_tx_watermark = __metal_driver_sifive_uart0_get_tx_watermark,
     .uart.set_rx_watermark = __metal_driver_sifive_uart0_set_rx_watermark,

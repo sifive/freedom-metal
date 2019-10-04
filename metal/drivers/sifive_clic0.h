@@ -34,7 +34,8 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0)
 struct __metal_driver_sifive_clic0 {
     struct metal_interrupt controller;
     int init_done;
-    struct {} __attribute__ ((aligned (64)));
+    struct {
+    } __attribute__((aligned(64)));
     metal_interrupt_vector_handler_t
         metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
     __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
