@@ -1,8 +1,6 @@
 #ifndef __SEGGER_LIBC__
 #include <sys/types.h>
-#else
-#include <stddef.h>
-#endif
+
 /* brk is handled entirely within the C library.  This limits METAL programs
  * that use the C library to be disallowed from dynamically allocating memory
  * without talking to the C library, but that sounds like a sane way to go
@@ -40,3 +38,7 @@ _sbrk(ptrdiff_t incr)
 
   return old;
 }
+#else
+#include <stddef.h>
+#endif
+
