@@ -225,6 +225,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_trace.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_uart0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.$(OBJEXT) \
+	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-button.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-cache.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT) \
@@ -505,6 +506,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_trace.h \
 	metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_wdog0.h \
+	metal/drivers/ucb_htif0.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
 	metal/button.h \
@@ -579,6 +581,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_trace.c \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
+	src/drivers/ucb_htif0.c \
 	src/button.c \
 	src/cache.c \
 	src/clock.c \
@@ -880,6 +883,9 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_uart0.$(OBJEXT):  \
 src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.$(OBJEXT):  \
+	src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/$(am__dirstamp):
 	@$(MKDIR_P) src
 	@: > src/$(am__dirstamp)
@@ -1063,6 +1069,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_trace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_uart0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/hello-hello.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/return_fail-return_fail.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@test/$(DEPDIR)/return_pass-return_pass.Po@am__quote@
@@ -1504,6 +1511,20 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.obj: src/drivers/s
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/sifive_wdog0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.obj `if test -f 'src/drivers/sifive_wdog0.c'; then $(CYGPATH_W) 'src/drivers/sifive_wdog0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/sifive_wdog0.c'; fi`
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.o: src/drivers/ucb_htif0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.o -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.o `test -f 'src/drivers/ucb_htif0.c' || echo '$(srcdir)/'`src/drivers/ucb_htif0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/ucb_htif0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.o `test -f 'src/drivers/ucb_htif0.c' || echo '$(srcdir)/'`src/drivers/ucb_htif0.c
+
+src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj: src/drivers/ucb_htif0.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj -MD -MP -MF src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.Tpo -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj `if test -f 'src/drivers/ucb_htif0.c'; then $(CYGPATH_W) 'src/drivers/ucb_htif0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/ucb_htif0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.Tpo src/drivers/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/ucb_htif0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj `if test -f 'src/drivers/ucb_htif0.c'; then $(CYGPATH_W) 'src/drivers/ucb_htif0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/ucb_htif0.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-button.o: src/button.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-button.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-button.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-button.o `test -f 'src/button.c' || echo '$(srcdir)/'`src/button.c
