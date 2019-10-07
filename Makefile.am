@@ -87,6 +87,7 @@ nobase_include_HEADERS = \
 	metal/clock.h \
 	metal/compiler.h \
 	metal/cpu.h \
+	metal/csr.h \
 	metal/gpio.h \
 	metal/init.h \
 	metal/interrupt.h \
