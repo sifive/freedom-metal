@@ -17,7 +17,7 @@ class FreedomMetalConan(ConanFile):
     "m4", "riscv__mmachine__hifive1-revb.lds", "compile", "dts", 
     "Makefile.am", "Makefile.in", "scripts", "configure",
     "configure.ac", "metal", "install-sh", "missing", "gloss/*"]
-    generators = ['TXTGenerator', 'VirtualEnvGenerator']
+    generators = 'TXTGenerator'
         
     def _env_info_cleaner(self):
         risc_v_specific_flags = ["RISCV_ASFLAGS", "RISCV_CCASFLAGS", "RISCV_CFLAGS", "RISCV_CXXFLAGS", "RISCV_XCFLAGS", "RISCV_LDFLAGS", "RISCV_LDLIBS"]
