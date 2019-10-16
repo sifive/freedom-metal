@@ -72,6 +72,7 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_gpio-leds.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h \
+	metal/drivers/sifive_i2c0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
@@ -90,6 +91,7 @@ nobase_include_HEADERS = \
 	metal/cpu.h \
 	metal/csr.h \
 	metal/gpio.h \
+	metal/i2c.h \
 	metal/init.h \
 	metal/interrupt.h \
 	metal/io.h \
@@ -181,6 +183,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_gpio-leds.c \
 	src/drivers/sifive_gpio-switches.c \
 	src/drivers/sifive_gpio0.c \
+	src/drivers/sifive_i2c0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
@@ -197,6 +200,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/entry.S \
 	src/trap.S \
 	src/gpio.c \
+	src/i2c.c \
 	src/init.c \
 	src/interrupt.c \
 	src/led.c \
