@@ -226,6 +226,7 @@ am_libriscv__mmachine__@MACHINE_NAME@_a_OBJECTS = src/drivers/libriscv__mmachine
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_uart0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-sifive_wdog0.$(OBJEXT) \
 	src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.$(OBJEXT) \
+	src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-button.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-cache.$(OBJEXT) \
 	src/libriscv__mmachine__@MACHINE_NAME@_a-clock.$(OBJEXT) \
@@ -509,6 +510,7 @@ nobase_include_HEADERS = \
 	metal/drivers/ucb_htif0.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
+	metal/atomic.h \
 	metal/button.h \
 	metal/cache.h \
 	metal/clock.h \
@@ -582,6 +584,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
 	src/drivers/ucb_htif0.c \
+	src/atomic.c \
 	src/button.c \
 	src/cache.c \
 	src/clock.c \
@@ -892,6 +895,8 @@ src/$(am__dirstamp):
 src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/$(DEPDIR)
 	@: > src/$(DEPDIR)/$(am__dirstamp)
+src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.$(OBJEXT):  \
+	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-button.$(OBJEXT):  \
 	src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/libriscv__mmachine__@MACHINE_NAME@_a-cache.$(OBJEXT):  \
@@ -1018,6 +1023,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_utime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-atomic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-clock.Po@am__quote@
@@ -1525,6 +1531,20 @@ src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj: src/drivers/ucb_
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/drivers/ucb_htif0.c' object='src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/drivers/libriscv__mmachine__@MACHINE_NAME@_a-ucb_htif0.obj `if test -f 'src/drivers/ucb_htif0.c'; then $(CYGPATH_W) 'src/drivers/ucb_htif0.c'; else $(CYGPATH_W) '$(srcdir)/src/drivers/ucb_htif0.c'; fi`
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.o: src/atomic.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-atomic.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.o `test -f 'src/atomic.c' || echo '$(srcdir)/'`src/atomic.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-atomic.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-atomic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/atomic.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.o `test -f 'src/atomic.c' || echo '$(srcdir)/'`src/atomic.c
+
+src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.obj: src/atomic.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.obj -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-atomic.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.obj `if test -f 'src/atomic.c'; then $(CYGPATH_W) 'src/atomic.c'; else $(CYGPATH_W) '$(srcdir)/src/atomic.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-atomic.Tpo src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-atomic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/atomic.c' object='src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-atomic.obj `if test -f 'src/atomic.c'; then $(CYGPATH_W) 'src/atomic.c'; else $(CYGPATH_W) '$(srcdir)/src/atomic.c'; fi`
 
 src/libriscv__mmachine__@MACHINE_NAME@_a-button.o: src/button.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS) $(CFLAGS) -MT src/libriscv__mmachine__@MACHINE_NAME@_a-button.o -MD -MP -MF src/$(DEPDIR)/libriscv__mmachine__@MACHINE_NAME@_a-button.Tpo -c -o src/libriscv__mmachine__@MACHINE_NAME@_a-button.o `test -f 'src/button.c' || echo '$(srcdir)/'`src/button.c

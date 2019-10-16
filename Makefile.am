@@ -82,6 +82,7 @@ nobase_include_HEADERS = \
 	metal/drivers/ucb_htif0.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h \
+	metal/atomic.h \
 	metal/button.h \
 	metal/cache.h \
 	metal/clock.h \
@@ -188,6 +189,7 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
 	src/drivers/ucb_htif0.c \
+	src/atomic.c \
 	src/button.c \
 	src/cache.c \
 	src/clock.c \
