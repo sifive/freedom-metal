@@ -11,6 +11,8 @@
 #include <metal/shutdown.h>
 #include <stdint.h>
 
+#define CLIC0_MAX_INTERRUPTS 4096
+
 typedef enum metal_clic_vector_ {
     METAL_CLIC_NONVECTOR = 0,
     METAL_CLIC_VECTORED = 1
@@ -496,11 +498,15 @@ void __metal_driver_sifive_clic0_init(struct metal_interrupt *controller) {
         num_subinterrupts =
             __metal_driver_sifive_clic0_num_subinterrupts(controller);
         clic->metal_mtvt_table[0] = &__metal_clic0_handler;
-        for (int i = 1; i < num_subinterrupts; i++) {
-            clic->metal_mtvt_table[i] = NULL;
-            clic->metal_exint_table[i].handler = NULL;
-            clic->metal_exint_table[i].sub_int = NULL;
-            clic->metal_exint_table[i].exint_data = NULL;
+        __metal_clic0_interrupt_disable(clic, 0);
+        __metal_clic0_interrupt_set_level(clic, 0, level);
+        for (int i = 1; i < CLIC0_MAX_INTERRUPTS; i++) {
+            if (i < num_subinterrupts) {
+                clic->metal_mtvt_table[i] = NULL;
+                clic->metal_exint_table[i].handler = NULL;
+                clic->metal_exint_table[i].sub_int = NULL;
+                clic->metal_exint_table[i].exint_data = NULL;
+            }
             __metal_clic0_interrupt_disable(clic, i);
             __metal_clic0_interrupt_set_level(clic, i, level);
         }
