@@ -5,8 +5,6 @@
 
 #ifdef METAL_RISCV_PLIC0
 
-#define PLIC0_MAX_INTERRUPTS 1024
-
 #include <metal/drivers/riscv_plic0.h>
 #include <metal/interrupt.h>
 #include <metal/io.h>
@@ -138,14 +136,12 @@ void __metal_driver_riscv_plic0_init(struct metal_interrupt *controller) {
             /* Initialize ist parent controller, aka cpu_intc. */
             intc->vtable->interrupt_init(intc);
 
-            for (int i = 0; i < PLIC0_MAX_INTERRUPTS; i++) {
+            for (int i = 0; i < num_interrupts; i++) {
                 __metal_plic0_enable(plic, parent, i, METAL_DISABLE);
                 __metal_driver_riscv_plic0_set_priority(controller, i, 0);
-                if (i < num_interrupts) {
-                    plic->metal_exint_table[i] = NULL;
-                    plic->metal_exdata_table[i].sub_int = NULL;
-                    plic->metal_exdata_table[i].exint_data = NULL;
-                }
+                plic->metal_exint_table[i] = NULL;
+                plic->metal_exdata_table[i].sub_int = NULL;
+                plic->metal_exdata_table[i].exint_data = NULL;
             }
 
             __metal_plic0_set_threshold(controller, parent, 0);
