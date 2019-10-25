@@ -1,59 +1,38 @@
 # Copyright 2018-2019 SiFive, Inc
 # SPDX-License-Identifier: Apache-2.0
 
-# Every test depends on the generated linker script.
-$(check_PROGRAMS): riscv__mmachine__@MACHINE_NAME@.lds
+########################################################
+# Sources passed in by configure
+########################################################
 
-# Every test depends on the freshly-compiled library.
-$(check_PROGRAMS): libriscv__mmachine__@MACHINE_NAME@.a
-
-# Generates a linker script that's more reasonable that whatever GCC's default
-# is.
-ldsdir = $(libdir)
-lds_DATA = riscv__mmachine__@MACHINE_NAME@.lds
-
-if PRECONFIGURED
-riscv__mmachine__@MACHINE_NAME@.lds: @MACHINE_HEADER@
+metal/machine.h: @MACHINE_HEADER@
+	@mkdir -p $(dir $@)
 	cp $< $@
-else # !PRECONFIGURED
-riscv__mmachine__@MACHINE_NAME@.lds: @LDSCRIPT_GENERATOR@ @MACHINE_NAME@.dtb
-	$< --dtb $(filter %.dtb,$^) --linker $@
-endif # PRECONFIGURED
 
-# Generates a SPEC file that sets a reasonable set of default options for this
-# build.
-specdir = $(libdir)
-spec_DATA =
-
-spec_DATA += riscv__mmachine__@MACHINE_NAME@.specs
-if PRECONFIGURED
-riscv__mmachine__@MACHINE_NAME@.specs:
-	touch $@
-else # !PRECONFIGURED
-riscv__mmachine__@MACHINE_NAME@.specs: @SPECS_GENERATOR@ @MACHINE_NAME@.dtb
-	$< --dtb $(filter %.dtb,$^) --specs $@ --prefix @prefix@ --machine @MACHINE_NAME@
-endif # PRECONFIGURED
-
-spec_DATA += riscv__menv__metal.specs
-riscv__menv__metal.specs: riscv__menv__metal.specs.in
-	cat $^ > $@
-
-# In order to generate code that's actually compatible with a machine we must
-# pass the march and mabi arguments to GCC that coorespond to the hardware.
-# This is handled by generating a makefile fragment, including it, and then
-# adding those argument to CFLAGS.
--include @MACHINE_NAME@.mk
-if PRECONFIGURED
-@MACHINE_NAME@.mk: @MACHINE_MAKEATTRIBUTES@
+metal/machine/inline.h: @MACHINE_INLINE@
+	@mkdir -p $(dir $@)
 	cp $< $@
-else # !PRECONFIGURED
-@MACHINE_NAME@.mk: @MAKEATTRIBUTES_GENERATOR@ @MACHINE_NAME@.dtb
-	$< --dtb $(filter %.dtb,$^) --output $@
-endif # PRECONFIGURED
 
-# Install some METAL-specific headers, one of which is automatically generated.
-# The files that aren't automatically generated are the same for all machines.
+metal/machine/platform.h: @PLATFORM_HEADER@
+	@mkdir -p $(dir $@)
+	cp $< $@
+
 nobase_include_HEADERS = \
+	metal/machine.h \
+	metal/machine/inline.h \
+	metal/machine/platform.h
+
+# This will generate these sources before the compilation step
+BUILT_SOURCES = \
+	metal/machine.h \
+	metal/machine/inline.h \
+	metal/machine/platform.h
+
+########################################################
+# Metal header files
+########################################################
+
+nobase_include_HEADERS += \
 	metal/drivers/fixed-clock.h \
 	metal/drivers/fixed-factor-clock.h \
 	metal/drivers/riscv_clint0.h \
@@ -81,8 +60,6 @@ nobase_include_HEADERS = \
 	metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_wdog0.h \
 	metal/drivers/ucb_htif0.h \
-	metal/machine/inline.h \
-	metal/machine/platform.h \
 	metal/atomic.h \
 	metal/button.h \
 	metal/cache.h \
@@ -98,7 +75,6 @@ nobase_include_HEADERS = \
 	metal/itim.h \
 	metal/led.h \
 	metal/lock.h \
-	metal/machine.h \
 	metal/memory.h \
 	metal/pmp.h \
 	metal/privilege.h \
@@ -112,58 +88,13 @@ nobase_include_HEADERS = \
 	metal/uart.h \
 	metal/watchdog.h
 
-if PRECONFIGURED
-metal/machine.h: @MACHINE_HEADER@
-	@mkdir -p $(dir $@)
-	cp $< $@
+########################################################
+# libmetal
+########################################################
 
-metal/machine/inline.h: @MACHINE_INLINE@
-	@mkdir -p $(dir $@)
-	cp $< $@
+lib_LIBRARIES = libmetal.a
 
-metal/machine/platform.h: @PLATFORM_HEADER@
-	@mkdir -p $(dir $@)
-	cp $< $@
-
-else # !PRECONFIGURED
-# Builds the machine-specific METAL header file, which paramaterizes the METAL for
-# one specific machine.  This is automatically picked up by GCC so users
-# automatically get the relevant definitions.  This is a two-step process:
-# first a DTB is built, and then the DTB is converted to a header file using an
-# external tool.
-@MACHINE_NAME@.dtb: @DTC@ @MACHINE_DTS@
-	$< $(filter %.dts,$^) -o $@ -O dtb -I dts
-
-metal/machine.h: @METAL_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
-	@mkdir -p $(dir $@)
-	$< --dtb $(filter %.dtb,$^) --output $@
-
-metal/machine/platform.h: @BARE_HEADER_GENERATOR@ @MACHINE_NAME@.dtb
-	@mkdir -p $(dir $@)
-	$< -d $(filter %.dtb,$^) -o $@
-
-endif # PRECONFIGURED
-
-# Quash an automake warning.
-lib_LIBRARIES =
-
-# Everything in here is compiled into a single library, which contains all the
-# source files in the project.  It's named for one specific machine, which GCC
-# uses to select the target machine that this METAL implementation points at.
-lib_LIBRARIES += libriscv__mmachine__@MACHINE_NAME@.a
-
-libriscv__mmachine__@MACHINE_NAME@_a_CFLAGS  = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-libriscv__mmachine__@MACHINE_NAME@_a_CCASFLAGS = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-
-# This will generate these sources before the compilation step
-BUILT_SOURCES = \
-	metal/machine.h \
-	metal/machine/inline.h \
-	metal/machine/platform.h \
-	riscv__menv__metal.specs \
-	riscv__mmachine__@MACHINE_NAME@.specs
-
-libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
+libmetal_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/fixed-factor-clock.c \
 	src/drivers/inline.c \
@@ -221,13 +152,17 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/vector.S \
 	src/watchdog.c
 
-# Freedom METAL has its own libgloss implementation that is only built in
+########################################################
+# libgloss
+########################################################
+
+# Freedom Metal has its own libgloss implementation that is only built when
 # --with-builtin-libgloss is passed to configure.
 if WITH_BUILTIN_LIBGLOSS
 
-lib_LIBRARIES += libriscv__menv__metal.a
+lib_LIBRARIES += libmetal-gloss.a
 
-libriscv__menv__metal_a_SOURCES = \
+libmetal_gloss_a_SOURCES = \
 	gloss/crt0.S \
 	gloss/nanosleep.c \
 	gloss/sys_access.c \
@@ -264,30 +199,10 @@ libriscv__menv__metal_a_SOURCES = \
 
 endif
 
-# Quash an automake warning.
-check_PROGRAMS =
+########################################################
+# Clean
+########################################################
 
-# The simplest possible pair of tests: one that passes and one that fails
-check_PROGRAMS       += return_pass
-return_pass_SOURCES   = test/return_pass.c
-return_pass_CFLAGS    = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-return_pass_LDFLAGS   = -L. -Wl,--gc-sections -Wl,-Map=return_pass.map
-
-check_PROGRAMS       += return_fail
-return_fail_SOURCES   = test/return_fail.c
-return_fail_CFLAGS    = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-return_fail_LDFLAGS   = -L. -Wl,--gc-sections -Wl,-Map=return_fail.map
-
-# A simple "Hello, World!" program that directly uses the METAL interface to
-# print to the serial terminal.
-check_PROGRAMS       += hello
-hello_SOURCES         = test/hello.c
-hello_CFLAGS          = @MENV_METAL@ @MMACHINE_MACHINE_NAME@
-hello_LDFLAGS         = -L. -Wl,--gc-sections -Wl,-Map=hello.map
-
-# Extra clean targets
 clean-local:
-	-rm -rf @MACHINE_NAME@.mk
-	-rm -rf metal/machine.h metal/machine/platform.h
-	-rm -rf @MACHINE_NAME@.dtb metal-@MACHINE_NAME@.lds
-	-rm -rf *.map *.specs
+	-rm -rf metal/machine.h metal/machine/inline.h
+	-rm -rf metal/machine/platform.h

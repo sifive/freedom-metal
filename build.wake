@@ -51,11 +51,9 @@ global tuple MakeElfOptions =
 
 global def runFreedomMetalInstall options =
   def outputDir = options.getFreedomMetalConfigureOptionsOutputDir
-  def meeHeader = options.getFreedomMetalConfigureOptionsMachineHeader
-  def meeInline = options.getFreedomMetalConfigureOptionsMachineInlineHeader
+  def metalHeader = options.getFreedomMetalConfigureOptionsMachineHeader
+  def metalInline = options.getFreedomMetalConfigureOptionsMachineInlineHeader
   def platformHeader = options.getFreedomMetalConfigureOptionsPlatformHeader
-  def meeLdScript = options.getFreedomMetalConfigureOptionsMachineLdScript
-  def machineName = options.getFreedomMetalConfigureOptionsMachineName
 
   def wrapperScript = source "{here}/scripts/autoconf_wrapper"
 
@@ -92,15 +90,13 @@ global def runFreedomMetalInstall options =
   def cmdline =
     relative runDir wrapperScript.getPathName,
     options.getFreedomMetalConfigureOptionsHost,
-    machineName,
-    relative runDir meeHeader.getPathName,
-    relative runDir meeInline.getPathName,
+    relative runDir metalHeader.getPathName,
+    relative runDir metalInline.getPathName,
     relative runDir platformHeader.getPathName,
-    relative runDir meeLdScript.getPathName,
     relative runDir outputDir,
     Nil
 
-  def inputs = mkdir outputDir, wrapperScript, meeHeader, meeLdScript, installedFreedomMetal
+  def inputs = mkdir outputDir, wrapperScript, metalHeader, installedFreedomMetal
   def foutputs _ =
     files "{outputDir}/include" `.*`
     ++ files "{outputDir}/lib" `.*`
@@ -126,13 +122,12 @@ global def runFreedomMetalInstall options =
     | getOrElse msg.makeError.makeBadPath
 
   def libmetal =
-    def machineName = options.getFreedomMetalConfigureOptionsMachineName
-    def fileName = "{outputDir}/lib/libriscv__mmachine__{machineName}.a"
+    def fileName = "{outputDir}/lib/libmetal.a"
     getFile fileName "Failed to compile libmetal: {fileName}"
 
   def libmetalGloss =
-    def fileName = "{outputDir}/lib/libriscv__menv__metal.a"
-    getFile fileName "Failed to compile libGloss: {fileName}"
+    def fileName = "{outputDir}/lib/libmetal-gloss.a"
+    getFile fileName "Failed to compile libgloss: {fileName}"
 
   def includeDir = "{outputDir}/include"
   def libDir = "{outputDir}/lib"

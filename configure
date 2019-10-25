@@ -588,24 +588,11 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-MENV_METAL
-MMACHINE_MACHINE_NAME
-MACHINE_DTS
-MACHINE_LDSCRIPT
 PLATFORM_HEADER
 MACHINE_INLINE
 MACHINE_HEADER
-PRECONFIGURED_FALSE
-PRECONFIGURED_TRUE
-SPECS_GENERATOR
-MAKEATTRIBUTES_GENERATOR
-LDSCRIPT_GENERATOR
-BARE_HEADER_GENERATOR
-METAL_HEADER_GENERATOR
-DTC
 WITH_BUILTIN_LIBGLOSS_FALSE
 WITH_BUILTIN_LIBGLOSS_TRUE
-MACHINE_NAME
 am__fastdepCCAS_FALSE
 am__fastdepCCAS_TRUE
 CCASDEPMODE
@@ -631,6 +618,14 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 CC
+host_os
+host_vendor
+host_cpu
+host
+build_os
+build_vendor
+build_cpu
+build
 MAINT
 MAINTAINER_MODE_FALSE
 MAINTAINER_MODE_TRUE
@@ -706,20 +701,10 @@ enable_option_checking
 enable_silent_rules
 enable_maintainer_mode
 enable_dependency_tracking
-with_machine_name
-with_preconfigured
 with_builtin_libgloss
 with_machine_header
 with_machine_inline
 with_platform_header
-with_machine_ldscript
-with_machine_dts
-with_dtc
-with_metal_header_generator
-with_platform_header_generator
-with_ldscript_generator
-with_makeattributes_generator
-with_metal_specs_generator
 '
       ac_precious_vars='build_alias
 host_alias
@@ -730,13 +715,7 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CCAS
-CCASFLAGS
-DTC
-METAL_HEADER_GENERATOR
-BARE_HEADER_GENERATOR
-LDSCRIPT_GENERATOR
-MAKEATTRIBUTES_GENERATOR
-SPECS_GENERATOR'
+CCASFLAGS'
 
 
 # Initialize some variables set by options.
@@ -1349,6 +1328,10 @@ Program names:
   --program-prefix=PREFIX            prepend PREFIX to installed program names
   --program-suffix=SUFFIX            append SUFFIX to installed program names
   --program-transform-name=PROGRAM   run sed PROGRAM on installed program names
+
+System types:
+  --build=BUILD     configure for building on BUILD [guessed]
+  --host=HOST       cross-compile to build programs to run on HOST [BUILD]
 _ACEOF
 fi
 
@@ -1375,33 +1358,13 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-machine-name=NAME
-                          Install this machine with a particular name
-  --with-preconfigured    Use pre-configured machine support files instead of
-                          generating them during the build
-  --with-bultin-libgloss  Build libgloss along with the METAL
+  --with-bultin-libgloss  Build libgloss along with Metal
   --with-machine-header=PATH
                           Path to the machine header file
   --with-machine-inline=PATH
                           Path to the machine inline file
   --with-platform-header=PATH
                           Path to the platform header file
-  --with-machine-ldscript=PATH
-                          Path to the machine ldscript
-  --with-machine-dts=PATH The full path to the device tree
-  --with-dtc=PATH         Use the given path to the device tree compiler
-  --with-metal-header-generator=PATH
-                          Use the given path to freedom-metal_header-generator
-  --with-platform-header-generator=PATH
-                          Use the given path to
-                          freedom-platform_header-generator
-  --with-ldscript-generator=PATH
-                          Use the given path to freedom-ldscript-generator
-  --with-makeattributes-generator=PATH
-                          Use the given path to
-                          freedom-makeattributes-generator
-  --with-metal_specs-generator=PATH
-                          Use the given path to freedom-metal_specs-generator
 
 Some influential environment variables:
   CC          C compiler command
@@ -1413,17 +1376,6 @@ Some influential environment variables:
               you have headers in a nonstandard directory <include dir>
   CCAS        assembler compiler command (defaults to CC)
   CCASFLAGS   assembler compiler flags (defaults to CFLAGS)
-  DTC         The absolute path to dtc
-  METAL_HEADER_GENERATOR
-              The absolute path of the freedom-metal_header-generator
-  BARE_HEADER_GENERATOR
-              The absolute path of the freedom-platform_header-generator
-  LDSCRIPT_GENERATOR
-              The absolute path of the freedom-ldscript-generator
-  MAKEATTRIBUTES_GENERATOR
-              The absolute path of the freedom-makeattributes-generator
-  SPECS_GENERATOR
-              The absolute path of the freedom-metal_specs-generator
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -2531,25 +2483,77 @@ fi
 
 
 
-# This library is actually an integral part of the toolchain build process on
-# METAL toolchains as it's necessary to link any program.  To prevent this from
-# causing every autoconf test failing we instead place some weak symbols in
-# confdefs.h to trick the toolchain into linking.
-#
-#AC_CANONICAL_HOST -- for now don't canonicalize the host because the *-metal
-#                     tuples aren't upstream in config.*
-case "${host_alias}" in
-*-metal)
-    $as_echo "long metal_segment_stack_end __attribute__((weak));" >> confdefs.h
-    $as_echo "long metal_segment_data_source_start __attribute__((weak));" >> confdefs.h
-    $as_echo "long metal_segment_data_source_end __attribute__((weak));" >> confdefs.h
-    $as_echo "long metal_segment_data_target_start __attribute__((weak));" >> confdefs.h
-    $as_echo "long metal_segment_data_target_end __attribute__((weak));" >> confdefs.h
-    $as_echo "long metal_segment_bss_target_start __attribute__((weak));" >> confdefs.h
-    $as_echo "long metal_segment_bss_target_end __attribute__((weak));" >> confdefs.h
-    $as_echo "void metal_shutdown(void) __attribute__((weak)); void metal_shutdown(void) {}" >> confdefs.h
-    ;;
+# Make sure we can run config.sub.
+$SHELL "$ac_aux_dir/config.sub" sun4 >/dev/null 2>&1 ||
+  as_fn_error $? "cannot run $SHELL $ac_aux_dir/config.sub" "$LINENO" 5
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking build system type" >&5
+$as_echo_n "checking build system type... " >&6; }
+if ${ac_cv_build+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_build_alias=$build_alias
+test "x$ac_build_alias" = x &&
+  ac_build_alias=`$SHELL "$ac_aux_dir/config.guess"`
+test "x$ac_build_alias" = x &&
+  as_fn_error $? "cannot guess build type; you must specify one" "$LINENO" 5
+ac_cv_build=`$SHELL "$ac_aux_dir/config.sub" $ac_build_alias` ||
+  as_fn_error $? "$SHELL $ac_aux_dir/config.sub $ac_build_alias failed" "$LINENO" 5
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_build" >&5
+$as_echo "$ac_cv_build" >&6; }
+case $ac_cv_build in
+*-*-*) ;;
+*) as_fn_error $? "invalid value of canonical build" "$LINENO" 5;;
 esac
+build=$ac_cv_build
+ac_save_IFS=$IFS; IFS='-'
+set x $ac_cv_build
+shift
+build_cpu=$1
+build_vendor=$2
+shift; shift
+# Remember, the first character of IFS is used to create $*,
+# except with old shells:
+build_os=$*
+IFS=$ac_save_IFS
+case $build_os in *\ *) build_os=`echo "$build_os" | sed 's/ /-/g'`;; esac
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking host system type" >&5
+$as_echo_n "checking host system type... " >&6; }
+if ${ac_cv_host+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test "x$host_alias" = x; then
+  ac_cv_host=$ac_cv_build
+else
+  ac_cv_host=`$SHELL "$ac_aux_dir/config.sub" $host_alias` ||
+    as_fn_error $? "$SHELL $ac_aux_dir/config.sub $host_alias failed" "$LINENO" 5
+fi
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_host" >&5
+$as_echo "$ac_cv_host" >&6; }
+case $ac_cv_host in
+*-*-*) ;;
+*) as_fn_error $? "invalid value of canonical host" "$LINENO" 5;;
+esac
+host=$ac_cv_host
+ac_save_IFS=$IFS; IFS='-'
+set x $ac_cv_host
+shift
+host_cpu=$1
+host_vendor=$2
+shift; shift
+# Remember, the first character of IFS is used to create $*,
+# except with old shells:
+host_os=$*
+IFS=$ac_save_IFS
+case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
+
+
 
 # Probe for tools that we need in order to build.
 ac_ext=c
@@ -4002,7 +4006,7 @@ main ()
 {
 
 #ifndef __riscv
-# error "A RISC-V compiler is required to build the Freedom MBI"
+# error "A RISC-V compiler is required to build Freedom Metal"
 #endif
 
   ;
@@ -4020,40 +4024,8 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 ########################################################
-# Generic Options
+# Options
 ########################################################
-
-# Allows users to specify some device tree information.
-
-# Check whether --with-machine-name was given.
-if test "${with_machine_name+set}" = set; then :
-  withval=$with_machine_name;
-else
-  with_machine_name="no"
-
-fi
-
-
-if test "x$with_machine_name" != "xno"; then :
-  MACHINE_NAME="$with_machine_name"
-
-else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-machine-name is required
-See \`config.log' for more details" "$LINENO" 5; }
-
-fi
-
-
-# Check whether --with-preconfigured was given.
-if test "${with_preconfigured+set}" = set; then :
-  withval=$with_preconfigured; with_preconfigured="yes"
-else
-  with_preconfigured="no"
-
-fi
-
 
 
 # Check whether --with-builtin-libgloss was given.
@@ -4064,19 +4036,6 @@ else
 
 fi
 
-
- if test "x$with_builtin_libgloss" = "xyes"; then
-  WITH_BUILTIN_LIBGLOSS_TRUE=
-  WITH_BUILTIN_LIBGLOSS_FALSE='#'
-else
-  WITH_BUILTIN_LIBGLOSS_TRUE='#'
-  WITH_BUILTIN_LIBGLOSS_FALSE=
-fi
-
-
-########################################################
-# Preconfigured Options (--with-preconfigured)
-########################################################
 
 
 # Check whether --with-machine-header was given.
@@ -4108,548 +4067,52 @@ else
 fi
 
 
-
-# Check whether --with-machine-ldscript was given.
-if test "${with_machine_ldscript+set}" = set; then :
-  withval=$with_machine_ldscript;
-else
-  with_machine_ldscript="no"
-
-fi
-
-
 ########################################################
-# Configuration Options (--without-preconfigured)
+# Process Options
 ########################################################
 
-
-# Check whether --with-machine-dts was given.
-if test "${with_machine_dts+set}" = set; then :
-  withval=$with_machine_dts;
+ if test "x$with_builtin_libgloss" = "xyes"; then
+  WITH_BUILTIN_LIBGLOSS_TRUE=
+  WITH_BUILTIN_LIBGLOSS_FALSE='#'
 else
-  with_machine_dts="no"
-
+  WITH_BUILTIN_LIBGLOSS_TRUE='#'
+  WITH_BUILTIN_LIBGLOSS_FALSE=
 fi
 
 
-# Allows users to specify a path to DTC
-
-# Check whether --with-dtc was given.
-if test "${with_dtc+set}" = set; then :
-  withval=$with_dtc;
-else
-  with_dtc=check
-
-fi
-
-
-
-
-# Allows users to specify a path to freedom-metal_header-generator, which
-# generates METAL paramaterization headers from the device tree.
-
-# Check whether --with-metal-header-generator was given.
-if test "${with_metal_header_generator+set}" = set; then :
-  withval=$with_metal_header_generator;
-else
-  with_metal_header_generator=check
-
-fi
-
-
-
-
-
-# Check whether --with-platform-header-generator was given.
-if test "${with_platform_header_generator+set}" = set; then :
-  withval=$with_platform_header_generator;
-else
-  with_platform_header_generator=check
-
-fi
-
-
-
-
-# Allows users to specify a path to freedom-ldscript-generator, which generates
-# linker scripts that are more suitable for embedded development than the
-# default linker script is.  This allows the tests to link using the actual
-# linker script.
-
-# Check whether --with-ldscript-generator was given.
-if test "${with_ldscript_generator+set}" = set; then :
-  withval=$with_ldscript_generator;
-else
-  with_ldscript_generator=check
-
-fi
-
-
-
-
-# Allows users to specify a path to freedom-makeattributes-generator, which
-# generates makefile fragments that help set up the various CFLAGS that are
-# required to target a machine.
-
-# Check whether --with-makeattributes-generator was given.
-if test "${with_makeattributes_generator+set}" = set; then :
-  withval=$with_makeattributes_generator;
-else
-  with_makeattributes_generator=check
-
-fi
-
-
-
-
-# Allows users to specify a path to freedom-metal_specs-generator, which
-# generates GCC spec files to control the compilation of METAL based targets.
-
-# Check whether --with-metal_specs-generator was given.
-if test "${with_metal_specs_generator+set}" = set; then :
-  withval=$with_metal_specs_generator;
-else
-  with_metal_specs_generator=check
-
-fi
-
-
-
-
-########################################################
-# Process the Preconfigured or Configured options
-########################################################
-
-
- if test "x$with_preconfigured" = "xyes"; then
-  PRECONFIGURED_TRUE=
-  PRECONFIGURED_FALSE='#'
-else
-  PRECONFIGURED_TRUE='#'
-  PRECONFIGURED_FALSE=
-fi
-
-
-if test "x$with_preconfigured" = "xyes"; then :
-
-    # Configure the build system to pass in the preconfigured machine support files
-    if test "x$with_machine_header" != "xno"; then :
+# Configure the build system to pass in the preconfigured machine support files
+if test "x$with_machine_header" != "xno"; then :
   MACHINE_HEADER="$with_machine_header"
 
 else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-machine-header is required with the --with-preconfigured option
+as_fn_error $? "--with-machine-header is required
 See \`config.log' for more details" "$LINENO" 5; }
 
 fi
 
-    if test "x$with_machine_inline" != "xno"; then :
+if test "x$with_machine_inline" != "xno"; then :
   MACHINE_INLINE="$with_machine_inline"
 
 else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-machine-inline is required with the --with-preconfigured option
+as_fn_error $? "--with-machine-inline is required
 See \`config.log' for more details" "$LINENO" 5; }
 
 fi
 
-    if test "x$with_platform_header" != "xno"; then :
+if test "x$with_platform_header" != "xno"; then :
   PLATFORM_HEADER="$with_platform_header"
 
 else
   { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
 $as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-platform-header is required with the --with-preconfigured option
+as_fn_error $? "--with-platform-header is required
 See \`config.log' for more details" "$LINENO" 5; }
 
 fi
-
-    if test "x$with_machine_ldscript" != "xno"; then :
-  MACHINE_LDSCRIPT="$with_machine_ldscript"
-
-else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-machine-ldscript is required with the --with-preconfigured option
-See \`config.log' for more details" "$LINENO" 5; }
-
-fi
-
-    MAKEATTRIBUTES_GENERATOR=false
-
-    SPECS_GENERATOR=false
-
-
-else
-
-    # Configure the build system to generate the machine support files during build
-    if test "x$with_machine_dts" != "xno"; then :
-  MACHINE_DTS="$with_machine_dts"
-
-else
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-machine-dts is required
-See \`config.log' for more details" "$LINENO" 5; }
-
-fi
-
-    if test "x$with_dtc" == "xcheck"; then :
-  # Extract the first word of "dtc", so it can be a program name with args.
-set dummy dtc; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_DTC+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $DTC in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_DTC="$DTC" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_DTC="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_DTC" && ac_cv_path_DTC="no"
-  ;;
-esac
-fi
-DTC=$ac_cv_path_DTC
-if test -n "$DTC"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DTC" >&5
-$as_echo "$DTC" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-else
-  DTC="$with_dtc"
-
-fi
-    if test "x$DTC" != "xno"; then :
-  DTC="$DTC"
-
-else
-  as_fn_error $? "Unable to find dtc, either place it in PATH or try the --with-dtc argument." "$LINENO" 5
-
-fi
-
-    if test "x$with_metal_header_generator" == "xcheck"; then :
-  # Extract the first word of "freedom-metal_header-generator", so it can be a program name with args.
-set dummy freedom-metal_header-generator; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_METAL_HEADER_GENERATOR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $METAL_HEADER_GENERATOR in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_METAL_HEADER_GENERATOR="$METAL_HEADER_GENERATOR" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_METAL_HEADER_GENERATOR="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_METAL_HEADER_GENERATOR" && ac_cv_path_METAL_HEADER_GENERATOR="no"
-  ;;
-esac
-fi
-METAL_HEADER_GENERATOR=$ac_cv_path_METAL_HEADER_GENERATOR
-if test -n "$METAL_HEADER_GENERATOR"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $METAL_HEADER_GENERATOR" >&5
-$as_echo "$METAL_HEADER_GENERATOR" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-else
-  METAL_HEADER_GENERATOR=$with_metal_header_generator
-
-fi
-    if test "x$METAL_HEADER_GENERATOR" != "xno"; then :
-  METAL_HEADER_GENERATOR="$METAL_HEADER_GENERATOR"
-
-else
-  as_fn_error $? "Unable to find freedom-metal_header-generator, either place it in PATH or try the --with-metal-header-generator argument." "$LINENO" 5
-
-fi
-
-    if test "x$with_ldscript_generator" == "xcheck"; then :
-  # Extract the first word of "freedom-ldscript-generator", so it can be a program name with args.
-set dummy freedom-ldscript-generator; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_LDSCRIPT_GENERATOR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $LDSCRIPT_GENERATOR in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_LDSCRIPT_GENERATOR="$LDSCRIPT_GENERATOR" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_LDSCRIPT_GENERATOR="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_LDSCRIPT_GENERATOR" && ac_cv_path_LDSCRIPT_GENERATOR="no"
-  ;;
-esac
-fi
-LDSCRIPT_GENERATOR=$ac_cv_path_LDSCRIPT_GENERATOR
-if test -n "$LDSCRIPT_GENERATOR"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $LDSCRIPT_GENERATOR" >&5
-$as_echo "$LDSCRIPT_GENERATOR" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-else
-  LDSCRIPT_GENERATOR=$with_ldscript_generator
-
-fi
-    if test "x$LDSCRIPT_GENERATOR" != "xno"; then :
-  LDSCRIPT_GENERATOR="$LDSCRIPT_GENERATOR"
-
-else
-  as_fn_error $? "Unable to find freedom-ldscript-generator, either place it in PATH or try the --with-ldscript-generator argument." "$LINENO" 5
-
-fi
-
-    if test "x$with_makeattributes_generator" == "xcheck"; then :
-  # Extract the first word of "freedom-makeattributes-generator", so it can be a program name with args.
-set dummy freedom-makeattributes-generator; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_MAKEATTRIBUTES_GENERATOR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $MAKEATTRIBUTES_GENERATOR in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_MAKEATTRIBUTES_GENERATOR="$MAKEATTRIBUTES_GENERATOR" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_MAKEATTRIBUTES_GENERATOR="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_MAKEATTRIBUTES_GENERATOR" && ac_cv_path_MAKEATTRIBUTES_GENERATOR="no"
-  ;;
-esac
-fi
-MAKEATTRIBUTES_GENERATOR=$ac_cv_path_MAKEATTRIBUTES_GENERATOR
-if test -n "$MAKEATTRIBUTES_GENERATOR"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MAKEATTRIBUTES_GENERATOR" >&5
-$as_echo "$MAKEATTRIBUTES_GENERATOR" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-else
-  MAKEATTRIBUTES_GENERATOR=$with_makeattributes_generator
-
-fi
-    if test "x$MAKEATTRIBUTES_GENERATOR" != "xno"; then :
-  MAKEATTRIBUTES_GENERATOR="$MAKEATTRIBUTES_GENERATOR"
-
-else
-  as_fn_error $? "Unable to find freedom-makeattributes-generator, either place it in PATH or try the --with-makeattributes-generator argument." "$LINENO" 5
-
-fi
-
-    if test "x$with_metal_specs_generator" == "xcheck"; then :
-  # Extract the first word of "freedom-metal_specs-generator", so it can be a program name with args.
-set dummy freedom-metal_specs-generator; ac_word=$2
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_SPECS_GENERATOR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  case $SPECS_GENERATOR in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_SPECS_GENERATOR="$SPECS_GENERATOR" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_SPECS_GENERATOR="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_SPECS_GENERATOR" && ac_cv_path_SPECS_GENERATOR="no"
-  ;;
-esac
-fi
-SPECS_GENERATOR=$ac_cv_path_SPECS_GENERATOR
-if test -n "$SPECS_GENERATOR"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SPECS_GENERATOR" >&5
-$as_echo "$SPECS_GENERATOR" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-else
-  SPECS_GENERATOR=$with_metal_specs_generator
-
-fi
-    if test "x$SPECS_GENERATOR" != "xno"; then :
-  SPECS_GENERATOR="$SPECS_GENERATOR"
-
-else
-  as_fn_error $? "Unable to find freedom-metal_specs-generator, either place it in PATH or try the --with-metal_specs-generator argument." "$LINENO" 5
-
-fi
-
-fi
-
-# Check for the additional compiler flags provided by the METAL toolchains,
-# directly substituting in the relevant
-as_CACHEVAR=`$as_echo "ax_cv_check_cflags__mmachine=$machine_name" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts mmachine=$machine_name" >&5
-$as_echo_n "checking whether C compiler accepts mmachine=$machine_name... " >&6; }
-if eval \${$as_CACHEVAR+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CFLAGS
-  CFLAGS="$CFLAGS  mmachine=$machine_name"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval "$as_CACHEVAR=yes"
-else
-  eval "$as_CACHEVAR=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CFLAGS=$ax_check_save_flags
-fi
-eval ac_res=\$$as_CACHEVAR
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_CACHEVAR"\" = x"yes"; then :
-  mmachine_machine_name="-mmachine=$machine_name"
-else
-  :
-fi
-
-
-MMACHINE_MACHINE_NAME="$mmachine_machine_name"
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts menv=metal" >&5
-$as_echo_n "checking whether C compiler accepts menv=metal... " >&6; }
-if ${ax_cv_check_cflags__menv_metal+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-
-  ax_check_save_flags=$CFLAGS
-  CFLAGS="$CFLAGS  menv=metal"
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  ax_cv_check_cflags__menv_metal=yes
-else
-  ax_cv_check_cflags__menv_metal=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-  CFLAGS=$ax_check_save_flags
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_check_cflags__menv_metal" >&5
-$as_echo "$ax_cv_check_cflags__menv_metal" >&6; }
-if test "x$ax_cv_check_cflags__menv_metal" = xyes; then :
-  menv_metal="-menv=metal"
-else
-  menv_metal="-lriscv_metal_$machine_name"
-
-fi
-
-
-MENV_METAL="$menv_metal"
-
 
 # Generates the remainder of the build system.
 ac_config_files="$ac_config_files Makefile"
@@ -4833,10 +4296,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_BUILTIN_LIBGLOSS_TRUE}" && test -z "${WITH_BUILTIN_LIBGLOSS_FALSE}"; then
   as_fn_error $? "conditional \"WITH_BUILTIN_LIBGLOSS\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${PRECONFIGURED_TRUE}" && test -z "${PRECONFIGURED_FALSE}"; then
-  as_fn_error $? "conditional \"PRECONFIGURED\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
