@@ -35,18 +35,28 @@ struct metal_uart_vtable {
 };
 
 /*!
- * @brief Enum type for describing the cause of a UART callaback
+ * @brief Enum type for describing the status of a UART device
  */
 typedef enum {
-    METAL_UART_TX_DONE,
-    METAL_UART_RX_DONE,
-} metal_uart_callback_cause;
+    /* Values prefixed with underscores are internal use for testind and
+     * validation */
+    _METAL_UART_STATUS_MIN = 0,
+    METAL_UART_STATUS_IDLE = _METAL_UART_STATUS_MIN,
+    METAL_UART_STATUS_TX_IN_PROGRESS,
+    METAL_UART_STATUS_RX_IN_PROGRESS,
+    METAL_UART_STATUS_TX_RX_IN_PROGRESS,
+    METAL_UART_STATUS_TX_DONE,
+    METAL_UART_STATUS_RX_DONE,
+    METAL_UART_STATUS_UNKNOWN,
+    _METAL_UART_STATUS_MAX = METAL_UART_STATUS_UNKNOWN,
+    _METAL_UART_STATUS_COUNT
+} metal_uart_status_t;
 
 /*!
  * @brief Function signature for UART callbacks
  */
 typedef void (*metal_uart_callback_t)(struct metal_uart *uart,
-                                      metal_uart_callback_cause);
+                                      metal_uart_status_t);
 
 struct _metal_uart_async_buf {
     int in_progress;
@@ -266,12 +276,6 @@ int metal_uart_send_async(struct metal_uart *uart, char *buf, size_t len,
                           metal_uart_callback_t callback);
 
 /*!
- * @brief Check if an asynchronous UART transmission is currently in-progress
- * @return 1 if a send is in progress, otherwise 0
- */
-int metal_uart_send_async_busy(struct metal_uart *uart);
-
-/*!
  * @brief Receive buffer asynchronously over UART
  *
  * Executes the callback when the buffer has been filled or if
@@ -292,9 +296,10 @@ int metal_uart_recv_async(struct metal_uart *uart, char *buf, size_t len,
                           metal_uart_callback_t callback);
 
 /*!
- * @brief Check if an asynchronous UART receipt is currently in-progress
- * @return 1 if a receipt is in progress, otherwise 0
+ * @brief Get the status of a UART device
+ *
+ * @return the enum value describing the UART status
  */
-int metal_uart_recv_async_busy(struct metal_uart *uart);
+metal_uart_status_t metal_uart_get_status(struct metal_uart *);
 
 #endif

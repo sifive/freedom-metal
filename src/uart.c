@@ -52,7 +52,7 @@ void _metal_uart_async_callback(int id, void *priv) {
             uart->_tx_async.index += 1;
             if (uart->_tx_async.index >= uart->_tx_async.len) {
                 uart->_tx_async.in_progress = 0;
-                uart->_tx_async.cb(uart, METAL_UART_TX_DONE);
+                uart->_tx_async.cb(uart, METAL_UART_STATUS_TX_DONE);
                 metal_uart_transmit_interrupt_disable(uart);
                 break;
             }
@@ -74,7 +74,7 @@ void _metal_uart_async_callback(int id, void *priv) {
             uart->_rx_async.index += 1;
             if (uart->_rx_async.index >= uart->_rx_async.len) {
                 uart->_rx_async.in_progress = 0;
-                uart->_rx_async.cb(uart, METAL_UART_RX_DONE);
+                uart->_rx_async.cb(uart, METAL_UART_STATUS_RX_DONE);
                 metal_uart_receive_interrupt_disable(uart);
                 break;
             }
@@ -109,8 +109,16 @@ int metal_uart_send_async(struct metal_uart *uart, char *buf, size_t len,
     return 0;
 }
 
-int metal_uart_send_async_busy(struct metal_uart *uart) {
-    return uart->_tx_async.in_progress;
+metal_uart_status_t metal_uart_get_status(struct metal_uart *) {
+    if (uart->_tx_async.in_progress && uart->_rx_async.in_progress) {
+        return METAL_UART_STATUS_TX_RX_IN_PROGRESS;
+    } else if (uart->_tx_async.in_progress) {
+        return METAL_UART_STATUS_TX_IN_PROGRESS;
+    } else if (uart->_rx_async.in_progress) {
+        return METAL_UART_STATUS_RX_IN_PROGRESS;
+    }
+
+    return METAL_UART_STATUS_UNKNOWN;
 }
 
 int metal_uart_recv_async(struct metal_uart *uart, char *buf, size_t len,
@@ -139,8 +147,4 @@ int metal_uart_recv_async(struct metal_uart *uart, char *buf, size_t len,
     metal_uart_receive_interrupt_enable(uart);
 
     return 0;
-}
-
-int metal_uart_recv_async_busy(struct metal_uart *uart) {
-    return uart->_rx_async.in_progress;
 }
