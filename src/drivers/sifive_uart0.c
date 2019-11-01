@@ -73,7 +73,7 @@ int __metal_driver_sifive_uart0_rx_interrupt_disable(struct metal_uart *uart) {
 int __metal_driver_sifive_uart0_txready(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
-    return !((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
+    return !!((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
 }
 
 int __metal_driver_sifive_uart0_set_tx_watermark(struct metal_uart *uart,
@@ -107,7 +107,7 @@ size_t __metal_driver_sifive_uart0_get_rx_watermark(struct metal_uart *uart) {
 int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, int c) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
-    while (!__metal_driver_sifive_uart0_txready(uart)) {
+    while (__metal_driver_sifive_uart0_txready(uart) != 0) {
         /* wait */
     }
     UART_REGW(METAL_SIFIVE_UART0_TXDATA) = c;
@@ -221,6 +221,7 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
     .uart.init = __metal_driver_sifive_uart0_init,
     .uart.putc = __metal_driver_sifive_uart0_putc,
     .uart.getc = __metal_driver_sifive_uart0_getc,
+    .uart.txready = __metal_driver_sifive_uart0_txready,
     .uart.get_baud_rate = __metal_driver_sifive_uart0_get_baud_rate,
     .uart.set_baud_rate = __metal_driver_sifive_uart0_set_baud_rate,
     .uart.controller_interrupt =
