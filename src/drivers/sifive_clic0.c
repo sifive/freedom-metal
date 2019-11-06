@@ -11,6 +11,8 @@
 #include <metal/shutdown.h>
 #include <stdint.h>
 
+#define CLIC0_MAX_INTERRUPTS 4096
+
 typedef enum metal_clic_vector_ {
     METAL_CLIC_NONVECTOR = 0,
     METAL_CLIC_VECTORED = 1
@@ -237,9 +239,6 @@ int __metal_clic0_interrupt_enable(struct __metal_driver_sifive_clic0 *clic,
     int num_subinterrupts = __metal_driver_sifive_clic0_num_subinterrupts(
         (struct metal_interrupt *)clic);
 
-    if (id >= num_subinterrupts) {
-        return -1;
-    }
     __METAL_ACCESS_ONCE(
         (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                           METAL_SIFIVE_CLIC0_CLICINTIE_BASE + id)) =
@@ -254,9 +253,6 @@ int __metal_clic0_interrupt_disable(struct __metal_driver_sifive_clic0 *clic,
     int num_subinterrupts = __metal_driver_sifive_clic0_num_subinterrupts(
         (struct metal_interrupt *)clic);
 
-    if (id >= num_subinterrupts) {
-        return -1;
-    }
     __METAL_ACCESS_ONCE(
         (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                           METAL_SIFIVE_CLIC0_CLICINTIE_BASE + id)) =
@@ -306,9 +302,8 @@ int __metal_clic0_interrupt_set(struct __metal_driver_sifive_clic0 *clic,
             (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                               METAL_SIFIVE_CLIC0_CLICINTIP_BASE + id)) =
             METAL_ENABLE;
-        return 0;
     }
-    return -1;
+    return 0;
 }
 
 int __metal_clic0_interrupt_clear(struct __metal_driver_sifive_clic0 *clic,
@@ -323,9 +318,8 @@ int __metal_clic0_interrupt_clear(struct __metal_driver_sifive_clic0 *clic,
             (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                               METAL_SIFIVE_CLIC0_CLICINTIP_BASE + id)) =
             METAL_DISABLE;
-        return 0;
     }
-    return -1;
+    return 0;
 }
 
 int __metal_clic0_configure_set_vector_mode(
@@ -496,13 +490,17 @@ void __metal_driver_sifive_clic0_init(struct metal_interrupt *controller) {
         num_subinterrupts =
             __metal_driver_sifive_clic0_num_subinterrupts(controller);
         clic->metal_mtvt_table[0] = &__metal_clic0_handler;
-        for (int i = 1; i < num_subinterrupts; i++) {
-            clic->metal_mtvt_table[i] = NULL;
-            clic->metal_exint_table[i].handler = NULL;
-            clic->metal_exint_table[i].sub_int = NULL;
-            clic->metal_exint_table[i].exint_data = NULL;
+        __metal_clic0_interrupt_disable(clic, 0);
+        __metal_clic0_interrupt_set_level(clic, 0, level);
+        for (int i = 1; i < CLIC0_MAX_INTERRUPTS; i++) {
+            if (i < num_subinterrupts) {
+                clic->metal_mtvt_table[i] = NULL;
+                clic->metal_exint_table[i].handler = NULL;
+                clic->metal_exint_table[i].sub_int = NULL;
+                clic->metal_exint_table[i].exint_data = NULL;
+                __metal_clic0_interrupt_set_level(clic, i, level);
+            }
             __metal_clic0_interrupt_disable(clic, i);
-            __metal_clic0_interrupt_set_level(clic, i, level);
         }
         clic->init_done = 1;
     }
