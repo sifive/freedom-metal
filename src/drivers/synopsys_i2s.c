@@ -285,7 +285,6 @@ int __metal_driver_synopsys_i2s_set_fifo_trigger_level(struct metal_i2s *i2s,str
           write_register((struct metal_i2s *)(i2s),(struct metal_i2s_config *)(cfg),(SYNOPSYS_I2S_V1_11A_TERx+0x40*x),1);
           
 		}
-		i--;
 	}
 	
 	if(cfg->rx_block_en==1)
