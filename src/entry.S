@@ -28,9 +28,10 @@ _enter:
      * the boot process. */
     la t0, early_trap_vector
     csrw mtvec, t0
-    /* enable chicken bit if core is bullet series*/
+    /* chicken bit is enable if core are sifive series. */
     la t0, __metal_chicken_bit
     beqz t0, 1f
+    /* If set, always clear the feature disable register for all cores series */
     csrwi 0x7C1, 0
 1:
 
