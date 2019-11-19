@@ -24,16 +24,20 @@ _enter:
     la gp, __global_pointer$
 .option pop
 
-    /* Set up a simple trap vector to catch anything that goes wrong early in
-     * the boot process. */
-    la t0, early_trap_vector
+    /* trap over the chicken bit register clearing, aloe & fe310 dont have it */
+    la t0, 1f
     csrw mtvec, t0
     /* chicken bit is enable if core are sifive series. */
     la t0, __metal_chicken_bit
     beqz t0, 1f
     /* If set, always clear the feature disable register for all cores series */
     csrwi 0x7C1, 0
+.align 4
 1:
+    /* Set up a simple trap vector to catch anything that goes wrong early in
+     * the boot process. */
+    la t0, early_trap_vector
+    csrw mtvec, t0
 
     /* There may be pre-initialization routines inside the MBI code that run in
      * C, so here we set up a C environment.  First we set up a stack pointer,
