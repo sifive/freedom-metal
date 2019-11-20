@@ -78,6 +78,7 @@ nobase_include_HEADERS += \
 	metal/memory.h \
 	metal/pmp.h \
 	metal/privilege.h \
+	metal/ringbuf.h \
 	metal/rtc.h \
 	metal/shutdown.h \
 	metal/spi.h \
@@ -139,6 +140,7 @@ libmetal_a_SOURCES = \
 	src/memory.c \
 	src/pmp.c \
 	src/privilege.c \
+	src/ringbuf.c \
 	src/rtc.c \
 	src/shutdown.c \
 	src/spi.c \
