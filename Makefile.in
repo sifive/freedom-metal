@@ -236,11 +236,11 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/gpio.$(OBJEXT) src/i2c.$(OBJEXT) src/init.$(OBJEXT) \
 	src/interrupt.$(OBJEXT) src/led.$(OBJEXT) src/lock.$(OBJEXT) \
 	src/memory.$(OBJEXT) src/pmp.$(OBJEXT) src/privilege.$(OBJEXT) \
-	src/rtc.$(OBJEXT) src/shutdown.$(OBJEXT) src/spi.$(OBJEXT) \
-	src/switch.$(OBJEXT) src/synchronize_harts.$(OBJEXT) \
-	src/timer.$(OBJEXT) src/time.$(OBJEXT) src/trap.$(OBJEXT) \
-	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
-	src/watchdog.$(OBJEXT)
+	src/ringbuf.$(OBJEXT) src/rtc.$(OBJEXT) src/shutdown.$(OBJEXT) \
+	src/spi.$(OBJEXT) src/switch.$(OBJEXT) \
+	src/synchronize_harts.$(OBJEXT) src/timer.$(OBJEXT) \
+	src/time.$(OBJEXT) src/trap.$(OBJEXT) src/tty.$(OBJEXT) \
+	src/uart.$(OBJEXT) src/vector.$(OBJEXT) src/watchdog.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -458,9 +458,9 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/csr.h metal/gpio.h metal/i2c.h metal/init.h \
 	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
 	metal/lock.h metal/memory.h metal/pmp.h metal/privilege.h \
-	metal/rtc.h metal/shutdown.h metal/spi.h metal/switch.h \
-	metal/timer.h metal/time.h metal/tty.h metal/uart.h \
-	metal/watchdog.h
+	metal/ringbuf.h metal/rtc.h metal/shutdown.h metal/spi.h \
+	metal/switch.h metal/timer.h metal/time.h metal/tty.h \
+	metal/uart.h metal/watchdog.h
 
 # This will generate these sources before the compilation step
 BUILT_SOURCES = \
@@ -518,6 +518,7 @@ libmetal_a_SOURCES = \
 	src/memory.c \
 	src/pmp.c \
 	src/privilege.c \
+	src/ringbuf.c \
 	src/rtc.c \
 	src/shutdown.c \
 	src/spi.c \
@@ -811,6 +812,8 @@ src/memory.$(OBJEXT): src/$(am__dirstamp) \
 src/pmp.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/privilege.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/ringbuf.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 src/rtc.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/shutdown.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
@@ -890,6 +893,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/memory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/privilege.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/ringbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/rtc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/shutdown.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/spi.Po@am__quote@
