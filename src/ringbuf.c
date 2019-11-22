@@ -1,6 +1,7 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <errno.h>
 #include <string.h>
 
 #include <metal/ringbuf.h>
@@ -22,6 +23,9 @@ int metal_ringbuf_create(struct metal_ringbuf *rb, void *buf, size_t capacity,
 }
 
 size_t metal_ringbuf_num_items(struct metal_ringbuf *rb) {
+    if (rb == NULL) {
+        return -EINVAL;
+    }
     if (rb->_start > rb->_end) {
         /*
          *  size = 10
@@ -73,10 +77,13 @@ size_t metal_ringbuf_num_items(struct metal_ringbuf *rb) {
 }
 
 int metal_ringbuf_put(struct metal_ringbuf *rb, const void *val) {
+    if (rb == NULL || val == NULL) {
+        return -EINVAL;
+    }
     size_t len = metal_ringbuf_num_items(rb);
     if (len == rb->_capacity) {
         /* buffer is full */
-        return 1;
+        return -ENOMEM;
     }
 
     /* write to the buffer */
@@ -98,8 +105,11 @@ int metal_ringbuf_put(struct metal_ringbuf *rb, const void *val) {
 }
 
 int metal_ringbuf_get(struct metal_ringbuf *rb, void *val) {
+    if (rb == NULL || val == NULL) {
+        return -EINVAL;
+    }
     if (rb->_empty) {
-        return 1;
+        return -ENODATA;
     }
 
     /* read from the buffer */
@@ -122,8 +132,11 @@ int metal_ringbuf_get(struct metal_ringbuf *rb, void *val) {
 }
 
 int metal_ringbuf_peek(struct metal_ringbuf *rb, void *val) {
+    if (rb == NULL || val == NULL) {
+        return -EINVAL;
+    }
     if (rb->_empty) {
-        return 1;
+        return -ENODATA;
     }
 
     /* read from the buffer */

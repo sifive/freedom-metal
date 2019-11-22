@@ -85,7 +85,7 @@ size_t metal_ringbuf_num_items(struct metal_ringbuf *rb);
  *
  * @param rb The ring buffer
  * @param val The value to append
- * @return 0 if the value is added, nonzero if no space remains
+ * @return 0 if the value is added, -ENOMEM if no space remains
  */
 int metal_ringbuf_put(struct metal_ringbuf *rb, const void *val);
 
@@ -100,7 +100,7 @@ int metal_ringbuf_put(struct metal_ringbuf *rb, const void *val);
  *
  * @param rb The ring buffer
  * @param val Stores the popped value
- * @return 0 if a value is popped, nonzero if the buffer is empty
+ * @return 0 if a value is popped, -ENODATA if the buffer is empty
  */
 int metal_ringbuf_get(struct metal_ringbuf *rb, void *val);
 
@@ -113,7 +113,7 @@ int metal_ringbuf_get(struct metal_ringbuf *rb, void *val);
  *
  * @param rb The ring buffer
  * @param val Stores the popped value
- * @return 0 if a value is peeked, nonzero if the buffer is empty
+ * @return 0 if a value is peeked, -ENODATA if the buffer is empty
  */
 int metal_ringbuf_peek(struct metal_ringbuf *rb, void *val);
 
