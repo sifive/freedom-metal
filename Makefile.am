@@ -199,6 +199,21 @@ libmetal_gloss_a_SOURCES = \
 
 endif
 
+
+########################################################
+# libsegger
+########################################################
+
+# Provide segger hook with Freedom Metal that is only built when
+# --with-builtin-libsegger is passed to configure.
+if WITH_BUILTIN_LIBSEGGER
+
+lib_LIBRARIES += libmetal-segger.a
+
+libmetal_segger_a_SOURCES = \
+	segger/crt0.S 
+
+endif
 ########################################################
 # Clean
 ########################################################

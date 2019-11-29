@@ -4,8 +4,8 @@
 #include <metal/cpu.h>
 #include <metal/machine.h>
 #include <metal/timer.h>
-#include <sys/time.h>
-#include <sys/times.h>
+//#include <sys/time.h>
+//#include <sys/times.h>
 
 #if defined(__METAL_DT_MAX_HARTS)
 /* This implementation serves as a small shim that interfaces with the first

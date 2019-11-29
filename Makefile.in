@@ -104,6 +104,14 @@ host_triplet = @host@
 # Freedom Metal has its own libgloss implementation that is only built when
 # --with-builtin-libgloss is passed to configure.
 @WITH_BUILTIN_LIBGLOSS_TRUE@am__append_1 = libmetal-gloss.a
+
+########################################################
+# libsegger
+########################################################
+
+# Provide segger hook with Freedom Metal that is only built when
+# --with-builtin-libsegger is passed to configure.
+@WITH_BUILTIN_LIBSEGGER_TRUE@am__append_2 = libmetal-segger.a
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -201,6 +209,12 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.$(OBJEXT)
 libmetal_gloss_a_OBJECTS = $(am_libmetal_gloss_a_OBJECTS)
+libmetal_segger_a_AR = $(AR) $(ARFLAGS)
+libmetal_segger_a_LIBADD =
+am__libmetal_segger_a_SOURCES_DIST = segger/crt0.S
+@WITH_BUILTIN_LIBSEGGER_TRUE@am_libmetal_segger_a_OBJECTS =  \
+@WITH_BUILTIN_LIBSEGGER_TRUE@	segger/crt0.$(OBJEXT)
+libmetal_segger_a_OBJECTS = $(am_libmetal_segger_a_OBJECTS)
 libmetal_a_AR = $(AR) $(ARFLAGS)
 libmetal_a_LIBADD =
 am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
@@ -276,9 +290,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_a_SOURCES)
-DIST_SOURCES = $(am__libmetal_gloss_a_SOURCES_DIST) \
+SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_segger_a_SOURCES) \
 	$(libmetal_a_SOURCES)
+DIST_SOURCES = $(am__libmetal_gloss_a_SOURCES_DIST) \
+	$(am__libmetal_segger_a_SOURCES_DIST) $(libmetal_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -472,7 +487,7 @@ BUILT_SOURCES = \
 ########################################################
 # libmetal
 ########################################################
-lib_LIBRARIES = libmetal.a $(am__append_1)
+lib_LIBRARIES = libmetal.a $(am__append_1) $(am__append_2)
 libmetal_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/fixed-factor-clock.c \
@@ -565,6 +580,9 @@ libmetal_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_utime.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.c
+
+@WITH_BUILTIN_LIBSEGGER_TRUE@libmetal_segger_a_SOURCES = \
+@WITH_BUILTIN_LIBSEGGER_TRUE@	segger/crt0.S 
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -712,6 +730,19 @@ libmetal-gloss.a: $(libmetal_gloss_a_OBJECTS) $(libmetal_gloss_a_DEPENDENCIES) $
 	$(AM_V_at)-rm -f libmetal-gloss.a
 	$(AM_V_AR)$(libmetal_gloss_a_AR) libmetal-gloss.a $(libmetal_gloss_a_OBJECTS) $(libmetal_gloss_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libmetal-gloss.a
+segger/$(am__dirstamp):
+	@$(MKDIR_P) segger
+	@: > segger/$(am__dirstamp)
+segger/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) segger/$(DEPDIR)
+	@: > segger/$(DEPDIR)/$(am__dirstamp)
+segger/crt0.$(OBJEXT): segger/$(am__dirstamp) \
+	segger/$(DEPDIR)/$(am__dirstamp)
+
+libmetal-segger.a: $(libmetal_segger_a_OBJECTS) $(libmetal_segger_a_DEPENDENCIES) $(EXTRA_libmetal_segger_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libmetal-segger.a
+	$(AM_V_AR)$(libmetal_segger_a_AR) libmetal-segger.a $(libmetal_segger_a_OBJECTS) $(libmetal_segger_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libmetal-segger.a
 src/drivers/$(am__dirstamp):
 	@$(MKDIR_P) src/drivers
 	@: > src/drivers/$(am__dirstamp)
@@ -836,6 +867,7 @@ libmetal.a: $(libmetal_a_OBJECTS) $(libmetal_a_DEPENDENCIES) $(EXTRA_libmetal_a_
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f gloss/*.$(OBJEXT)
+	-rm -f segger/*.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
 	-rm -f src/drivers/*.$(OBJEXT)
 
@@ -875,6 +907,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_utime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@segger/$(DEPDIR)/crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Po@am__quote@
@@ -1246,6 +1279,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f gloss/$(DEPDIR)/$(am__dirstamp)
 	-rm -f gloss/$(am__dirstamp)
+	-rm -f segger/$(DEPDIR)/$(am__dirstamp)
+	-rm -f segger/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
 	-rm -f src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -1261,7 +1296,7 @@ clean-am: clean-generic clean-libLIBRARIES clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf gloss/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) segger/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1309,7 +1344,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf gloss/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) segger/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

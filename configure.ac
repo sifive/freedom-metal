@@ -36,6 +36,12 @@ AC_ARG_WITH([builtin-libgloss],
     [with_builtin_libgloss="no"]
 )
 
+AC_ARG_WITH([builtin-libsegger],
+    [AS_HELP_STRING([--with-bultin-libsegger], [Build libsegger along with Metal])],
+    [with_builtin_libsegger="yes"],
+    [with_builtin_libsegger="no"]
+)
+
 AC_ARG_WITH([machine-header],
     [AS_HELP_STRING([--with-machine-header=PATH], [Path to the machine header file])],
     [],
@@ -59,6 +65,7 @@ AC_ARG_WITH([platform-header],
 ########################################################
 
 AM_CONDITIONAL([WITH_BUILTIN_LIBGLOSS], [test "x$with_builtin_libgloss" = "xyes"])
+AM_CONDITIONAL([WITH_BUILTIN_LIBSEGGER], [test "x$with_builtin_libsegger" = "xyes"])
 
 # Configure the build system to pass in the preconfigured machine support files
 AS_IF([test "x$with_machine_header" != "xno"],
