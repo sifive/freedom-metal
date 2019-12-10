@@ -14,12 +14,11 @@ extern char __heap_size;
 char __user_locale_name_buffer[16] __attribute__((weak));
 unsigned long __SEGGER_HeapSize = (unsigned long)&__heap_size;
 
-static inline int metal_writeC(SEGGER_SEMIHOST_PARA* pPara)
+static inline int metal_writeC(char *pChar)
 {
-int i, r;
-char* pChar = pPara[0].cpC;
+  int r;
 
-  r = metal_tty_putc((int)pChar);
+  r = metal_tty_putc((int)*pChar);
   return r;
 }
 
@@ -109,7 +108,7 @@ int __SEGGER_RTL_stdin_getc(void) {
 int __SEGGER_RTL_stdout_putc(int c) {
   int r;
 
-  r = SEGGER_SEMIHOST_WriteC(c);
+  r = SEGGER_SEMIHOST_WriteC((char)c);
   return r < 0 ? EOF : r;
 }
 
