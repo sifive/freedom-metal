@@ -211,7 +211,7 @@ if WITH_BUILTIN_LIBSEGGER
 lib_LIBRARIES += libmetal-segger.a
 
 libmetal_segger_a_SOURCES = \
-	segger/crt0.S \
+	gloss/crt0.S \
 	segger/SEGGER_target_metal.c
 
 endif

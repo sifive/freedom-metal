@@ -211,10 +211,10 @@ am__dirstamp = $(am__leading_dot)dirstamp
 libmetal_gloss_a_OBJECTS = $(am_libmetal_gloss_a_OBJECTS)
 libmetal_segger_a_AR = $(AR) $(ARFLAGS)
 libmetal_segger_a_LIBADD =
-am__libmetal_segger_a_SOURCES_DIST = segger/crt0.S \
+am__libmetal_segger_a_SOURCES_DIST = gloss/crt0.S \
 	segger/SEGGER_target_metal.c
 @WITH_BUILTIN_LIBSEGGER_TRUE@am_libmetal_segger_a_OBJECTS =  \
-@WITH_BUILTIN_LIBSEGGER_TRUE@	segger/crt0.$(OBJEXT) \
+@WITH_BUILTIN_LIBSEGGER_TRUE@	gloss/crt0.$(OBJEXT) \
 @WITH_BUILTIN_LIBSEGGER_TRUE@	segger/SEGGER_target_metal.$(OBJEXT)
 libmetal_segger_a_OBJECTS = $(am_libmetal_segger_a_OBJECTS)
 libmetal_a_AR = $(AR) $(ARFLAGS)
@@ -584,7 +584,7 @@ libmetal_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.c
 
 @WITH_BUILTIN_LIBSEGGER_TRUE@libmetal_segger_a_SOURCES = \
-@WITH_BUILTIN_LIBSEGGER_TRUE@	segger/crt0.S \
+@WITH_BUILTIN_LIBSEGGER_TRUE@	gloss/crt0.S \
 @WITH_BUILTIN_LIBSEGGER_TRUE@	segger/SEGGER_target_metal.c
 
 all: $(BUILT_SOURCES)
@@ -739,8 +739,6 @@ segger/$(am__dirstamp):
 segger/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) segger/$(DEPDIR)
 	@: > segger/$(DEPDIR)/$(am__dirstamp)
-segger/crt0.$(OBJEXT): segger/$(am__dirstamp) \
-	segger/$(DEPDIR)/$(am__dirstamp)
 segger/SEGGER_target_metal.$(OBJEXT): segger/$(am__dirstamp) \
 	segger/$(DEPDIR)/$(am__dirstamp)
 
@@ -913,7 +911,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@segger/$(DEPDIR)/SEGGER_target_metal.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@segger/$(DEPDIR)/crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Po@am__quote@
