@@ -1,9 +1,7 @@
 #include <errno.h>
 #include <time.h>
 
-int
-_gettimeofday(struct timeval *tp, void *tzp)
-{
+int _gettimeofday(struct timeval *tp, void *tzp) {
     int rv;
     unsigned long long mcc, timebase;
     rv = metal_timer_get_cyclecount(0, &mcc);
