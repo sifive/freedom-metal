@@ -44,22 +44,7 @@ _start:
   la gp, __global_pointer$
 .option pop
 
-  /* The METAL is designed for a bare-metal environment and therefor is expected
-   * to define its own stack pointer.  We also align the stack pointer here
-   * because the only RISC-V ABI that's currently defined mandates 16-byte
-   * stack alignment. */
-  la sp, _sp
-
-  /* Increment by hartid number of stack sizes */
-  li t0, 0
-  la t1, __stack_size
-1:
-  beq t0, a0, 1f
-  add sp, sp, t1
-  addi t0, t0, 1
-  j 1b
-1:
-  andi sp, sp, -16
+  /* Stack pointer is expected to be initialized before _start */
 
   /* If we're not hart 0, skip the initialization work */
   la t0, __metal_boot_hart
