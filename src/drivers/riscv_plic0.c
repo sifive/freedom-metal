@@ -221,7 +221,7 @@ __metal_driver_riscv_plic0_get_threshold(struct metal_interrupt *controller) {
 metal_affinity
 __metal_driver_riscv_plic0_affinity_enable(struct metal_interrupt *controller,
                                            metal_affinity bitmask, int id) {
-    metal_affinity ret;
+    metal_affinity ret = {0};
     int context;
 
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
@@ -244,7 +244,7 @@ __metal_driver_riscv_plic0_affinity_enable(struct metal_interrupt *controller,
 metal_affinity
 __metal_driver_riscv_plic0_affinity_disable(struct metal_interrupt *controller,
                                             metal_affinity bitmask, int id) {
-    metal_affinity ret;
+    metal_affinity ret = {0};
     int context;
 
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
@@ -267,7 +267,7 @@ __metal_driver_riscv_plic0_affinity_disable(struct metal_interrupt *controller,
 metal_affinity __metal_driver_riscv_plic0_affinity_set_threshold(
     struct metal_interrupt *controller, metal_affinity bitmask,
     unsigned int threshold) {
-    metal_affinity ret;
+    metal_affinity ret = {0};
     int context;
 
     for_each_metal_affinity(context, bitmask) {
