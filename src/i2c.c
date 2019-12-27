@@ -19,9 +19,10 @@ extern inline int metal_i2c_get_baud_rate(struct metal_i2c *i2c);
 extern inline int metal_i2c_set_baud_rate(struct metal_i2c *i2c, int baud_rate);
 
 struct metal_i2c *metal_i2c_get_device(int device_num) {
-    if (device_num >= __METAL_DT_MAX_I2CS) {
-        return NULL;
+#if __METAL_DT_MAX_I2CS > 0
+    if (device_num < __METAL_DT_MAX_I2CS) {
+        return (struct metal_i2c *)__metal_i2c_table[device_num];
     }
-
-    return (struct metal_i2c *)__metal_i2c_table[device_num];
+#endif
+    return NULL;
 }
