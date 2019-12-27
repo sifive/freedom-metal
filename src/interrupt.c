@@ -48,6 +48,11 @@ extern __inline__ unsigned int metal_interrupt_get_priority(struct metal_interru
 
 extern __inline__ int metal_interrupt_set_priority(struct metal_interrupt *controller, int id, unsigned int priority);
 
+extern __inline__ int metal_interrupt_set_preemptive_level(struct metal_interrupt *controller,
+                                     int id, unsigned int level, unsigned int priority);
+
+extern __inline__ unsigned int metal_interrupt_get_preemptive_level(struct metal_interrupt *controller, int id);
+
 extern __inline__ int metal_interrupt_clear(struct metal_interrupt *controller, int id);
 
 extern __inline__ int metal_interrupt_set(struct metal_interrupt *controller, int id);

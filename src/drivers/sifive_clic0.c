@@ -643,6 +643,24 @@ int __metal_driver_sifive_clic0_set_priority (struct metal_interrupt *controller
     return __metal_clic0_interrupt_set_priority(clic, id, priority);
 }
 
+unsigned int
+__metal_driver_sifive_clic0_get_premptive_level(struct metal_interrupt *controller,
+                                         int id) {
+    struct __metal_driver_sifive_clic0 *clic =
+        (struct __metal_driver_sifive_clic0 *)(controller);
+    return __metal_clic0_interrupt_get_level(clic, id);
+}
+
+int __metal_driver_sifive_clic0_set_preemptive_level(struct metal_interrupt *controller,
+                                                     int id, unsigned int level,
+                                                     unsigned int priority) {
+    struct __metal_driver_sifive_clic0 *clic =
+        (struct __metal_driver_sifive_clic0 *)(controller);
+                __metal_clic0_interrupt_set_level(clic, i, level);
+    return (__metal_clic0_interrupt_set_level(clic, id, level) &&
+            __metal_clic0_interrupt_set_priority(clic, id, priority));
+}
+
 int __metal_driver_sifive_clic0_clear_interrupt (struct metal_interrupt *controller, int id)
 {
     struct __metal_driver_sifive_clic0 *clic =
@@ -725,6 +743,8 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
     .clic_vtable.interrupt_set_threshold   = __metal_driver_sifive_clic0_set_threshold,
     .clic_vtable.interrupt_get_priority    = __metal_driver_sifive_clic0_get_priority,
     .clic_vtable.interrupt_set_priority    = __metal_driver_sifive_clic0_set_priority,
+    .clic_vtable.interrupt_get_preemptive_level = __metal_driver_sifive_clic0_get_preemptive_level,
+    .clic_vtable.interrupt_set_preemptive_level = __metal_driver_sifive_clic0_set_preemptive_level,
     .clic_vtable.interrupt_clear    = __metal_driver_sifive_clic0_clear_interrupt,
     .clic_vtable.interrupt_set      = __metal_driver_sifive_clic0_set_interrupt,
     .clic_vtable.command_request    = __metal_driver_sifive_clic0_command_request,

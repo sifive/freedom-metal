@@ -84,8 +84,10 @@ struct metal_interrupt_vtable {
     int (*interrupt_set_threshold)(struct metal_interrupt *controller, unsigned int threshold);
     unsigned int (*interrupt_get_priority)(struct metal_interrupt *controller, int id);
     int (*interrupt_set_priority)(struct metal_interrupt *controller, int id, unsigned int priority);
-    int (*command_request)(struct metal_interrupt *controller, int cmd, void *data);
-    int (*mtimecmp_set)(struct metal_interrupt *controller, int hartid, unsigned long long time);
+    unsigned int (*interrupt_get_preemptive_level)(
+        struct metal_interrupt *controller, unsigned int priority);
+    int (*interrupt_set_preemptive_level)(
+        struct metal_interrupt *controller, int id, unsigned int level, unsigned int priority);
     metal_affinity (*interrupt_affinity_enable)(
         struct metal_interrupt *controller, metal_affinity bitmask, int id);
     metal_affinity (*interrupt_affinity_disable)(
@@ -95,6 +97,8 @@ struct metal_interrupt_vtable {
         unsigned int threshold);
     unsigned int (*interrupt_affinity_get_threshold)(
         struct metal_interrupt *controller, int context_id);
+    int (*command_request)(struct metal_interrupt *controller, int cmd, void *data);
+    int (*mtimecmp_set)(struct metal_interrupt *controller, int hartid, unsigned long long time);
 };
 
 /*!
@@ -312,6 +316,35 @@ __inline__ int metal_interrupt_set_priority(struct metal_interrupt *controller,
 __inline__ unsigned int metal_interrupt_get_priority(struct metal_interrupt *controller, int id)
 {
   return controller->vtable->interrupt_get_priority(controller, id);
+}
+
+/*!
+ * @brief Set preemptive level and priority for a given interrupt ID
+ *
+ * Set the preemptive level and priority for a given interrupt ID.
+ *
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to enable
+ * @param level The interrupt level
+ * @param priority The interrupt priority level
+ * @return 0 upon success
+ */
+__inline__ int metal_interrupt_set_preemptive_level(struct metal_interrupt *controller,
+                                                    int id, unsigned int level,
+                                                    unsigned int priority) {
+    return controller->vtable->interrupt_set_preemptive_level(controller, id,
+                                                              level, priority);
+}
+
+/*!
+ * @brief Get an interrupt preemptive level
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to enable
+ * @return The interrupt level
+ */
+__inline__ unsigned int
+metal_interrupt_get_preemptive_level(struct metal_interrupt *controller, int id) {
+    return controller->vtable->interrupt_get_preemptive_level(controller, id);
 }
 
 /*!
