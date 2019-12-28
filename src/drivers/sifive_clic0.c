@@ -644,7 +644,7 @@ int __metal_driver_sifive_clic0_set_priority (struct metal_interrupt *controller
 }
 
 unsigned int
-__metal_driver_sifive_clic0_get_premptive_level(struct metal_interrupt *controller,
+__metal_driver_sifive_clic0_get_preemptive_level(struct metal_interrupt *controller,
                                          int id) {
     struct __metal_driver_sifive_clic0 *clic =
         (struct __metal_driver_sifive_clic0 *)(controller);
@@ -656,7 +656,7 @@ int __metal_driver_sifive_clic0_set_preemptive_level(struct metal_interrupt *con
                                                      unsigned int priority) {
     struct __metal_driver_sifive_clic0 *clic =
         (struct __metal_driver_sifive_clic0 *)(controller);
-                __metal_clic0_interrupt_set_level(clic, i, level);
+                __metal_clic0_interrupt_set_level(clic, id, level);
     return (__metal_clic0_interrupt_set_level(clic, id, level) &&
             __metal_clic0_interrupt_set_priority(clic, id, priority));
 }

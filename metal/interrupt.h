@@ -85,7 +85,7 @@ struct metal_interrupt_vtable {
     unsigned int (*interrupt_get_priority)(struct metal_interrupt *controller, int id);
     int (*interrupt_set_priority)(struct metal_interrupt *controller, int id, unsigned int priority);
     unsigned int (*interrupt_get_preemptive_level)(
-        struct metal_interrupt *controller, unsigned int priority);
+        struct metal_interrupt *controller, int id);
     int (*interrupt_set_preemptive_level)(
         struct metal_interrupt *controller, int id, unsigned int level, unsigned int priority);
     metal_affinity (*interrupt_affinity_enable)(
