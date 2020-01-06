@@ -10,6 +10,7 @@
 
 #include <metal/init.h>
 #include <metal/machine.h>
+#include <metal/machine/platform.h>
 
 #include <metal/drivers/sifive_fe310-g000_pll.h>
 #include <stdlib.h>
@@ -270,6 +271,19 @@ static int find_closest_config(long ref_hz, long rate) {
     return closest_index;
 }
 
+/* The PLL needs 100 usec to stabilize before we test PLL_LOCK. Since LFROSC
+ * on all targets with the FE310-G000 PLL runs at 32768 Hz, we need to wait
+ * at least
+ *
+ *   ceil(100 usec * 32768 ticks/sec * 1 sec / 1000000 usec) = 4 ticks
+ *
+ * of mtime before we test PLL_LOCK.
+ *
+ * TODO: Determine the mtime timebase at compile or runtime and use that
+ * here.
+ */
+#define PLL_LOCK_WAIT_TICKS 4
+
 /* Configure the PLL and wait for it to lock */
 static void configure_pll(__metal_io_u32 *pllcfg, __metal_io_u32 *plloutdiv,
                           const struct pll_config_t *config) {
@@ -296,6 +310,30 @@ static void configure_pll(__metal_io_u32 *pllcfg, __metal_io_u32 *plloutdiv,
     }
 
     __METAL_ACCESS_ONCE(pllcfg) &= ~(PLL_BYPASS);
+
+    /* Wait for the PLL to stabilize before testing it for lock */
+#ifdef __METAL_DT_RISCV_CLINT0_HANDLE
+    unsigned long long mtime, mtime_end;
+    __metal_driver_riscv_clint0_command_request(__METAL_DT_RISCV_CLINT0_HANDLE,
+                                                METAL_TIMER_MTIME_GET, &mtime);
+    mtime_end = mtime + PLL_LOCK_WAIT_TICKS;
+    while (mtime <= mtime_end) {
+        __metal_driver_riscv_clint0_command_request(
+            __METAL_DT_RISCV_CLINT0_HANDLE, METAL_TIMER_MTIME_GET, &mtime);
+    }
+#elif __METAL_DT_RISCV_CLIC0_HANDLE
+    unsigned long long mtime, mtime_end;
+    __metal_driver_sifive_clic0_command_request(__METAL_DT_RISCV_CLIC0_HANDLE,
+                                                METAL_TIMER_MTIME_GET, &mtime);
+    mtime_end = mtime + PLL_LOCK_WAIT_TICKS;
+    while (mtime <= mtime_end) {
+        __metal_driver_sifive_clic0_command_request(
+            __METAL_DT_RISCV_CLIC0_HANDLE, METAL_TIMER_MTIME_GET, &mtime);
+    }
+#else
+#pragma message(                                                               \
+    No handle for CLINT or CLIC found, PLL might race with lock signal !)
+#endif
 
     /* Wait for PLL to lock */
     while ((__METAL_ACCESS_ONCE(pllcfg) & PLL_LOCK) == 0)
