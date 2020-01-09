@@ -1,4 +1,5 @@
 tuple MachineExecutionEnvironment =
+  Job_:           Job
   IncludeDir_:    String
   LibDir_:        String
   LibMetal_:      Path
@@ -6,6 +7,7 @@ tuple MachineExecutionEnvironment =
   ConfigOptions:  FreedomMetalConfigureOptions
   AllOutputs_:    List Path
 
+global def getMachineExecutionEnvironmentJob           = getMachineExecutionEnvironmentJob_
 global def getMachineExecutionEnvironmentLibMetal      = getMachineExecutionEnvironmentLibMetal_
 global def getMachineExecutionEnvironmentLibMetalGloss = getMachineExecutionEnvironmentLibMetalGloss_
 global def getMachineExecutionEnvironmentIncludeDir    = getMachineExecutionEnvironmentIncludeDir_
@@ -55,8 +57,6 @@ global def runFreedomMetalInstall options =
   def metalInline = options.getFreedomMetalConfigureOptionsMachineInlineHeader
   def platformHeader = options.getFreedomMetalConfigureOptionsPlatformHeader
 
-  def wrapperScript = source "{here}/scripts/autoconf_wrapper"
-
   def metalInstallDir = outputDir
 
   def installedFreedomMetal =
@@ -87,16 +87,32 @@ global def runFreedomMetalInstall options =
 
 
   def runDir = "{metalInstallDir}/freedom-metal"
-  def cmdline =
-    relative runDir wrapperScript.getPathName,
-    options.getFreedomMetalConfigureOptionsHost,
-    relative runDir metalHeader.getPathName,
-    relative runDir metalInline.getPathName,
-    relative runDir platformHeader.getPathName,
-    relative runDir outputDir,
-    Nil
+  def cmdline = "bash", "-c", "%
+    set -eo pipefail
+    machine_header=$(pwd)/%{metalHeader.getPathName}
+    machine_inline=$(pwd)/%{metalInline.getPathName}
+    platform_header=$(pwd)/%{platformHeader.getPathName}
+    install_dir=$(pwd)/%{outputDir}
+    export RISCV_PATH=$RISCV
+    cd %{runDir}
+    ./configure \
+      --host=%{options.getFreedomMetalConfigureOptionsHost} \
+      --with-builtin-libgloss \
+      --with-machine-header=$machine_header \
+      --with-machine-inline=$machine_inline \
+      --with-platform-header=$platform_header \
+      --prefix=
+    make \
+      RANLIB="riscv64-unknown-elf-ranlib -D" \
+      ARFLAGS=Dcr
+    make  \
+      RANLIB="riscv64-unknown-elf-ranlib -D" \
+      ARFLAGS=Dcr \
+      DESTDIR=$install_dir \
+      install
+    %", Nil
 
-  def inputs = mkdir outputDir, wrapperScript, metalHeader, installedFreedomMetal
+  def inputs = mkdir outputDir, metalHeader, installedFreedomMetal
   def foutputs _ =
     files "{outputDir}/include" `.*`
     ++ files "{outputDir}/lib" `.*`
@@ -106,20 +122,21 @@ global def runFreedomMetalInstall options =
     def cmodel = options.getFreedomMetalConfigureOptionsRISCV_CMODEL
     "CFLAGS=-march={march} -mabi={mabi} -g -mcmodel={cmodel}", _
 
-  def makeOutputs =
+  def job =
     makePlan cmdline inputs
     | setPlanLocalOnly True
     | setPlanFnOutputs foutputs
-    | setPlanDirectory runDir
     | setPlanResources options.getFreedomMetalConfigureOptionsResources
     | editPlanEnvironment withCFlags
     | runJob
-    | getJobOutputs
+  def makeOutputs = job.getJobOutputs
 
-  def getFile f msg =
-    filter (simplify f ==~ _.getPathName) makeOutputs
-    | head
-    | getOrElse msg.makeError.makeBadPath
+  def getFile f msg = match (makeOutputs | map getPathResult | findFail)
+    Fail e = makeBadPath e
+    Pass _ =
+      filter (simplify f ==~ _.getPathName) makeOutputs
+      | head
+      | getOrElse msg.makeError.makeBadPath
 
   def libmetal =
     def fileName = "{outputDir}/lib/libmetal.a"
@@ -131,4 +148,4 @@ global def runFreedomMetalInstall options =
 
   def includeDir = "{outputDir}/include"
   def libDir = "{outputDir}/lib"
-  MachineExecutionEnvironment includeDir libDir libmetal libmetalGloss options makeOutputs
+  MachineExecutionEnvironment job includeDir libDir libmetal libmetalGloss options makeOutputs
