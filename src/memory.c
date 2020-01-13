@@ -9,7 +9,7 @@ struct metal_memory *metal_get_memory_from_address(const uintptr_t address) {
 		struct metal_memory *mem = __metal_memory_table[i];
 
 		uintptr_t lower_bound = metal_memory_get_base_address(mem);
-		uintptr_t upper_bound  = lower_bound + metal_memory_get_size(mem);
+                unsigned long long upper_bound  = (unsigned long long)lower_bound + metal_memory_get_size(mem);
 
 		if((address >= lower_bound) && (address < upper_bound)) {
 			return mem;
