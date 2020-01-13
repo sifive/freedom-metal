@@ -22,17 +22,17 @@ void metal_privilege_drop_to_mode(enum metal_privilege_mode mode,
     __asm__ volatile("csrr %0, mstatus" : "=r"(mstatus));
 
     /* Set xPIE bits based on current xIE bits */
-    if (mstatus && (1 << METAL_MSTATUS_MIE_OFFSET)) {
+    if (mstatus & (1 << METAL_MSTATUS_MIE_OFFSET)) {
         mstatus |= (1 << METAL_MSTATUS_MPIE_OFFSET);
     } else {
         mstatus &= ~(1 << METAL_MSTATUS_MPIE_OFFSET);
     }
-    if (mstatus && (1 << METAL_MSTATUS_SIE_OFFSET)) {
+    if (mstatus & (1 << METAL_MSTATUS_SIE_OFFSET)) {
         mstatus |= (1 << METAL_MSTATUS_SPIE_OFFSET);
     } else {
         mstatus &= ~(1 << METAL_MSTATUS_SPIE_OFFSET);
     }
-    if (mstatus && (1 << METAL_MSTATUS_UIE_OFFSET)) {
+    if (mstatus & (1 << METAL_MSTATUS_UIE_OFFSET)) {
         mstatus |= (1 << METAL_MSTATUS_UPIE_OFFSET);
     } else {
         mstatus &= ~(1 << METAL_MSTATUS_UPIE_OFFSET);
