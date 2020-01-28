@@ -173,7 +173,7 @@ void __metal_driver_sifive_fe310_g000_pll_init(
 
     /* If we're running off of the PLL, switch off before we start configuring
      * it*/
-    if ((__METAL_ACCESS_ONCE(pllcfg) & PLL_SEL) == 0)
+    if ((__METAL_ACCESS_ONCE(pllcfg) & PLL_SEL) != 0)
         __METAL_ACCESS_ONCE(pllcfg) &= ~(PLL_SEL);
 
     /* Make sure we're running off of the external oscillator for stability */
