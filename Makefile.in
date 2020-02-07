@@ -104,6 +104,11 @@ host_triplet = @host@
 # Freedom Metal has its own libgloss implementation that is only built when
 # --with-builtin-libgloss is passed to configure.
 @WITH_BUILTIN_LIBGLOSS_TRUE@am__append_1 = libmetal-gloss.a
+
+########################################################
+# libmetal-pico
+########################################################
+@WITH_BUILTIN_LIBGLOSS_FALSE@am__append_2 = libmetal-pico.a
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -201,6 +206,18 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.$(OBJEXT)
 libmetal_gloss_a_OBJECTS = $(am_libmetal_gloss_a_OBJECTS)
+libmetal_pico_a_AR = $(AR) $(ARFLAGS)
+libmetal_pico_a_LIBADD =
+am__libmetal_pico_a_SOURCES_DIST = gloss/crt0.S pico/iob.c \
+	gloss/sys_exit.c pico/times.c gloss/sys_sbrk.c pico/sysconf.c
+@WITH_BUILTIN_LIBGLOSS_FALSE@am_libmetal_pico_a_OBJECTS =  \
+@WITH_BUILTIN_LIBGLOSS_FALSE@	gloss/crt0.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_FALSE@	pico/iob.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_FALSE@	gloss/sys_exit.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_FALSE@	pico/times.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_FALSE@	gloss/sys_sbrk.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_FALSE@	pico/sysconf.$(OBJEXT)
+libmetal_pico_a_OBJECTS = $(am_libmetal_pico_a_OBJECTS)
 libmetal_a_AR = $(AR) $(ARFLAGS)
 libmetal_a_LIBADD =
 am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
@@ -242,13 +259,6 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
 	src/watchdog.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
-libmetal_pico_a_AR = $(AR) $(ARFLAGS)
-libmetal_pico_a_LIBADD =
-am_libmetal_pico_a_OBJECTS = gloss/crt0.$(OBJEXT) \
-	pico/iob.$(OBJEXT) gloss/sys_exit.$(OBJEXT) pico/times.$(OBJEXT) \
-	gloss/sys_sbrk.$(OBJEXT) pico/sysconf.$(OBJEXT)
-libmetal_pico_a_OBJECTS =  \
-	$(am_libmetal_pico_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -283,10 +293,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_a_SOURCES) \
-	$(libmetal_pico_a_SOURCES)
+SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_pico_a_SOURCES) \
+	$(libmetal_a_SOURCES)
 DIST_SOURCES = $(am__libmetal_gloss_a_SOURCES_DIST) \
-	$(libmetal_a_SOURCES) $(libmetal_pico_a_SOURCES)
+	$(am__libmetal_pico_a_SOURCES_DIST) $(libmetal_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -480,11 +490,7 @@ BUILT_SOURCES = \
 ########################################################
 # libmetal
 ########################################################
-
-########################################################
-# libmetal-pico
-########################################################
-lib_LIBRARIES = libmetal.a libmetal-pico.a $(am__append_1)
+lib_LIBRARIES = libmetal.a $(am__append_1) $(am__append_2)
 libmetal_a_SOURCES = \
 	src/drivers/fixed-clock.c \
 	src/drivers/fixed-factor-clock.c \
@@ -543,14 +549,6 @@ libmetal_a_SOURCES = \
 	src/vector.S \
 	src/watchdog.c
 
-libmetal_pico_a_SOURCES = \
-	gloss/crt0.S \
-	pico/iob.c \
-	gloss/sys_exit.c \
-	pico/times.c \
-	gloss/sys_sbrk.c \
-	pico/sysconf.c
-
 @WITH_BUILTIN_LIBGLOSS_TRUE@libmetal_gloss_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.c \
@@ -585,6 +583,14 @@ libmetal_pico_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_utime.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.c
+
+@WITH_BUILTIN_LIBGLOSS_FALSE@libmetal_pico_a_SOURCES = \
+@WITH_BUILTIN_LIBGLOSS_FALSE@        gloss/crt0.S \
+@WITH_BUILTIN_LIBGLOSS_FALSE@        pico/iob.c \
+@WITH_BUILTIN_LIBGLOSS_FALSE@        gloss/sys_exit.c \
+@WITH_BUILTIN_LIBGLOSS_FALSE@        pico/times.c \
+@WITH_BUILTIN_LIBGLOSS_FALSE@        gloss/sys_sbrk.c \
+@WITH_BUILTIN_LIBGLOSS_FALSE@        pico/sysconf.c
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -732,6 +738,23 @@ libmetal-gloss.a: $(libmetal_gloss_a_OBJECTS) $(libmetal_gloss_a_DEPENDENCIES) $
 	$(AM_V_at)-rm -f libmetal-gloss.a
 	$(AM_V_AR)$(libmetal_gloss_a_AR) libmetal-gloss.a $(libmetal_gloss_a_OBJECTS) $(libmetal_gloss_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libmetal-gloss.a
+pico/$(am__dirstamp):
+	@$(MKDIR_P) pico
+	@: > pico/$(am__dirstamp)
+pico/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) pico/$(DEPDIR)
+	@: > pico/$(DEPDIR)/$(am__dirstamp)
+pico/iob.$(OBJEXT): pico/$(am__dirstamp) \
+	pico/$(DEPDIR)/$(am__dirstamp)
+pico/times.$(OBJEXT): pico/$(am__dirstamp) \
+	pico/$(DEPDIR)/$(am__dirstamp)
+pico/sysconf.$(OBJEXT): pico/$(am__dirstamp) \
+	pico/$(DEPDIR)/$(am__dirstamp)
+
+libmetal-pico.a: $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_DEPENDENCIES) $(EXTRA_libmetal_pico_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libmetal-pico.a
+	$(AM_V_AR)$(libmetal_pico_a_AR) libmetal-pico.a $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libmetal-pico.a
 src/drivers/$(am__dirstamp):
 	@$(MKDIR_P) src/drivers
 	@: > src/drivers/$(am__dirstamp)
@@ -852,29 +875,6 @@ libmetal.a: $(libmetal_a_OBJECTS) $(libmetal_a_DEPENDENCIES) $(EXTRA_libmetal_a_
 	$(AM_V_at)-rm -f libmetal.a
 	$(AM_V_AR)$(libmetal_a_AR) libmetal.a $(libmetal_a_OBJECTS) $(libmetal_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libmetal.a
-pico/$(am__dirstamp):
-	@$(MKDIR_P) pico
-	@: > pico/$(am__dirstamp)
-pico/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) pico/$(DEPDIR)
-	@: > pico/$(DEPDIR)/$(am__dirstamp)
-gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
-	gloss/$(DEPDIR)/$(am__dirstamp)
-pico/iob.$(OBJEXT): pico/$(am__dirstamp) \
-	pico/$(DEPDIR)/$(am__dirstamp)
-gloss/sys_exit.$(OBJEXT): gloss/$(am__dirstamp) \
-	gloss/$(DEPDIR)/$(am__dirstamp)
-pico/times.$(OBJEXT): pico/$(am__dirstamp) \
-	pico/$(DEPDIR)/$(am__dirstamp)
-gloss/sys_sbrk.$(OBJEXT): gloss/$(am__dirstamp) \
-	gloss/$(DEPDIR)/$(am__dirstamp)
-pico/sysconf.$(OBJEXT): pico/$(am__dirstamp) \
-	pico/$(DEPDIR)/$(am__dirstamp)
-
-libmetal-pico.a: $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_DEPENDENCIES) $(EXTRA_libmetal_pico_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libmetal-pico.a
-	$(AM_V_AR)$(libmetal_pico_a_AR) libmetal-pico.a $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libmetal-pico.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -919,10 +919,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_utime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/crt0.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/exit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/iob.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/sysconf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/times.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@

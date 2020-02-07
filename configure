@@ -1358,7 +1358,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-bultin-libgloss  Build libgloss along with Metal
+  --with-builtin-libgloss Build libgloss along with Metal
   --with-machine-header=PATH
                           Path to the machine header file
   --with-machine-inline=PATH

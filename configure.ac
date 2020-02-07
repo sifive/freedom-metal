@@ -31,7 +31,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
 ########################################################
 
 AC_ARG_WITH([builtin-libgloss],
-    [AS_HELP_STRING([--with-bultin-libgloss], [Build libgloss along with Metal])],
+    [AS_HELP_STRING([--with-builtin-libgloss], [Build libgloss along with Metal])],
     [with_builtin_libgloss="yes"],
     [with_builtin_libgloss="no"]
 )
