@@ -133,7 +133,7 @@ global def runFreedomMetalInstall options =
   def libDir = "{outputDir}/lib"
   MachineExecutionEnvironment includeDir libDir libmetal libmetalGloss options makeOutputs
 
-def freedomMetalBuildTarget =
+global def freedomMetalBuildTarget =
   baseBuildTargetPlan "freedom-metal"
   | dependsOn "ARCH" jString
   | dependsOn "ABI" jString
@@ -185,3 +185,6 @@ def freedomMetalBuildTarget =
     "outputs" → bArray (map bPath metal.getMachineExecutionEnvironmentAllOutputs),
     Nil
   ))
+  | makeBuildTarget
+
+publish buildTargets = freedomMetalBuildTarget, Nil
