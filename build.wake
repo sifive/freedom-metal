@@ -132,3 +132,56 @@ global def runFreedomMetalInstall options =
   def includeDir = "{outputDir}/include"
   def libDir = "{outputDir}/lib"
   MachineExecutionEnvironment includeDir libDir libmetal libmetalGloss options makeOutputs
+
+def freedomMetalBuildTarget =
+  baseBuildTargetPlan "freedom-metal"
+  | dependsOn "ARCH" jString
+  | dependsOn "ABI" jString
+  | dependsOn "CMODEL" jString
+  | dependsOn "host" jString
+  | dependsOnFn "machineHeader" (_)
+  | dependsOnFn "machineInlineHeader" (_)
+  | dependsOnFn "platformHeader" (_)
+  | dependsOnFn "machineLdScript" (_)
+  | dependsOn "resources" (jArrayMap jString)
+  | definedAs (
+    \arch
+    \abi
+    \cmodel
+    \host
+    \machineHeader
+    \machineInlineHeader
+    \platformHeader
+    \ldScript
+    \resources
+    \buildInputs
+    match buildInputs.getBuildTargetInputsOutputDir
+      None = Fail "no target directory specified".makeError
+      Some outputDir =
+        def metal =
+          makeFreedomMetalConfigureOptions
+          arch
+          abi
+          cmodel
+          host
+          outputDir
+          "dontcare-name"
+          machineHeader
+          machineInlineHeader
+          platformHeader
+          ldScript
+          | setFreedomMetalConfigureOptionsResources resources
+          | runFreedomMetalInstall
+        metal
+        | getMachineExecutionEnvironmentAllOutputs
+        | findFailFn getPathResult
+        | rmap (\_ metal)
+  )
+  | exports (\metal bObject (
+    "libMetal" → bPath metal.getMachineExecutionEnvironmentLibMetal,
+    "libMetalGloss" → bPath metal.getMachineExecutionEnvironmentLibMetalGloss,
+    "includeDir" → bJValue (JString metal.getMachineExecutionEnvironmentIncludeDir),
+    "libDir" → bJValue (JString metal.getMachineExecutionEnvironmentLibDir),
+    "outputs" → bArray (map bPath metal.getMachineExecutionEnvironmentAllOutputs),
+    Nil
+  ))
