@@ -244,9 +244,17 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 libmetal_pico_a_AR = $(AR) $(ARFLAGS)
 libmetal_pico_a_LIBADD =
+
+ifeq ($(RISCV_LIBC),nano)
+am_libmetal_pico_a_OBJECTS = gloss/crt0.$(OBJEXT) \
+	gloss/sys_exit.$(OBJEXT) gloss/sys_sbrk.$(OBJEXT)
+endif
+ifeq ($(RISCV_LIBC),picolibc)
 am_libmetal_pico_a_OBJECTS = gloss/crt0.$(OBJEXT) \
 	pico/iob.$(OBJEXT) gloss/sys_exit.$(OBJEXT) pico/times.$(OBJEXT) \
 	gloss/sys_sbrk.$(OBJEXT) pico/sysconf.$(OBJEXT)
+endif
+
 libmetal_pico_a_OBJECTS =  \
 	$(am_libmetal_pico_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -541,14 +549,14 @@ libmetal_a_SOURCES = \
 	src/tty.c \
 	src/uart.c \
 	src/vector.S \
-	src/watchdog.c
+	src/watchdog.c \
+	gloss/crt0.S \
+	gloss/sys_exit.c \
+	gloss/sys_sbrk.c 
 
 libmetal_pico_a_SOURCES = \
-	gloss/crt0.S \
 	pico/iob.c \
-	gloss/sys_exit.c \
 	pico/times.c \
-	gloss/sys_sbrk.c \
 	pico/sysconf.c
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libmetal_gloss_a_SOURCES = \
