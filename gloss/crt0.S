@@ -203,7 +203,7 @@ _skip_init:
   and  a5, a5, a4
   beqz a5, 1f
   csrr a5, mstatus
-  lui  a4, 0x800 /* set METAL_MSTATUS_VS_INIT */
+  li  a4, 0x200 /* set METAL_MSTATUS_VS_INIT */
   or   a5, a5, a4
   csrw mstatus, a5
   csrwi fcsr, 0
