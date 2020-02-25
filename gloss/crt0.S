@@ -190,10 +190,10 @@ _skip_init:
   /* Check for vector extension support and enable it if found */
   csrr a5, misa
   li a4, 0x200000
-  andi a5, a5, a4
-  beqz a5, 1
+  and a5, a5, a4
+  beqz a5, 1f
   csrr a5, mstatus
-  ori a5, 0x200
+  ori a5, a5, 0x200
   csrw mstatus, a5
 1:
 

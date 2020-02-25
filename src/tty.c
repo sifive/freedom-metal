@@ -36,12 +36,17 @@ METAL_CONSTRUCTOR(metal_tty_init) {
     metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE, __METAL_DT_STDOUT_UART_BAUD);
 }
 #else
-/* This implementation of putc doesn't actually do anything, it's just there to
- * provide a shim that eats all the characters so we can ensure that everything
- * can link to metal_tty_putc. */
-int nop_putc(int c) __attribute__((section(".text.metal.nop.putc")));
-int nop_putc(int c) { return -1; }
-int metal_tty_putc(int c) __attribute__((weak, alias("nop_putc")));
+/* This implementation of putc performs a very particular nop, which can be
+ * found in RTL simulation commit logs (using the default rocket-chip pipeline
+ * output).  Its RS1 register source contains the (hex) value of character c.
+ */
+int rtl_putc(int c) __attribute__((section(".text.metal.nop.putc")));
+int rtl_putc(int c) {
+    register unsigned long y asm ("a0") = (unsigned long) c;
+    asm volatile ("andi x0, %0, 0x99" : : "r" (y));
+    return 0;
+}
+int metal_tty_putc(int c) __attribute__((weak, alias("rtl_putc")));
 #pragma message(                                                               \
     "There is no default output device, metal_tty_putc() will throw away all input.")
 #endif
