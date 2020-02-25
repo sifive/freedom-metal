@@ -187,6 +187,16 @@ _skip_init:
   csrwi fcsr, 0
 1:
 
+  /* Check for vector extension support and enable it if found */
+  csrr a5, misa
+  li a4, 0x200000
+  andi a5, a5, a4
+  beqz a5, 1
+  csrr a5, mstatus
+  ori a5, 0x200
+  csrw mstatus, a5
+1:
+
   /* This is a C runtime, so main() is defined to have some arguments.  Since
    * there's nothing sane the METAL can pass we don't bother with that but
    * instead just setup as close to a NOP as we can. */
