@@ -1,4 +1,4 @@
-/* Copyright 2019 SiFive, Inc */
+/* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #ifndef METAL__PWM_H
@@ -33,7 +33,8 @@ struct metal_pwm_vtable {
                     metal_pwm_phase_correct_t phase_corr);
     unsigned int (*get_duty)(struct metal_pwm *pwm, unsigned int idx);
     unsigned int (*get_freq)(struct metal_pwm *pwm, unsigned int idx);
-    int (*trigger)(struct metal_pwm *pwm, unsigned int idx, metal_pwm_run_mode_t mode);
+    int (*trigger)(struct metal_pwm *pwm, unsigned int idx,
+                   metal_pwm_run_mode_t mode);
     int (*stop)(struct metal_pwm *pwm, unsigned int idx);
     int (*cfg_interrupt)(struct metal_pwm *pwm, metal_pwm_interrupt_t flag);
     int (*clr_interrupt)(struct metal_pwm *pwm, unsigned int idx);
@@ -110,7 +111,8 @@ inline unsigned int metal_pwm_get_freq(struct metal_pwm *pwm,
  * @param pwm PWM device handle.
  * @param idx PWM channel id.
  * @return 0 If no error.*/
-inline int metal_pwm_trigger(struct metal_pwm *pwm, unsigned int idx, metal_pwm_run_mode_t mode) {
+inline int metal_pwm_trigger(struct metal_pwm *pwm, unsigned int idx,
+                             metal_pwm_run_mode_t mode) {
     return pwm->vtable->trigger(pwm, idx, mode);
 }
 

@@ -1,4 +1,4 @@
-/* Copyright 2019 SiFive, Inc */
+/* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/machine/platform.h>
@@ -21,7 +21,7 @@
 #define METAL_PWMCFG_ENONESHOT (1UL << 13)
 #define METAL_PWMCFG_CMPCENTER(x) (1UL << (16 + x))
 #define METAL_PWMCFG_CMPIP(x) (1UL << (28 + x))
-#define METAL_SIFIVE_PWM0_PWMCMP(x) METAL_SIFIVE_PWM0_PWMCMP0 + x * 4
+#define METAL_SIFIVE_PWM0_PWMCMP(x) (METAL_SIFIVE_PWM0_PWMCMP0 + (x * 4))
 
 /* Macros to access registers */
 #define METAL_PWM_REG(offset) ((base + offset))
@@ -40,11 +40,13 @@
 #error *** Unsupported endianess ***
 #endif
 
+#if (METAL_MAX_PWM0_NCMP > METAL_MAX_PWM_CHANNELS)
+#error *** METAL_MAX_PWM_CHANNELS exceeded ***
+#endif
+
 /* Return values */
 #define METAL_PWM_RET_OK 0
 #define METAL_PWM_RET_ERR -1
-
-#define METAL_PWM_DEBUG
 
 static void pre_rate_change_callback(void *priv) {
     struct metal_pwm *gpwm = priv;
@@ -172,8 +174,8 @@ static int __metal_driver_sifive_pwm0_set_freq(struct metal_pwm *gpwm,
 
 #if defined(METAL_PWM_DEBUG)
         printf("PWM requested freq:%u set freq:%u \n", freq, pwm->freq);
-        printf("CPU Clk:%u Prescale:%u Count:%u \n", clock_rate,
-                      prescale, count);
+        printf("CPU Clk:%u Prescale:%u Count:%u \n", clock_rate, prescale,
+               count);
 #endif
     }
     return ret;
@@ -222,12 +224,12 @@ static unsigned int __metal_driver_sifive_pwm0_get_duty(struct metal_pwm *gpwm,
     return duty;
 }
 
-static unsigned int
-__metal_driver_sifive_pwm0_get_freq(struct metal_pwm *gpwm, unsigned int idx) {
+static unsigned int __metal_driver_sifive_pwm0_get_freq(struct metal_pwm *gpwm,
+                                                        unsigned int idx) {
     struct __metal_driver_sifive_pwm0 *pwm = (void *)gpwm;
     unsigned int freq = 0;
 
-    (void)idx;/* Unused parameter, no support for per channel frequency */
+    (void)idx; /* Unused parameter, no support for per channel frequency */
 
     /* Check for valid parameters and get configured PWM frequency value */
     if (pwm != NULL) {
@@ -242,7 +244,7 @@ static int __metal_driver_sifive_pwm0_trigger(struct metal_pwm *gpwm,
     unsigned long base = __metal_driver_sifive_pwm0_control_base(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
-    (void)idx;/* Unused parameter,for later use */
+    (void)idx; /* Unused parameter,for later use */
 
     if (base != 0) {
         /* Configure for requested PWM run mode */
@@ -265,7 +267,7 @@ static int __metal_driver_sifive_pwm0_stop(struct metal_pwm *gpwm,
     unsigned long base = __metal_driver_sifive_pwm0_control_base(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
-    (void)idx;/* Unused parameter,for later use */
+    (void)idx; /* Unused parameter,for later use */
 
     if (base != 0) {
         /* Disable always running mode */
