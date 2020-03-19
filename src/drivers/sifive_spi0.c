@@ -82,19 +82,19 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi,
     /* Set Polarity */
     if (config->polarity) {
         METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |=
-            (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+            (1 << METAL_SPI_SCKMODE_POL_SHIFT);
     } else {
         METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
-            ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+            ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
     }
 
     /* Set Phase */
     if (config->phase) {
         METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |=
-            (1 << METAL_SPI_SCKMODE_POL_SHIFT);
+            (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
     } else {
         METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
-            ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
+            ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
     }
 
     /* Set Endianness */
@@ -123,7 +123,7 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi,
     }
 
     /* Set CS line */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = 1 << (config->csid);
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = config->csid;
 
     /* Toggle off memory-mapped SPI flash mode, toggle on programmable IO mode
      * It seems that with this line uncommented, the debugger cannot have access
