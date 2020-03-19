@@ -260,7 +260,7 @@ static int __metal_driver_sifive_i2c0_write(struct metal_i2c *i2c,
         }
 
     } else {
-        /* Write address failed */
+        /* I2C device not initialized, return error */
         METAL_I2C_LOG("I2C device not initialized.\n");
         ret = METAL_I2C_RET_ERR;
     }

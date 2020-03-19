@@ -100,7 +100,7 @@ int __metal_driver_sifive_gpio0_enable_io(struct metal_gpio *ggpio, long source,
     long base = __metal_driver_sifive_gpio0_base(ggpio);
 
     __METAL_ACCESS_ONCE(
-        (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO0_IOF_SEL)) &= ~source;
+        (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO0_IOF_SEL)) |= source;
     __METAL_ACCESS_ONCE((__metal_io_u32 *)(base + METAL_SIFIVE_GPIO0_IOF_EN)) |=
         dest;
 
