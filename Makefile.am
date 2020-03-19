@@ -81,6 +81,7 @@ nobase_include_HEADERS += \
 	metal/privilege.h \
 	metal/pwm.h\
 	metal/rtc.h \
+	metal/semihosting.h \
 	metal/shutdown.h \
 	metal/spi.h \
 	metal/switch.h \
@@ -181,6 +182,7 @@ libmetal_gloss_a_SOURCES = \
 	gloss/sys_fstat.c \
 	gloss/sys_fstatat.c \
 	gloss/sys_ftime.c \
+	gloss/sys_getcmdline.c \
 	gloss/sys_getcwd.c \
 	gloss/sys_getpid.c \
 	gloss/sys_gettimeofday.c \
