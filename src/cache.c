@@ -132,7 +132,7 @@ int metal_icache_l1_available(int hartid) {
 void metal_dcache_l1_flush(int hartid, uintptr_t address) {
     if (metal_dcache_l1_available(hartid)) {
         if (address) {
-            uintptr_t ms1, ms2;
+            uintptr_t ms1 = 0, ms2 = 0;
             __asm__ __volatile__("csrr %0, mtvec \n\t"
                                  "la %1, 1f \n\t"
                                  "csrw mtvec, %1 \n\t"
