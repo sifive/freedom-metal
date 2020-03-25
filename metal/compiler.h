@@ -15,6 +15,9 @@
 #define __METAL_SET_FIELD(reg, mask, val)                                      \
     (((reg) & ~(mask)) | (((val) * ((mask) & ~((mask) << 1))) & (mask)))
 
+#define __METAL_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define __METAL_MAX(a, b) ((a) > (b) ? (a) : (b))
+
 void _metal_trap(int ecode);
 
 #endif

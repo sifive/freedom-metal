@@ -92,6 +92,10 @@ struct metal_interrupt_vtable {
                                            int id);
     int (*interrupt_set_priority)(struct metal_interrupt *controller, int id,
                                   unsigned int priority);
+    unsigned int (*interrupt_get_preemptive_level)(
+        struct metal_interrupt *controller, int id);
+    int (*interrupt_set_preemptive_level)(struct metal_interrupt *controller,
+                                          int id, unsigned int level);
     int (*command_request)(struct metal_interrupt *controller, int cmd,
                            void *data);
     int (*mtimecmp_set)(struct metal_interrupt *controller, int hartid,
@@ -317,6 +321,35 @@ __inline__ int metal_interrupt_set_priority(struct metal_interrupt *controller,
 __inline__ unsigned int
 metal_interrupt_get_priority(struct metal_interrupt *controller, int id) {
     return controller->vtable->interrupt_get_priority(controller, id);
+}
+
+/*!
+ * @brief Set preemptive level and priority for a given interrupt ID
+ *
+ * Set the preemptive level and priority for a given interrupt ID.
+ *
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to enable
+ * @param level The interrupt level and priority are encoded together
+ * @return 0 upon success
+ */
+__inline__ int
+metal_interrupt_set_preemptive_level(struct metal_interrupt *controller, int id,
+                                     unsigned int level) {
+    return controller->vtable->interrupt_set_preemptive_level(controller, id,
+                                                              level);
+}
+
+/*!
+ * @brief Get an interrupt preemptive level
+ * @param controller The handle for the interrupt controller
+ * @param id The interrupt ID to enable
+ * @return The interrupt level
+ */
+__inline__ unsigned int
+metal_interrupt_get_preemptive_level(struct metal_interrupt *controller,
+                                     int id) {
+    return controller->vtable->interrupt_get_preemptive_level(controller, id);
 }
 
 /*!
