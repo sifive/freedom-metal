@@ -87,11 +87,4 @@ void metal_dcache_l1_discard(int hartid, uintptr_t address);
  */
 int metal_icache_l1_available(int hartid);
 
-/*!
- * @brief Flush icache for L1 on the requested core
- * @param hartid  The core to flush
- * @return None
- */
-void metal_icache_l1_flush(int hartid);
-
 #endif
