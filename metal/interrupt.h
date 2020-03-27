@@ -336,8 +336,11 @@ metal_interrupt_get_priority(struct metal_interrupt *controller, int id) {
 __inline__ int
 metal_interrupt_set_preemptive_level(struct metal_interrupt *controller, int id,
                                      unsigned int level) {
-    return controller->vtable->interrupt_set_preemptive_level(controller, id,
-                                                              level);
+    if (controller->vtable->interrupt_set_preemptive_level)
+        return controller->vtable->interrupt_set_preemptive_level(controller,
+                                                                  id, level);
+    else
+        return 0;
 }
 
 /*!
@@ -349,7 +352,11 @@ metal_interrupt_set_preemptive_level(struct metal_interrupt *controller, int id,
 __inline__ unsigned int
 metal_interrupt_get_preemptive_level(struct metal_interrupt *controller,
                                      int id) {
-    return controller->vtable->interrupt_get_preemptive_level(controller, id);
+    if (controller->vtable->interrupt_get_preemptive_level)
+        return controller->vtable->interrupt_get_preemptive_level(controller,
+                                                                  id);
+    else
+        return 0;
 }
 
 /*!
