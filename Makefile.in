@@ -228,6 +228,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/riscv_clint0.$(OBJEXT) \
 	src/drivers/riscv_cpu.$(OBJEXT) \
 	src/drivers/riscv_plic0.$(OBJEXT) \
+	src/drivers/sifive_buserror0.$(OBJEXT) \
 	src/drivers/sifive_ccache0.$(OBJEXT) \
 	src/drivers/sifive_clic0.$(OBJEXT) \
 	src/drivers/sifive_fe310-g000_hfrosc.$(OBJEXT) \
@@ -457,8 +458,8 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/machine/platform.h metal/drivers/fixed-clock.h \
 	metal/drivers/fixed-factor-clock.h \
 	metal/drivers/riscv_clint0.h metal/drivers/riscv_cpu.h \
-	metal/drivers/riscv_plic0.h metal/drivers/sifive_ccache0.h \
-	metal/drivers/sifive_clic0.h \
+	metal/drivers/riscv_plic0.h metal/drivers/sifive_buserror0.h \
+	metal/drivers/sifive_ccache0.h metal/drivers/sifive_clic0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
 	metal/drivers/sifive_fe310-g000_hfxosc.h \
 	metal/drivers/sifive_fe310-g000_lfrosc.h \
@@ -501,6 +502,7 @@ libmetal_a_SOURCES = \
 	src/drivers/riscv_clint0.c \
 	src/drivers/riscv_cpu.c \
 	src/drivers/riscv_plic0.c \
+	src/drivers/sifive_buserror0.c \
 	src/drivers/sifive_ccache0.c \
 	src/drivers/sifive_clic0.c \
 	src/drivers/sifive_fe310-g000_hfrosc.c \
@@ -778,6 +780,8 @@ src/drivers/riscv_cpu.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/riscv_plic0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/sifive_buserror0.$(OBJEXT): src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_ccache0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_clic0.$(OBJEXT): src/drivers/$(am__dirstamp) \
@@ -964,6 +968,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_clint0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_cpu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_plic0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_buserror0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_ccache0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_clic0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fe310-g000_hfrosc.Po@am__quote@
