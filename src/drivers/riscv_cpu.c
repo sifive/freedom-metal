@@ -149,6 +149,8 @@ metal_timer_interrupt_vector_handler(void) {
     __METAL_IRQ_VECTOR_HANDLER(METAL_INTERRUPT_ID_TMR);
 }
 
+void __metal_default_beu_handler(int id, void *priv) {}
+
 void __metal_default_timer_handler(int id, void *priv) {
     struct metal_cpu *cpu = __metal_driver_cpu_get(__metal_myhart_id());
     unsigned long long time = __metal_driver_cpu_mtime_get(cpu);
@@ -181,6 +183,11 @@ void __metal_exception_handler(void) {
             __metal_driver_cpu_interrupt_controller((struct metal_cpu *)cpu);
         id = mcause & METAL_MCAUSE_CAUSE;
         if (mcause & METAL_MCAUSE_INTR) {
+            if (id == METAL_INTERRUPT_ID_BEU) {
+                priv = intc->metal_int_beu.exint_data;
+                intc->metal_int_beu.handler(id, priv);
+                return;
+            }
             if ((id < METAL_INTERRUPT_ID_CSW) ||
                 ((mtvec & METAL_MTVEC_MASK) == METAL_MTVEC_DIRECT)) {
                 priv = intc->metal_int_table[id].exint_data;
@@ -357,6 +364,7 @@ int __metal_valid_interrupt_id(int id) {
     case METAL_INTERRUPT_ID_LC13:
     case METAL_INTERRUPT_ID_LC14:
     case METAL_INTERRUPT_ID_LC15:
+    case METAL_INTERRUPT_ID_BEU:
         return 1;
     default:
         break;
@@ -483,10 +491,21 @@ int __metal_driver_riscv_cpu_controller_interrupt_register(
     if (!__metal_valid_interrupt_id(id)) {
         return -11;
     }
+    if ((id == METAL_INTERRUPT_ID_BEU) &&
+        (__metal_controller_interrupt_vector_mode() != METAL_DIRECT_MODE)) {
+        /* Only allow registration of the bus error unit interrupt if
+         * interrupt vectoring if off */
+        return -13;
+    }
 
     if (isr) {
-        intc->metal_int_table[id].handler = isr;
-        intc->metal_int_table[id].exint_data = priv;
+        if (id == METAL_INTERRUPT_ID_BEU) {
+            intc->metal_int_beu.handler = isr;
+            intc->metal_int_beu.exint_data = priv;
+        } else {
+            intc->metal_int_table[id].handler = isr;
+            intc->metal_int_table[id].exint_data = priv;
+        }
     } else {
         switch (id) {
         case METAL_INTERRUPT_ID_SW:
@@ -496,6 +515,10 @@ int __metal_driver_riscv_cpu_controller_interrupt_register(
         case METAL_INTERRUPT_ID_TMR:
             intc->metal_int_table[id].handler = __metal_default_timer_handler;
             intc->metal_int_table[id].sub_int = priv;
+            break;
+        case METAL_INTERRUPT_ID_BEU:
+            intc->metal_int_beu.handler = __metal_default_beu_handler;
+            intc->metal_int_beu.exint_data = priv;
             break;
         case METAL_INTERRUPT_ID_EXT:
         case METAL_INTERRUPT_ID_LC0:
@@ -808,6 +831,10 @@ int __metal_driver_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t mepc) {
     return 0;
 }
 
+struct metal_buserror *__metal_driver_cpu_get_buserror(struct metal_cpu *cpu) {
+    return __metal_driver_cpu_buserror(cpu);
+}
+
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
     .controller_vtable.interrupt_init =
         __metal_driver_riscv_cpu_controller_interrupt_init,
@@ -845,4 +872,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_cpu) = {
     .cpu_vtable.get_ilen = __metal_driver_cpu_get_instruction_length,
     .cpu_vtable.get_epc = __metal_driver_cpu_get_exception_pc,
     .cpu_vtable.set_epc = __metal_driver_cpu_set_exception_pc,
+    .cpu_vtable.get_buserror = __metal_driver_cpu_get_buserror,
 };
