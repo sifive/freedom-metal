@@ -126,6 +126,10 @@ _start:
 #endif
 2:
 
+  /* Set TLS pointer */
+  .weak __tls_base	
+  la tp, __tls_base
+
   /* At this point we're in an environment that can execute C code.  The first
    * thing to do is to make the callback to the parent environment if it's been
    * requested to do so. */
