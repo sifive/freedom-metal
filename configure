@@ -591,6 +591,8 @@ LIBOBJS
 PLATFORM_HEADER
 MACHINE_INLINE
 MACHINE_HEADER
+WITH_BUILTIN_LIBMETAL_PICO_FALSE
+WITH_BUILTIN_LIBMETAL_PICO_TRUE
 WITH_BUILTIN_LIBGLOSS_FALSE
 WITH_BUILTIN_LIBGLOSS_TRUE
 am__fastdepCCAS_FALSE
@@ -702,6 +704,7 @@ enable_silent_rules
 enable_maintainer_mode
 enable_dependency_tracking
 with_builtin_libgloss
+with_builtin_libmetal_pico
 with_machine_header
 with_machine_inline
 with_platform_header
@@ -1359,6 +1362,8 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-bultin-libgloss  Build libgloss along with Metal
+  --with-bultin-libmetal-pico
+                          Build libmetal-pico along with Metal
   --with-machine-header=PATH
                           Path to the machine header file
   --with-machine-inline=PATH
@@ -4038,6 +4043,16 @@ fi
 
 
 
+# Check whether --with-builtin-libmetal-pico was given.
+if test "${with_builtin_libmetal_pico+set}" = set; then :
+  withval=$with_builtin_libmetal_pico; with_builtin_libmetal_pico="yes"
+else
+  with_builtin_libmetal_pico="no"
+
+fi
+
+
+
 # Check whether --with-machine-header was given.
 if test "${with_machine_header+set}" = set; then :
   withval=$with_machine_header;
@@ -4077,6 +4092,15 @@ fi
 else
   WITH_BUILTIN_LIBGLOSS_TRUE='#'
   WITH_BUILTIN_LIBGLOSS_FALSE=
+fi
+
+
+ if test "x$with_builtin_libmetal_pico" = "xyes"; then
+  WITH_BUILTIN_LIBMETAL_PICO_TRUE=
+  WITH_BUILTIN_LIBMETAL_PICO_FALSE='#'
+else
+  WITH_BUILTIN_LIBMETAL_PICO_TRUE='#'
+  WITH_BUILTIN_LIBMETAL_PICO_FALSE=
 fi
 
 
@@ -4296,6 +4320,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_BUILTIN_LIBGLOSS_TRUE}" && test -z "${WITH_BUILTIN_LIBGLOSS_FALSE}"; then
   as_fn_error $? "conditional \"WITH_BUILTIN_LIBGLOSS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WITH_BUILTIN_LIBMETAL_PICO_TRUE}" && test -z "${WITH_BUILTIN_LIBMETAL_PICO_FALSE}"; then
+  as_fn_error $? "conditional \"WITH_BUILTIN_LIBMETAL_PICO\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

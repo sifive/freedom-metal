@@ -36,6 +36,12 @@ AC_ARG_WITH([builtin-libgloss],
     [with_builtin_libgloss="no"]
 )
 
+AC_ARG_WITH([builtin-libmetal-pico],
+    [AS_HELP_STRING([--with-bultin-libmetal-pico], [Build libmetal-pico along with Metal])],
+    [with_builtin_libmetal_pico="yes"],
+    [with_builtin_libmetal_pico="no"]
+)
+
 AC_ARG_WITH([machine-header],
     [AS_HELP_STRING([--with-machine-header=PATH], [Path to the machine header file])],
     [],
@@ -59,6 +65,8 @@ AC_ARG_WITH([platform-header],
 ########################################################
 
 AM_CONDITIONAL([WITH_BUILTIN_LIBGLOSS], [test "x$with_builtin_libgloss" = "xyes"])
+
+AM_CONDITIONAL([WITH_BUILTIN_LIBMETAL_PICO], [test "x$with_builtin_libmetal_pico" = "xyes"])
 
 # Configure the build system to pass in the preconfigured machine support files
 AS_IF([test "x$with_machine_header" != "xno"],
