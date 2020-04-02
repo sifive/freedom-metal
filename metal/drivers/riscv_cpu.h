@@ -121,6 +121,7 @@ typedef enum {
     METAL_INTERRUPT_ID_LCMX,
     METAL_INTERRUPT_ID_GL0 = METAL_INTERRUPT_ID_LCMX,
     METAL_INTERRUPT_ID_GLMX = (METAL_MCAUSE_CAUSE + 1),
+    METAL_INTERRUPT_ID_BEU = 128,
 } metal_interrupt_id_e;
 
 typedef enum {
@@ -176,6 +177,7 @@ struct __metal_driver_riscv_cpu_intc {
     int init_done;
     uintptr_t metal_mtvec_table[METAL_MAX_MI];
     __metal_interrupt_data metal_int_table[METAL_MAX_MI];
+    __metal_interrupt_data metal_int_beu;
     metal_exception_handler_t metal_exception_table[METAL_MAX_ME];
 };
 

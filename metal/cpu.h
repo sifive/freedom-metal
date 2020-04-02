@@ -37,6 +37,7 @@ struct metal_cpu_vtable {
     int (*get_ilen)(struct metal_cpu *cpu, uintptr_t epc);
     uintptr_t (*get_epc)(struct metal_cpu *cpu);
     int (*set_epc)(struct metal_cpu *cpu, uintptr_t epc);
+    struct metal_buserror *(*get_buserror)(struct metal_cpu *cpu);
 };
 
 /*! @brief A device handle for a CPU hart
@@ -290,6 +291,17 @@ __inline__ uintptr_t metal_cpu_get_exception_pc(struct metal_cpu *cpu) {
 __inline__ int metal_cpu_set_exception_pc(struct metal_cpu *cpu,
                                           uintptr_t epc) {
     return cpu->vtable->set_epc(cpu, epc);
+}
+
+/*!
+ * @brief Get the handle for the hart's bus error unit
+ *
+ * @param cpu The CPU device handle
+ * @return A pointer to the bus error unit handle
+ */
+__inline__ struct metal_buserror *
+metal_cpu_get_buserror(struct metal_cpu *cpu) {
+    return cpu->vtable->get_buserror(cpu);
 }
 
 #endif

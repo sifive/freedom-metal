@@ -38,6 +38,7 @@ nobase_include_HEADERS += \
 	metal/drivers/riscv_clint0.h \
 	metal/drivers/riscv_cpu.h \
 	metal/drivers/riscv_plic0.h \
+	metal/drivers/sifive_buserror0.h \
 	metal/drivers/sifive_ccache0.h \
 	metal/drivers/sifive_clic0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
@@ -103,6 +104,7 @@ libmetal_a_SOURCES = \
 	src/drivers/riscv_clint0.c \
 	src/drivers/riscv_cpu.c \
 	src/drivers/riscv_plic0.c \
+	src/drivers/sifive_buserror0.c \
 	src/drivers/sifive_ccache0.c \
 	src/drivers/sifive_clic0.c \
 	src/drivers/sifive_fe310-g000_hfrosc.c \
