@@ -160,6 +160,9 @@ libmetal_a_SOURCES = \
 # libmetal-pico
 ########################################################
 
+# Build support for picolibc if --with-builtin-libmetal-pico is passed to configure
+if WITH_BUILTIN_LIBMETAL_PICO
+
 lib_LIBRARIES += libmetal-pico.a
 
 libmetal_pico_a_SOURCES = \
@@ -169,6 +172,8 @@ libmetal_pico_a_SOURCES = \
 	pico/times.c \
 	gloss/sys_sbrk.c \
 	pico/sysconf.c
+
+endif # WITH_BUILTIN_LIBMETAL_PICO
 
 ########################################################
 # libgloss
