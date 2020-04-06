@@ -159,13 +159,45 @@ _skip_init:
      initializing */
   call __metal_synchronize_harts
 
-  /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
+  /* Disable and clear all interrupt sources */
+  li   a3, -1
+  csrc mie, a3
+  csrc mip, a3
+
+  /* The delegation CSRs exist if user mode interrupts (N extension) or
+   * supervisor mode (S extension) are supported */
   csrr a5, misa
-  li   a4, 0x10028
+  lui  a4, 0x42
+  and  a4, a4, a5
+  beqz a4, 1f
+  csrc mideleg, a3
+  csrc medeleg, a3
+1:
+
+  /* The satp CSR exists if supervisor mode (S extension) is supported */
+  lui  a4, 0x40
+  and  a4, a4, a5
+  beqz a4, 1f
+  csrc satp, a3
+1:
+
+  /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
+  li   a4, 0x10028 /* F, D, Q */
+  and  a4, a5, a4
+  beqz a4, 1f
+  csrr a4, mstatus
+  lui  a4, 0x2 /* set METAL_MSTATUS_FS_INIT */
+  or   a4, a5, a4
+  csrw mstatus, a4
+  csrwi fcsr, 0
+1:
+
+  /* Check RISC-V isa and enalbe VF bits if Vector extension architecture */
+  li  a4, 0x200000 /* V */
   and  a5, a5, a4
   beqz a5, 1f
   csrr a5, mstatus
-  lui  a4, 0x2
+  li  a4, 0x200 /* set METAL_MSTATUS_VS_INIT */
   or   a5, a5, a4
   csrw mstatus, a5
   csrwi fcsr, 0
