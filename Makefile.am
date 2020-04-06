@@ -70,6 +70,7 @@ nobase_include_HEADERS += \
 	metal/cpu.h \
 	metal/csr.h \
 	metal/gpio.h \
+	metal/hpm.h \
 	metal/i2c.h \
 	metal/init.h \
 	metal/interrupt.h \
@@ -136,6 +137,7 @@ libmetal_a_SOURCES = \
 	src/entry.S \
 	src/trap.S \
 	src/gpio.c \
+	src/hpm.c \
 	src/i2c.c \
 	src/init.c \
 	src/interrupt.c \
