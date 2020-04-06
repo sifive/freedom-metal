@@ -29,6 +29,9 @@ _metal_memory_scrub:
 .global __metal_before_start
 .type __metal_before_start, @function
 __metal_before_start:
+    /* Save caller ra */
+    mv s0, ra
+
     /* Zero out itim memory. */
     .weak metal_itim_memory_start
     .weak metal_itim_memory_end
@@ -57,4 +60,6 @@ __metal_before_start:
     la t2, metal_main_memory_end
     jal _metal_memory_scrub
 
+    /* Restore caller ra */
+    mv ra, s0
     ret
