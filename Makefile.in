@@ -211,17 +211,20 @@ am__dirstamp = $(am__leading_dot)dirstamp
 libmetal_gloss_a_OBJECTS = $(am_libmetal_gloss_a_OBJECTS)
 libmetal_pico_a_AR = $(AR) $(ARFLAGS)
 libmetal_pico_a_LIBADD =
-am__libmetal_pico_a_SOURCES_DIST = gloss/crt0.S pico/iob.c \
-	gloss/sys_exit.c pico/times.c gloss/sys_sbrk.c pico/sysconf.c \
-	gloss/sys_clock_gettime.c
+am__libmetal_pico_a_SOURCES_DIST = pico/iob.c gloss/crt0.S \
+	gloss/sys_sbrk.c gloss/sys_exit.c gloss/sys_times.c \
+	gloss/sys_sysconf.c gloss/sys_gettimeofday.c \
+	gloss/sys_clock_gettime.c gloss/sys_write.c
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@am_libmetal_pico_a_OBJECTS =  \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/crt0.$(OBJEXT) \
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/iob.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_exit.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/times.$(OBJEXT) \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/crt0.$(OBJEXT) \
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sbrk.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/sysconf.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_clock_gettime.$(OBJEXT)
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_exit.$(OBJEXT) \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_times.$(OBJEXT) \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sysconf.$(OBJEXT) \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_gettimeofday.$(OBJEXT) \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_clock_gettime.$(OBJEXT) \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_write.$(OBJEXT)
 libmetal_pico_a_OBJECTS = $(am_libmetal_pico_a_OBJECTS)
 libmetal_a_AR = $(AR) $(ARFLAGS)
 libmetal_a_LIBADD =
@@ -300,8 +303,7 @@ am__depfiles_remade = gloss/$(DEPDIR)/crt0.Po \
 	gloss/$(DEPDIR)/sys_sysconf.Po gloss/$(DEPDIR)/sys_times.Po \
 	gloss/$(DEPDIR)/sys_unlink.Po gloss/$(DEPDIR)/sys_utime.Po \
 	gloss/$(DEPDIR)/sys_wait.Po gloss/$(DEPDIR)/sys_write.Po \
-	pico/$(DEPDIR)/iob.Po pico/$(DEPDIR)/sysconf.Po \
-	pico/$(DEPDIR)/times.Po src/$(DEPDIR)/atomic.Po \
+	pico/$(DEPDIR)/iob.Po src/$(DEPDIR)/atomic.Po \
 	src/$(DEPDIR)/button.Po src/$(DEPDIR)/cache.Po \
 	src/$(DEPDIR)/clock.Po src/$(DEPDIR)/cpu.Po \
 	src/$(DEPDIR)/entry.Po src/$(DEPDIR)/gpio.Po \
@@ -624,13 +626,15 @@ libmetal_a_SOURCES = \
 	src/watchdog.c
 
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@libmetal_pico_a_SOURCES = \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/crt0.S \
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/iob.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_exit.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/times.c \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/crt0.S \
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sbrk.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/sysconf.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_clock_gettime.c
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_exit.c \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_times.c \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sysconf.c \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_gettimeofday.c \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_clock_gettime.c \
+@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_write.c
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libmetal_gloss_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
@@ -824,10 +828,6 @@ pico/$(DEPDIR)/$(am__dirstamp):
 	@: > pico/$(DEPDIR)/$(am__dirstamp)
 pico/iob.$(OBJEXT): pico/$(am__dirstamp) \
 	pico/$(DEPDIR)/$(am__dirstamp)
-pico/times.$(OBJEXT): pico/$(am__dirstamp) \
-	pico/$(DEPDIR)/$(am__dirstamp)
-pico/sysconf.$(OBJEXT): pico/$(am__dirstamp) \
-	pico/$(DEPDIR)/$(am__dirstamp)
 
 libmetal-pico.a: $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_DEPENDENCIES) $(EXTRA_libmetal_pico_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libmetal-pico.a
@@ -1004,8 +1004,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/iob.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/sysconf.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/times.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/button.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Po@am__quote@ # am--include-marker
@@ -1441,8 +1439,6 @@ distclean: distclean-am
 	-rm -f gloss/$(DEPDIR)/sys_wait.Po
 	-rm -f gloss/$(DEPDIR)/sys_write.Po
 	-rm -f pico/$(DEPDIR)/iob.Po
-	-rm -f pico/$(DEPDIR)/sysconf.Po
-	-rm -f pico/$(DEPDIR)/times.Po
 	-rm -f src/$(DEPDIR)/atomic.Po
 	-rm -f src/$(DEPDIR)/button.Po
 	-rm -f src/$(DEPDIR)/cache.Po
@@ -1583,8 +1579,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f gloss/$(DEPDIR)/sys_wait.Po
 	-rm -f gloss/$(DEPDIR)/sys_write.Po
 	-rm -f pico/$(DEPDIR)/iob.Po
-	-rm -f pico/$(DEPDIR)/sysconf.Po
-	-rm -f pico/$(DEPDIR)/times.Po
 	-rm -f src/$(DEPDIR)/atomic.Po
 	-rm -f src/$(DEPDIR)/button.Po
 	-rm -f src/$(DEPDIR)/cache.Po
