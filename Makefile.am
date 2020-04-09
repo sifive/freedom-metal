@@ -168,13 +168,15 @@ if WITH_BUILTIN_LIBMETAL_PICO
 lib_LIBRARIES += libmetal-pico.a
 
 libmetal_pico_a_SOURCES = \
-	gloss/crt0.S \
 	pico/iob.c \
-	gloss/sys_exit.c \
-	pico/times.c \
+	gloss/crt0.S \
 	gloss/sys_sbrk.c \
-	pico/sysconf.c \
-	gloss/sys_clock_gettime.c
+	gloss/sys_exit.c \
+	gloss/sys_times.c \
+	gloss/sys_sysconf.c \
+	gloss/sys_gettimeofday.c \
+	gloss/sys_clock_gettime.c \
+	gloss/sys_write.c
 
 endif # WITH_BUILTIN_LIBMETAL_PICO
 
