@@ -35,7 +35,7 @@ tuple FreedomMetalConfigureOptions =
   global PlatformHeader:      Path
   global MachineLdScript:     Path
 
-global def defaultSiFiveRISCVResources = "riscv-tools/2019.05.0", Nil
+global def defaultSiFiveRISCVResources = "riscv-tools/2019.08.0", Nil
 
 global def makeFreedomMetalConfigureOptions arch abi cmodel host outputDir name header inlineHeader platformHeader ldScript =
   def resources = defaultSiFiveRISCVResources
