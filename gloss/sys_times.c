@@ -64,3 +64,5 @@ clock_t _times(struct tms *buf) {
     buf->tms_cstime = 0;
     return buf->tms_utime = mcc;
 }
+
+extern __typeof(_times) times __attribute__((__weak__, __alias__("_times")));
