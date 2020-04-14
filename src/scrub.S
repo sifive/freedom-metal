@@ -41,55 +41,61 @@ __metal_before_start:
     bne     a5, t0, wait_scrub
 
     /* Zero out itim memory. */
-    .weak metal_itim_memory_start
-    .weak metal_itim_memory_end
-    la      t1, metal_itim_memory_start
-    la      t2, metal_itim_memory_end
+    .weak metal_itim_0_memory_start
+    .weak metal_itim_0_memory_end
+    la      t1, metal_itim_0_memory_start
+    la      t2, metal_itim_0_memory_end
+    beq     t1, t2, dtim_scrub
+    jal     _metal_memory_scrub
+    .weak metal_itim_1_memory_start
+    .weak metal_itim_1_memory_end
+    la      t1, metal_itim_1_memory_start
+    la      t2, metal_itim_1_memory_end
     beq     t1, t2, dtim_scrub
     jal     _metal_memory_scrub
 
 dtim_scrub:
     /* Zero out dtim memory. */
-    .weak metal_dtim_memory_start
-    .weak metal_dtim_memory_end
-    la      t1, metal_dtim_memory_start
-    la      t2, metal_dtim_memory_end
+    .weak metal_dtim_0_memory_start
+    .weak metal_dtim_0_memory_end
+    la      t1, metal_dtim_0_memory_start
+    la      t2, metal_dtim_0_memory_end
     beq     t1, t2, ils_scrub
     jal     _metal_memory_scrub
 
 ils_scrub:
     /* Zero out ils memory. */
-    .weak metal_ils_memory_start
-    .weak metal_ils_memory_end
-    la      t1, metal_ils_memory_start
-    la      t2, metal_ils_memory_end
+    .weak metal_ils_0_memory_start
+    .weak metal_ils_0_memory_end
+    la      t1, metal_ils_0_memory_start
+    la      t2, metal_ils_0_memory_end
     beq     t1, t2, dls_scrub
     jal     _metal_memory_scrub
 
 dls_scrub:
     /* Zero out dls memory. */
-    .weak metal_dls_memory_start
-    .weak metal_dls_memory_end
-    la      t1, metal_dls_memory_start
-    la      t2, metal_dls_memory_end
+    .weak metal_dls_0_memory_start
+    .weak metal_dls_0_memory_end
+    la      t1, metal_dls_0_memory_start
+    la      t2, metal_dls_0_memory_end
     beq     t1, t2, sram_scrub
     jal     _metal_memory_scrub
 
 sram_scrub:
     /* Zero out sram memory. */
-    .weak metal_sram_memory_start
-    .weak metal_sram_memory_end
-    la      t1, metal_sram_memory_start
-    la      t2, metal_sram_memory_end
+    .weak metal_sys_sram_0_memory_start
+    .weak metal_sys_sram_0_memory_end
+    la      t1, metal_sys_sram_0_memory_start
+    la      t2, metal_sys_sram_0_memory_end
     beq     t1, t2, memory_scrub
     jal     _metal_memory_scrub
 
 memory_scrub:
     /* Zero out main memory. */
-    .weak metal_main_memory_start
-    .weak metal_main_memory_end
-    la      t1, metal_main_memory_start
-    la      t2, metal_main_memory_end
+    .weak metal_memory_0_memory_start
+    .weak metal_memory_0_memory_end
+    la      t1, metal_memory_0_memory_start
+    la      t2, metal_memory_0_memory_end
     beq     t1, t2, done_scrub
     jal     _metal_memory_scrub
 
