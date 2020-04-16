@@ -138,7 +138,7 @@ void __metal_driver_riscv_plic0_init(struct metal_interrupt *controller) {
             /* Initialize ist parent controller, aka cpu_intc. */
             intc->vtable->interrupt_init(intc);
 
-            for (int i = 0; i < PLIC0_MAX_INTERRUPTS; i++) {
+            for (int i = 0; i < num_interrupts; i++) {
                 __metal_plic0_enable(plic, parent, i, METAL_DISABLE);
                 if (i < num_interrupts) {
                     __metal_driver_riscv_plic0_set_priority(controller, i, 0);
