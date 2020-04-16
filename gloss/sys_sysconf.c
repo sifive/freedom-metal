@@ -11,3 +11,6 @@ long _sysconf(int name) {
 
     return -1;
 }
+
+extern __typeof(_sysconf) sysconf
+    __attribute__((__weak__, __alias__("_sysconf")));
