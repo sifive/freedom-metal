@@ -1,0 +1,77 @@
+tuple MetalDependOptions =
+  global TopDTSFile:    Path
+  global OtherDTSFiles: List Path
+  global OutputFile:    String
+  global Layout:        MetalDependLayout
+
+global data MetalDependLayout =
+  # The default mode tries to strike a good balance for all use-cases.
+  # If you don't need scratchpad or ramrodata modes, use the default one.
+  METALDEPEND_DEFAULT
+  # Scratchpad mode places the entire binary contents into the memory
+  # selected by metal,ram in the chosen node.
+  METALDEPEND_SCRATCHPAD
+  # Ramrodata mode places all read-only data into writable memory under
+  # the assumption that this decreases read latency for benchmarks.
+  # Also, if the memory selected by metal,itim is large enough, this places
+  # all non-init text into the ITIM.
+  METALDEPEND_RAMRODATA
+  # This layout is used for freertos use when pmp is need, it introduce symbole
+  # and sections for memory isolation (based on defauult lds)
+  METALDEPEND_FREERTOS
+
+# Instead of copying the script sources into build/{here}, we'll just
+# execute directly out of the package directory, since nothing gets
+# modified during execution.
+#
+# The virtualenv does get placed in build/{here} by
+# addPythonRequirementsEnv, along with a copy of requirements.txt
+def generatorDir = here
+
+#######################################################################
+# makeMetalDependOptions takes the following parameters:
+#   - topDTSFile: The top-level Devicetree source file
+#   - otherDTSFiles: any other Devicetree source files included in the
+#                    hierarchy of Devicetree source files
+#   - layout: one of {METALDEPEND_DEFAULT, METALDEPEND_SCRATCHPAD,
+#                     METALDEPEND_RAMRODATA}
+#   - outputFile: A string representing the path of the output file to
+#                 produce
+#######################################################################
+global def makeMetalDependOptions topDTSFile otherDTSFiles layout outputFile =
+  MetalDependOptions topDTSFile otherDTSFiles outputFile layout
+
+global def runMetalDepend options =
+  def topDTSFile = options.getMetalDependOptionsTopDTSFile
+  def otherDTSFiles = options.getMetalDependOptionsOtherDTSFiles
+
+  def inputs =
+    # During execution, the generator needs access to both
+    # Python sources and the linker script template files
+    def generatorSources = sources here `.*\.(py|lds)`
+    def dtsSources = topDTSFile, otherDTSFiles
+    generatorSources ++ dtsSources
+
+  def outputs = options.getMetalDependOptionsOutputFile, Nil
+
+  def args =
+    def base =
+      "-d", topDTSFile.getPathName,
+      "-o", options.getMetalDependOptionsOutputFile,
+      Nil
+
+    match options.getMetalDependOptionsLayout
+      METALDEPEND_DEFAULT    = base
+      METALDEPEND_SCRATCHPAD = "--scratchpad", base
+      METALDEPEND_RAMRODATA  = "--ramrodata", base
+      METALDEPEND_FREERTOS  = "--freertos", base
+
+  makePlan (pythonCommand "{generatorDir}/metal-depend.py" args) inputs
+  | addPlanRelativePath "PYTHONPATH" generatorDir
+  | addPythonRequirementsEnv generatorDir
+  | setPlanFnOutputs (\_ outputs)
+  | runJob
+
+# This allows the python virtualenv to be created prior to running a build
+# with `wake preinstall Unit`.
+publish preinstall = (pythonRequirementsInstaller generatorDir), Nil
