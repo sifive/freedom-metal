@@ -23,9 +23,8 @@
  * timebase to be less than about 4,000,000,000,000 (4 trillion).
  */
 
-static unsigned long long inline muldiv(unsigned long long v,
-                                        unsigned long long num,
-                                        unsigned long long den) {
+static inline unsigned long long
+muldiv(unsigned long long v, unsigned long long num, unsigned long long den) {
     return (((v % den) * num) / den) + ((v / den) * num);
 }
 
