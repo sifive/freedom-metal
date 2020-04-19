@@ -190,6 +190,7 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_cpu)
 
 struct __metal_driver_cpu {
     struct metal_cpu cpu;
+    unsigned int hpm_count; /* Available HPM counters per CPU */
 };
 
 #endif
