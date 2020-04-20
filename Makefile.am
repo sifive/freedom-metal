@@ -53,6 +53,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_gpio0.h \
 	metal/drivers/sifive_i2c0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
+	metal/drivers/sifive_lpdma0.h \
 	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
 	metal/drivers/sifive_test0.h \
@@ -67,6 +68,7 @@ nobase_include_HEADERS += \
 	metal/compiler.h \
 	metal/cpu.h \
 	metal/csr.h \
+	metal/dma.h \
 	metal/gpio.h \
 	metal/i2c.h \
 	metal/init.h \
@@ -116,6 +118,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
+	src/drivers/sifive_lpdma0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
 	src/drivers/sifive_test0.c \
@@ -128,6 +131,7 @@ libmetal_a_SOURCES = \
 	src/cache.c \
 	src/clock.c \
 	src/cpu.c \
+	src/dma.c \
 	src/entry.S \
 	src/trap.S \
 	src/gpio.c \

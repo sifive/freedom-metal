@@ -229,6 +229,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/sifive_test0.$(OBJEXT) \
 	src/drivers/sifive_trace.$(OBJEXT) \
 	src/drivers/sifive_uart0.$(OBJEXT) \
+  src/drivers/sifive_lpdma0.$(OBJEXT) \
 	src/drivers/sifive_wdog0.$(OBJEXT) \
 	src/drivers/ucb_htif0.$(OBJEXT) src/atomic.$(OBJEXT) \
 	src/button.$(OBJEXT) src/cache.$(OBJEXT) src/clock.$(OBJEXT) \
@@ -239,7 +240,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/rtc.$(OBJEXT) src/shutdown.$(OBJEXT) src/spi.$(OBJEXT) \
 	src/switch.$(OBJEXT) src/synchronize_harts.$(OBJEXT) \
 	src/timer.$(OBJEXT) src/time.$(OBJEXT) src/trap.$(OBJEXT) \
-	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
+	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/dma.$(OBJEXT) src/vector.$(OBJEXT) \
 	src/watchdog.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -450,12 +451,13 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h metal/drivers/sifive_i2c0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
+  metal/drivers/sifive_lpdma0.h \
 	metal/drivers/sifive_rtc0.h metal/drivers/sifive_spi0.h \
 	metal/drivers/sifive_test0.h metal/drivers/sifive_trace.h \
 	metal/drivers/sifive_uart0.h metal/drivers/sifive_wdog0.h \
 	metal/drivers/ucb_htif0.h metal/atomic.h metal/button.h \
 	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
-	metal/csr.h metal/gpio.h metal/i2c.h metal/init.h \
+	metal/csr.h metal/dma.h metal/gpio.h metal/i2c.h metal/init.h \
 	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
 	metal/lock.h metal/memory.h metal/pmp.h metal/privilege.h \
 	metal/rtc.h metal/shutdown.h metal/spi.h metal/switch.h \
@@ -495,6 +497,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
+  src/drivers/sifive_lpdma0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
 	src/drivers/sifive_test0.c \
@@ -507,6 +510,7 @@ libmetal_a_SOURCES = \
 	src/cache.c \
 	src/clock.c \
 	src/cpu.c \
+  src/dma.c \
 	src/entry.S \
 	src/trap.S \
 	src/gpio.c \
@@ -780,6 +784,8 @@ src/drivers/sifive_trace.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_uart0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/sifive_lpdma0.$(OBJEXT): src/drivers/$(am__dirstamp) \
+  src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_wdog0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/ucb_htif0.$(OBJEXT): src/drivers/$(am__dirstamp) \
@@ -823,6 +829,7 @@ src/timer.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/time.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/tty.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/uart.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/dma.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/vector.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/watchdog.$(OBJEXT): src/$(am__dirstamp) \
