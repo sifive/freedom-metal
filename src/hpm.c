@@ -277,11 +277,10 @@ unsigned long long metal_hpm_read_counter(struct metal_cpu *gcpu,
             __asm__ __volatile__("csrr %0, mcycle" : "=r"(vl));
             __asm__ __volatile__("csrr %0, mcycleh" : "=r"(vh1));
         } while (vh != vh1);
-        break;
 #else
         __asm__ __volatile__("csrr %0, mcycle" : "=r"(vl));
-        break;
 #endif
+        break;
     case METAL_HPM_TIME:
         /* mtime is memory mapped within CLINT block,
          * Use CLINT APIs to access this register. */
@@ -295,11 +294,10 @@ unsigned long long metal_hpm_read_counter(struct metal_cpu *gcpu,
             __asm__ __volatile__("csrr %0, minstret" : "=r"(vl));
             __asm__ __volatile__("csrr %0, minstreth" : "=r"(vh1));
         } while (vh != vh1);
-        break;
 #else
         __asm__ __volatile__("csrr %0, minstret" : "=r"(vl));
-        break;
 #endif
+        break;
         METAL_HPM_HANDLE_SWITCH(METAL_HPM_GET_COUNT_REG)
 
     default:
@@ -340,8 +338,8 @@ int metal_hpm_clear_counter(struct metal_cpu *gcpu, metal_hpm_counter counter) {
         __asm__ __volatile__("csrw minstreth, zero");
 #else
         __asm__ __volatile__("csrw minstret, zero");
-        break;
 #endif
+        break;
         METAL_HPM_HANDLE_SWITCH(METAL_HPM_CLR_COUNT_REG)
 
     default:
