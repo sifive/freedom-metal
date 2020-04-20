@@ -41,4 +41,5 @@ static int metal_flush(FILE *file) { return 0; }
 static FILE __stdio =
     FDEV_SETUP_STREAM(metal_putc, metal_getc, metal_flush, _FDEV_SETUP_RW);
 
-FILE *const __iob[3] = {&__stdio, &__stdio, &__stdio};
+/* Let applications replace this if they want */
+FILE *const __iob[3] __attribute__((weak)) = {&__stdio, &__stdio, &__stdio};
