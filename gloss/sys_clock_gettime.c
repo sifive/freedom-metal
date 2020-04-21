@@ -20,8 +20,8 @@
 #endif
 
 #if !defined(mtime_interrupt_controller) &&                                    \
-    defined(__METAL_DT_RISCV_CLIC0_HANDLE)
-#define mtime_interrupt_controller __METAL_DT_RISCV_CLIC0_HANDLE
+    defined(__METAL_DT_SIFIVE_CLIC0_HANDLE)
+#define mtime_interrupt_controller __METAL_DT_SIFIVE_CLIC0_HANDLE
 #endif
 
 int clock_getres(clockid_t clk_id, struct timespec *res) {
