@@ -137,6 +137,7 @@ void metal_dcache_l1_flush(int hartid, uintptr_t address) {
                                  "la %1, 1f \n\t"
                                  "csrw mtvec, %1 \n\t"
                                  ".insn i 0x73, 0, x0, %2, -0x40 \n\t"
+                                 ".align 2\n\t"
                                  "1: \n\t"
                                  "csrw mtvec, %0 \n\t"
                                  : "+r"(ms1), "+r"(ms2)
@@ -170,11 +171,18 @@ void metal_dcache_l1_flush(int hartid, uintptr_t address) {
 void metal_dcache_l1_discard(int hartid, uintptr_t address) {
     if (metal_dcache_l1_available(hartid)) {
         if (address) {
+            uintptr_t ms1 = 0, ms2 = 0;
+            __asm__ __volatile__("csrr %0, mtvec \n\t"
+                                 "la %1, 1f \n\t"
+                                 "csrw mtvec, %1 \n\t"
+                                 ".insn i 0x73, 0, x0, %2, -0x3E \n\t"
+                                 ".align 2\n\t"
+                                 "1: \n\t"
+                                 "csrw mtvec, %0 \n\t"
+                                 : "+r"(ms1), "+r"(ms2)
+                                 : "r"(address));
             // Using ‘.insn’ pseudo directive:
             //       '.insn i opcode, func3, rd, rs1, simm12'
-            __asm__ __volatile__(".insn i 0x73, 0, x0, %0, -0x3E"
-                                 :
-                                 : "r"(address));
         } else {
             __asm__ __volatile__(".word 0xfc200073" : : : "memory");
         }
