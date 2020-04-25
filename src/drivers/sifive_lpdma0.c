@@ -30,9 +30,11 @@ int __metal_driver_sifive_lpdma0_enable_dma(struct metal_dma *gdma,
 	struct __metal_driver_sifive_lpdma0 *dma = (void *)gdma;
 	unsigned long control_base = __metal_driver_sifive_lpdma0_control_base((struct metal_dma *)gdma);
 
+	METAL_DMA_REGW(METAL_SIFIVE_LPDMA0_CONTROL) = METAL_DMA_CTL_EN;
+
 	dma_cfg = METAL_DMA_REGW(METAL_SIFIVE_LPDMA0_CONFIG);
 	integ_sram_used = __METAL_GET_FIELD(dma_cfg, METAL_DMA_INTEG_SRAM_MASK);
-	//assert(integ_sram_used == 1);
+	
 
 #if 0
     jobq_depth = METAL_DMA_REGW(METAL_SIFIVE_LPDMA0_CONFIG);
@@ -55,7 +57,7 @@ int __metal_driver_sifive_lpdma0_enable_dma(struct metal_dma *gdma,
 	gdma->jobq_depth = jobq_depth;
 	gdma->channel_count = ch_cnt_minus_1;
 
-	METAL_DMA_REGW(METAL_SIFIVE_LPDMA0_CONTROL) = METAL_DMA_CTL_EN;
+
 
 	return 0;
 }
@@ -90,6 +92,7 @@ void __metal_driver_sifive_lpdma0_setup_jobques (struct metal_dma *gdma, unsigne
 		METAL_DMA_CHAN_ENQUE_SRC_ENDPTR_REG(chan) = tempjob.src_end_ptr;
 		METAL_DMA_CHAN_ENQUE_DST_ENTPTR_REG(chan) = tempjob.dst_end_ptr;
 	}	
+	//METAL_DMA_REGW(METAL_SIFIVE_LPDMA0_CONTROL) = METAL_DMA_CTL_EN;
 }
 
 
@@ -143,18 +146,31 @@ void __metal_driver_sifive_lpdma0_chan_init (struct metal_dma *gdma,
 
 	val = METAL_DMA_CHAN_CONTROL_REG(chan);
 	METAL_DMA_CHAN_CONTROL_REG(chan) = __METAL_SET_FIELD(val, 1, 1);
+
 	while(channel_status) {
 		val = METAL_DMA_CHAN_STATUS_REG(chan);
 		channel_status = __METAL_GET_FIELD(val, METAL_DMA_CHAN_STATUS_MASK);
 	}
 }
 
+struct metal_interrupt *
+__metal_driver_sifive_lpdma0_get_interrupt(const struct metal_dma *const dma) {
+    return __metal_driver_sifive_lpdma0_interrupt_parent(dma);
+}
+
+int __metal_driver_sifive_lpdma0_get_interrupt_id(
+    const struct metal_dma *const dma) {
+    return __metal_driver_sifive_lpdma0_interrupt_line(dma);
+}
+
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_lpdma0) = {
-	.dma.dma_enable      =  __metal_driver_sifive_lpdma0_enable_dma,
-	.dma.dma_disable     =  __metal_driver_sifive_lpdma0_disable_dma,
-	.dma.chan_init       =  __metal_driver_sifive_lpdma0_chan_init,
-	.dma.chan_active     =  __metal_driver_sifive_lpdma0_chan_active,
-	.dma.setup_jobques   = __metal_driver_sifive_lpdma0_setup_jobques,
+	.dma.dma_enable       =  __metal_driver_sifive_lpdma0_enable_dma,
+	.dma.dma_disable      =  __metal_driver_sifive_lpdma0_disable_dma,
+	.dma.chan_init        =  __metal_driver_sifive_lpdma0_chan_init,
+	.dma.chan_active      =  __metal_driver_sifive_lpdma0_chan_active,
+	.dma.setup_jobques    = __metal_driver_sifive_lpdma0_setup_jobques,
+	.dma.get_interrupt    = __metal_driver_sifive_lpdma0_get_interrupt,
+    .dma.get_interrupt_id = __metal_driver_sifive_lpdma0_get_interrupt_id,
 };
 
 #endif /* METAL_SIFIVE_LPDMA0 */

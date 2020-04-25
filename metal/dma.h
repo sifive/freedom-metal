@@ -68,6 +68,8 @@ struct metal_dma_vtable {
     void (*chan_init)(struct metal_dma *dma, unsigned int chan, struct metal_dma_chan_config *config);
     int (*chan_active)(struct metal_dma *dma, unsigned int chan);
     void (*setup_jobques)(struct metal_dma *dma, unsigned int chan, struct metal_dma_chan_config *config);
+    struct metal_interrupt *(*get_interrupt)(const struct metal_dma *const dma);
+    int (*get_interrupt_id)(const struct metal_dma *const dma);
 };
 
 
@@ -126,6 +128,23 @@ inline int metal_dma_channel_active(struct metal_dma *dma, unsigned int metal_dm
  */
 inline void metal_dma_setup_jobques(struct metal_dma *dma, unsigned int metal_dma_channel, struct metal_dma_chan_config *config) {
     return dma->vtable->setup_jobques(dma, metal_dma_channel, config);
+}
+
+/*!
+ * @brief Get the interrupt handle for the dma compare
+ * @return The interrupt handle
+ */
+inline struct metal_interrupt *
+metal_dma_get_interrupt(const struct metal_dma *const dma) {
+    return dma->vtable->get_interrupt(dma);
+}
+
+/*!
+ * @brief Get the interrupt ID for the dma compare
+ * @return The interrupt ID
+ */
+inline int metal_dma_get_interrupt_id(const struct metal_dma *const dma) {
+    return dma->vtable->get_interrupt_id(dma);
 }
 
 #endif

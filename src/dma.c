@@ -10,6 +10,9 @@ extern inline int metal_dma_disable(struct metal_dma *dma, unsigned int chan);
 extern inline void metal_dma_channel_init(struct metal_dma *dma, unsigned int chan, struct metal_dma_chan_config *config);
 extern inline int metal_dma_channel_active(struct metal_dma *dma, unsigned int chan);
 extern inline void metal_dma_setup_jobques(struct metal_dma *dma, unsigned int chan, struct metal_dma_chan_config *config);
+extern inline struct metal_interrupt * metal_dma_get_interrupt(const struct metal_dma *const dma) ;
+extern inline int metal_dma_get_interrupt_id(const struct metal_dma *const dma);
+
 
 
 struct metal_dma *metal_dma_get_device(int device_num)
