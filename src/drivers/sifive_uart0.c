@@ -7,6 +7,7 @@
 
 #include <metal/drivers/sifive_uart0.h>
 #include <metal/machine.h>
+#include <assert.h>
 
 /* TXDATA Fields */
 #define UART_TXEN               (1 <<  0)
@@ -51,16 +52,20 @@ int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, int c)
 {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
-    while (!__metal_driver_sifive_uart0_txready(uart)) {
+    //assert(0);
+
+    //while (!__metal_driver_sifive_uart0_txready(uart)) {
 		/* wait */
-    }
+    //}
     UART_REGW(METAL_SIFIVE_UART0_TXDATA) = c;
+
     return 0;
 }
 
 
 int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, int *c)
 {
+#if 0
     uint32_t ch;
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
     /* No seperate status register, we get status and the byte at same time */
@@ -70,6 +75,7 @@ int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, int *c)
     } else {
       *c = ch & 0x0ff;
     }
+#endif
     return 0;
 }
 
@@ -131,6 +137,7 @@ static void post_rate_change_callback_func(void *priv)
 
 void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate)
 {
+#if 0
     struct __metal_driver_sifive_uart0 *uart = (void *)(guart);
     struct metal_clock *clock = __metal_driver_sifive_uart0_clock(guart);
     struct __metal_driver_sifive_gpio0 *pinmux = __metal_driver_sifive_uart0_pinmux(guart);
@@ -156,6 +163,7 @@ void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate)
             pinmux_source_selector
         );
     }
+#endif
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
