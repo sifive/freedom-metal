@@ -44,7 +44,9 @@ int __metal_driver_sifive_lpdma0_enable_dma(struct metal_dma *gdma,
 	
 	ch_cnt_minus_1 = __METAL_GET_FIELD(dma_cfg, METAL_DMA_CHANCNT_MINUS1_MASK);
 	ch_cnt_minus_1 += 1;
-	//assert(ch_cnt_minus_1 == 4);
+
+	assert(ch_cnt_minus_1 == 4);
+	
 
 	if(!integ_sram_used) {
 		METAL_DMA_REGW(METAL_SIFIVE_LPDMA0_JOBQ_PTR) = (uintptr_t) jobqtemp;
@@ -77,10 +79,7 @@ void __metal_driver_sifive_lpdma0_setup_jobques (struct metal_dma *gdma, unsigne
 {
 	struct job tempjob;
 	struct __metal_driver_sifive_lpdma0 *dma = (void *)gdma;
-	unsigned long control_base = __metal_driver_sifive_lpdma0_control_base((struct  metal_dma *)gdma);
-
-    assert(gdma->jobq[chan][0].control.fields.src_size == 4);
-	//assert(*(gdma->jobq[chan][0].src_end_ptr) == 0x05060708); gdma->jobq_depth
+	unsigned long control_base = __metal_driver_sifive_lpdma0_control_base((struct  metal_dma *)gdma);    
 
 	for (int i =0; i < 1; i++) {
 		tempjob.control.bits = gdma->jobq[chan][i].control.bits;
@@ -141,10 +140,9 @@ void __metal_driver_sifive_lpdma0_chan_init (struct metal_dma *gdma,
 	}
 
 	//METAL_DMA_CHAN_CONTROL_REG(chan) |= (1 << METAL_DMA_CHAN_ENABLE_SHIFT);
-#if 1
+
 	val = METAL_DMA_CHAN_CONTROL_REG(chan);
 	METAL_DMA_CHAN_CONTROL_REG(chan) = __METAL_SET_FIELD(val, 1, 1);
-#endif
 	while(channel_status) {
 		val = METAL_DMA_CHAN_STATUS_REG(chan);
 		channel_status = __METAL_GET_FIELD(val, METAL_DMA_CHAN_STATUS_MASK);

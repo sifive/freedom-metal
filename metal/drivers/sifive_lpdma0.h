@@ -41,10 +41,10 @@
 
 
 #define METAL_DMA_CHAN_CONTROL_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0020))))
-#define METAL_DMA_CHAN_STATUS_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0030) + 0x04)))
-#define METAL_DMA_CHAN_ENQUE_JOBCTRL_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0030) + 0x08))) 
-#define METAL_DMA_CHAN_ENQUE_SRC_ENDPTR_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0030) + 0x0C))) 
-#define METAL_DMA_CHAN_ENQUE_DST_ENTPTR_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0030) + 0x10))) 
+#define METAL_DMA_CHAN_STATUS_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0020) + 0x04)))
+#define METAL_DMA_CHAN_ENQUE_JOBCTRL_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0020) + 0x08))) 
+#define METAL_DMA_CHAN_ENQUE_SRC_ENDPTR_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0020) + 0x0C))) 
+#define METAL_DMA_CHAN_ENQUE_DST_ENTPTR_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x020 + (chan_num * 0x0020) + 0x10))) 
 
 #define METAL_DMA_JOB_CTRL_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x0020 + (chan_num * 0x0030))))
 #define METAL_DMA_JOB_SRCEND_REG(chan_num) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_DMA_REG(0) + 0x0020 + (chan_num * 0x0030) + 0x4)))
