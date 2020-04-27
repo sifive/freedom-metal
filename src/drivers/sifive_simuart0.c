@@ -1,4 +1,4 @@
-/* Copyright 2018 SiFive, Inc */
+/* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/machine/platform.h>
@@ -40,21 +40,10 @@ int __metal_driver_sifive_simuart0_get_interrupt_id(struct metal_uart *uart)
 }
 
 
-int __metal_driver_sifive_simuart0_txready(struct metal_uart *uart)
-{
-  long control_base = __metal_driver_sifive_simuart0_control_base(uart);
-
-  return !((SIMUART_REGW(METAL_SIFIVE_SIMUART0_TXDATA) & SIMUART_TXFULL));
-}
-
-
 int __metal_driver_sifive_simuart0_putc(struct metal_uart *uart, int c)
 {
     long control_base = __metal_driver_sifive_simuart0_control_base(uart);
 
-    while (!__metal_driver_sifive_simuart0_txready(uart)) {
-		/* wait */
-    }
     SIMUART_REGW(METAL_SIFIVE_SIMUART0_TXDATA) = c;
     return 0;
 }
@@ -62,15 +51,6 @@ int __metal_driver_sifive_simuart0_putc(struct metal_uart *uart, int c)
 
 int __metal_driver_sifive_simuart0_getc(struct metal_uart *uart, int *c)
 {
-    uint32_t ch;
-    long control_base = __metal_driver_sifive_simuart0_control_base(uart);
-    /* No seperate status register, we get status and the byte at same time */
-    ch = SIMUART_REGW(METAL_SIFIVE_SIMUART0_RXDATA);;
-    if( ch & SIMUART_RXEMPTY ){
-      *c = -1; /* aka: EOF in most of the world */
-    } else {
-      *c = ch & 0x0ff;
-    }
     return 0;
 }
 
@@ -80,6 +60,7 @@ int __metal_driver_sifive_simuart0_get_baud_rate(struct metal_uart *guart)
     struct __metal_driver_sifive_simuart0 *uart = (void *)guart;
     return uart->baud_rate;
 }
+
 
 int __metal_driver_sifive_simuart0_set_baud_rate(struct metal_uart *guart, int baud_rate)
 {
@@ -98,69 +79,9 @@ int __metal_driver_sifive_simuart0_set_baud_rate(struct metal_uart *guart, int b
     return 0;
 }
 
-static void pre_rate_change_callback_func(void *priv)
-{
-    struct __metal_driver_sifive_simuart0 *uart = priv;
-    long control_base = __metal_driver_sifive_simuart0_control_base((struct metal_uart *)priv);
-    struct metal_clock *clock = __metal_driver_sifive_simuart0_clock((struct metal_uart *)priv);
-
-    /* Detect when the TXDATA is empty by setting the transmit watermark count
-     * to one and waiting until an interrupt is pending */
-
-    SIMUART_REGW(METAL_SIFIVE_SIMUART0_TXCTRL) &= ~(SIMUART_TXCNT(0x7));
-    SIMUART_REGW(METAL_SIFIVE_SIMUART0_TXCTRL) |= SIMUART_TXCNT(1);
-
-    while((SIMUART_REGW(METAL_SIFIVE_SIMUART0_IP) & SIMUART_TXWM) == 0) ;
-
-    /* When the TXDATA clears, the SIMUART is still shifting out the last byte.
-     * Calculate the time we must drain to finish transmitting and then wait
-     * that long. */
-
-    long bits_per_symbol = (SIMUART_REGW(METAL_SIFIVE_SIMUART0_TXCTRL) & (1 << 1)) ? 9 : 10;
-    long clk_freq = clock->vtable->get_rate_hz(clock);
-    long cycles_to_wait = bits_per_symbol * clk_freq / uart->baud_rate;
-
-    for(volatile long x = 0; x < cycles_to_wait; x++)
-        __asm__("nop");
-}
-
-static void post_rate_change_callback_func(void *priv)
-{
-    struct __metal_driver_sifive_simuart0 *uart = priv;
-    metal_uart_set_baud_rate(&uart->uart, uart->baud_rate);
-}
-
 void __metal_driver_sifive_simuart0_init(struct metal_uart *guart, int baud_rate)
 {
-    #if 0
-    struct __metal_driver_sifive_simuart0 *uart = (void *)(guart);
-    struct metal_clock *clock = __metal_driver_sifive_simuart0_clock(guart);
-    struct __metal_driver_sifive_gpio0 *pinmux = __metal_driver_sifive_simuart0_pinmux(guart);
 
-    assert(1)
-
-    if(clock != NULL) {
-        uart->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
-        uart->pre_rate_change_callback.priv = guart;
-        metal_clock_register_pre_rate_change_callback(clock, &(uart->pre_rate_change_callback));
-
-        uart->post_rate_change_callback.callback = &post_rate_change_callback_func;
-        uart->post_rate_change_callback.priv = guart;
-        metal_clock_register_post_rate_change_callback(clock, &(uart->post_rate_change_callback));
-    }
-
-    metal_uart_set_baud_rate(&(uart->uart), baud_rate);
-
-    if (pinmux != NULL) {
-        long pinmux_output_selector = __metal_driver_sifive_simuart0_pinmux_output_selector(guart);
-        long pinmux_source_selector = __metal_driver_sifive_simuart0_pinmux_source_selector(guart);
-        pinmux->gpio.vtable->enable_io(
-            (struct metal_gpio *) pinmux,
-            pinmux_output_selector,
-            pinmux_source_selector
-        );
-    }
-    #endif
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_simuart0) = {
