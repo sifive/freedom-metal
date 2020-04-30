@@ -4,6 +4,11 @@
 /*
  * Scrub memory with zero
  */
+
+/* Disable linker relaxation */
+.option push
+.option norelax
+
 .type _metal_memory_scrub, @function
 _metal_memory_scrub:
     /* Zero out memory */
@@ -115,3 +120,5 @@ skip_scrub:
     /* Restore caller ra */
     mv      ra, s0
     ret
+
+.option pop
