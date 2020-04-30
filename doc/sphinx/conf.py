@@ -23,7 +23,7 @@ project = 'Freedom Metal'
 copyright = '2019, SiFive Inc.'
 author = 'SiFive Inc.'
 
-version = "master"
+version = os.environ['RELEASE_TAG']
 release = version
 
 
