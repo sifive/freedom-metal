@@ -5,6 +5,8 @@
  * Scrub memory with zero
  */
 
+/* Keep it in metal.init section with _enter */
+.section .text.metal.init.scrub
 /* Disable linker relaxation */
 .option push
 .option norelax
