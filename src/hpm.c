@@ -66,6 +66,9 @@
         break;
 #endif
 
+/* Max available counters */
+#define METAL_HPM_COUNT_MAX 32
+
 /* Macro to check for instruction trap */
 #define MCAUSE_ILLEGAL_INST 0x02
 
@@ -78,44 +81,20 @@ int metal_hpm_init(struct metal_cpu *gcpu) {
 
     /* Check if counters are initialized or pointer is NULL */
     if ((gcpu) && (cpu->hpm_count == 0)) {
-        unsigned int temp, r1 = 0, r2 = 0;
-
-        /* Clear 'Illegal instruction' bit in mcause */
-        __asm__ __volatile__("csrr %0, mcause" : "=r"(temp));
-        temp &= -3;
-        __asm__ __volatile__("csrw mcause, %0" : : "r"(temp));
-
-        /* Write and read back all 1s to check number of available counters */
-        /* Note that we have setup mtvec to avoid being caught by a trap handler
-         * since 'csrw mcounteren, %2' can lead to trap on some old Risc-V cores
-         */
-        temp = -1;
-        __asm__ __volatile__("csrr %0, mtvec \n\t"
-                             "la %1, 1f \n\t"
-                             "csrw mtvec, %1 \n\t"
-                             "csrw mcounteren, %2 \n\t"
-                             "nop\n\t"
-                             "1: \n\t"
-                             "csrw mtvec, %0 \n\t"
-                             : "+r"(r1), "+r"(r2)
-                             : "r"(temp));
-
-        __asm__ __volatile__("csrr %0, mcause" : "=r"(temp));
-
-        /* Check if there was any Illegal instruction trap */
-        if ((temp & MCAUSE_ILLEGAL_INST) == MCAUSE_ILLEGAL_INST)
-            return METAL_HPM_RET_NOK;
-
-        /* Read value from counter enable register */
-        __asm__ __volatile__("csrr %0, mcounteren" : "=r"(temp));
+        metal_hpm_counter n;
 
         /* Count number of available hardware performance counters */
-        while ((temp & 0x01)) {
-            cpu->hpm_count++;
-            temp >>= 1;
+        cpu->hpm_count = METAL_HPM_COUNT_MAX;
+
+        /* mcycle, mtime and minstret counters are always available */
+        for (n = METAL_HPM_COUNTER_3; n < METAL_HPM_COUNTER_31; n++) {
+            metal_hpm_set_event(gcpu, n, 0xFFFFFFFF);
+
+            if (metal_hpm_get_event(gcpu, n) == 0) {
+                break;
+            }
         }
-        /* Set enable register to zero */
-        __asm__ __volatile__("csrw mcounteren, zero");
+        cpu->hpm_count = n;
 
         /* TODO: mcountinhibit csr is not yet accessible.
          * As per latest RiscV privileged spec v1.11,
@@ -138,11 +117,19 @@ int metal_hpm_init(struct metal_cpu *gcpu) {
 
 int metal_hpm_disable(struct metal_cpu *gcpu) {
     struct __metal_driver_cpu *cpu = (void *)gcpu;
+    uintptr_t temp = 0, val = 0;
 
     /* Check if pointer is NULL */
     if (gcpu) {
         /* Disable counter access */
-        __asm__ __volatile__("csrw mcounteren, zero");
+        __asm__ __volatile__("la %0, 1f \n\t"
+                             "csrr %1, mtvec \n\t"
+                             "csrw mtvec, %0 \n\t"
+                             "csrw mcounteren, zero \n\t"
+                             ".align 4 \n\t"
+                             "1: \n\t"
+                             "csrw mtvec, %1 \n\t"
+                             : "+r"(val), "+r"(temp));
 
         /* TODO: Disable all counters */
         /* __asm__ __volatile__("csrw mcountinhibit, zero"); */
@@ -217,20 +204,24 @@ int metal_hpm_clr_event(struct metal_cpu *gcpu, metal_hpm_counter counter,
 
 int metal_hpm_enable_access(struct metal_cpu *gcpu, metal_hpm_counter counter) {
     struct __metal_driver_cpu *cpu = (void *)gcpu;
-    unsigned int val;
+    uintptr_t temp = 0, val = 0;
 
     /* Return error if counter is out of range or pointer is NULL */
     if ((gcpu) && (counter >= cpu->hpm_count))
         return METAL_HPM_RET_NOK;
 
-    __asm__ __volatile__("csrr %0, mcounteren" : "=r"(val));
-
-    val |= (unsigned int)(1 << counter);
-
-    __asm__ __volatile__("csrw mcounteren"
-                         ", %0"
-                         :
-                         : "r"(val));
+    /* Set trap exit, to handle illegal instruction trap. */
+    __asm__ __volatile__("la %0, 1f \n\t"
+                         "csrr %1, mtvec \n\t"
+                         "csrw mtvec, %0 \n\t"
+                         "csrr %0, mcounteren \n\t"
+                         "or %0, %0, %2 \n\t"
+                         "csrw mcounteren, %0 \n\t"
+                         ".align 4 \n\t"
+                         "1: \n\t"
+                         "csrw mtvec, %1 \n\t"
+                         : "+r"(val), "+r"(temp)
+                         : "r"(1 << counter));
 
     return METAL_HPM_RET_OK;
 }
@@ -238,20 +229,24 @@ int metal_hpm_enable_access(struct metal_cpu *gcpu, metal_hpm_counter counter) {
 int metal_hpm_disable_access(struct metal_cpu *gcpu,
                              metal_hpm_counter counter) {
     struct __metal_driver_cpu *cpu = (void *)gcpu;
-    unsigned int val;
+    uintptr_t temp = 0, val = 0;
 
     /* Return error if counter is out of range or pointer is NULL */
     if ((gcpu) && (counter >= cpu->hpm_count))
         return METAL_HPM_RET_NOK;
 
-    __asm__ __volatile__("csrr %0, mcounteren" : "=r"(val));
-
-    val &= (unsigned int)~(1 << counter);
-
-    __asm__ __volatile__("csrw mcounteren"
-                         ", %0"
-                         :
-                         : "r"(val));
+    /* Set trap exit, to handle illegal instruction trap. */
+    __asm__ __volatile__("la %0, 1f \n\t"
+                         "csrr %1, mtvec \n\t"
+                         "csrw mtvec, %0 \n\t"
+                         "csrr %0, mcounteren \n\t"
+                         "and %0, %0, %2 \n\t"
+                         "csrw mcounteren, %0 \n\t"
+                         ".align 4 \n\t"
+                         "1: \n\t"
+                         "csrw mtvec, %1 \n\t"
+                         : "+r"(val), "+r"(temp)
+                         : "r"(~(1 << counter)));
 
     return METAL_HPM_RET_OK;
 }
