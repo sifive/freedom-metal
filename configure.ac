@@ -67,12 +67,26 @@ AC_ARG_WITH([preconfigured],
 )
 
 AC_ARG_WITH([builtin-libgloss],
-    [AS_HELP_STRING([--with-bultin-libgloss], [Build libgloss along with the METAL])],
+    [AS_HELP_STRING([--with-builtin-libgloss], [Build libgloss along with the METAL])],i
     [with_builtin_libgloss="yes"],
     [with_builtin_libgloss="no"]
 )
 
+AC_ARG_WITH([builtin-libmetal-pico],
+    [AS_HELP_STRING([--with-builtin-libmetal-pico], [Build libmetal-pico along with Metal])],
+    [with_builtin_libmetal_pico="yes"],
+    [with_builtin_libmetal_pico="no"]
+)
+
+AC_ARG_WITH([builtin-libmetal-segger],
+    [AS_HELP_STRING([--with-builtin-libmetal-segger], [Build libmetal-segger along with Metal])],
+    [with_builtin_libmetal_segger="yes"],
+    [with_builtin_libmetal_segger="no"]
+)
+
 AM_CONDITIONAL([WITH_BUILTIN_LIBGLOSS], [test "x$with_builtin_libgloss" = "xyes"])
+AM_CONDITIONAL([WITH_BUILTIN_LIBMETAL_PICO], [test "x$with_builtin_libmetal_pico" = "xyes"])
+AM_CONDITIONAL([WITH_BUILTIN_LIBMETAL_SEGGER], [test "x$with_builtin_libmetal_segger" = "xyes"])
 
 ########################################################
 # Preconfigured Options (--with-preconfigured)

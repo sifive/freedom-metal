@@ -1,8 +1,10 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#ifndef __SEGGER_LIBC__
 #include <sys/time.h>
 #include <sys/times.h>
+#endif
 #include <metal/cpu.h>
 #include <metal/timer.h>
 #include <metal/machine.h>

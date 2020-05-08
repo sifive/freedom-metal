@@ -209,6 +209,45 @@ libriscv__mmachine__@MACHINE_NAME@_a_SOURCES = \
 	src/vector.S \
 	src/watchdog.c
 
+########################################################
+# libmetal-pico
+########################################################
+
+# Build support for picolibc if --with-builtin-libmetal-pico is passed to configure
+if WITH_BUILTIN_LIBMETAL_PICO
+
+lib_LIBRARIES += libmetal-pico.a
+
+libmetal_pico_a_SOURCES = \
+        pico/iob.c \
+        gloss/crt0.S \
+        gloss/sys_sbrk.c \
+        gloss/sys_exit.c \
+        gloss/sys_times.c \
+        gloss/sys_sysconf.c \
+        gloss/sys_gettimeofday.c \
+        gloss/sys_clock_gettime.c \
+        gloss/sys_write.c
+
+endif # WITH_BUILTIN_LIBMETAL_PICO
+
+
+########################################################
+# libsegger
+########################################################
+
+# Provide segger hook with Freedom Metal that is built when
+# --with-builtin-libmetal-segger is passed to configure
+if WITH_BUILTIN_LIBMETAL_SEGGER
+
+lib_LIBRARIES += libmetal-segger.a
+
+libmetal_segger_a_SOURCES = \
+       gloss/crt0.S \
+       segger/SEGGER_target_metal.c
+
+endif # WITH_BUILTIN_LIBMETAL_SEGGER
+
 # Freedom METAL has its own libgloss implementation that is only built in
 # --with-builtin-libgloss is passed to configure.
 if WITH_BUILTIN_LIBGLOSS
