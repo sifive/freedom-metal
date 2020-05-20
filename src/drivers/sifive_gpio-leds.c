@@ -10,14 +10,14 @@
 #include <metal/machine.h>
 #include <string.h>
 
-int __metal_driver_led_exist(struct metal_led *led, char *label) {
+int metal_led_has_label(struct metal_led *led, char *label) {
     if (strcmp(__metal_driver_sifive_gpio_led_label(led), label) == 0) {
         return 1;
     }
     return 0;
 }
 
-void __metal_driver_led_enable(struct metal_led *led) {
+void metal_led_enable(struct metal_led *led) {
     int pin;
     struct metal_gpio *gpio;
 
@@ -31,7 +31,7 @@ void __metal_driver_led_enable(struct metal_led *led) {
     }
 }
 
-void __metal_driver_led_on(struct metal_led *led) {
+void metal_led_on(struct metal_led *led) {
     int pin;
     struct metal_gpio *gpio;
 
@@ -43,7 +43,7 @@ void __metal_driver_led_on(struct metal_led *led) {
     }
 }
 
-void __metal_driver_led_off(struct metal_led *led) {
+void metal_led_off(struct metal_led *led) {
     int pin;
     struct metal_gpio *gpio;
 
@@ -55,7 +55,7 @@ void __metal_driver_led_off(struct metal_led *led) {
     }
 }
 
-void __metal_driver_led_toggle(struct metal_led *led) {
+void metal_led_toggle(struct metal_led *led) {
     int pin;
     struct metal_gpio *gpio;
 
@@ -66,14 +66,6 @@ void __metal_driver_led_toggle(struct metal_led *led) {
         metal_gpio_toggle_pin((struct metal_gpio *)gpio, pin);
     }
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_led) = {
-    .led_vtable.led_exist = __metal_driver_led_exist,
-    .led_vtable.led_enable = __metal_driver_led_enable,
-    .led_vtable.led_on = __metal_driver_led_on,
-    .led_vtable.led_off = __metal_driver_led_off,
-    .led_vtable.led_toggle = __metal_driver_led_toggle,
-};
 
 #endif
 

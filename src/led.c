@@ -6,6 +6,7 @@
 #include <string.h>
 
 struct metal_led *metal_led_get_rgb(char *label, char *color) {
+#if __METAL_DT_MAX_LEDS > 0
     int i;
     struct metal_led *led;
     char led_label[100];
@@ -18,18 +19,16 @@ struct metal_led *metal_led_get_rgb(char *label, char *color) {
     strcat(led_label, color);
     for (i = 0; i < __METAL_DT_MAX_LEDS; i++) {
         led = (struct metal_led *)__metal_led_table[i];
-        if (led->vtable->led_exist(led, led_label)) {
+        if (metal_led_has_label(led, led_label)) {
             return led;
         }
     }
     return NULL;
+#else
+    return NULL;
+#endif
 }
 
 struct metal_led *metal_led_get(char *label) {
     return metal_led_get_rgb(label, "");
 }
-
-extern __inline__ void metal_led_enable(struct metal_led *led);
-extern __inline__ void metal_led_on(struct metal_led *led);
-extern __inline__ void metal_led_off(struct metal_led *led);
-extern __inline__ void metal_led_toggle(struct metal_led *led);
