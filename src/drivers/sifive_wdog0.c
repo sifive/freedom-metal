@@ -37,7 +37,7 @@
     WDOG_UNLOCK(base);                                                         \
     WDOG_REGW(base, offset)
 
-int __metal_driver_sifive_wdog0_feed(const struct metal_watchdog *const wdog) {
+int metal_watchdog_feed(const struct metal_watchdog *const wdog) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
@@ -47,8 +47,7 @@ int __metal_driver_sifive_wdog0_feed(const struct metal_watchdog *const wdog) {
     return 0;
 }
 
-long int
-__metal_driver_sifive_wdog0_get_rate(const struct metal_watchdog *const wdog) {
+long int metal_watchdog_get_rate(const struct metal_watchdog *const wdog) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
     const struct metal_clock *const clock =
@@ -65,9 +64,8 @@ __metal_driver_sifive_wdog0_get_rate(const struct metal_watchdog *const wdog) {
     return clock_rate / (1 << scale);
 }
 
-long int
-__metal_driver_sifive_wdog0_set_rate(const struct metal_watchdog *const wdog,
-                                     const long int rate) {
+long int metal_watchdog_set_rate(const struct metal_watchdog *const wdog,
+                                 const long int rate) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
     const struct metal_clock *const clock =
@@ -107,17 +105,15 @@ __metal_driver_sifive_wdog0_set_rate(const struct metal_watchdog *const wdog,
     return clock_rate / (1 << min_scale);
 }
 
-long int __metal_driver_sifive_wdog0_get_timeout(
-    const struct metal_watchdog *const wdog) {
+long int metal_watchdog_get_timeout(const struct metal_watchdog *const wdog) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
     return (WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCMP) & METAL_WDOGCMP_MASK);
 }
 
-long int
-__metal_driver_sifive_wdog0_set_timeout(const struct metal_watchdog *const wdog,
-                                        const long int timeout) {
+long int metal_watchdog_set_timeout(const struct metal_watchdog *const wdog,
+                                    const long int timeout) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
@@ -139,9 +135,8 @@ __metal_driver_sifive_wdog0_set_timeout(const struct metal_watchdog *const wdog,
     return set_timeout;
 }
 
-int __metal_driver_sifive_wdog0_set_result(
-    const struct metal_watchdog *const wdog,
-    const enum metal_watchdog_result result) {
+int metal_watchdog_set_result(const struct metal_watchdog *const wdog,
+                              const enum metal_watchdog_result result) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
@@ -167,9 +162,8 @@ int __metal_driver_sifive_wdog0_set_result(
     return 0;
 }
 
-int __metal_driver_sifive_wdog0_run(
-    const struct metal_watchdog *const wdog,
-    const enum metal_watchdog_run_option option) {
+int metal_watchdog_run(const struct metal_watchdog *const wdog,
+                       const enum metal_watchdog_run_option option) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
@@ -182,14 +176,14 @@ int __metal_driver_sifive_wdog0_run(
         break;
     case METAL_WATCHDOG_RUN_ALWAYS:
         /* Feed the watchdog before starting to reset counter */
-        __metal_driver_sifive_wdog0_feed(wdog);
+        metal_watchdog_feed(wdog);
 
         WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |=
             METAL_WDOGCFG_ENALWAYS;
         break;
     case METAL_WATCHDOG_RUN_AWAKE:
         /* Feed the watchdog before starting to reset counter */
-        __metal_driver_sifive_wdog0_feed(wdog);
+        metal_watchdog_feed(wdog);
 
         WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |=
             METAL_WDOGCFG_COREAWAKE;
@@ -199,18 +193,16 @@ int __metal_driver_sifive_wdog0_run(
     return 0;
 }
 
-struct metal_interrupt *__metal_driver_sifive_wdog0_get_interrupt(
-    const struct metal_watchdog *const wdog) {
+struct metal_interrupt *
+metal_watchdog_get_interrupt(const struct metal_watchdog *const wdog) {
     return __metal_driver_sifive_wdog0_interrupt_parent(wdog);
 }
 
-int __metal_driver_sifive_wdog0_get_interrupt_id(
-    const struct metal_watchdog *const wdog) {
+int metal_watchdog_get_interrupt_id(const struct metal_watchdog *const wdog) {
     return __metal_driver_sifive_wdog0_interrupt_line(wdog);
 }
 
-int __metal_driver_sifive_wdog0_clear_interrupt(
-    const struct metal_watchdog *const wdog) {
+int metal_watchdog_clear_interrupt(const struct metal_watchdog *const wdog) {
     const uintptr_t base =
         (uintptr_t)__metal_driver_sifive_wdog0_control_base(wdog);
 
@@ -219,19 +211,6 @@ int __metal_driver_sifive_wdog0_clear_interrupt(
 
     return 0;
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_wdog0) = {
-    .watchdog.feed = __metal_driver_sifive_wdog0_feed,
-    .watchdog.get_rate = __metal_driver_sifive_wdog0_get_rate,
-    .watchdog.set_rate = __metal_driver_sifive_wdog0_set_rate,
-    .watchdog.get_timeout = __metal_driver_sifive_wdog0_get_timeout,
-    .watchdog.set_timeout = __metal_driver_sifive_wdog0_set_timeout,
-    .watchdog.set_result = __metal_driver_sifive_wdog0_set_result,
-    .watchdog.run = __metal_driver_sifive_wdog0_run,
-    .watchdog.get_interrupt = __metal_driver_sifive_wdog0_get_interrupt,
-    .watchdog.get_interrupt_id = __metal_driver_sifive_wdog0_get_interrupt_id,
-    .watchdog.clear_interrupt = __metal_driver_sifive_wdog0_clear_interrupt,
-};
 
 #endif /* METAL_SIFIVE_WDOG0 */
 

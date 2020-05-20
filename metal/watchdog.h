@@ -11,8 +11,7 @@
  */
 
 #include <metal/interrupt.h>
-
-struct metal_watchdog;
+#include <stdint.h>
 
 /*!
  * @brief List of watchdog timer count behaviors
@@ -36,47 +35,24 @@ enum metal_watchdog_result {
                                   system reset */
 };
 
-struct metal_watchdog_vtable {
-    int (*feed)(const struct metal_watchdog *const wdog);
-    long int (*get_rate)(const struct metal_watchdog *const wdog);
-    long int (*set_rate)(const struct metal_watchdog *const wdog,
-                         const long int rate);
-    long int (*get_timeout)(const struct metal_watchdog *const wdog);
-    long int (*set_timeout)(const struct metal_watchdog *const wdog,
-                            const long int timeout);
-    int (*set_result)(const struct metal_watchdog *const wdog,
-                      const enum metal_watchdog_result result);
-    int (*run)(const struct metal_watchdog *const wdog,
-               const enum metal_watchdog_run_option option);
-    struct metal_interrupt *(*get_interrupt)(
-        const struct metal_watchdog *const wdog);
-    int (*get_interrupt_id)(const struct metal_watchdog *const wdog);
-    int (*clear_interrupt)(const struct metal_watchdog *const wdog);
-};
-
 /*!
  * @brief Handle for a Watchdog Timer
  */
 struct metal_watchdog {
-    const struct metal_watchdog_vtable *vtable;
+    uint8_t __no_empty_structs;
 };
 
 /*!
  * @brief Feed the watchdog timer
  */
-inline int metal_watchdog_feed(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->feed(wdog);
-}
+int metal_watchdog_feed(const struct metal_watchdog *const wdog);
 
 /*!
  * @brief Get the rate of the watchdog timer in Hz
  *
  * @return the rate of the watchdog timer
  */
-inline long int
-metal_watchdog_get_rate(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->get_rate(wdog);
-}
+long int metal_watchdog_get_rate(const struct metal_watchdog *const wdog);
 
 /*!
  * @brief Set the rate of the watchdog timer in Hz
@@ -85,20 +61,15 @@ metal_watchdog_get_rate(const struct metal_watchdog *const wdog) {
  *
  * @return the new rate of the watchdog timer
  */
-inline long int metal_watchdog_set_rate(const struct metal_watchdog *const wdog,
-                                        const long int rate) {
-    return wdog->vtable->set_rate(wdog, rate);
-}
+long int metal_watchdog_set_rate(const struct metal_watchdog *const wdog,
+                                 const long int rate);
 
 /*!
  * @brief Get the timeout of the watchdog timer
  *
  * @return the watchdog timeout value
  */
-inline long int
-metal_watchdog_get_timeout(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->get_timeout(wdog);
-}
+long int metal_watchdog_get_timeout(const struct metal_watchdog *const wdog);
 
 /*!
  * @brief Set the timeout of the watchdog timer
@@ -108,21 +79,16 @@ metal_watchdog_get_timeout(const struct metal_watchdog *const wdog) {
  *
  * @return the new watchdog timeout value
  */
-inline long int
-metal_watchdog_set_timeout(const struct metal_watchdog *const wdog,
-                           const long int timeout) {
-    return wdog->vtable->set_timeout(wdog, timeout);
-}
+long int metal_watchdog_set_timeout(const struct metal_watchdog *const wdog,
+                                    const long int timeout);
 
 /*!
  * @brief Sets the result behavior of a watchdog timer timeout
  *
  * @return 0 if the requested result behavior is supported
  */
-inline int metal_watchdog_set_result(const struct metal_watchdog *const wdog,
-                                     const enum metal_watchdog_result result) {
-    return wdog->vtable->set_result(wdog, result);
-}
+int metal_watchdog_set_result(const struct metal_watchdog *const wdog,
+                              const enum metal_watchdog_result result);
 
 /*!
  * @brief Set the run behavior of the watchdog
@@ -131,34 +97,24 @@ inline int metal_watchdog_set_result(const struct metal_watchdog *const wdog,
  *
  * @return 0 if the watchdog was successfully started/stopped
  */
-inline int metal_watchdog_run(const struct metal_watchdog *const wdog,
-                              const enum metal_watchdog_run_option option) {
-    return wdog->vtable->run(wdog, option);
-}
+int metal_watchdog_run(const struct metal_watchdog *const wdog,
+                       const enum metal_watchdog_run_option option);
 
 /*!
  * @brief Get the interrupt controller for the watchdog interrupt
  */
-inline struct metal_interrupt *
-metal_watchdog_get_interrupt(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->get_interrupt(wdog);
-}
+struct metal_interrupt *
+metal_watchdog_get_interrupt(const struct metal_watchdog *const wdog);
 
 /*!
  * @Brief Get the interrupt id for the watchdog interrupt
  */
-inline int
-metal_watchdog_get_interrupt_id(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->get_interrupt_id(wdog);
-}
+int metal_watchdog_get_interrupt_id(const struct metal_watchdog *const wdog);
 
 /*!
  * @brief Clear the watchdog interrupt
  */
-inline int
-metal_watchdog_clear_interrupt(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->clear_interrupt(wdog);
-}
+int metal_watchdog_clear_interrupt(const struct metal_watchdog *const wdog);
 
 /*!
  * @brief Get a watchdog handle
