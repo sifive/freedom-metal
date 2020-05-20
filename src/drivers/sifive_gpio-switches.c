@@ -10,7 +10,7 @@
 #include <metal/machine.h>
 #include <string.h>
 
-int __metal_driver_switch_exist(struct metal_switch *flip, char *label) {
+int metal_switch_has_label(struct metal_switch *flip, char *label) {
     if (strcmp(__metal_driver_sifive_gpio_switch_label(flip), label) == 0) {
         return 1;
     }
@@ -18,11 +18,11 @@ int __metal_driver_switch_exist(struct metal_switch *flip, char *label) {
 }
 
 struct metal_interrupt *
-__metal_driver_switch_interrupt_controller(struct metal_switch *flip) {
+metal_switch_interrupt_controller(struct metal_switch *flip) {
     return __metal_driver_sifive_gpio_switch_interrupt_controller(flip);
 }
 
-int __metal_driver_switch_get_interrupt_id(struct metal_switch *flip) {
+int metal_switch_get_interrupt_id(struct metal_switch *flip) {
     int irq, max_irq;
     struct metal_interrupt *irc;
 
@@ -39,13 +39,6 @@ int __metal_driver_switch_get_interrupt_id(struct metal_switch *flip) {
     }
     return METAL_INTERRUPT_ID_LCMX;
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_switch) = {
-    .switch_vtable.switch_exist = __metal_driver_switch_exist,
-    .switch_vtable.interrupt_controller =
-        __metal_driver_switch_interrupt_controller,
-    .switch_vtable.get_interrupt_id = __metal_driver_switch_get_interrupt_id,
-};
 
 #endif
 

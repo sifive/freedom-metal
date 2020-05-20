@@ -10,20 +10,13 @@
  */
 
 #include <metal/interrupt.h>
-
-struct metal_switch;
-
-struct metal_switch_vtable {
-    int (*switch_exist)(struct metal_switch *sw, char *label);
-    struct metal_interrupt *(*interrupt_controller)(struct metal_switch *sw);
-    int (*get_interrupt_id)(struct metal_switch *sw);
-};
+#include <stdint.h>
 
 /*!
  * @brief A handle for a switch
  */
 struct metal_switch {
-    const struct metal_switch_vtable *vtable;
+    uint8_t __no_empty_structs;
 };
 
 /*!
@@ -39,18 +32,23 @@ struct metal_switch *metal_switch_get(char *label);
  * @param sw The handle for the switch
  * @return The interrupt controller handle
  */
-__inline__ struct metal_interrupt *
-metal_switch_interrupt_controller(struct metal_switch *sw) {
-    return sw->vtable->interrupt_controller(sw);
-}
+struct metal_interrupt *
+metal_switch_interrupt_controller(struct metal_switch *sw);
 
 /*!
  * @brief Get the interrupt id for a switch
  * @param sw The handle for the switch
  * @return The interrupt ID for the switch
  */
-__inline__ int metal_switch_get_interrupt_id(struct metal_switch *sw) {
-    return sw->vtable->get_interrupt_id(sw);
-}
+int metal_switch_get_interrupt_id(struct metal_switch *sw);
+
+/*!
+ * @brief Check if a switch has a given label
+ *
+ * @param switch The handle for the switch
+ * @param label A null-terminated string
+ * @return True if the switch label matches
+ */
+int metal_switch_has_label(struct metal_switch *sw, char *label);
 
 #endif

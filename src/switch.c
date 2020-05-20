@@ -14,13 +14,9 @@ struct metal_switch *metal_switch_get(char *label) {
 
     for (i = 0; i < __METAL_DT_MAX_BUTTONS; i++) {
         flip = (struct metal_switch *)__metal_switch_table[i];
-        if (flip->vtable->switch_exist(flip, label)) {
+        if (metal_switch_has_label(flip, label)) {
             return flip;
         }
     }
     return NULL;
 }
-
-extern __inline__ struct metal_interrupt *
-metal_switch_interrupt_controller(struct metal_switch *flip);
-extern __inline__ int metal_switch_get_interrupt_id(struct metal_switch *flip);
