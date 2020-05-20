@@ -22,22 +22,20 @@
 #define RTC_REGW(base, offset)                                                 \
     (__METAL_ACCESS_ONCE((__metal_io_u32 *)RTC_REG(base, offset)))
 
-uint64_t
-__metal_driver_sifive_rtc0_get_rate(const struct metal_rtc *const rtc) {
+uint64_t metal_rtc_get_rate(const struct metal_rtc *const rtc) {
     const struct metal_clock *const clock =
         __metal_driver_sifive_rtc0_clock(rtc);
     return metal_clock_get_rate_hz(clock);
 }
 
-uint64_t __metal_driver_sifive_rtc0_set_rate(const struct metal_rtc *const rtc,
-                                             const uint64_t rate) {
+uint64_t metal_rtc_set_rate(const struct metal_rtc *const rtc,
+                            const uint64_t rate) {
     const struct metal_clock *const clock =
         __metal_driver_sifive_rtc0_clock(rtc);
     return metal_clock_get_rate_hz(clock);
 }
 
-uint64_t
-__metal_driver_sifive_rtc0_get_compare(const struct metal_rtc *const rtc) {
+uint64_t metal_rtc_get_compare(const struct metal_rtc *const rtc) {
     const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
 
     const uint32_t shift =
@@ -46,9 +44,8 @@ __metal_driver_sifive_rtc0_get_compare(const struct metal_rtc *const rtc) {
     return ((uint64_t)RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCMP0) << shift);
 }
 
-uint64_t
-__metal_driver_sifive_rtc0_set_compare(const struct metal_rtc *const rtc,
-                                       const uint64_t compare) {
+uint64_t metal_rtc_set_compare(const struct metal_rtc *const rtc,
+                               const uint64_t compare) {
     const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
 
     /* Determine the bit shift and shifted value to store in
@@ -69,11 +66,10 @@ __metal_driver_sifive_rtc0_set_compare(const struct metal_rtc *const rtc,
     /* Set the value of rtccmp0 */
     RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCMP0) = (uint32_t)comp_shifted;
 
-    return __metal_driver_sifive_rtc0_get_compare(rtc);
+    return metal_rtc_get_compare(rtc);
 }
 
-uint64_t
-__metal_driver_sifive_rtc0_get_count(const struct metal_rtc *const rtc) {
+uint64_t metal_rtc_get_count(const struct metal_rtc *const rtc) {
     const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
 
     uint64_t count = RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCOUNTHI);
@@ -83,18 +79,18 @@ __metal_driver_sifive_rtc0_get_count(const struct metal_rtc *const rtc) {
     return count;
 }
 
-uint64_t __metal_driver_sifive_rtc0_set_count(const struct metal_rtc *const rtc,
-                                              const uint64_t count) {
+uint64_t metal_rtc_set_count(const struct metal_rtc *const rtc,
+                             const uint64_t count) {
     const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
 
     RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCOUNTHI) = (UINT_MAX & (count >> 32));
     RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCOUNTLO) = (UINT_MAX & count);
 
-    return __metal_driver_sifive_rtc0_get_count(rtc);
+    return metal_rtc_get_count(rtc);
 }
 
-int __metal_driver_sifive_rtc0_run(const struct metal_rtc *const rtc,
-                                   const enum metal_rtc_run_option option) {
+int metal_rtc_run(const struct metal_rtc *const rtc,
+                  const enum metal_rtc_run_option option) {
     const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
 
     switch (option) {
@@ -111,26 +107,13 @@ int __metal_driver_sifive_rtc0_run(const struct metal_rtc *const rtc,
 }
 
 struct metal_interrupt *
-__metal_driver_sifive_rtc0_get_interrupt(const struct metal_rtc *const rtc) {
+metal_rtc_get_interrupt(const struct metal_rtc *const rtc) {
     return __metal_driver_sifive_rtc0_interrupt_parent(rtc);
 }
 
-int __metal_driver_sifive_rtc0_get_interrupt_id(
-    const struct metal_rtc *const rtc) {
+int metal_rtc_get_interrupt_id(const struct metal_rtc *const rtc) {
     return __metal_driver_sifive_rtc0_interrupt_line(rtc);
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_rtc0) = {
-    .rtc.get_rate = __metal_driver_sifive_rtc0_get_rate,
-    .rtc.set_rate = __metal_driver_sifive_rtc0_set_rate,
-    .rtc.get_compare = __metal_driver_sifive_rtc0_get_compare,
-    .rtc.set_compare = __metal_driver_sifive_rtc0_set_compare,
-    .rtc.get_count = __metal_driver_sifive_rtc0_get_count,
-    .rtc.set_count = __metal_driver_sifive_rtc0_set_count,
-    .rtc.run = __metal_driver_sifive_rtc0_run,
-    .rtc.get_interrupt = __metal_driver_sifive_rtc0_get_interrupt,
-    .rtc.get_interrupt_id = __metal_driver_sifive_rtc0_get_interrupt_id,
-};
 
 #endif
 

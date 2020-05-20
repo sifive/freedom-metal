@@ -11,16 +11,8 @@
 #include <metal/interrupt.h>
 #include <metal/rtc.h>
 
-struct __metal_driver_vtable_sifive_rtc0 {
-    const struct metal_rtc_vtable rtc;
-};
-
-struct __metal_driver_sifive_rtc0;
-
-__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_rtc0)
-
 struct __metal_driver_sifive_rtc0 {
-    const struct metal_rtc rtc;
+    uint8_t __no_empty_structs;
 };
 
 #endif
