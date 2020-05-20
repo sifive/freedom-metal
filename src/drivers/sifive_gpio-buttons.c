@@ -10,7 +10,7 @@
 #include <metal/machine.h>
 #include <string.h>
 
-int __metal_driver_button_exist(struct metal_button *button, char *label) {
+int metal_button_has_label(struct metal_button *button, char *label) {
     if (strcmp(__metal_driver_sifive_gpio_button_label(button), label) == 0) {
         return 1;
     }
@@ -18,11 +18,11 @@ int __metal_driver_button_exist(struct metal_button *button, char *label) {
 }
 
 struct metal_interrupt *
-__metal_driver_button_interrupt_controller(struct metal_button *button) {
+metal_button_interrupt_controller(struct metal_button *button) {
     return __metal_driver_sifive_gpio_button_interrupt_controller(button);
 }
 
-int __metal_driver_button_get_interrupt_id(struct metal_button *button) {
+int metal_button_get_interrupt_id(struct metal_button *button) {
     int irq, max_irq;
     struct metal_interrupt *irc;
 
@@ -40,13 +40,6 @@ int __metal_driver_button_get_interrupt_id(struct metal_button *button) {
     }
     return METAL_INTERRUPT_ID_LCMX;
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_button) = {
-    .button_vtable.button_exist = __metal_driver_button_exist,
-    .button_vtable.interrupt_controller =
-        __metal_driver_button_interrupt_controller,
-    .button_vtable.get_interrupt_id = __metal_driver_button_get_interrupt_id,
-};
 
 #endif
 
