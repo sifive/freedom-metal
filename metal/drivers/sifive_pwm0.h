@@ -7,17 +7,10 @@
 #include <metal/clock.h>
 #include <metal/pwm.h>
 
-struct __metal_driver_vtable_sifive_pwm0 {
-    const struct metal_pwm_vtable pwm;
-};
-
 /* Max possible PWM channel count */
 #define METAL_MAX_PWM_CHANNELS 16
 
-__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_pwm0)
-
 struct __metal_driver_sifive_pwm0 {
-    struct metal_pwm pwm;
     unsigned int max_count;
     unsigned int count_val;
     unsigned int freq;
