@@ -64,3 +64,6 @@ extern __inline__ uintptr_t metal_cpu_get_exception_pc(struct metal_cpu *cpu);
 
 extern __inline__ int metal_cpu_set_exception_pc(struct metal_cpu *cpu,
                                                  uintptr_t epc);
+
+extern __inline__ struct metal_buserror *
+metal_cpu_get_buserror(struct metal_cpu *cpu);

@@ -17,3 +17,6 @@ int _gettimeofday(struct timeval *tp, void *tzp) {
     tp->tv_usec = mcc % timebase * 1000000 / timebase;
     return 0;
 }
+
+extern __typeof(_gettimeofday) gettimeofday
+    __attribute__((__weak__, __alias__("_gettimeofday")));
