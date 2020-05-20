@@ -85,12 +85,11 @@ static void pre_rate_change_callback(void *priv) {
 static void post_rate_change_callback(void *priv) {
     struct __metal_driver_sifive_i2c0 *i2c = priv;
     /* Set baud rate after clock rate change */
-    metal_i2c_set_baud_rate(&i2c->i2c, i2c->baud_rate);
+    metal_i2c_set_baud_rate((struct metal_i2c *)i2c, i2c->baud_rate);
 }
 
-static void __metal_driver_sifive_i2c0_init(struct metal_i2c *gi2c,
-                                            unsigned int baud_rate,
-                                            metal_i2c_mode_t mode) {
+void metal_i2c_init(struct metal_i2c *gi2c, unsigned int baud_rate,
+                    metal_i2c_mode_t mode) {
     struct __metal_driver_sifive_gpio0 *pinmux =
         __metal_driver_sifive_i2c0_pinmux(gi2c);
     struct __metal_driver_sifive_i2c0 *i2c = (void *)gi2c;
@@ -117,13 +116,12 @@ static void __metal_driver_sifive_i2c0_init(struct metal_i2c *gi2c,
     }
 }
 
-static int __metal_driver_sifive_i2c0_get_baud_rate(struct metal_i2c *gi2c) {
+int metal_i2c_get_baud_rate(struct metal_i2c *gi2c) {
     struct __metal_driver_sifive_i2c0 *i2c = (void *)gi2c;
     return i2c->baud_rate;
 }
 
-static int __metal_driver_sifive_i2c0_set_baud_rate(struct metal_i2c *gi2c,
-                                                    unsigned int baud_rate) {
+int metal_i2c_set_baud_rate(struct metal_i2c *gi2c, unsigned int baud_rate) {
     struct metal_clock *clock = __metal_driver_sifive_i2c0_clock(gi2c);
     struct __metal_driver_sifive_i2c0 *i2c = (void *)gi2c;
     unsigned long base = __metal_driver_sifive_i2c0_control_base(gi2c);
@@ -166,9 +164,8 @@ static int __metal_driver_sifive_i2c0_set_baud_rate(struct metal_i2c *gi2c,
     return ret;
 }
 
-static int __metal_driver_sifive_i2c0_write_addr(unsigned long base,
-                                                 unsigned int addr,
-                                                 unsigned char rw_flag) {
+int metal_i2c_write_addr(unsigned long base, unsigned int addr,
+                         unsigned char rw_flag) {
     time_t timeout;
     int ret = METAL_I2C_RET_OK;
     /* Reset timeout */
@@ -204,10 +201,8 @@ static int __metal_driver_sifive_i2c0_write_addr(unsigned long base,
     return ret;
 }
 
-static int __metal_driver_sifive_i2c0_write(struct metal_i2c *i2c,
-                                            unsigned int addr, unsigned int len,
-                                            unsigned char buf[],
-                                            metal_i2c_stop_bit_t stop_bit) {
+int metal_i2c_write(struct metal_i2c *i2c, unsigned int addr, unsigned int len,
+                    unsigned char buf[], metal_i2c_stop_bit_t stop_bit) {
     __metal_io_u8 command;
     time_t timeout;
     int ret;
@@ -219,8 +214,7 @@ static int __metal_driver_sifive_i2c0_write(struct metal_i2c *i2c,
 
         /* Send address over I2C bus, current driver supports only 7bit
          * addressing */
-        ret =
-            __metal_driver_sifive_i2c0_write_addr(base, addr, METAL_I2C_WRITE);
+        ret = metal_i2c_write_addr(base, addr, METAL_I2C_WRITE);
 
         if (ret != METAL_I2C_RET_OK) {
             /* Write address failed */
@@ -267,10 +261,9 @@ static int __metal_driver_sifive_i2c0_write(struct metal_i2c *i2c,
 
     return ret;
 }
-static int __metal_driver_sifive_i2c0_read(struct metal_i2c *i2c,
-                                           unsigned int addr, unsigned int len,
-                                           unsigned char buf[],
-                                           metal_i2c_stop_bit_t stop_bit) {
+
+int metal_i2c_read(struct metal_i2c *i2c, unsigned int addr, unsigned int len,
+                   unsigned char buf[], metal_i2c_stop_bit_t stop_bit) {
     int ret;
     __metal_io_u8 command;
     time_t timeout;
@@ -282,7 +275,7 @@ static int __metal_driver_sifive_i2c0_read(struct metal_i2c *i2c,
 
         /* Send address over I2C bus, current driver supports only 7bit
          * addressing */
-        ret = __metal_driver_sifive_i2c0_write_addr(base, addr, METAL_I2C_READ);
+        ret = metal_i2c_write_addr(base, addr, METAL_I2C_READ);
 
         if (ret != METAL_I2C_RET_OK) {
             /* Write address failed */
@@ -321,10 +314,9 @@ static int __metal_driver_sifive_i2c0_read(struct metal_i2c *i2c,
     return ret;
 }
 
-static int
-__metal_driver_sifive_i2c0_transfer(struct metal_i2c *i2c, unsigned int addr,
-                                    unsigned char txbuf[], unsigned int txlen,
-                                    unsigned char rxbuf[], unsigned int rxlen) {
+int metal_i2c_transfer(struct metal_i2c *i2c, unsigned int addr,
+                       unsigned char txbuf[], unsigned int txlen,
+                       unsigned char rxbuf[], unsigned int rxlen) {
     __metal_io_u8 command;
     time_t timeout;
     int ret;
@@ -338,8 +330,7 @@ __metal_driver_sifive_i2c0_transfer(struct metal_i2c *i2c, unsigned int addr,
             command = METAL_I2C_CMD_WRITE;
             /* Send address over I2C bus, current driver supports only 7bit
              * addressing */
-            ret = __metal_driver_sifive_i2c0_write_addr(base, addr,
-                                                        METAL_I2C_WRITE);
+            ret = metal_i2c_write_addr(base, addr, METAL_I2C_WRITE);
 
             if (ret != METAL_I2C_RET_OK) {
                 /* Write address failed */
@@ -378,8 +369,7 @@ __metal_driver_sifive_i2c0_transfer(struct metal_i2c *i2c, unsigned int addr,
             command = METAL_I2C_CMD_READ; /* Set command flags */
             /* Send address over I2C bus, current driver supports only 7bit
              * addressing */
-            ret = __metal_driver_sifive_i2c0_write_addr(base, addr,
-                                                        METAL_I2C_READ);
+            ret = metal_i2c_write_addr(base, addr, METAL_I2C_READ);
 
             if (ret != METAL_I2C_RET_OK) {
                 /* Return error */
@@ -413,15 +403,6 @@ __metal_driver_sifive_i2c0_transfer(struct metal_i2c *i2c, unsigned int addr,
 
     return ret;
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_i2c0) = {
-    .i2c.init = __metal_driver_sifive_i2c0_init,
-    .i2c.write = __metal_driver_sifive_i2c0_write,
-    .i2c.read = __metal_driver_sifive_i2c0_read,
-    .i2c.transfer = __metal_driver_sifive_i2c0_transfer,
-    .i2c.get_baud_rate = __metal_driver_sifive_i2c0_get_baud_rate,
-    .i2c.set_baud_rate = __metal_driver_sifive_i2c0_set_baud_rate,
-};
 
 #endif /* METAL_SIFIVE_I2C0 */
 
