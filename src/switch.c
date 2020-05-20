@@ -20,3 +20,21 @@ struct metal_switch *metal_switch_get(char *label) {
     }
     return NULL;
 }
+
+/* Weak stubs for when no driver exists */
+
+int metal_switch_has_label(struct metal_switch *flip, char *label)
+    __attribute__((weak));
+int metal_switch_has_label(struct metal_switch *flip, char *label) { return 0; }
+
+struct metal_interrupt *
+metal_switch_interrupt_controller(struct metal_switch *flip)
+    __attribute__((weak));
+struct metal_interrupt *
+metal_switch_interrupt_controller(struct metal_switch *flip) {
+    return NULL;
+}
+
+int metal_switch_get_interrupt_id(struct metal_switch *flip)
+    __attribute__((weak));
+int metal_switch_get_interrupt_id(struct metal_switch *flip) { return -1; }
