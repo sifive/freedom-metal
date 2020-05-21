@@ -24,7 +24,7 @@ int __metal_driver_cpu_mtimecmp_set(struct metal_cpu *cpu,
 
 struct metal_cpu *__metal_driver_cpu_get(int hartid) {
     if (hartid < __METAL_DT_MAX_HARTS) {
-        return &(__metal_cpu_table[hartid]->cpu);
+        return (struct metal_cpu *)__metal_cpu_table[hartid];
     }
     return (struct metal_cpu *)NULL;
 }
@@ -153,10 +153,10 @@ void __metal_default_beu_handler(int id, void *priv) {}
 
 void __metal_default_timer_handler(int id, void *priv) {
     struct metal_cpu *cpu = __metal_driver_cpu_get(__metal_myhart_id());
-    unsigned long long time = __metal_driver_cpu_mtime_get(cpu);
+    unsigned long long time = metal_cpu_get_mtime(cpu);
 
     /* Set a 10 cycle timer */
-    __metal_driver_cpu_mtimecmp_set(cpu, time + 10);
+    metal_cpu_set_mtimecmp(cpu, time + 10);
 }
 
 /* The metal_external_interrupt_vector_handler() function can be redefined. */
@@ -617,7 +617,7 @@ int __metal_driver_riscv_cpu_controller_command_request(
 
 /* CPU driver !!! */
 
-unsigned long long __metal_driver_cpu_mcycle_get(struct metal_cpu *cpu) {
+unsigned long long metal_cpu_get_timer(struct metal_cpu *cpu) {
     unsigned long long val = 0;
 
 #if __riscv_xlen == 32
@@ -639,7 +639,7 @@ unsigned long long __metal_driver_cpu_mcycle_get(struct metal_cpu *cpu) {
     return val;
 }
 
-unsigned long long __metal_driver_cpu_timebase_get(struct metal_cpu *cpu) {
+unsigned long long metal_cpu_get_timebase(struct metal_cpu *cpu) {
     int timebase;
     if (!cpu) {
         return 0;
@@ -649,7 +649,7 @@ unsigned long long __metal_driver_cpu_timebase_get(struct metal_cpu *cpu) {
     return timebase;
 }
 
-unsigned long long __metal_driver_cpu_mtime_get(struct metal_cpu *cpu) {
+unsigned long long metal_cpu_get_mtime(struct metal_cpu *cpu) {
     unsigned long long time = 0;
     struct metal_interrupt *tmr_intc;
     struct __metal_driver_riscv_cpu_intc *intc =
@@ -666,8 +666,7 @@ unsigned long long __metal_driver_cpu_mtime_get(struct metal_cpu *cpu) {
     return time;
 }
 
-int __metal_driver_cpu_mtimecmp_set(struct metal_cpu *cpu,
-                                    unsigned long long time) {
+int metal_cpu_set_mtimecmp(struct metal_cpu *cpu, unsigned long long time) {
     int rc = -1;
     struct metal_interrupt *tmr_intc;
     struct __metal_driver_riscv_cpu_intc *intc =
@@ -685,7 +684,7 @@ int __metal_driver_cpu_mtimecmp_set(struct metal_cpu *cpu,
 }
 
 struct metal_interrupt *
-__metal_driver_cpu_timer_controller_interrupt(struct metal_cpu *cpu) {
+metal_cpu_timer_interrupt_controller(struct metal_cpu *cpu) {
 #ifdef __METAL_DT_RISCV_CLINT0_HANDLE
     return __METAL_DT_RISCV_CLINT0_HANDLE;
 #else
@@ -698,12 +697,12 @@ __metal_driver_cpu_timer_controller_interrupt(struct metal_cpu *cpu) {
 #endif
 }
 
-int __metal_driver_cpu_get_timer_interrupt_id(struct metal_cpu *cpu) {
+int metal_cpu_timer_get_interrupt_id(struct metal_cpu *cpu) {
     return METAL_INTERRUPT_ID_TMR;
 }
 
 struct metal_interrupt *
-__metal_driver_cpu_sw_controller_interrupt(struct metal_cpu *cpu) {
+metal_cpu_software_interrupt_controller(struct metal_cpu *cpu) {
 #ifdef __METAL_DT_RISCV_CLINT0_HANDLE
     return __METAL_DT_RISCV_CLINT0_HANDLE;
 #else
@@ -716,11 +715,11 @@ __metal_driver_cpu_sw_controller_interrupt(struct metal_cpu *cpu) {
 #endif
 }
 
-int __metal_driver_cpu_get_sw_interrupt_id(struct metal_cpu *cpu) {
+int metal_cpu_software_get_interrupt_id(struct metal_cpu *cpu) {
     return METAL_INTERRUPT_ID_SW;
 }
 
-int __metal_driver_cpu_set_sw_ipi(struct metal_cpu *cpu, int hartid) {
+int metal_cpu_software_set_ipi(struct metal_cpu *cpu, int hartid) {
     int rc = -1;
     struct metal_interrupt *sw_intc;
     struct __metal_driver_riscv_cpu_intc *intc =
@@ -737,7 +736,7 @@ int __metal_driver_cpu_set_sw_ipi(struct metal_cpu *cpu, int hartid) {
     return rc;
 }
 
-int __metal_driver_cpu_clear_sw_ipi(struct metal_cpu *cpu, int hartid) {
+int metal_cpu_software_clear_ipi(struct metal_cpu *cpu, int hartid) {
     int rc = -1;
     struct metal_interrupt *sw_intc;
     struct __metal_driver_riscv_cpu_intc *intc =
@@ -754,7 +753,7 @@ int __metal_driver_cpu_clear_sw_ipi(struct metal_cpu *cpu, int hartid) {
     return rc;
 }
 
-int __metal_driver_cpu_get_msip(struct metal_cpu *cpu, int hartid) {
+int metal_cpu_get_msip(struct metal_cpu *cpu, int hartid) {
     int rc = 0;
     struct metal_interrupt *sw_intc;
     struct __metal_driver_riscv_cpu_intc *intc =
@@ -771,8 +770,7 @@ int __metal_driver_cpu_get_msip(struct metal_cpu *cpu, int hartid) {
     return rc;
 }
 
-struct metal_interrupt *
-__metal_driver_cpu_controller_interrupt(struct metal_cpu *cpu) {
+struct metal_interrupt *metal_cpu_interrupt_controller(struct metal_cpu *cpu) {
     return __metal_driver_cpu_interrupt_controller(cpu);
 }
 
@@ -794,8 +792,8 @@ int __metal_driver_cpu_disable_interrupt(struct metal_cpu *cpu, void *priv) {
     return -1;
 }
 
-int __metal_driver_cpu_exception_register(struct metal_cpu *cpu, int ecode,
-                                          metal_exception_handler_t isr) {
+int metal_cpu_exception_register(struct metal_cpu *cpu, int ecode,
+                                 metal_exception_handler_t isr) {
     struct __metal_driver_riscv_cpu_intc *intc =
         (struct __metal_driver_riscv_cpu_intc *)
             __metal_driver_cpu_interrupt_controller(cpu);
@@ -807,8 +805,7 @@ int __metal_driver_cpu_exception_register(struct metal_cpu *cpu, int ecode,
     return -1;
 }
 
-int __metal_driver_cpu_get_instruction_length(struct metal_cpu *cpu,
-                                              uintptr_t epc) {
+int metal_cpu_get_instruction_length(struct metal_cpu *cpu, uintptr_t epc) {
     /**
      * Per ISA compressed instruction has last two bits of opcode set.
      * The encoding '00' '01' '10' are used for compressed instruction.
@@ -820,18 +817,18 @@ int __metal_driver_cpu_get_instruction_length(struct metal_cpu *cpu,
                : 2;
 }
 
-uintptr_t __metal_driver_cpu_get_exception_pc(struct metal_cpu *cpu) {
+uintptr_t metal_cpu_get_exception_pc(struct metal_cpu *cpu) {
     uintptr_t mepc;
     __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
     return mepc;
 }
 
-int __metal_driver_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t mepc) {
+int metal_cpu_set_exception_pc(struct metal_cpu *cpu, uintptr_t mepc) {
     __asm__ volatile("csrw mepc, %0" ::"r"(mepc));
     return 0;
 }
 
-struct metal_buserror *__metal_driver_cpu_get_buserror(struct metal_cpu *cpu) {
+struct metal_buserror *metal_cpu_get_buserror(struct metal_cpu *cpu) {
     return __metal_driver_cpu_buserror(cpu);
 }
 
@@ -850,27 +847,4 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
         __metal_driver_riscv_cpu_controller_set_vector_mode,
     .controller_vtable.command_request =
         __metal_driver_riscv_cpu_controller_command_request,
-};
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_cpu) = {
-    .cpu_vtable.mcycle_get = __metal_driver_cpu_mcycle_get,
-    .cpu_vtable.timebase_get = __metal_driver_cpu_timebase_get,
-    .cpu_vtable.mtime_get = __metal_driver_cpu_mtime_get,
-    .cpu_vtable.mtimecmp_set = __metal_driver_cpu_mtimecmp_set,
-    .cpu_vtable.tmr_controller_interrupt =
-        __metal_driver_cpu_timer_controller_interrupt,
-    .cpu_vtable.get_tmr_interrupt_id =
-        __metal_driver_cpu_get_timer_interrupt_id,
-    .cpu_vtable.sw_controller_interrupt =
-        __metal_driver_cpu_sw_controller_interrupt,
-    .cpu_vtable.get_sw_interrupt_id = __metal_driver_cpu_get_sw_interrupt_id,
-    .cpu_vtable.set_sw_ipi = __metal_driver_cpu_set_sw_ipi,
-    .cpu_vtable.clear_sw_ipi = __metal_driver_cpu_clear_sw_ipi,
-    .cpu_vtable.get_msip = __metal_driver_cpu_get_msip,
-    .cpu_vtable.controller_interrupt = __metal_driver_cpu_controller_interrupt,
-    .cpu_vtable.exception_register = __metal_driver_cpu_exception_register,
-    .cpu_vtable.get_ilen = __metal_driver_cpu_get_instruction_length,
-    .cpu_vtable.get_epc = __metal_driver_cpu_get_exception_pc,
-    .cpu_vtable.set_epc = __metal_driver_cpu_set_exception_pc,
-    .cpu_vtable.get_buserror = __metal_driver_cpu_get_buserror,
 };
