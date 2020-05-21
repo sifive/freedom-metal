@@ -399,9 +399,9 @@ void metal_spi_init(struct metal_spi *gspi, int baud_rate) {
             __metal_driver_sifive_spi0_pinmux_output_selector(gspi);
         long pinmux_source_selector =
             __metal_driver_sifive_spi0_pinmux_source_selector(gspi);
-        pinmux->gpio.vtable->enable_io((struct metal_gpio *)pinmux,
-                                       pinmux_output_selector,
-                                       pinmux_source_selector);
+        metal_gpio_enable_pinmux((struct metal_gpio *)pinmux,
+                                 pinmux_output_selector,
+                                 pinmux_source_selector);
     }
 }
 

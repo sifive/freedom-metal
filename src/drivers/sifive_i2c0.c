@@ -100,9 +100,9 @@ void metal_i2c_init(struct metal_i2c *gi2c, unsigned int baud_rate,
             __metal_driver_sifive_i2c0_pinmux_output_selector(gi2c);
         long pinmux_source_selector =
             __metal_driver_sifive_i2c0_pinmux_source_selector(gi2c);
-        pinmux->gpio.vtable->enable_io((struct metal_gpio *)pinmux,
-                                       pinmux_output_selector,
-                                       pinmux_source_selector);
+        metal_gpio_enable_pinmux((struct metal_gpio *)pinmux,
+                                 pinmux_output_selector,
+                                 pinmux_source_selector);
 
         /* 1: Master 0: Slave */
         if (mode == METAL_I2C_MASTER) {

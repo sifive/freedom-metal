@@ -211,9 +211,9 @@ void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate) {
             __metal_driver_sifive_uart0_pinmux_output_selector(guart);
         long pinmux_source_selector =
             __metal_driver_sifive_uart0_pinmux_source_selector(guart);
-        pinmux->gpio.vtable->enable_io((struct metal_gpio *)pinmux,
-                                       pinmux_output_selector,
-                                       pinmux_source_selector);
+        metal_gpio_enable_pinmux((struct metal_gpio *)pinmux,
+                                 pinmux_output_selector,
+                                 pinmux_source_selector);
     }
 }
 

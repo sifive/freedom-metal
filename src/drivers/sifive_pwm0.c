@@ -94,9 +94,9 @@ int metal_pwm_enable(struct metal_pwm *gpwm) {
             long pinmux_source_selector =
                 __metal_driver_sifive_pwm0_pinmux_source_selector(gpwm);
 
-            pinmux->gpio.vtable->enable_io((struct metal_gpio *)pinmux,
-                                           pinmux_output_selector,
-                                           pinmux_source_selector);
+            metal_gpio_enable_pinmux((struct metal_gpio *)pinmux,
+                                     pinmux_output_selector,
+                                     pinmux_source_selector);
         }
 
         /* Initialize default values */
@@ -121,8 +121,8 @@ int metal_pwm_disable(struct metal_pwm *gpwm) {
             /* Disable PWM I/O pins */
             long pinmux_source_selector =
                 __metal_driver_sifive_pwm0_pinmux_source_selector(gpwm);
-            pinmux->gpio.vtable->disable_io((struct metal_gpio *)pinmux,
-                                            pinmux_source_selector);
+            metal_gpio_disable_pinmux((struct metal_gpio *)pinmux,
+                                      pinmux_source_selector);
         }
 
         ret = METAL_PWM_RET_OK;
