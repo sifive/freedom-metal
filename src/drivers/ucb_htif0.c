@@ -60,8 +60,8 @@ static void do_tohost_fromhost(uintptr_t dev, uintptr_t cmd, uintptr_t data) {
 
 void __metal_driver_ucb_htif0_init(struct metal_uart *uart, int baud_rate) {}
 
-void __metal_driver_ucb_htif0_exit(const struct __metal_shutdown *sd,
-                                   int code) {
+void metal_shutdown(int code) __attribute__((noreturn));
+void metal_shutdown(int code) {
     volatile uint64_t magic_mem[8];
     magic_mem[0] = 93; // SYS_exit
     magic_mem[1] = code;
@@ -108,10 +108,6 @@ __metal_driver_ucb_htif0_interrupt_controller(struct metal_uart *uart) {
 int __metal_driver_ucb_htif0_get_interrupt_id(struct metal_uart *uart) {
     return -1;
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_ucb_htif0_shutdown) = {
-    .shutdown.exit = &__metal_driver_ucb_htif0_exit,
-};
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_ucb_htif0_uart) = {
     .uart.init = __metal_driver_ucb_htif0_init,
