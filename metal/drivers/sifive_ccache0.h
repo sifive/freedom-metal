@@ -6,17 +6,10 @@
 
 #include <metal/cache.h>
 #include <metal/compiler.h>
-
-struct __metal_driver_vtable_sifive_ccache0 {
-    struct __metal_cache_vtable cache;
-};
-
-struct __metal_driver_sifive_ccache0;
-
-__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_ccache0)
+#include <stdint.h>
 
 struct __metal_driver_sifive_ccache0 {
-    struct metal_cache cache;
+    uint8_t __no_empty_structs;
 };
 
 #endif

@@ -14,12 +14,11 @@
 #define L2_CONFIG_WAYS_SHIFT 8
 #define L2_CONFIG_WAYS_MASK (0xFF << L2_CONFIG_WAYS_SHIFT)
 
-void __metal_driver_sifive_fu540_c000_l2_init(struct metal_cache *l2, int ways);
-
 METAL_CONSTRUCTOR(metal_driver_sifive_fu540_c000_l2_init) {
 #ifdef __METAL_DT_SIFIVE_FU540_C000_L2_HANDLE
     /* Get the handle for the L2 cache controller */
-    struct metal_cache *l2 = __METAL_DT_SIFIVE_FU540_C000_L2_HANDLE;
+    struct metal_cache *l2 =
+        (struct metal_cache *)__METAL_DT_SIFIVE_FU540_C000_L2_HANDLE;
     if (!l2) {
         return;
     }
@@ -32,17 +31,15 @@ METAL_CONSTRUCTOR(metal_driver_sifive_fu540_c000_l2_init) {
     ways = ((ways & L2_CONFIG_WAYS_MASK) >> L2_CONFIG_WAYS_SHIFT);
 
     /* Enable all the ways */
-    __metal_driver_sifive_fu540_c000_l2_init(l2, ways);
+    metal_cache_init(l2, ways);
 #endif
 }
 
-void __metal_driver_sifive_fu540_c000_l2_init(struct metal_cache *l2,
-                                              int ways) {
+void metal_cache_init(struct metal_cache *l2, int ways) {
     metal_cache_set_enabled_ways(l2, ways);
 }
 
-int __metal_driver_sifive_fu540_c000_l2_get_enabled_ways(
-    struct metal_cache *cache) {
+int metal_cache_get_enabled_ways(struct metal_cache *cache) {
     unsigned long control_base =
         __metal_driver_sifive_fu540_c000_l2_control_base(cache);
 
@@ -53,8 +50,7 @@ int __metal_driver_sifive_fu540_c000_l2_get_enabled_ways(
     return (0xFF & way_enable) + 1;
 }
 
-int __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(
-    struct metal_cache *cache, int ways) {
+int metal_cache_set_enabled_ways(struct metal_cache *cache, int ways) {
     unsigned long control_base =
         __metal_driver_sifive_fu540_c000_l2_control_base(cache);
 
@@ -78,14 +74,6 @@ int __metal_driver_sifive_fu540_c000_l2_set_enabled_ways(
 
     return 0;
 }
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_fu540_c000_l2) = {
-    .cache.init = __metal_driver_sifive_fu540_c000_l2_init,
-    .cache.get_enabled_ways =
-        __metal_driver_sifive_fu540_c000_l2_get_enabled_ways,
-    .cache.set_enabled_ways =
-        __metal_driver_sifive_fu540_c000_l2_set_enabled_ways,
-};
 
 #endif
 
