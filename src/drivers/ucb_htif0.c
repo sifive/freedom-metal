@@ -1,7 +1,7 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/machine.h>
 
 #ifdef METAL_UCB_HTIF0
 
@@ -58,8 +58,6 @@ static void do_tohost_fromhost(uintptr_t dev, uintptr_t cmd, uintptr_t data) {
     }
 }
 
-void __metal_driver_ucb_htif0_init(struct metal_uart *uart, int baud_rate) {}
-
 void metal_shutdown(int code) __attribute__((noreturn));
 void metal_shutdown(int code) {
     volatile uint64_t magic_mem[8];
@@ -75,7 +73,9 @@ void metal_shutdown(int code) {
     }
 }
 
-int __metal_driver_ucb_htif0_putc(struct metal_uart *htif, int c) {
+#ifdef METAL_STDOUT_UCB_HTIF0
+
+int metal_tty_putc(int c) {
     volatile uint64_t magic_mem[8];
     magic_mem[0] = 64; // SYS_write
     magic_mem[1] = 1;
@@ -87,62 +87,6 @@ int __metal_driver_ucb_htif0_putc(struct metal_uart *htif, int c) {
     return 0;
 }
 
-int __metal_driver_ucb_htif0_getc(struct metal_uart *htif, int *c) {
-    return -1;
-}
-
-int __metal_driver_ucb_htif0_get_baud_rate(struct metal_uart *guart) {
-    return 0;
-}
-
-int __metal_driver_ucb_htif0_set_baud_rate(struct metal_uart *guart,
-                                           int baud_rate) {
-    return 0;
-}
-
-struct metal_interrupt *
-__metal_driver_ucb_htif0_interrupt_controller(struct metal_uart *uart) {
-    return NULL;
-}
-
-int __metal_driver_ucb_htif0_get_interrupt_id(struct metal_uart *uart) {
-    return -1;
-}
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_ucb_htif0_uart) = {
-    .uart.init = __metal_driver_ucb_htif0_init,
-    .uart.putc = __metal_driver_ucb_htif0_putc,
-    .uart.getc = __metal_driver_ucb_htif0_getc,
-    .uart.get_baud_rate = __metal_driver_ucb_htif0_get_baud_rate,
-    .uart.set_baud_rate = __metal_driver_ucb_htif0_set_baud_rate,
-    .uart.controller_interrupt = __metal_driver_ucb_htif0_interrupt_controller,
-    .uart.get_interrupt_id = __metal_driver_ucb_htif0_get_interrupt_id,
-};
-
-#ifdef METAL_STDOUT_UCB_HTIF0
-#if defined(__METAL_DT_STDOUT_UART_HANDLE)
-
-METAL_CONSTRUCTOR(metal_tty_init) {
-    metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE, __METAL_DT_STDOUT_UART_BAUD);
-}
-
-int metal_tty_putc(int c) {
-    return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
-}
-
-int metal_tty_getc(int *c) {
-    do {
-        metal_uart_getc(__METAL_DT_STDOUT_UART_HANDLE, c);
-        /* -1 means no key pressed, getc waits */
-    } while (-1 == *c);
-    return 0;
-}
-
-#ifndef __METAL_DT_STDOUT_UART_BAUD
-#define __METAL_DT_STDOUT_UART_BAUD 115200
-#endif
-
-#endif /* __METAL_DT_STDOUT_UART_HANDLE */
 #endif /* METAL_STDOUT_UCB_HTIF0 */
 
 #endif /* METAL_UCB_HTIF0 */
