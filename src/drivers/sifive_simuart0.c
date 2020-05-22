@@ -5,8 +5,8 @@
 
 #ifdef METAL_SIFIVE_SIMUART0
 
-#include <metal/init.h>
 #include <metal/drivers/sifive_simuart0.h>
+#include <metal/init.h>
 #include <metal/machine.h>
 
 /* TXDATA Fields */
@@ -35,17 +35,14 @@ int metal_uart_putc(struct metal_uart *uart, int c) {
     return 0;
 }
 
-int metal_uart_getc(struct metal_uart *uart, int *c) {
-    return 0;
-}
+int metal_uart_getc(struct metal_uart *uart, int *c) { return 0; }
 
 int metal_uart_get_baud_rate(struct metal_uart *guart) {
     struct __metal_driver_sifive_simuart0 *uart = (void *)guart;
     return uart->baud_rate;
 }
 
-int metal_uart_set_baud_rate(struct metal_uart *guart,
-                                                 int baud_rate) {
+int metal_uart_set_baud_rate(struct metal_uart *guart, int baud_rate) {
     struct __metal_driver_sifive_simuart0 *uart = (void *)guart;
     long control_base = __metal_driver_sifive_simuart0_control_base(guart);
     struct metal_clock *clock = __metal_driver_sifive_simuart0_clock(guart);
@@ -60,14 +57,14 @@ int metal_uart_set_baud_rate(struct metal_uart *guart,
     return 0;
 }
 
-void metal_uart_init(struct metal_uart *guart,
-                                         int baud_rate) {}
+void metal_uart_init(struct metal_uart *guart, int baud_rate) {}
 
 #ifdef METAL_STDOUT_SIFIVE_SIMUART0
 #if defined(__METAL_DT_STDOUT_UART_HANDLE)
 
 int metal_tty_putc(int c) {
-    return metal_uart_putc((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE, c);
+    return metal_uart_putc((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE,
+                           c);
 }
 
 #ifndef __METAL_DT_STDOUT_UART_BAUD

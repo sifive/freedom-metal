@@ -76,8 +76,7 @@ int metal_uart_get_baud_rate(struct metal_uart *uart);
  * @param baud_rate The baud rate to configure
  * @return the new baud rate of the UART
  */
-int metal_uart_set_baud_rate(struct metal_uart *uart,
-                                        int baud_rate);
+int metal_uart_set_baud_rate(struct metal_uart *uart, int baud_rate);
 
 /*!
  * @brief Get the interrupt controller of the UART peripheral
@@ -133,8 +132,7 @@ int metal_uart_receive_interrupt_disable(struct metal_uart *uart);
  * @param level The UART transmit watermark level
  * @return 0 upon success
  */
-int metal_uart_set_transmit_watermark(struct metal_uart *uart,
-                                                 size_t level);
+int metal_uart_set_transmit_watermark(struct metal_uart *uart, size_t level);
 
 /*!
  * @brief Get the transmit watermark level of the UART controller
@@ -149,8 +147,7 @@ size_t metal_uart_get_transmit_watermark(struct metal_uart *uart);
  * @param level The UART transmit watermark level
  * @return 0 upon success
  */
-int metal_uart_set_receive_watermark(struct metal_uart *uart,
-                                                size_t level);
+int metal_uart_set_receive_watermark(struct metal_uart *uart, size_t level);
 
 /*!
  * @brief Get the receive watermark level of the UART controller

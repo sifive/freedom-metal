@@ -5,8 +5,8 @@
 
 #ifdef METAL_SIFIVE_UART0
 
-#include <metal/init.h>
 #include <metal/drivers/sifive_uart0.h>
+#include <metal/init.h>
 #include <metal/machine.h>
 
 /* TXDATA Fields */
@@ -77,8 +77,7 @@ int metal_uart_txready(struct metal_uart *uart) {
     return !!((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
 }
 
-int metal_uart_set_tx_watermark(struct metal_uart *uart,
-                                                 size_t level) {
+int metal_uart_set_tx_watermark(struct metal_uart *uart, size_t level) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXCNT(level);
@@ -91,8 +90,7 @@ size_t metal_uart_get_tx_watermark(struct metal_uart *uart) {
     return ((UART_REGW(METAL_SIFIVE_UART0_TXCTRL) >> 16) & 0x7);
 }
 
-int metal_uart_set_rx_watermark(struct metal_uart *uart,
-                                                 size_t level) {
+int metal_uart_set_rx_watermark(struct metal_uart *uart, size_t level) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXCNT(level);
@@ -134,8 +132,7 @@ int metal_uart_get_baud_rate(struct metal_uart *guart) {
     return uart->baud_rate;
 }
 
-int metal_uart_set_baud_rate(struct metal_uart *guart,
-                                              int baud_rate) {
+int metal_uart_set_baud_rate(struct metal_uart *guart, int baud_rate) {
     struct __metal_driver_sifive_uart0 *uart = (void *)guart;
     long control_base = __metal_driver_sifive_uart0_control_base(guart);
     struct metal_clock *clock = __metal_driver_sifive_uart0_clock(guart);
@@ -222,11 +219,13 @@ void metal_uart_init(struct metal_uart *guart, int baud_rate) {
 #if defined(__METAL_DT_STDOUT_UART_HANDLE)
 
 METAL_CONSTRUCTOR(metal_tty_init) {
-    metal_uart_init((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE, __METAL_DT_STDOUT_UART_BAUD);
+    metal_uart_init((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE,
+                    __METAL_DT_STDOUT_UART_BAUD);
 }
 
 int metal_tty_putc(int c) {
-    return metal_uart_putc((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE, c);
+    return metal_uart_putc((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE,
+                           c);
 }
 
 int metal_tty_getc(int *c) {

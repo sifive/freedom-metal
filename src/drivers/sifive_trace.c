@@ -5,8 +5,8 @@
 
 #ifdef METAL_SIFIVE_TRACE
 
-#include <metal/init.h>
 #include <metal/drivers/sifive_trace.h>
+#include <metal/init.h>
 #include <metal/machine.h>
 
 #define TRACE_REG(offset) (((unsigned long)base + (offset)))
