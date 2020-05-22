@@ -119,6 +119,32 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_ucb_htif0_uart) = {
     .uart.get_interrupt_id = __metal_driver_ucb_htif0_get_interrupt_id,
 };
 
+#ifdef METAL_STDOUT_UCB_HTIF0
+#if defined(__METAL_DT_STDOUT_UART_HANDLE)
+
+METAL_CONSTRUCTOR(metal_tty_init) {
+    metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE, __METAL_DT_STDOUT_UART_BAUD);
+}
+
+int metal_tty_putc(int c) {
+    return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
+}
+
+int metal_tty_getc(int *c) {
+    do {
+        metal_uart_getc(__METAL_DT_STDOUT_UART_HANDLE, c);
+        /* -1 means no key pressed, getc waits */
+    } while (-1 == *c);
+    return 0;
+}
+
+#ifndef __METAL_DT_STDOUT_UART_BAUD
+#define __METAL_DT_STDOUT_UART_BAUD 115200
+#endif
+
+#endif /* __METAL_DT_STDOUT_UART_HANDLE */
+#endif /* METAL_STDOUT_UCB_HTIF0 */
+
 #endif /* METAL_UCB_HTIF0 */
 
 typedef int no_empty_translation_units;
