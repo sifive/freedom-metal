@@ -5,7 +5,7 @@
 
 #ifdef METAL_SIFIVE_SIMUART0
 
-#include <assert.h>
+#include <metal/init.h>
 #include <metal/drivers/sifive_simuart0.h>
 #include <metal/machine.h>
 

@@ -5,6 +5,7 @@
 
 #ifdef METAL_SIFIVE_UART0
 
+#include <metal/init.h>
 #include <metal/drivers/sifive_uart0.h>
 #include <metal/machine.h>
 

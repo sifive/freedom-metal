@@ -5,6 +5,7 @@
 
 #ifdef METAL_UCB_HTIF0
 
+#include <metal/init.h>
 #include <metal/drivers/ucb_htif0.h>
 #include <metal/io.h>
 #include <stddef.h>
