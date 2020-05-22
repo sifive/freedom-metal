@@ -19,32 +19,32 @@
     (__METAL_ACCESS_ONCE((__metal_io_u32 *)SIMUART_REG(offset)))
 
 struct metal_interrupt *
-__metal_driver_sifive_simuart0_interrupt_controller(struct metal_uart *uart) {
+metal_uart_interrupt_controller(struct metal_uart *uart) {
     return __metal_driver_sifive_simuart0_interrupt_parent(uart);
 }
 
-int __metal_driver_sifive_simuart0_get_interrupt_id(struct metal_uart *uart) {
+int metal_uart_get_interrupt_id(struct metal_uart *uart) {
     return (__metal_driver_sifive_simuart0_interrupt_line(uart) +
             METAL_INTERRUPT_ID_GL0);
 }
 
-int __metal_driver_sifive_simuart0_putc(struct metal_uart *uart, int c) {
+int metal_uart_putc(struct metal_uart *uart, int c) {
     long control_base = __metal_driver_sifive_simuart0_control_base(uart);
 
     SIMUART_REGW(METAL_SIFIVE_SIMUART0_TXDATA) = c;
     return 0;
 }
 
-int __metal_driver_sifive_simuart0_getc(struct metal_uart *uart, int *c) {
+int metal_uart_getc(struct metal_uart *uart, int *c) {
     return 0;
 }
 
-int __metal_driver_sifive_simuart0_get_baud_rate(struct metal_uart *guart) {
+int metal_uart_get_baud_rate(struct metal_uart *guart) {
     struct __metal_driver_sifive_simuart0 *uart = (void *)guart;
     return uart->baud_rate;
 }
 
-int __metal_driver_sifive_simuart0_set_baud_rate(struct metal_uart *guart,
+int metal_uart_set_baud_rate(struct metal_uart *guart,
                                                  int baud_rate) {
     struct __metal_driver_sifive_simuart0 *uart = (void *)guart;
     long control_base = __metal_driver_sifive_simuart0_control_base(guart);
@@ -60,37 +60,14 @@ int __metal_driver_sifive_simuart0_set_baud_rate(struct metal_uart *guart,
     return 0;
 }
 
-void __metal_driver_sifive_simuart0_init(struct metal_uart *guart,
+void metal_uart_init(struct metal_uart *guart,
                                          int baud_rate) {}
-
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_simuart0) = {
-    .uart.init = __metal_driver_sifive_simuart0_init,
-    .uart.putc = __metal_driver_sifive_simuart0_putc,
-    .uart.getc = __metal_driver_sifive_simuart0_getc,
-    .uart.get_baud_rate = __metal_driver_sifive_simuart0_get_baud_rate,
-    .uart.set_baud_rate = __metal_driver_sifive_simuart0_set_baud_rate,
-    .uart.controller_interrupt =
-        __metal_driver_sifive_simuart0_interrupt_controller,
-    .uart.get_interrupt_id = __metal_driver_sifive_simuart0_get_interrupt_id,
-};
 
 #ifdef METAL_STDOUT_SIFIVE_SIMUART0
 #if defined(__METAL_DT_STDOUT_UART_HANDLE)
 
-METAL_CONSTRUCTOR(metal_tty_init) {
-    metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE, __METAL_DT_STDOUT_UART_BAUD);
-}
-
 int metal_tty_putc(int c) {
-    return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
-}
-
-int metal_tty_getc(int *c) {
-    do {
-        metal_uart_getc(__METAL_DT_STDOUT_UART_HANDLE, c);
-        /* -1 means no key pressed, getc waits */
-    } while (-1 == *c);
-    return 0;
+    return metal_uart_putc((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE, c);
 }
 
 #ifndef __METAL_DT_STDOUT_UART_BAUD

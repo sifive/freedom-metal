@@ -34,49 +34,49 @@
     (__METAL_ACCESS_ONCE((__metal_io_u32 *)UART_REG(offset)))
 
 struct metal_interrupt *
-__metal_driver_sifive_uart0_interrupt_controller(struct metal_uart *uart) {
+metal_uart_interrupt_controller(struct metal_uart *uart) {
     return __metal_driver_sifive_uart0_interrupt_parent(uart);
 }
 
-int __metal_driver_sifive_uart0_get_interrupt_id(struct metal_uart *uart) {
+int metal_uart_get_interrupt_id(struct metal_uart *uart) {
     return __metal_driver_sifive_uart0_interrupt_line(uart);
 }
 
-int __metal_driver_sifive_uart0_tx_interrupt_enable(struct metal_uart *uart) {
+int metal_uart_tx_interrupt_enable(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_TXWM;
     return 0;
 }
 
-int __metal_driver_sifive_uart0_tx_interrupt_disable(struct metal_uart *uart) {
+int metal_uart_tx_interrupt_disable(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_TXWM;
     return 0;
 }
 
-int __metal_driver_sifive_uart0_rx_interrupt_enable(struct metal_uart *uart) {
+int metal_uart_rx_interrupt_enable(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_RXWM;
     return 0;
 }
 
-int __metal_driver_sifive_uart0_rx_interrupt_disable(struct metal_uart *uart) {
+int metal_uart_rx_interrupt_disable(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_RXWM;
     return 0;
 }
 
-int __metal_driver_sifive_uart0_txready(struct metal_uart *uart) {
+int metal_uart_txready(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     return !!((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
 }
 
-int __metal_driver_sifive_uart0_set_tx_watermark(struct metal_uart *uart,
+int metal_uart_set_tx_watermark(struct metal_uart *uart,
                                                  size_t level) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
@@ -84,13 +84,13 @@ int __metal_driver_sifive_uart0_set_tx_watermark(struct metal_uart *uart,
     return 0;
 }
 
-size_t __metal_driver_sifive_uart0_get_tx_watermark(struct metal_uart *uart) {
+size_t metal_uart_get_tx_watermark(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     return ((UART_REGW(METAL_SIFIVE_UART0_TXCTRL) >> 16) & 0x7);
 }
 
-int __metal_driver_sifive_uart0_set_rx_watermark(struct metal_uart *uart,
+int metal_uart_set_rx_watermark(struct metal_uart *uart,
                                                  size_t level) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
@@ -98,23 +98,23 @@ int __metal_driver_sifive_uart0_set_rx_watermark(struct metal_uart *uart,
     return 0;
 }
 
-size_t __metal_driver_sifive_uart0_get_rx_watermark(struct metal_uart *uart) {
+size_t metal_uart_get_rx_watermark(struct metal_uart *uart) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
     return ((UART_REGW(METAL_SIFIVE_UART0_RXCTRL) >> 16) & 0x7);
 }
 
-int __metal_driver_sifive_uart0_putc(struct metal_uart *uart, int c) {
+int metal_uart_putc(struct metal_uart *uart, int c) {
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
 
-    while (__metal_driver_sifive_uart0_txready(uart) != 0) {
+    while (metal_uart_txready(uart) != 0) {
         /* wait */
     }
     UART_REGW(METAL_SIFIVE_UART0_TXDATA) = c;
     return 0;
 }
 
-int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, int *c) {
+int metal_uart_getc(struct metal_uart *uart, int *c) {
     uint32_t ch;
     long control_base = __metal_driver_sifive_uart0_control_base(uart);
     /* No seperate status register, we get status and the byte at same time */
@@ -128,12 +128,12 @@ int __metal_driver_sifive_uart0_getc(struct metal_uart *uart, int *c) {
     return 0;
 }
 
-int __metal_driver_sifive_uart0_get_baud_rate(struct metal_uart *guart) {
+int metal_uart_get_baud_rate(struct metal_uart *guart) {
     struct __metal_driver_sifive_uart0 *uart = (void *)guart;
     return uart->baud_rate;
 }
 
-int __metal_driver_sifive_uart0_set_baud_rate(struct metal_uart *guart,
+int metal_uart_set_baud_rate(struct metal_uart *guart,
                                               int baud_rate) {
     struct __metal_driver_sifive_uart0 *uart = (void *)guart;
     long control_base = __metal_driver_sifive_uart0_control_base(guart);
@@ -181,10 +181,10 @@ static void pre_rate_change_callback_func(void *priv) {
 
 static void post_rate_change_callback_func(void *priv) {
     struct __metal_driver_sifive_uart0 *uart = priv;
-    metal_uart_set_baud_rate(&uart->uart, uart->baud_rate);
+    metal_uart_set_baud_rate((struct metal_uart *)uart, uart->baud_rate);
 }
 
-void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate) {
+void metal_uart_init(struct metal_uart *guart, int baud_rate) {
     struct __metal_driver_sifive_uart0 *uart = (void *)(guart);
     struct metal_clock *clock = __metal_driver_sifive_uart0_clock(guart);
     struct __metal_driver_sifive_gpio0 *pinmux =
@@ -204,7 +204,7 @@ void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate) {
             clock, &(uart->post_rate_change_callback));
     }
 
-    metal_uart_set_baud_rate(&(uart->uart), baud_rate);
+    metal_uart_set_baud_rate(guart, baud_rate);
 
     if (pinmux != NULL) {
         long pinmux_output_selector =
@@ -217,42 +217,20 @@ void __metal_driver_sifive_uart0_init(struct metal_uart *guart, int baud_rate) {
     }
 }
 
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_uart0) = {
-    .uart.init = __metal_driver_sifive_uart0_init,
-    .uart.putc = __metal_driver_sifive_uart0_putc,
-    .uart.getc = __metal_driver_sifive_uart0_getc,
-    .uart.txready = __metal_driver_sifive_uart0_txready,
-    .uart.get_baud_rate = __metal_driver_sifive_uart0_get_baud_rate,
-    .uart.set_baud_rate = __metal_driver_sifive_uart0_set_baud_rate,
-    .uart.controller_interrupt =
-        __metal_driver_sifive_uart0_interrupt_controller,
-    .uart.get_interrupt_id = __metal_driver_sifive_uart0_get_interrupt_id,
-    .uart.tx_interrupt_enable = __metal_driver_sifive_uart0_tx_interrupt_enable,
-    .uart.tx_interrupt_disable =
-        __metal_driver_sifive_uart0_tx_interrupt_disable,
-    .uart.rx_interrupt_enable = __metal_driver_sifive_uart0_rx_interrupt_enable,
-    .uart.rx_interrupt_disable =
-        __metal_driver_sifive_uart0_rx_interrupt_disable,
-    .uart.set_tx_watermark = __metal_driver_sifive_uart0_set_tx_watermark,
-    .uart.get_tx_watermark = __metal_driver_sifive_uart0_get_tx_watermark,
-    .uart.set_rx_watermark = __metal_driver_sifive_uart0_set_rx_watermark,
-    .uart.get_rx_watermark = __metal_driver_sifive_uart0_get_rx_watermark,
-};
-
 #ifdef METAL_STDOUT_SIFIVE_UART0
 #if defined(__METAL_DT_STDOUT_UART_HANDLE)
 
 METAL_CONSTRUCTOR(metal_tty_init) {
-    metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE, __METAL_DT_STDOUT_UART_BAUD);
+    metal_uart_init((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE, __METAL_DT_STDOUT_UART_BAUD);
 }
 
 int metal_tty_putc(int c) {
-    return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
+    return metal_uart_putc((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE, c);
 }
 
 int metal_tty_getc(int *c) {
     do {
-        metal_uart_getc(__METAL_DT_STDOUT_UART_HANDLE, c);
+        metal_uart_getc((struct metal_uart *)__METAL_DT_STDOUT_UART_HANDLE, c);
         /* -1 means no key pressed, getc waits */
     } while (-1 == *c);
     return 0;
