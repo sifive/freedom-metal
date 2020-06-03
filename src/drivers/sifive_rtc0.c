@@ -1,14 +1,10 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
-
 #ifdef METAL_SIFIVE_RTC0
 
 #include <metal/drivers/sifive_rtc0.h>
-#include <metal/machine.h>
-
-#include <limits.h>
+#include <metal/io.h>
 
 /* RTCCFG */
 #define METAL_RTCCFG_RTCSCALE_MASK 0xF
@@ -23,20 +19,18 @@
     (__METAL_ACCESS_ONCE((__metal_io_u32 *)RTC_REG(base, offset)))
 
 uint64_t metal_rtc_get_rate(const struct metal_rtc *const rtc) {
-    const struct metal_clock *const clock =
-        __metal_driver_sifive_rtc0_clock(rtc);
+    struct metal_clock clock = dt_rtc_data[get_index(rtc)].clock;
     return metal_clock_get_rate_hz(clock);
 }
 
 uint64_t metal_rtc_set_rate(const struct metal_rtc *const rtc,
                             const uint64_t rate) {
-    const struct metal_clock *const clock =
-        __metal_driver_sifive_rtc0_clock(rtc);
+    struct metal_clock clock = dt_rtc_data[get_index(rtc)].clock;
     return metal_clock_get_rate_hz(clock);
 }
 
 uint64_t metal_rtc_get_compare(const struct metal_rtc *const rtc) {
-    const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
+    uintptr_t base = dt_rtc_data[get_inedx(rtc)].base_addr;
 
     const uint32_t shift =
         RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCFG) & METAL_RTCCFG_RTCSCALE_MASK;
@@ -46,7 +40,7 @@ uint64_t metal_rtc_get_compare(const struct metal_rtc *const rtc) {
 
 uint64_t metal_rtc_set_compare(const struct metal_rtc *const rtc,
                                const uint64_t compare) {
-    const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
+    uintptr_t base = dt_rtc_data[get_inedx(rtc)].base_addr;
 
     /* Determine the bit shift and shifted value to store in
      * rtccmp0/rtccfg.scale */
@@ -70,7 +64,7 @@ uint64_t metal_rtc_set_compare(const struct metal_rtc *const rtc,
 }
 
 uint64_t metal_rtc_get_count(const struct metal_rtc *const rtc) {
-    const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
+    uintptr_t base = dt_rtc_data[get_inedx(rtc)].base_addr;
 
     uint64_t count = RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCOUNTHI);
     count <<= 32;
@@ -81,7 +75,7 @@ uint64_t metal_rtc_get_count(const struct metal_rtc *const rtc) {
 
 uint64_t metal_rtc_set_count(const struct metal_rtc *const rtc,
                              const uint64_t count) {
-    const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
+    uintptr_t base = dt_rtc_data[get_inedx(rtc)].base_addr;
 
     RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCOUNTHI) = (UINT_MAX & (count >> 32));
     RTC_REGW(base, METAL_SIFIVE_RTC0_RTCCOUNTLO) = (UINT_MAX & count);
@@ -91,7 +85,7 @@ uint64_t metal_rtc_set_count(const struct metal_rtc *const rtc,
 
 int metal_rtc_run(const struct metal_rtc *const rtc,
                   const enum metal_rtc_run_option option) {
-    const uint64_t base = __metal_driver_sifive_rtc0_control_base(rtc);
+    uintptr_t base = dt_rtc_data[get_inedx(rtc)].base_addr;
 
     switch (option) {
     default:
@@ -108,11 +102,11 @@ int metal_rtc_run(const struct metal_rtc *const rtc,
 
 struct metal_interrupt *
 metal_rtc_get_interrupt(const struct metal_rtc *const rtc) {
-    return __metal_driver_sifive_rtc0_interrupt_parent(rtc);
+    return dt_rtc_data[get_index(rtc)].interrupt_parent;
 }
 
 int metal_rtc_get_interrupt_id(const struct metal_rtc *const rtc) {
-    return __metal_driver_sifive_rtc0_interrupt_line(rtc);
+    return dt_rtc_data[get_index(rtc)].interrupt_id;
 }
 
 #endif
