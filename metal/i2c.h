@@ -4,6 +4,8 @@
 #ifndef METAL__I2C_H
 #define METAL__I2C_H
 
+#include <assert.h>
+#include <metal/generated/i2c.h>
 #include <stdint.h>
 
 /*! @brief Enums to enable/disable stop condition. */
@@ -17,20 +19,23 @@ typedef enum { METAL_I2C_SLAVE = 0, METAL_I2C_MASTER = 1 } metal_i2c_mode_t;
 
 /*! @brief A handle for a I2C device. */
 struct metal_i2c {
-    uint8_t __no_empty_structs;
+    uint32_t __i2c_index;
 };
 
 /*! @brief Get a handle for a I2C device.
- * @param device_num The index of the desired I2C device.
+ * @param index The index of the desired I2C device.
  * @return A handle to the I2C device, or NULL if the device does not exist.*/
-struct metal_i2c *metal_i2c_get_device(unsigned int device_num);
+inline const struct metal_i2c metal_i2c_get_device(uint32_t index) {
+	assert(index < __METAL_DT_NUM_I2CS);
+	return (const struct metal_i2c) { index };
+}
 
 /*! @brief Initialize a I2C device with a certain baud rate.
  * @param i2c The handle for the I2C device to initialize.
  * @param baud_rate The baud rate for the I2C device to operate at.
  * @param mode I2C operation mode.
  */
-void metal_i2c_init(struct metal_i2c *i2c, unsigned int baud_rate,
+void metal_i2c_init(struct metal_i2c i2c, unsigned int baud_rate,
                     metal_i2c_mode_t mode);
 
 /*! @brief Perform a I2C write.
@@ -41,7 +46,7 @@ void metal_i2c_init(struct metal_i2c *i2c, unsigned int baud_rate,
  * @param stop_bit Enable / Disable STOP condition.
  * @return 0 if the write succeeds.
  */
-int metal_i2c_write(struct metal_i2c *i2c, unsigned int addr, unsigned int len,
+int metal_i2c_write(struct metal_i2c i2c, unsigned int addr, unsigned int len,
                     unsigned char buf[], metal_i2c_stop_bit_t stop_bit);
 
 /*! @brief Perform a I2C read.
@@ -52,7 +57,7 @@ int metal_i2c_write(struct metal_i2c *i2c, unsigned int addr, unsigned int len,
  * @param stop_bit Enable / Disable STOP condition.
  * @return 0 if the read succeeds.
  */
-int metal_i2c_read(struct metal_i2c *i2c, unsigned int addr, unsigned int len,
+int metal_i2c_read(struct metal_i2c i2c, unsigned int addr, unsigned int len,
                    unsigned char buf[], metal_i2c_stop_bit_t stop_bit);
 
 /*! @brief Performs back to back I2C write and read operations.
@@ -64,7 +69,7 @@ int metal_i2c_read(struct metal_i2c *i2c, unsigned int addr, unsigned int len,
  * @param rxlen The number of bytes to read over I2C.
  * @return 0 if the transfer succeeds.
  */
-int metal_i2c_transfer(struct metal_i2c *i2c, unsigned int addr,
+int metal_i2c_transfer(struct metal_i2c i2c, unsigned int addr,
                        unsigned char txbuf[], unsigned int txlen,
                        unsigned char rxbuf[], unsigned int rxlen);
 
@@ -72,13 +77,13 @@ int metal_i2c_transfer(struct metal_i2c *i2c, unsigned int addr,
  * @param i2c The handle for the I2C device.
  * @return The baud rate in Hz.
  */
-int metal_i2c_get_baud_rate(struct metal_i2c *i2c);
+int metal_i2c_get_baud_rate(struct metal_i2c i2c);
 
 /*! @brief Set the current baud rate of the I2C device.
  * @param i2c The handle for the I2C device.
  * @param baud_rate The desired baud rate of the I2C device.
  * @return 0 If the baud rate is successfully changed.
  */
-int metal_i2c_set_baud_rate(struct metal_i2c *i2c, unsigned int baud_rate);
+int metal_i2c_set_baud_rate(struct metal_i2c i2c, unsigned int baud_rate);
 
 #endif
