@@ -1,12 +1,10 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
-
 #ifdef METAL_SIFIVE_SPI0
-#include <metal/drivers/sifive_spi0.h>
+
+#include <metal/generated/sifive_spi0.h>
 #include <metal/io.h>
-#include <metal/machine.h>
 #include <metal/time.h>
 #include <time.h>
 
@@ -44,7 +42,7 @@
 #define METAL_SPI_CONTROL_IO 0
 #define METAL_SPI_CONTROL_MAPPED 1
 
-#define METAL_SPI_REG(offset) (((unsigned long)control_base + offset))
+#define METAL_SPI_REG(offset) (((unsigned long)base + offset))
 #define METAL_SPI_REGB(offset)                                                 \
     (__METAL_ACCESS_ONCE((__metal_io_u8 *)METAL_SPI_REG(offset)))
 #define METAL_SPI_REGW(offset)                                                 \
@@ -52,9 +50,19 @@
 
 #define METAL_SPI_RXDATA_TIMEOUT 1
 
+static struct __metal_driver_sifive_spi0 {
+    unsigned long baud_rate;
+    metal_clock_callback pre_rate_change_callback;
+    metal_clock_callback post_rate_change_callback;
+} spi_state[__METAL_DT_NUM_SPIS];
+
+static inline get_index(struct metal_spi spi) {
+    return spi.__spi_index;
+}
+
 static int configure_spi(struct metal_spi *spi,
                          struct metal_spi_config *config) {
-    long control_base = __metal_driver_sifive_spi0_control_base(spi);
+    uintptr_t base = dt_spi_data[get_index(spi)].base_addr;
     /* Set protocol */
     METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
     switch (config->protocol) {
@@ -139,7 +147,7 @@ static int configure_spi(struct metal_spi *spi,
 static void spi_mode_switch(struct metal_spi *spi,
                             struct metal_spi_config *config,
                             unsigned int trans_stage) {
-    long control_base = __metal_driver_sifive_spi0_control_base(spi);
+    uintptr_t base = dt_spi_data[get_index(spi)].base_addr;
 
     if (config->multi_wire == trans_stage) {
         METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
@@ -157,13 +165,13 @@ static void spi_mode_switch(struct metal_spi *spi,
     }
 }
 
-int metal_spi_transfer(struct metal_spi *gspi, struct metal_spi_config *config,
+int metal_spi_transfer(struct metal_spi spi, struct metal_spi_config *config,
                        size_t len, char *tx_buf, char *rx_buf) {
-    long control_base = __metal_driver_sifive_spi0_control_base(gspi);
+    uintptr_t base = dt_spi_data[get_index(spi)].base_addr;
     int rc = 0;
     size_t i = 0;
 
-    rc = configure_spi(gspi, config);
+    rc = configure_spi(spi, config);
     if (rc != 0) {
         return rc;
     }
@@ -177,7 +185,7 @@ int metal_spi_transfer(struct metal_spi *gspi, struct metal_spi_config *config,
     /* Declare time_t variables to break out of infinite while loop */
     time_t endwait;
 
-    for (i = 0; i < config->cmd_num; i++) {
+    for (int i = 0; i < config->cmd_num; i++) {
 
         while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
             ;
@@ -206,7 +214,7 @@ int metal_spi_transfer(struct metal_spi *gspi, struct metal_spi_config *config,
     }
 
     /* switch to Dual/Quad mode */
-    spi_mode_switch(gspi, config, MULTI_WIRE_ADDR_DATA);
+    spi_mode_switch(spi, config, MULTI_WIRE_ADDR_DATA);
 
     /* Send Addr data */
     for (; i < (config->cmd_num + config->addr_num); i++) {
@@ -265,7 +273,7 @@ int metal_spi_transfer(struct metal_spi *gspi, struct metal_spi_config *config,
     }
 
     /* switch to Dual/Quad mode */
-    spi_mode_switch(gspi, config, MULTI_WIRE_DATA_ONLY);
+    spi_mode_switch(spi, config, MULTI_WIRE_DATA_ONLY);
 
     for (; i < len; i++) {
         /* Master send bytes to the slave */
@@ -321,20 +329,18 @@ int metal_spi_transfer(struct metal_spi *gspi, struct metal_spi_config *config,
     return 0;
 }
 
-int metal_spi_get_baud_rate(struct metal_spi *gspi) {
-    struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
-    return spi->baud_rate;
+int metal_spi_get_baud_rate(struct metal_spi spi) {
+    return spi_state[get_index(spi)].baud_rate;
 }
 
-int metal_spi_set_baud_rate(struct metal_spi *gspi, int baud_rate) {
-    long control_base = __metal_driver_sifive_spi0_control_base(gspi);
-    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(gspi);
-    struct __metal_driver_sifive_spi0 *spi = (void *)gspi;
+int metal_spi_set_baud_rate(struct metal_spi spi, int baud_rate) {
+    uintptr_t base = dt_spi_data[get_index(spi)].base_addr;
 
-    spi->baud_rate = baud_rate;
+    spi_state[get_index(spi)].baud_rate = baud_rate;
 
+    struct metal_clock *clock = dt_spi_data[get_index(spi)].clock;
     if (clock != NULL) {
-        long clock_rate = clock->vtable->get_rate_hz(clock);
+        long clock_rate = metal_clock_get_rate_hz(clock);
 
         /* Calculate divider */
         long div = (clock_rate / (2 * baud_rate)) - 1;
@@ -355,8 +361,8 @@ int metal_spi_set_baud_rate(struct metal_spi *gspi, int baud_rate) {
 }
 
 static void pre_rate_change_callback_func(void *priv) {
-    long control_base =
-        __metal_driver_sifive_spi0_control_base((struct metal_spi *)priv);
+    struct metal_spi spi = priv;
+    uintptr_t base = dt_spi_data[get_index(spi)].base_addr;
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to one and waiting until an interrupt is pending (indicating an empty
@@ -369,39 +375,33 @@ static void pre_rate_change_callback_func(void *priv) {
 }
 
 static void post_rate_change_callback_func(void *priv) {
-    struct __metal_driver_sifive_spi0 *spi = priv;
-    metal_spi_set_baud_rate((struct metal_spi *)spi, spi->baud_rate);
+    struct metal_spi spi = priv;
+    metal_spi_set_baud_rate(spi, spi_state[get_index(spi)].baud_rate);
 }
 
-void metal_spi_init(struct metal_spi *gspi, int baud_rate) {
-    struct __metal_driver_sifive_spi0 *spi = (void *)(gspi);
-    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(gspi);
-    struct __metal_driver_sifive_gpio0 *pinmux =
-        __metal_driver_sifive_spi0_pinmux(gspi);
-
+void metal_spi_init(struct metal_spi spi, int baud_rate) {
+    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(spi);
     if (clock != NULL) {
-        spi->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
-        spi->pre_rate_change_callback.priv = spi;
-        metal_clock_register_pre_rate_change_callback(
-            clock, &(spi->pre_rate_change_callback));
+        metal_clock_callback_t pre_cb = &spi_state[index].pre_rate_change_callback;
+        metal_clock_callback_t post_cb = &spi_state[index].post_rate_change_callback;
 
-        spi->post_rate_change_callback.callback =
-            &post_rate_change_callback_func;
-        spi->post_rate_change_callback.priv = spi;
-        metal_clock_register_post_rate_change_callback(
-            clock, &(spi->post_rate_change_callback));
+        pre_cb->callback = &pre_rate_change_callback_func;
+        pre_cb->priv = spi;
+        metal_clock_register_pre_rate_change_callback(clock, pre_cb);
+
+        post_cb->callback = &post_rate_change_callback_func;
+        post_cb->priv = spi;
+        metal_clock_register_post_rate_change_callback(clock, post_cb);
     }
 
-    metal_spi_set_baud_rate(gspi, baud_rate);
+    metal_spi_set_baud_rate(spi, baud_rate);
 
-    if (pinmux != NULL) {
-        long pinmux_output_selector =
-            __metal_driver_sifive_spi0_pinmux_output_selector(gspi);
-        long pinmux_source_selector =
-            __metal_driver_sifive_spi0_pinmux_source_selector(gspi);
-        metal_gpio_enable_pinmux((struct metal_gpio *)pinmux,
-                                 pinmux_output_selector,
-                                 pinmux_source_selector);
+    int has_pinmux = dt_spi_data[index].has_pinmux;
+    if (has_pinmux) {
+        struct metal_gpio pinmux = dt_spi_data[index].pinmux;
+        uint32_t output_sel = dt_spi_data[index].pinmux_output_selector;
+        uint32_t source_sel = dt_spi_data[index].pinmux_source_selector;
+        metal_gpio_enable_io(pinmux, output_sel, source_sel);
     }
 }
 

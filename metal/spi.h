@@ -37,19 +37,21 @@ struct metal_spi_config {
 
 /*! @brief A handle for a SPI device */
 struct metal_spi {
-    uint8_t __no_empty_structs;
+    uint32_t __spi_index;
 };
 
 /*! @brief Get a handle for a SPI device
- * @param device_num The index of the desired SPI device
+ * @param index The index of the desired SPI device
  * @return A handle to the SPI device, or NULL if the device does not exist*/
-struct metal_spi *metal_spi_get_device(unsigned int device_num);
+inline struct metal_spi metal_spi_get_device(unsigned int index) {
+    assert(index < __METAL_DT_NUM_SPIS);
+}
 
 /*! @brief Initialize a SPI device with a certain baud rate
  * @param spi The handle for the SPI device to initialize
  * @param baud_rate The baud rate to set the SPI device to
  */
-void metal_spi_init(struct metal_spi *spi, int baud_rate);
+void metal_spi_init(struct metal_spi spi, int baud_rate);
 
 /*! @brief Perform a SPI transfer
  * @param spi The handle for the SPI device to perform the transfer
@@ -61,20 +63,20 @@ void metal_spi_init(struct metal_spi *spi, int baud_rate);
  * NULL, the SPI will ignore received bytes.
  * @return 0 if the transfer succeeds
  */
-int metal_spi_transfer(struct metal_spi *spi, struct metal_spi_config *config,
+int metal_spi_transfer(struct metal_spi spi, struct metal_spi_config *config,
                        size_t len, char *tx_buf, char *rx_buf);
 
 /*! @brief Get the current baud rate of the SPI device
  * @param spi The handle for the SPI device
  * @return The baud rate in Hz
  */
-int metal_spi_get_baud_rate(struct metal_spi *spi);
+int metal_spi_get_baud_rate(struct metal_spi spi);
 
 /*! @brief Set the current baud rate of the SPI device
  * @param spi The handle for the SPI device
  * @param baud_rate The desired baud rate of the SPI device
  * @return 0 if the baud rate is successfully changed
  */
-int metal_spi_set_baud_rate(struct metal_spi *spi, int baud_rate);
+int metal_spi_set_baud_rate(struct metal_spi spi, int baud_rate);
 
 #endif
