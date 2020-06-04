@@ -4,6 +4,8 @@
 #ifndef METAL__DRIVERS__RISCV_CPU_H
 #define METAL__DRIVERS__RISCV_CPU_H
 
+{% include 'template_comment.h' %}
+
 #include <metal/compiler.h>
 #include <metal/cpu.h>
 #include <stdint.h>
@@ -182,8 +184,19 @@ struct __metal_driver_riscv_cpu_intc {
 };
 
 /* CPU driver*/
-struct __metal_driver_cpu {
-    unsigned int hpm_count; /* Available HPM counters per CPU */
+
+static struct dt_cpu_data {
+    uint64_t timebase;
+    struct metal_interrupt *interrupt_controller;
+    struct metal_buserror buserror;
+} dt_cpu_data {
+    {% for hart in harts %}
+    {
+        .timebase = {{ hart.timebase }},
+        .interrupt_controller = (struct metal_interrupt *) {{ metal_interrupt(hart.interrupt_controller.id) }},
+        .buserror = (struct metal_buserror) { {{ hart.beu.id }} }
+    },
+    {% endfor %}
 };
 
 #endif
