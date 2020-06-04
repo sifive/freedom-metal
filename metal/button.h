@@ -20,7 +20,7 @@
  * a button on a development board.
  */
 struct metal_button {
-    uint8_t __no_empty_structs;
+    uint32_t __button_index;
 };
 
 /*!
@@ -29,7 +29,7 @@ struct metal_button {
  * @param label The DeviceTree label for the button
  * @return A handle for the button
  */
-struct metal_button *metal_button_get(char *label);
+struct metal_button metal_button_get(char *label);
 
 /*!
  * @brief Get the interrupt controller for a button
@@ -39,7 +39,7 @@ struct metal_button *metal_button_get(char *label);
  * button interrupts.
  */
 struct metal_interrupt *
-metal_button_interrupt_controller(struct metal_button *button);
+metal_button_interrupt_controller(struct metal_button button);
 
 /*!
  * @brief Get the interrupt id for a button
@@ -47,7 +47,7 @@ metal_button_interrupt_controller(struct metal_button *button);
  * @param button The handle for the button
  * @return The interrupt id corresponding to a button.
  */
-int metal_button_get_interrupt_id(struct metal_button *button);
+int metal_button_get_interrupt_id(struct metal_button button);
 
 /*!
  * @brief Check if a button has a given label
@@ -56,6 +56,6 @@ int metal_button_get_interrupt_id(struct metal_button *button);
  * @param label A null-terminated string
  * @return True if the button label matches
  */
-int metal_button_has_label(struct metal_button *button, char *label);
+int metal_button_has_label(struct metal_button button, char *label);
 
 #endif
