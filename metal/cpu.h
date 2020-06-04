@@ -10,6 +10,7 @@
 #define METAL__CPU_H
 
 #include <assert.h>
+#include <metal/generated/cpu.h>
 #include <metal/interrupt.h>
 #include <stdint.h>
 
@@ -244,6 +245,6 @@ int metal_cpu_set_exception_pc(struct metal_cpu cpu, uintptr_t epc);
  * @param cpu The CPU device handle
  * @return A pointer to the bus error unit handle
  */
-struct metal_buserror *metal_cpu_get_buserror(struct metal_cpu cpu);
+struct metal_buserror metal_cpu_get_buserror(struct metal_cpu cpu);
 
 #endif

@@ -52,7 +52,7 @@ typedef enum {
  * @brief The handle for a bus error unit
  */
 struct metal_buserror {
-    uint8_t __no_empty_structs;
+    uint32_t __beu_index;
 };
 
 /*!
@@ -67,7 +67,7 @@ struct metal_buserror {
  * disabled
  * @return 0 upon success
  */
-int metal_buserror_set_event_enabled(struct metal_buserror *beu,
+int metal_buserror_set_event_enabled(struct metal_buserror beu,
                                      metal_buserror_event_t events,
                                      bool enabled);
 
@@ -77,7 +77,7 @@ int metal_buserror_set_event_enabled(struct metal_buserror *beu,
  * @return A mask of all enabled events
  */
 metal_buserror_event_t
-metal_buserror_get_event_enabled(struct metal_buserror *beu);
+metal_buserror_get_event_enabled(struct metal_buserror beu);
 
 /*!
  * @brief Enable or disable the platform interrupt
@@ -87,7 +87,7 @@ metal_buserror_get_event_enabled(struct metal_buserror *beu);
  * @param enabled True if the interrupt should be enabled
  * @return 0 upon success
  */
-int metal_buserror_set_platform_interrupt(struct metal_buserror *beu,
+int metal_buserror_set_platform_interrupt(struct metal_buserror beu,
                                           metal_buserror_event_t events,
                                           bool enabled);
 
@@ -99,7 +99,7 @@ int metal_buserror_set_platform_interrupt(struct metal_buserror *beu,
  * @param enabled True if the interrupt should be enabled
  * @return 0 upon success
  */
-int metal_buserror_set_local_interrupt(struct metal_buserror *beu,
+int metal_buserror_set_local_interrupt(struct metal_buserror beu,
                                        metal_buserror_event_t events,
                                        bool enabled);
 
@@ -112,7 +112,7 @@ int metal_buserror_set_local_interrupt(struct metal_buserror *beu,
  * @param beu The bus error unit handle
  * @return The event which caused the interrupt
  */
-metal_buserror_event_t metal_buserror_get_cause(struct metal_buserror *beu);
+metal_buserror_event_t metal_buserror_get_cause(struct metal_buserror beu);
 
 /*!
  * @brief Clear the cause register for the bus error unit
@@ -123,7 +123,7 @@ metal_buserror_event_t metal_buserror_get_cause(struct metal_buserror *beu);
  * @param beu The bus error unit handle
  * @return 0 upon success
  */
-int metal_buserror_clear_cause(struct metal_buserror *beu);
+int metal_buserror_clear_cause(struct metal_buserror beu);
 
 /*!
  * @brief Get the physical address of the error event
@@ -134,7 +134,7 @@ int metal_buserror_clear_cause(struct metal_buserror *beu);
  * @param beu The bus error unit handle
  * @return The address of the error event
  */
-uintptr_t metal_buserror_get_event_address(struct metal_buserror *beu);
+uintptr_t metal_buserror_get_event_address(struct metal_buserror beu);
 
 /*!
  * @brief Returns true if the event is set in the accrued register
@@ -143,7 +143,7 @@ uintptr_t metal_buserror_get_event_address(struct metal_buserror *beu);
  * @param event The event to query
  * @return True if the event is set in the accrued register
  */
-bool metal_buserror_is_event_accrued(struct metal_buserror *beu,
+bool metal_buserror_is_event_accrued(struct metal_buserror beu,
                                      metal_buserror_event_t events);
 
 /*!
@@ -153,7 +153,7 @@ bool metal_buserror_is_event_accrued(struct metal_buserror *beu,
  * @param event The event to clear
  * @return 0 upon success
  */
-int metal_buserror_clear_event_accrued(struct metal_buserror *beu,
+int metal_buserror_clear_event_accrued(struct metal_buserror beu,
                                        metal_buserror_event_t events);
 
 /*!
@@ -163,7 +163,7 @@ int metal_buserror_clear_event_accrued(struct metal_buserror *beu,
  * @return A pointer to the interrupt parent
  */
 struct metal_interrupt *
-metal_buserror_get_platform_interrupt_parent(struct metal_buserror *beu);
+metal_buserror_get_platform_interrupt_parent(struct metal_buserror beu);
 
 /*!
  * @brief Get the platform-level interrupt id for the bus error unit interrupt
@@ -171,7 +171,7 @@ metal_buserror_get_platform_interrupt_parent(struct metal_buserror *beu);
  * @param beu The bus error unit handle
  * @return The interrupt id
  */
-int metal_buserror_get_platform_interrupt_id(struct metal_buserror *beu);
+int metal_buserror_get_platform_interrupt_id(struct metal_buserror beu);
 
 /*!
  * @brief Get the hart-local interrupt id for the bus error unit interrupt
@@ -179,6 +179,6 @@ int metal_buserror_get_platform_interrupt_id(struct metal_buserror *beu);
  * @param beu The bus error unit handle
  * @return The interrupt id
  */
-int metal_buserror_get_local_interrupt_id(struct metal_buserror *beu);
+int metal_buserror_get_local_interrupt_id(struct metal_buserror beu);
 
 #endif
