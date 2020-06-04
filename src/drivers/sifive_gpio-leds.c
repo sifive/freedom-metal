@@ -1,70 +1,74 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
-
 #ifdef METAL_SIFIVE_GPIO_LEDS
 
-#include <metal/drivers/sifive_gpio-leds.h>
+#include <metal/generated/sifive_gpio-leds.h>
 #include <metal/gpio.h>
-#include <metal/machine.h>
 #include <string.h>
 
-int metal_led_has_label(struct metal_led *led, char *label) {
-    if (strcmp(__metal_driver_sifive_gpio_led_label(led), label) == 0) {
+static inline uint32_t get_index(struct metal_led led) {
+    return led.__led_index;
+}
+
+int metal_led_has_label(struct metal_led led, char *label) {
+    if (strcmp(dt_led_data[get_index(led)].label, label) == 0) {
         return 1;
     }
     return 0;
 }
 
-void metal_led_enable(struct metal_led *led) {
-    int pin;
-    struct metal_gpio *gpio;
-
-    pin = __metal_driver_sifive_gpio_led_pin(led);
-    gpio = __metal_driver_sifive_gpio_led_gpio(led);
-
-    if (gpio != NULL) {
-        /* Configure LED as output */
-        metal_gpio_disable_input((struct metal_gpio *)gpio, pin);
-        metal_gpio_enable_output((struct metal_gpio *)gpio, pin);
-    }
+struct metal_led metal_led_get(char *label) {
+    return metal_led_get_rgb(label, "");
 }
 
-void metal_led_on(struct metal_led *led) {
-    int pin;
-    struct metal_gpio *gpio;
+struct metal_led metal_led_get_rgb(char *label, char *color) {
+    assert(label != NULL);
+    assert(color != NULL);
 
-    pin = __metal_driver_sifive_gpio_led_pin(led);
-    gpio = __metal_driver_sifive_gpio_led_gpio(led);
+    char led_label[100];
+    strcpy(led_label, label);
+    strcat(led_label, color);
 
-    if (gpio != NULL) {
-        metal_gpio_set_pin((struct metal_gpio *)gpio, pin, 1);
+    for (uint32_t i = 0; i < __METAL_DT_NUM_LEDS; i++) {
+        struct metal_led led = (struct metal_led ) { i };
+        if (metal_led_has_label(led, led_label)) {
+            return led;
+        }
     }
+
+    assert(0);
+    return (struct metal_led) { 0 };
 }
 
-void metal_led_off(struct metal_led *led) {
-    int pin;
-    struct metal_gpio *gpio;
+void metal_led_enable(struct metal_led led) {
+    struct metal_gpio gpio = dt_led_data[get_index(led)].gpio;
+    uint32_t pin = dt_led_data[get_index(led)].pin;
 
-    pin = __metal_driver_sifive_gpio_led_pin(led);
-    gpio = __metal_driver_sifive_gpio_led_gpio(led);
-
-    if (gpio != NULL) {
-        metal_gpio_set_pin((struct metal_gpio *)gpio, pin, 0);
-    }
+    /* Configure LED as output */
+    metal_gpio_disable_input(gpio, pin);
+    metal_gpio_enable_output(gpio, pin);
 }
 
-void metal_led_toggle(struct metal_led *led) {
-    int pin;
-    struct metal_gpio *gpio;
+void metal_led_on(struct metal_led led) {
+    struct metal_gpio gpio = dt_led_data[get_index(led)].gpio;
+    uint32_t pin = dt_led_data[get_index(led)].pin;
 
-    pin = __metal_driver_sifive_gpio_led_pin(led);
-    gpio = __metal_driver_sifive_gpio_led_gpio(led);
+    metal_gpio_set_pin(gpio, pin, 1);
+}
 
-    if (gpio != NULL) {
-        metal_gpio_toggle_pin((struct metal_gpio *)gpio, pin);
-    }
+void metal_led_off(struct metal_led led) {
+    struct metal_gpio gpio = dt_led_data[get_index(led)].gpio;
+    uint32_t pin = dt_led_data[get_index(led)].pin;
+
+    metal_gpio_set_pin(gpio, pin, 0);
+}
+
+void metal_led_toggle(struct metal_led led) {
+    struct metal_gpio gpio = dt_led_data[get_index(led)].gpio;
+    uint32_t pin = dt_led_data[get_index(led)].pin;
+
+    metal_gpio_toggle_pin(gpio, pin);
 }
 
 #endif
