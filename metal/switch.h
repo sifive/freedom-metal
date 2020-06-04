@@ -16,7 +16,7 @@
  * @brief A handle for a switch
  */
 struct metal_switch {
-    uint8_t __no_empty_structs;
+    uint32_t __switch_index;
 };
 
 /*!
@@ -25,7 +25,7 @@ struct metal_switch {
  * @return A handle to the switch, or NULL if none is found for the requested
  * label
  */
-struct metal_switch *metal_switch_get(char *label);
+struct metal_switch metal_switch_get(char *label);
 
 /*!
  * @brief Get the interrupt controller for a switch
@@ -33,14 +33,14 @@ struct metal_switch *metal_switch_get(char *label);
  * @return The interrupt controller handle
  */
 struct metal_interrupt *
-metal_switch_interrupt_controller(struct metal_switch *sw);
+metal_switch_interrupt_controller(struct metal_switch sw);
 
 /*!
  * @brief Get the interrupt id for a switch
  * @param sw The handle for the switch
  * @return The interrupt ID for the switch
  */
-int metal_switch_get_interrupt_id(struct metal_switch *sw);
+int metal_switch_get_interrupt_id(struct metal_switch sw);
 
 /*!
  * @brief Check if a switch has a given label
@@ -49,6 +49,6 @@ int metal_switch_get_interrupt_id(struct metal_switch *sw);
  * @param label A null-terminated string
  * @return True if the switch label matches
  */
-int metal_switch_has_label(struct metal_switch *sw, char *label);
+int metal_switch_has_label(struct metal_switch sw, char *label);
 
 #endif
