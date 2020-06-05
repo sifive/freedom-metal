@@ -16,7 +16,7 @@
 
 static const struct dt_uart_data {
 	uintptr_t base_addr;
-	struct metal_clock *clock;
+	struct metal_clock clock;
 	bool has_pinmux;
 	struct metal_gpio pinmux;
 	uint32_t pinmux_output_selector;
@@ -28,11 +28,7 @@ static const struct dt_uart_data {
 	{
 	    .base_addr = METAL_SIFIVE_UART0_{{ uart.id }}_BASE_ADDR,
 
-	    {% if defined(uart.clocks) %}
-		    .clock = (struct metal_clock *) {{ metal_clock(uart.clocks[0].id) }},
-	    {% else %}
-		    .clock = NULL,
-	    {% endif %}
+	    .clock = (struct metal_clock) { {{ uart.clocks[0].id }} },
 
 	    .has_pinmux = {{ defined(uart.pinmux) ? 1 : 0 }},
 	    {% if defined(uart.pinmux) %}
@@ -50,5 +46,8 @@ static const struct dt_uart_data {
 	},
 	{% endfor %}
 };
+
+{% set driver_string = tosnakecase(uarts[0].clocks[0].compatible[0]) }
+{% include 'clock_dispatch.h' %}
 
 #endif

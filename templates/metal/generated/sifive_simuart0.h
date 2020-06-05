@@ -13,19 +13,17 @@
 
 static const struct dt_uart_data {
 	uintptr_t base_addr;
-	struct metal_clock *clock;
+	struct metal_clock clock;
 } dt_uart_data[__METAL_DT_NUM_UARTS] = {
 	{% for uart in uarts %}
 	{
 	    .base_addr = METAL_SIFIVE_SIMUART0_{{ uart.id }}_BASE_ADDR,
-
-	    {% if defined(uart.clocks) %}
-		    .clock = (struct metal_clock *) {{ metal_clock(uart.clocks[0].id) }},
-	    {% else %}
-		    .clock = NULL,
-	    {% endif %}
+	    .clock = (struct metal_clock) { {{ uart.clocks[0].id }} },
 	},
 	{% endfor %}
 };
+
+{% set driver_string = tosnakecase(uarts[0].clocks[0].compatible[0]) }
+{% include 'clock_dispatch.h' %}
 
 #endif

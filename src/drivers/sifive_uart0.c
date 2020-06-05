@@ -143,12 +143,12 @@ int metal_uart_get_baud_rate(struct metal_uart guart) {
 int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
     uint32_t index = get_index(uart);
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
-    struct metal_clock *clock = dt_uart_data[get_index(uart)].clock;
+    struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
     uart_state[index].baud_rate = baud_rate;
 
     if (clock != NULL) {
-        long clock_rate =  metal_clock_get_rate_hz(clock);
+        long clock_rate =  dt_clock_get_rate_hz(clock);
         UART_REGW(METAL_SIFIVE_UART0_DIV) = clock_rate / baud_rate - 1;
         UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXEN;
         UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXEN;
@@ -159,7 +159,7 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
 static void pre_rate_change_callback_func(void *priv) {
     struct metal_uart uart = priv;
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
-    struct metal_clock *clock = dt_uart_data[get_index(uart)].clock;
+    struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to one and waiting until an interrupt is pending */
@@ -176,7 +176,7 @@ static void pre_rate_change_callback_func(void *priv) {
 
     long bits_per_symbol =
         (UART_REGW(METAL_SIFIVE_UART0_TXCTRL) & (1 << 1)) ? 9 : 10;
-    long clk_freq = metal_clock_get_rate_hz(clock);
+    long clk_freq = dt_clock_get_rate_hz(clock);
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
     long cycles_to_wait = bits_per_symbol * clk_freq / baud_rate;
 
@@ -193,19 +193,17 @@ static void post_rate_change_callback_func(void *priv) {
 void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
     uint32_t index = get_index(uart);
 
-    struct metal_clock *clock = dt_uart_data[index].clock;
-    if (clock != NULL) {
-        metal_clock_callback_t pre_cb = &uart_state[index].pre_rate_change_callback;
-        metal_clock_callback_t post_cb = &uart_state[index].post_rate_change_callback;
+    struct metal_clock clock = dt_uart_data[index].clock;
+    metal_clock_callback_t pre_cb = &uart_state[index].pre_rate_change_callback;
+    metal_clock_callback_t post_cb = &uart_state[index].post_rate_change_callback;
 
-        pre_cb->callback = &pre_rate_change_callback_func;
-        pre_cb->priv = uart;
-        metal_clock_register_pre_rate_change_callback(clock, pre_cb);
+    pre_cb->callback = &pre_rate_change_callback_func;
+    pre_cb->priv = uart;
+    dt_clock_register_pre_rate_change_callback(clock, pre_cb);
 
-        post_cb->callback = &post_rate_change_callback_func;
-        post_cb->priv = uart;
-        metal_clock_register_post_rate_change_callback(clock, post_cb);
-    }
+    post_cb->callback = &post_rate_change_callback_func;
+    post_cb->priv = uart;
+    dt_clock_register_post_rate_change_callback(clock, post_cb);
 
     metal_uart_set_baud_rate(uart, baud_rate);
 

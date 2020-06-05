@@ -51,15 +51,12 @@ long int metal_watchdog_get_rate(const struct metal_watchdog wdog) {
     uintptr_t base = dt_wdog_data[get_index(wdog)].base_addr;
     struct metal_clock clock = dt_wdog_data[get_index(wdog)].clock;
 
-    if (clock != NULL) {
-        long int clock_rate = metal_clock_get_rate_hz(clock);
+    long int clock_rate = dt_clock_get_rate_hz(clock);
 
-        unsigned int scale = (WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &
-                                    METAL_WDOGCFG_SCALE_MASK);
+    unsigned int scale = (WDOG_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &
+                                METAL_WDOGCFG_SCALE_MASK);
 
-        return clock_rate / (1 << scale);
-    }
-    return 0;
+    return clock_rate / (1 << scale);
 }
 
 long int metal_watchdog_set_rate(const struct metal_watchdog wdog,
@@ -67,41 +64,38 @@ long int metal_watchdog_set_rate(const struct metal_watchdog wdog,
     uintptr_t base = dt_wdog_data[get_index(wdog)].base_addr;
     struct metal_clock clock = dt_wdog_data[get_index(wdog)].clock;
 
-    if (clock != NULL) {
-        const long int clock_rate = metal_clock_get_rate_hz(clock);
+    const long int clock_rate = dt_clock_get_rate_hz(clock);
 
-        if (rate >= clock_rate) {
-            /* We can't scale the rate above the driving clock. Clear the scale
-             * field and return the driving clock rate */
-            WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &=
-                ~(METAL_WDOGCFG_SCALE_MASK);
-            return clock_rate;
-        }
-
-        /* Look for the closest scale value */
-        long min_diff = LONG_MAX;
-        unsigned int min_scale = 0;
-        for (int i = 0; i < METAL_WDOGCFG_SCALE_MASK; i++) {
-            const long int new_rate = clock_rate / (1 << i);
-
-            long int diff = rate - new_rate;
-            if (diff < 0)
-                diff *= -1;
-
-            if (diff < min_diff) {
-                min_diff = diff;
-                min_scale = i;
-            }
-        }
-
+    if (rate >= clock_rate) {
+        /* We can't scale the rate above the driving clock. Clear the scale
+         * field and return the driving clock rate */
         WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &=
             ~(METAL_WDOGCFG_SCALE_MASK);
-        WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |=
-            (METAL_WDOGCFG_SCALE_MASK & min_scale);
-
-        return clock_rate / (1 << min_scale);
+        return clock_rate;
     }
-    return 0;
+
+    /* Look for the closest scale value */
+    long min_diff = LONG_MAX;
+    unsigned int min_scale = 0;
+    for (int i = 0; i < METAL_WDOGCFG_SCALE_MASK; i++) {
+        const long int new_rate = clock_rate / (1 << i);
+
+        long int diff = rate - new_rate;
+        if (diff < 0)
+            diff *= -1;
+
+        if (diff < min_diff) {
+            min_diff = diff;
+            min_scale = i;
+        }
+    }
+
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) &=
+        ~(METAL_WDOGCFG_SCALE_MASK);
+    WDOG_UNLOCK_REGW(base, METAL_SIFIVE_WDOG0_WDOGCFG) |=
+        (METAL_WDOGCFG_SCALE_MASK & min_scale);
+
+    return clock_rate / (1 << min_scale);
 }
 
 long int metal_watchdog_get_timeout(const struct metal_watchdog wdog) {

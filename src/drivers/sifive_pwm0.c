@@ -125,8 +125,8 @@ int metal_pwm_set_freq(struct metal_pwm pwm, unsigned int channel,
     
     int ret = METAL_PWM_RET_ERR;
 
-    struct metal_clock *clock = dt_metal_data[index].clock;
-    if ((clock != NULL) && (channel < num_channels)) {
+    struct metal_clock clock = dt_metal_data[index].clock;
+    if (channel < num_channels) {
         /* Register clock rate change call-backs */
         if (pwm_state[index].freq == 0) {
             metal_clock_callback_t pre_cb = &pwm_state[index].pre_rate_change_callback;
@@ -134,14 +134,14 @@ int metal_pwm_set_freq(struct metal_pwm pwm, unsigned int channel,
 
             pre_cb->callback = &pre_rate_change_callback_func;
             pre_cb->priv = pwm;
-            metal_clock_register_pre_rate_change_callback(clock, pre_cb);
+            dt_clock_register_pre_rate_change_callback(clock, pre_cb);
 
             post_cb->callback = &post_rate_change_callback_func;
             post_cb->priv = pwm;
-            metal_clock_register_post_rate_change_callback(clock, post_cb);
+            dt_clock_register_post_rate_change_callback(clock, post_cb);
         }
 
-        uint64_t clock_rate = metal_clock_get_rate(clock);
+        uint64_t clock_rate = dt_clock_get_rate_hz(clock);
 
         /* Calculate count value for given PWM frequency */
         uint64_t count;

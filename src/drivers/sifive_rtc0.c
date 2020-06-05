@@ -20,13 +20,13 @@
 
 uint64_t metal_rtc_get_rate(const struct metal_rtc *const rtc) {
     struct metal_clock clock = dt_rtc_data[get_index(rtc)].clock;
-    return metal_clock_get_rate_hz(clock);
+    return dt_clock_get_rate_hz(clock);
 }
 
 uint64_t metal_rtc_set_rate(const struct metal_rtc *const rtc,
                             const uint64_t rate) {
     struct metal_clock clock = dt_rtc_data[get_index(rtc)].clock;
-    return metal_clock_get_rate_hz(clock);
+    return dt_clock_get_rate_hz(clock);
 }
 
 uint64_t metal_rtc_get_compare(const struct metal_rtc *const rtc) {

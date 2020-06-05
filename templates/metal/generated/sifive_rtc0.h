@@ -16,7 +16,7 @@
 
 static const struct dt_rtc_data {
 	uintptr_t base_addr;
-	struct metal_clock *clock;
+	struct metal_clock clock;
 	struct metal_interrupt *interrupt_parent;
 	uint32_t interrupt_id;
 } dt_rtc_data[__METAL_DT_NUM_RTCS] = {
@@ -24,11 +24,7 @@ static const struct dt_rtc_data {
 	{
 	    .base_addr = METAL_SIFIVE_RTC0_{{ rtc.id }}_BASE_ADDR,
 
-	    {% if defined(rtc.clocks) %}
-		    .clock = (struct metal_clock *) {{ metal_clock(rtc.clocks[0].id) }},
-	    {% else %}
-		    .clock = NULL,
-	    {% endif %}
+	    .clock = (struct metal_clock) { {{ rtc.clocks[0].id }} },
 
 		{% if defined(rtc.interrupt_parent) %}
 			.interrupt_parent = (struct metal_interrupt *) = {{ metal_interrupt(rtc.interrupt_parent.id) }},
@@ -39,5 +35,8 @@ static const struct dt_rtc_data {
 	},
 	{% endfor %}
 };
+
+{% set driver_string = tosnakecase(rtcs[0].clocks[0].compatible[0]) }
+{% include 'clock_dispatch.h' %}
 
 #endif

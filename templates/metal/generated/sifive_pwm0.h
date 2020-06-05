@@ -19,7 +19,7 @@
 static const struct dt_pwm_data {
 	uintptr_t base_addr;
 	uint32_t num_channels;
-	struct metal_clock *clock;
+	struct metal_clock clock;
 	bool has_pinmux;
 	struct metal_gpio pinmux;
 	uint32_t pinmux_output_selector;
@@ -33,11 +33,7 @@ static const struct dt_pwm_data {
 
 	    .num_channels = {{ pwm.sifive_ncomparators[0] }},
 
-	    {% if defined(pwm.clocks) %}
-		    .clock = (struct metal_clock *) {{ metal_clock(pwm.clocks[0].id) }},
-	    {% else %}
-		    .clock = NULL,
-	    {% endif %}
+	    .clock = (struct metal_clock) { {{ pwm.clocks[0].id }} },
 
 	    .has_pinmux = {{ defined(pwm.pinmux) ? 1 : 0 }},
 	    {% if defined(pwm.pinmux) %}
@@ -55,5 +51,8 @@ static const struct dt_pwm_data {
 	},
 	{% endfor %}
 }
+
+{% set driver_string = tosnakecase(pwms[0].clocks[0].compatible[0]) }
+{% include 'clock_dispatch.h' %}
 
 #endif

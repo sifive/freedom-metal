@@ -16,7 +16,7 @@
 
 static const struct dt_wdog_data {
 	uintptr_t base_addr;
-	struct metal_clock *clock;
+	struct metal_clock clock;
 	bool has_pinmux;
 	uint32_t interrupt_id;
 } dt_wdog_data[__METAL_DT_NUM_WDOGS] = {
@@ -24,11 +24,7 @@ static const struct dt_wdog_data {
 	{
 	    .base_addr = METAL_SIFIVE_WDOG0_{{ wdog.id }}_BASE_ADDR,
 
-	    {% if defined(wdog.clocks) %}
-		    .clock = (struct metal_clock *) {{ metal_clock(wdog.clocks[0].id) }},
-	    {% else %}
-		    .clock = NULL,
-	    {% endif %}
+	    .clock = (struct metal_clock) { {{ wdog.clocks[0].id }} },
 
 		{% if defined(wdog.interrupt_parent) %}
 			.interrupt_parent = (struct metal_interrupt *) = {{ metal_interrupt(wdog.interrupt_parent.id) }},
@@ -39,5 +35,8 @@ static const struct dt_wdog_data {
 	},
 	{% endfor %}
 };
+
+{% set driver_string = tosnakecase(wdogs[0].clocks[0].compatible[0]) }
+{% include 'clock_dispatch.h' %}
 
 #endif

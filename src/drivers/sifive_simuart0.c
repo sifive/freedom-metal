@@ -47,9 +47,9 @@ int metal_uart_get_baud_rate(struct metal_uart uart) {
 int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
     long base = dt_uart_data[get_index(uart)].base_addr;
 
-    struct metal_clock *clock = dt_uart_data[get_index(uart)].clock;
+    struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
     if (clock != NULL) {
-        long clock_rate = metal_clock_get_rate_hz(clock);
+        long clock_rate = dt_clock_get_rate_hz(clock);
         baud_rate[get_index(uart)] = baud_rate;
         SIMUART_REGW(METAL_SIFIVE_SIMUART0_DIV) = clock_rate / baud_rate - 1;
         SIMUART_REGW(METAL_SIFIVE_SIMUART0_TXCTRL) |= SIMUART_TXEN;

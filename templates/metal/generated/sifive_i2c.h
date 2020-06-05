@@ -17,7 +17,7 @@
 
 static const struct dt_i2c_data {
 	uintptr_t base_addr;
-	struct metal_clock *clock;
+	struct metal_clock clock;
 	bool has_pinmux
 	struct metal_gpio pinmux;
 	uint32_t pinmux_output_selector;
@@ -29,11 +29,7 @@ static const struct dt_i2c_data {
 	{
 	    .base_addr = METAL_SIFIVE_I2C0_{{ i2c.id }}_BASE_ADDR,
 
-	    {% if defined(i2c.clocks) %}
-		    .clock = (struct metal_clock *) {{ metal_clock(i2c.clocks[0].id) }},
-	    {% else %}
-		    .clock = NULL,
-	    {% endif %}
+	    .clock = (struct metal_clock) { {{ i2c.clocks[0].id }} },
 
 	    .has_pinmux = {{ defined(i2c.pinmux) ? 1 : 0 }},
 	    {% if defined(i2c.pinmux) %}
@@ -51,5 +47,8 @@ static const struct dt_i2c_data {
 	},
 	{% endfor %}
 };
+
+{% set driver_string = tosnakecase(i2cs[0].clocks[0].compatible[0]) }
+{% include 'clock_dispatch.h' %}
 
 #endif

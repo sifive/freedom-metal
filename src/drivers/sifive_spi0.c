@@ -338,24 +338,22 @@ int metal_spi_set_baud_rate(struct metal_spi spi, int baud_rate) {
 
     spi_state[get_index(spi)].baud_rate = baud_rate;
 
-    struct metal_clock *clock = dt_spi_data[get_index(spi)].clock;
-    if (clock != NULL) {
-        long clock_rate = metal_clock_get_rate_hz(clock);
+    struct metal_clock clock = dt_spi_data[get_index(spi)].clock;
+    long clock_rate = dt_clock_get_rate_hz(clock);
 
-        /* Calculate divider */
-        long div = (clock_rate / (2 * baud_rate)) - 1;
+    /* Calculate divider */
+    long div = (clock_rate / (2 * baud_rate)) - 1;
 
-        if (div > METAL_SPI_SCKDIV_MASK) {
-            /* The requested baud rate is lower than we can support at
-             * the current clock rate */
-            return -1;
-        }
-
-        /* Set divider */
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |=
-            (div & METAL_SPI_SCKDIV_MASK);
+    if (div > METAL_SPI_SCKDIV_MASK) {
+        /* The requested baud rate is lower than we can support at
+         * the current clock rate */
+        return -1;
     }
+
+    /* Set divider */
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
+    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |=
+        (div & METAL_SPI_SCKDIV_MASK);
 
     return 0;
 }
@@ -380,19 +378,17 @@ static void post_rate_change_callback_func(void *priv) {
 }
 
 void metal_spi_init(struct metal_spi spi, int baud_rate) {
-    struct metal_clock *clock = __metal_driver_sifive_spi0_clock(spi);
-    if (clock != NULL) {
-        metal_clock_callback_t pre_cb = &spi_state[index].pre_rate_change_callback;
-        metal_clock_callback_t post_cb = &spi_state[index].post_rate_change_callback;
+    struct metal_clock clock = dt_spi_data[get_index(spi)].clock;
+    metal_clock_callback_t pre_cb = &spi_state[index].pre_rate_change_callback;
+    metal_clock_callback_t post_cb = &spi_state[index].post_rate_change_callback;
 
-        pre_cb->callback = &pre_rate_change_callback_func;
-        pre_cb->priv = spi;
-        metal_clock_register_pre_rate_change_callback(clock, pre_cb);
+    pre_cb->callback = &pre_rate_change_callback_func;
+    pre_cb->priv = spi;
+    dt_clock_register_pre_rate_change_callback(clock, pre_cb);
 
-        post_cb->callback = &post_rate_change_callback_func;
-        post_cb->priv = spi;
-        metal_clock_register_post_rate_change_callback(clock, post_cb);
-    }
+    post_cb->callback = &post_rate_change_callback_func;
+    post_cb->priv = spi;
+    dt_clock_register_post_rate_change_callback(clock, post_cb);
 
     metal_spi_set_baud_rate(spi, baud_rate);
 

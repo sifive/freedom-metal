@@ -67,8 +67,6 @@
 #define METAL_SIFIVE_I2C_INSERT_STOP(stop_flag) ((stop_flag & 0x01UL) << 6)
 #define METAL_SIFIVE_I2C_INSERT_RW_BIT(addr, rw)                               \
     ((addr & 0x7FUL) << 1 | (rw & 0x01UL))
-#define METAL_SIFIVE_I2C_GET_PRESCALER(baud)                                   \
-    ((clock_rate / (baud_rate * 5)) - 1)
 #define METAL_I2C_INIT_OK 1
 #define METAL_I2C_RET_OK 0
 #define METAL_I2C_RET_ERR -1
@@ -102,19 +100,17 @@ void metal_i2c_init(struct metal_i2c i2c, unsigned int baud_rate,
                     metal_i2c_mode_t mode) {
     uint32_t index = get_index(i2c);
 
-    struct metal_clock *clock = dt_i2c_data[index].clock;
-    if (clock != NULL) {
-        metal_clock_callback_t pre_cb = &i2c_state[index].pre_rate_change_callback;
-        metal_clock_callback_t post_cb = &i2c_state[index].post_rate_change_callback;
+    struct metal_clock clock = dt_i2c_data[index].clock;
+    metal_clock_callback_t pre_cb = &i2c_state[index].pre_rate_change_callback;
+    metal_clock_callback_t post_cb = &i2c_state[index].post_rate_change_callback;
 
-        pre_cb->callback = &pre_rate_change_callback_func;
-        pre_cb->priv = i2c;
-        metal_clock_register_pre_rate_change_callback(clock, pre_cb);
+    pre_cb->callback = &pre_rate_change_callback_func;
+    pre_cb->priv = i2c;
+    dt_clock_register_pre_rate_change_callback(clock, pre_cb);
 
-        post_cb->callback = &post_rate_change_callback_func;
-        post_cb->priv = i2c;
-        metal_clock_register_post_rate_change_callback(clock, post_cb);
-    }
+    post_cb->callback = &post_rate_change_callback_func;
+    post_cb->priv = i2c;
+    dt_clock_register_post_rate_change_callback(clock, post_cb);
 
     if (mode == METAL_I2C_MASTER) {
         /* Set requested baud rate */
@@ -140,31 +136,28 @@ int metal_i2c_get_baud_rate(struct metal_i2c i2c) {
 
 int metal_i2c_set_baud_rate(struct metal_i2c i2c, unsigned int baud_rate) {
     uint32_t index = get_index(uart);
-    struct metal_clock *clock = dt_i2c_data[index].clock;
     uintptr_t base = dt_i2c_data[index].base_addr;
 
     int ret = METAL_I2C_RET_ERR;
 
-    if (clock != NULL) {
-        /* Calculate prescaler value */
-        long prescaler = METAL_SIFIVE_I2C_GET_PRESCALER(baud_rate);
+    /* Calculate prescaler value */
+    struct metal_clock clock = dt_i2c_data[index].clock;
+    uint64_t clock_rate = dt_clock_get_rate_hz(clock);
+    long prescaler = ((clock_rate / (baud_rate * 5)) - 1);
 
-        if ((prescaler > METAL_I2C_PRESCALE_MAX) || (prescaler < 0)) {
-            /* Out of range value, return error */
-            METAL_I2C_LOG("I2C Set baud failed.\n");
-        } else {
-            /* Set pre-scaler value */
-            METAL_I2C_REGB(METAL_SIFIVE_I2C0_CONTROL) &= ~METAL_I2C_CONTROL_EN;
-            METAL_I2C_REGB(METAL_SIFIVE_I2C0_PRESCALE_LOW) = prescaler & 0xFF;
-            METAL_I2C_REGB(METAL_SIFIVE_I2C0_PRESCALE_HIGH) =
-                (prescaler >> 8) & 0xFF;
-            METAL_I2C_REGB(METAL_SIFIVE_I2C0_CONTROL) |= METAL_I2C_CONTROL_EN;
-
-            i2c_state[index].baud_rate = baud_rate;
-            ret = METAL_I2C_RET_OK;
-        }
-    } else {
+    if ((prescaler > METAL_I2C_PRESCALE_MAX) || (prescaler < 0)) {
+        /* Out of range value, return error */
         METAL_I2C_LOG("I2C Set baud failed.\n");
+    } else {
+        /* Set pre-scaler value */
+        METAL_I2C_REGB(METAL_SIFIVE_I2C0_CONTROL) &= ~METAL_I2C_CONTROL_EN;
+        METAL_I2C_REGB(METAL_SIFIVE_I2C0_PRESCALE_LOW) = prescaler & 0xFF;
+        METAL_I2C_REGB(METAL_SIFIVE_I2C0_PRESCALE_HIGH) =
+            (prescaler >> 8) & 0xFF;
+        METAL_I2C_REGB(METAL_SIFIVE_I2C0_CONTROL) |= METAL_I2C_CONTROL_EN;
+
+        i2c_state[index].baud_rate = baud_rate;
+        ret = METAL_I2C_RET_OK;
     }
 
     return ret;
