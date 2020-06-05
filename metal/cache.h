@@ -15,7 +15,7 @@
  * @brief a handle for a cache
  */
 struct metal_cache {
-    uint8_t __no_empty_structs;
+    uint32_t __cache_index;
 };
 
 /*!
@@ -25,14 +25,14 @@ struct metal_cache {
  *
  * Initializes a cache with the requested number of ways enabled.
  */
-void metal_cache_init(struct metal_cache *cache, int ways);
+void metal_cache_init(struct metal_cache cache, int ways);
 
 /*!
  * @brief Get the current number of enabled cache ways
  * @param cache The handle for the cache
  * @return The current number of enabled cache ways
  */
-int metal_cache_get_enabled_ways(struct metal_cache *cache);
+int metal_cache_get_enabled_ways(struct metal_cache cache);
 
 /*!
  * @brief Enable the requested number of cache ways
@@ -40,7 +40,7 @@ int metal_cache_get_enabled_ways(struct metal_cache *cache);
  * @param ways The number of ways to enabled
  * @return 0 if the ways are successfully enabled
  */
-int metal_cache_set_enabled_ways(struct metal_cache *cache, int ways);
+int metal_cache_set_enabled_ways(struct metal_cache cache, int ways);
 
 /*!
  * @brief Check if dcache is supported on the core

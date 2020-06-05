@@ -183,3 +183,14 @@ void metal_dcache_l1_discard(int hartid, uintptr_t address) {
         }
     }
 }
+
+/* Stubs for when no L2 cache is present */
+
+void metal_cache_init(struct metal_cache cache, int ways) __attribute__((weak));
+void metal_cache_init(struct metal_cache cache, int ways) {}
+
+int metal_cache_get_enabled_ways(struct metal_cache cache) __attribute__((weak));
+int metal_cache_get_enabled_ways(struct metal_cache cache) {}
+
+int metal_cache_set_enabled_ways(struct metal_cache cache, int ways) __attribute__((weak));
+int metal_cache_set_enabled_ways(struct metal_cache cache, int ways) {}
