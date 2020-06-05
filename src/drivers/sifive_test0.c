@@ -5,17 +5,12 @@
 
 #ifdef METAL_SIFIVE_TEST0
 
-#include <metal/machine.h>
-
-#include <stdint.h>
-
-#include <metal/drivers/sifive_test0.h>
 #include <metal/io.h>
+#include <stdint.h>
 
 void metal_shutdown(int code) __attribute__((noreturn));
 void metal_shutdown(int code) {
-    long base = __metal_driver_sifive_test0_base(
-        (struct __metal_shutdown *)__METAL_DT_SHUTDOWN_HANDLE);
+    uintptr_t base = METAL_SIFIVE_TEST0_0_BASE_ADDR;
     uint32_t out = (code << 16) + (code == 0 ? 0x5555 : 0x3333);
     while (1) {
         __METAL_ACCESS_ONCE((

@@ -11,10 +11,6 @@
 
 #include <stdint.h>
 
-struct __metal_shutdown {
-    uint8_t __no_empty_structs;
-};
-
 /*!
  * @brief The public METAL shutdown interface
  *
