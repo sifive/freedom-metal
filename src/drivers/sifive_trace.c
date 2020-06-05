@@ -5,7 +5,6 @@
 
 #ifdef METAL_SIFIVE_TRACE
 
-#include <metal/drivers/sifive_trace.h>
 #include <metal/init.h>
 #include <metal/machine.h>
 
