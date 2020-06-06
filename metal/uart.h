@@ -14,8 +14,29 @@
 struct metal_uart;
 #undef getc
 #undef putc
+
+typedef enum {
+	METAL_UART_1_STOP   = 0x0,          // 1 stop bit
+	METAL_UART_2_STOP   = 0x1           // 2 stop bits (or 1.5 stop bits if the number of bits per character is 5).
+} uart_stop_bits;
+
+typedef enum {
+	METAL_UART_5_BITS   = 0x0,          // 5 bits per character
+	METAL_UART_6_BITS   = 0x1,          // 6 bits per character
+	METAL_UART_7_BITS   = 0x2,          // 7 bits per character
+	METAL_UART_8_BITS   = 0x3           // 8 bits per character
+} uart_dls;
+
+typedef enum {
+	METAL_UART_NO_PARITY        = 0x0,          // no parity
+	METAL_UART_ODD_PARITY       = 0x1,          // odd parity
+	METAL_UART_EVEN_PARITY      = 0x3           // even parity
+} uart_parity;
+
+
 struct metal_uart_vtable {
     void (*init)(struct metal_uart *uart, int baud_rate);
+    void (*reinit)(struct metal_uart *uart, int baud_rate, uart_dls data, uart_stop_bits stop, uart_parity parity);
     int (*putc)(struct metal_uart *uart, int c);
     int (*txready)(struct metal_uart *uart);
     int (*getc)(struct metal_uart *uart, int *c);
@@ -59,6 +80,21 @@ struct metal_uart *metal_uart_get_device(unsigned int device_num);
 __inline__ void metal_uart_init(struct metal_uart *uart, int baud_rate) {
     uart->vtable->init(uart, baud_rate);
 }
+
+/*!
+ * @brief Initialize the UART device and set the Line Control Configurations
+ * @param uart The UART device handle
+ * @param baud_rate The baud rate to set the UART to
+ * @param data The number of data bits per character that UART will transmit and receive
+ * @param stop The number of stop bits per character that UART will transmit and receive
+ * @param parity For parity generation and detection in transmitted and received serial character
+ */
+
+__inline__ void metal_uart_reinit(struct metal_uart *uart, int baud_rate, uart_dls data, uart_stop_bits stop, uart_parity parity)
+{
+	uart->vtable->reinit(uart, baud_rate, data, stop, parity);
+}
+
 
 /*!
  * @brief Output a character over the UART

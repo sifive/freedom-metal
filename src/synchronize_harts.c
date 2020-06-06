@@ -40,7 +40,7 @@ __attribute__((section(".init"))) void __metal_synchronize_harts() {
 
     /* Disable machine interrupts as a precaution */
     __asm__ volatile("csrc mstatus, %0" ::"r"(METAL_MSTATUS_MIE));
-
+#if 0
     if (hart == 0) {
         /* Hart 0 waits for all harts to set their MSIP bit */
         for (int i = 1; i < __METAL_DT_MAX_HARTS; i++) {
@@ -62,5 +62,6 @@ __attribute__((section(".init"))) void __metal_synchronize_harts() {
             ;
     }
 
+#endif
 #endif /* __METAL_DT_MAX_HARTS > 1 */
 }
