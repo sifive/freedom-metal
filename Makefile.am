@@ -84,6 +84,7 @@ nobase_include_HEADERS += \
 	metal/pwm.h\
 	metal/rtc.h \
 	metal/shutdown.h \
+	metal/scrub.h \
 	metal/spi.h \
 	metal/switch.h \
 	metal/timer.h \
