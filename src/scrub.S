@@ -11,10 +11,19 @@
 .option push
 .option norelax
 
-/* Function to zero-scrub specified memory */
+/* Function to zero-scrub specified memory
+ * a0 : start address for zero-scrub
+ * a1 : size memory region size in bytes
+ */
 .global metal_mem_scrub
 .type metal_mem_scrub, @function
 metal_mem_scrub:
+
+    /* Disable machine interrupts,
+    restore previous mstatus value at exit */
+    li      a3, 8
+    csrrc   t1, mstatus, a3
+
 #if __riscv_xlen == 32
     addi    t0, x0, 4
 1:
@@ -26,12 +35,14 @@ metal_mem_scrub:
     addi    a0, a0, 1
     addi    a1, a1, -1
     bgtz    a1, 1b
+    csrw    mstatus, t1
     ret
 3:
     sw      x0, 0(a0)
     addi    a0, a0, 4
     addi    a1, a1, -4
     bgtz    a1, 1b
+    csrw    mstatus, t1
     ret
 #else
     addi    t0, x0, 8
@@ -44,12 +55,14 @@ metal_mem_scrub:
     addi    a0, a0, 1
     addi    a1, a1, -1
     bgtz    a1, 1b
+    csrw    mstatus, t1
     ret
 3:
     sd      x0, 0(a0)
     addi    a0, a0, 8
     addi    a1, a1, -8
     bgtz    a1, 1b
+    csrw    mstatus, t1
     ret
 #endif
 
@@ -68,7 +81,10 @@ __metal_memory_scrub:
 #endif
     ret
 
-/* Initialize memories to zero */
+/*
+ * Initialize memories to zero
+ * This must be called before setting up any stack(s)
+ */
 .weak __metal_before_start
 .global __metal_before_start
 .type __metal_before_start, @function
@@ -104,12 +120,6 @@ __metal_before_start:
     /* Zero out itim memory */
     la      t1, metal_segment_itim_target_start
     la      t2, metal_segment_itim_target_end
-    beq     t1, t2, 1f
-    jal     __metal_memory_scrub
-1:
-    /* Zero out heap memory */
-    la      t1, metal_segment_heap_target_start
-    la      t2, metal_segment_heap_target_end
     beq     t1, t2, skip_scrub
     jal     __metal_memory_scrub
 

@@ -1,3 +1,4 @@
+#include <metal/scrub.h>
 #include <sys/types.h>
 
 /* brk is handled entirely within the C library.  This limits METAL programs
@@ -35,6 +36,8 @@ char *_sbrk(ptrdiff_t incr) {
         __brk = &metal_segment_heap_target_end;
         return (void *)-1;
     }
+    /* Scrub out allocated memory to avoid spurious ECC errors */
+    metal_mem_scrub(old, incr);
 
     return old;
 }
