@@ -22,7 +22,8 @@ int __metal_driver_sifive_nb2uart0_get_interrupt_id(struct metal_uart *uart)
 {
 	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
- 	UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  1;//temp fix
+ 	//UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x81;//temp fix //we don't have Programmable THRE Interrupt Mode Enable in linux also
+ 	UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x0F;//temp fix
 	return __metal_driver_sifive_nb2uart0_interrupt_line(uart);
 }
 
