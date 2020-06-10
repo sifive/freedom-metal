@@ -159,6 +159,8 @@ typedef struct eMMCRequest
 
     unsigned int blocklen;
 
+    unsigned int blockcnt;
+
     unsigned int dataRemaining;
 
     unsigned char  *dataptr;

@@ -15,6 +15,8 @@
 #include <stdio.h>
 
 #define MAX_COUNT 10000
+#define EMMC_RCA 0x1000
+
 
 #define SD_HOST_CLK 200000000
 #define SD_ADDR_SECTOR_MODE 1
@@ -31,6 +33,10 @@
 #define ERROR_STATUS_MASK 0xFFFF8000
 #define BIT_WIDTH_MASK 0x0F
 #define ERASE_VAL 0x00000000
+
+
+#define METAL_EMMC_BIT_WIDTH 4
+#define METAL_EMMC_BOOT_PARTITION_ENABLE 0
 
 /*
    Host Register Set
@@ -49,6 +55,10 @@ Slot Register Set
 #define REG_SRS13 0x0234
 #define REG_SRS14 0x0238
 */
+
+//SRS01
+
+#define BCCT  16
 
 // SRS10
 #define LEDC	0
@@ -144,25 +154,31 @@ static unsigned long emmc_control_base=0;
 static eMMCRequest_t input_cmd;
 
 
+/*
+static bool conditional_wait(volatile unsigned long reg,uint32_t val, bool condition)
+{
+	uint32_t val=0;
+	do{
+		val=METAL_EMMC_REGW(reg)__METAL_ACCESS_ONCE((__metal_io_u32 *)reg);
+	
+	}while(val & SWR== condition);
+}
+*/
 static void emmc_host_reset()
 {
 	uint32_t timeout=0;
 	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_HRS00) = SWR ;
-	while ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_HRS00) & SWR) == 1)  //wait for HRS0.0 (SWR)= 0
-	{
-		if(timeout > MAX_COUNT){
-			printf("Exit from function \"static void emmc_host_reset()\" due to timeout");
-			exit(1);
-		}
-		else
-			timeout++;
-	}
+
+	//conditional_wait(METAL_SIFIVE_NB2EMMC_HRS00,SWR,true);
+
+	
+	while ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_HRS00) & SWR) == 1);  //wait for HRS0.0 (SWR)= 0
 }
 
 static void emmc_host_set_clock(unsigned int freq)
 {
 	uint32_t sdclkfs, dtcvval;
-	uint32_t timeout=0;
+
 	if(freq) {
 		sdclkfs = (SD_HOST_CLK / 2000) / freq;
 	} else {
@@ -173,22 +189,15 @@ static void emmc_host_set_clock(unsigned int freq)
 	// set clock
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS11) = 0;  // disable SDCE
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS11) = (dtcvval << DTCV) | (sdclkfs << SDCFSL) | (1 << ICE); // ICE (internal clock enable)
-	while ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS11) & (1 << ICS)) == 0) // wait for ICS (internal clock stable)
-	{
-		if(timeout > MAX_COUNT){
-			printf("Exit from function \"static void emmc_host_set_clock()\" due to timeout");
-			exit(1);
-		}
-		else
-			timeout++;
-	}
+
+
+	while ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS11) & (1 << ICS)) == 0); // wait for ICS (internal clock stable)
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS11) = (dtcvval << DTCV) | (sdclkfs << SDCFSL) | (1 << ICE) | (1 << SDCE); // enable SD clock (SRS11.SDCE)
 }
 
 
 static void emmc_host_initialization()
 {
-	uint32_t timeout=0;
 	printf("\n Doing eMMC Reset");
 	// Software reset
 	emmc_host_reset();
@@ -197,15 +206,8 @@ static void emmc_host_initialization()
 	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_HRS06) = EMMC_LEGACY_MODE;
 
 	// sd card detection
-	while ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS09) & (1 << CIns)) == 0)  //wait for SRS9.CI = 1
-		{
-			if(timeout > MAX_COUNT){
-				printf("Exit from function \"static void emmc_host_initialization()\" due to timeout");
-				exit(1);
-			}
-			else
-				timeout++;
-		}
+	while ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS09) & (1 << CIns)) == 0);  //wait for SRS9.CI = 1
+
 	//eMMC card reset
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10) = (7 << BVS) | (1 << BP); //BVS - SD Bus Voltage Select,  BP - SD Bus Power for VDD1
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10) = (7 << BVS) | (0 << BP);
@@ -221,11 +223,49 @@ static void emmc_host_initialization()
 }
 
 
+//-----------------------------------------------------------------------------
+static uint32_t calc_data_tocopy(const eMMCRequest_t* request)
+{
+	uint32_t data_tocopy;
+
+	if (request->dataRemaining < (request->blocklen) ){
+		data_tocopy = request->dataRemaining;
+	} else {
+		data_tocopy = request->blocklen;
+	}
+
+	return (data_tocopy);
+}
+
+//-----------------------------------------------------------------------------
+static void process_databuffer_read(eMMCRequest_t* request)
+{
+	uint32_t data_tocopy = calc_data_tocopy(request);
+
+	request->dataRemaining -= data_tocopy;
+
+	uint8_t *tempdataptr=request->dataptr;
+
+	while(data_tocopy > 0U) 
+	{
+		uint32_t data = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS08);
+		uint8_t byte_count = 4;
+		while(data_tocopy && byte_count) {
+			*((uint8_t*)tempdataptr) = data & 0xFF;
+			data >>= 8;
+			byte_count--;
+			data_tocopy--;
+			tempdataptr++;
+		}
+	}
+}
+
+
+
 static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 {
 	uint32_t cmd=0;
 	uint32_t crccet_val=0;
-	uint32_t timeout=0;
 
 	input_cmd->cmd_response[0]=0;
 	input_cmd->cmd_response[1]=0;
@@ -240,23 +280,25 @@ static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS14) = 0x00000000;  // disable interrupts
 
-	
-	cmd=(input_cmd->cmd << CI) | (input_cmd->response_type << RTS);
-	
 
-	if(input_cmd->response_type==EMMC_RESPONSE_R1B)
+	cmd=(input_cmd->cmd << CI) | (input_cmd->response_type << RTS);
+
+
+	//if((input_cmd->response_type==EMMC_RESPONSE_R1B) ||(input_cmd->response_type==EMMC_RESPONSE_R1))
+	if((input_cmd->response_type==EMMC_RESPONSE_R1B))
 	{
 		crccet_val=3;
 	}else
 	{
 		crccet_val=0;
 	}
-	
+
 	cmd  |= crccet_val<< CRCCE;
 
 	if(input_cmd->data_present)
 	{
 		cmd |=((1 << DPS) | (input_cmd->data_direction << DTDS));
+		METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = input_cmd->blocklen|(input_cmd->blockcnt<<BCCT);
 	}
 
 	printf("Sending eMMC Command CMD%d\n arg=%x",input_cmd->cmd, input_cmd->arg);
@@ -266,16 +308,13 @@ static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 
 	do {
 		input_cmd->status = METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS12);
-			if(timeout > MAX_COUNT) {
-			printf("Exit from function \"static int emmc_host_send_cmd()\" due to timeout");
-			exit(1);
-		}
-			else
-				timeout++;
+
 	} while ((input_cmd->status & ((1 << CC) | (1 << EINT)) ) == 0); // exit loop when CC (command complete) flag is set to 1
 
 	printf("EMMC:CMD%d complete status %x\n",input_cmd->cmd,input_cmd->status);
+
 	input_cmd->status &= ERROR_STATUS_MASK;
+
 
 	if(input_cmd->response_type !=EMMC_RESPONSE_NO_RESP)
 	{
@@ -284,11 +323,35 @@ static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 		input_cmd->cmd_response[2]=METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS06);
 		input_cmd->cmd_response[3]=METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS07);
 
-	printf("Response received %x %x %x %x\n",input_cmd->cmd_response[0],input_cmd->cmd_response[1],input_cmd->cmd_response[2],input_cmd->cmd_response[3]);
+		printf("Response received %x %x %x %x\n",input_cmd->cmd_response[0],input_cmd->cmd_response[1],input_cmd->cmd_response[2],input_cmd->cmd_response[3]);
 	}
 
 	return input_cmd->status;
 }
+static int emmc_select_card (uint32_t card_rca)
+{
+	//eMMCRequest_t input_cmd;
+	input_cmd.cmd=EMMC_CMD7;
+	if (card_rca == 0x000){
+
+		input_cmd.arg=0;
+		input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
+		input_cmd.data_present=0;
+
+		// no response from the deselected Card
+		//sd_emmc_host_send_cmd((7 << CI) | (0 << CRCCE) | (0 << RTS), 0x0000, 0);
+	}
+	else{
+		//  R1/R1b response from the selected Card
+		input_cmd.arg=card_rca << 16;
+		input_cmd.response_type=EMMC_RESPONSE_R1;
+		input_cmd.data_present=0;
+		printf("card selected with RCA %x \n",card_rca );
+	}
+	emmc_host_send_cmd(&input_cmd);
+	return 0;	
+}
+
 
 static void emmc_read_cid()
 {
@@ -301,51 +364,49 @@ static void emmc_read_cid()
 	input_cmd.data_present=0;
 
 	emmc_host_send_cmd(&input_cmd);
-	
-	printf("CID received %x %x %x %x\n",input_cmd.cmd_response[0],input_cmd.cmd_response[1],input_cmd.cmd_response[1],input_cmd.cmd_response[3]);
+
+	printf("CID received %x %x %x %x\n",input_cmd.cmd_response[0],input_cmd.cmd_response[1],input_cmd.cmd_response[2],input_cmd.cmd_response[3]);
 
 
 	uint32_t manufacturerId = (uint8_t)((input_cmd.cmd_response[3] >> 16) & 0xFFU);
-        uint32_t oemApplicationId = (uint16_t)(input_cmd.cmd_response[3] & 0xFFFFU);
+	uint32_t oemApplicationId = (uint16_t)(input_cmd.cmd_response[3] & 0xFFFFU);
 
-	uint32_t name[10];
-        name[0] = (uint8_t)((input_cmd.cmd_response[1] >> 24) & 0xFFU);
-        for (int i = 0U; i < 4U; i++) {
-            uint8_t nameElement = 0U;
-            const uint8_t shift = i * 8U;
-            if (shift < 32U) {
-                nameElement = (uint8_t)((input_cmd.cmd_response[2] >> shift) & 0xFFU);
-            }
-            name[i + 1U] = nameElement;
-        }
+	uint32_t name[20];
+	name[0] = (uint8_t)((input_cmd.cmd_response[1] >> 24) & 0xFFU);
+	for (int i = 0U; i < 4U; i++) {
+		uint8_t nameElement = 0U;
+		const uint8_t shift = i * 8U;
+		if (shift < 32U) {
+			nameElement = (uint8_t)((input_cmd.cmd_response[2] >> shift) & 0xFFU);
+		}
+		name[i + 1U] = nameElement;
+	}
 
-        uint32_t productRevision = (uint8_t)((input_cmd.cmd_response[1] >> 16) & 0xFFU);
+	uint32_t productRevision = (uint8_t)((input_cmd.cmd_response[1] >> 16) & 0xFFU);
 
-        uint32_t productSn = ((input_cmd.cmd_response[0] >> 16) & 0xFFFFU)
-                         | ((input_cmd.cmd_response[1] & 0xFFFFU) << 16);
+	uint32_t productSn = ((input_cmd.cmd_response[0] >> 16) & 0xFFFFU)
+		| ((input_cmd.cmd_response[1] & 0xFFFFU) << 16);
 
-        uint32_t manufacturingDate = (uint16_t)((input_cmd.cmd_response[0]) & 0xFFFU);
+	uint32_t manufacturingDate = (uint16_t)((input_cmd.cmd_response[0]) & 0xFFFU);
 
-
-	printf("\n manufacturerId %x\n",manufacturerId); 
-	printf("\n Name %s\n",name); 
-	printf("\n productRevision %x\n",productRevision); 
-	printf("\n productSn %x\n",productSn); 
-	printf("\n manufacturingDate %x\n",manufacturingDate); 
-
+	printf(" manufacturerId %x\n",manufacturerId); 
+	printf(" Name %s\n",name); 
+	printf(" productRevision %x\n",productRevision); 
+	printf(" productSn %x\n",productSn); 
+	printf(" manufacturingDate %x\n",manufacturingDate); 
 }
 
 
 static int emmc_card_init(unsigned int low_voltage_en)
 {
-	uint32_t timeout=0;
+
 	uint32_t _status;
 	uint32_t _count_delay;
 
 	printf("emmc_card_init\n");
 	// CMD0 - reset all cards to IDLE state
 	//eMMCRequest_t input_cmd;
-	
+
 	input_cmd.cmd=EMMC_CMD0;
 	input_cmd.arg=0;
 	input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
@@ -367,24 +428,25 @@ static int emmc_card_init(unsigned int low_voltage_en)
 
 
 		//sd_emmc_host_send_cmd( (1 << CI) | (2<<RTS), _status, 0);  // voltage and address mode
-		 _status =input_cmd.cmd_response[0];
-		if(timeout > MAX_COUNT) {
-			printf("Exit from function \"static int emmc_card_init()\" due to timeout");
-			exit(1);
-		}
-		else
-			timeout++;
+		_status =input_cmd.cmd_response[0];
 	} while ((_status & 0x80000000) == 0);
 
 	emmc_read_cid();
 
 	// CMD3 - send RCA to eMMC card and go to STBY
-	uint32_t sd_card_rca = 0x12;
+	uint32_t sd_card_rca = EMMC_RCA;
 	input_cmd.cmd=EMMC_CMD3;
 	input_cmd.arg=sd_card_rca<<16;
 	input_cmd.response_type=EMMC_RESPONSE_R1;
 	input_cmd.data_present=0;
-	emmc_host_send_cmd(&input_cmd);  
+	
+	emmc_host_send_cmd(&input_cmd);
+
+	if(EMMC_RCA==((input_cmd.cmd_response[0]>>16) &0xFFFFU))
+	 {
+		printf("RAC set %x\n",((input_cmd.cmd_response[0]>>16) &0xFFFFU));
+         }
+  
 
 	// -- initialization finished --
 	return 0;
@@ -398,7 +460,6 @@ static void emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 	uint32_t timeout=0;
 
 	arg = ((val << 8) | (index << 16) | (3 << 24));
-
 
 	//MMCRequest_t input_cmd;
 	input_cmd.cmd=EMMC_CMD6;
@@ -417,6 +478,99 @@ static void emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 		else
 			timeout++;
 	} while ((status & (1 << TC)) == 0);
+}
+
+
+static void emmc_card_ext_csd_read(uint8_t *rx_data)
+{
+	unsigned int status;
+	long int arg;
+	uint32_t timeout=0;
+
+	printf("Reading eMMC CSD EXT\n");
+
+	emmc_select_card(EMMC_RCA);
+
+	input_cmd.cmd=EMMC_CMD8;
+	input_cmd.arg=0;
+	input_cmd.response_type=EMMC_RESPONSE_R1;
+	input_cmd.data_present=1;
+	input_cmd.data_direction=EMMC_TRANSFER_READ;
+
+	input_cmd.dataptr=rx_data;
+	input_cmd.dataRemaining=512;
+	input_cmd.blockcnt=1;
+	input_cmd.blocklen=512;
+
+	emmc_host_send_cmd(&input_cmd);
+
+
+	while( ((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
+	// wait for BRE(buffer read enable)
+#if 0
+#endif	
+
+	process_databuffer_read(&input_cmd);
+
+	do
+	{
+		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+	} while ((status & (1 << TC)) == 0);
+
+#if 0	
+#endif
+}
+
+static void emmc_card_csd_write( unsigned int index, unsigned int val)
+{
+	unsigned int status;
+	long int arg;
+	uint32_t timeout=0;
+
+	arg = ((val << 8) | (index << 16) | (3 << 24));
+
+	//MMCRequest_t input_cmd;
+	input_cmd.cmd=EMMC_CMD6;
+	input_cmd.arg=arg;
+	input_cmd.response_type=EMMC_RESPONSE_R1B;
+	input_cmd.data_present=0;
+
+	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD6 << CI) | (3 << CRCCE) | (3 << RTS), arg);
+
+	do {
+		status = METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS12);
+		if(timeout > MAX_COUNT) {
+			printf("Exit from function \"static void emmc_card_ext_csd_write()\" due to timeout");
+			exit(1);
+		}
+		else
+			timeout++;
+	} while ((status & (1 << TC)) == 0);
+}
+
+
+static void emmc_card_csd_read(uint8_t *rx_data)
+{
+	unsigned int status;
+	long int arg;
+	uint32_t timeout=0;
+
+	printf("Reading eMMC CSD : CMD9\n");
+
+	emmc_select_card(0);
+
+	input_cmd.cmd=EMMC_CMD9;
+	input_cmd.arg=EMMC_RCA<<16;
+	input_cmd.response_type=EMMC_RESPONSE_R2;
+	input_cmd.data_present=0;
+
+	emmc_host_send_cmd(&input_cmd);
+
+	uint32_t *dataptr=(uint32_t *)rx_data;
+	dataptr[0]=input_cmd.cmd_response[0];
+	dataptr[1]=input_cmd.cmd_response[1];
+	dataptr[2]=input_cmd.cmd_response[2];
+	dataptr[3]=input_cmd.cmd_response[3];
 }
 
 
@@ -449,7 +603,7 @@ static int emmc_host_set_bit_width( char bit_width)
 	}
 
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10) = status;
-	
+
 	val = ((bit_width << 8) | (183 << 16) | (3 << 24));
 
 	//eMMCRequest_t input_cmd;
@@ -459,35 +613,13 @@ static int emmc_host_set_bit_width( char bit_width)
 	input_cmd.data_present=0;
 
 	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD6 << CI) | (3 << CRCCE) | (3 << RTS), val);
-	
+
 	return 0;
 }
 
 
 
-static int emmc_select_card (uint8_t card_rca)
-{
-	//eMMCRequest_t input_cmd;
-	input_cmd.cmd=EMMC_CMD7;
-	if (card_rca == 0x000){
 
-		input_cmd.arg=0;
-		input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
-		input_cmd.data_present=0;
-		emmc_host_send_cmd(&input_cmd);
-
-		// no response from the deselected Card
-		//sd_emmc_host_send_cmd((7 << CI) | (0 << CRCCE) | (0 << RTS), 0x0000, 0);
-		return 1;
-	}
-	else{
-		//  R1/R1b response from the selected Card
-		input_cmd.arg=card_rca << 16;
-		input_cmd.response_type=EMMC_RESPONSE_R1;
-		printf("card selected with RCA %x \n",card_rca );
-	}
-	return 0;	
-}
 
 
 
@@ -509,99 +641,75 @@ static void emmc_toggle_sleep()
 
 
 
-//-----------------------------------------------------------------------------
-static uint32_t calc_data_tocopy(const eMMCRequest_t* request)
-{
-    uint32_t data_tocopy;
 
-    if (request->dataRemaining < (request->blocklen) ){
-        data_tocopy = request->dataRemaining;
-    } else {
-        data_tocopy = request->blocklen;
-    }
-
-    return (data_tocopy);
-}
 
 //-----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-static void process_databuffer_read(eMMCRequest_t* request)
-{
-    uint32_t data_tocopy = calc_data_tocopy(request);
-    uint32_t timeout1=0;
-    uint32_t timeout2=0;
-
-    request->dataRemaining -= data_tocopy;
-
-    uint8_t *tempdataptr=request->dataptr;
-
-    while(data_tocopy > 0U) 
-    {
-        uint32_t data = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS08);
-        uint8_t byte_count = 4;
-	if(timeout1 > MAX_COUNT) {
-		printf("Exit from function \"static void process_databuffer_read()\" due to timeout1");
-		exit(1);
-	}
-	else
-		timeout1++;
-        while(data_tocopy && byte_count) {
-            *((uint8_t*)tempdataptr) = data & 0xFF;
-            data >>= 8;
-            byte_count--;
-            data_tocopy--;
-	    tempdataptr++;
-	    if(timeout2 > MAX_COUNT) {
-		    printf("Exit from function \"static void process_databuffer_read()\" due to timeout2");
-		    exit(1);
-	    }
-	    else
-		    timeout2++;
-        }
-    }
-}
 
 
-
-int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc)
+int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint32_t bootpartion,uint8_t *rx_data,uint8_t size)
 {
 	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
-	
+
+	//Enable partition table 
+	//return of partiton size
+
+
+	//Read EXT_CSD
+
+
+#if 0	
+	input_cmd.cmd=EMMC_CMD0;
+	input_cmd.arg=BOOT_INITIATION;
+	input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
+	input_cmd.data_present=0;
+	emmc_host_send_cmd(&input_cmd);// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), BOOT_INITIATION);	// initiate alternative boot operation
+#endif
 	return 0;
 }
 
 
+	uint32_t datag[128];
 int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 {
-	
 	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
 
 	emmc_host_initialization();
 
-
 	emmc_card_init(1);
 
-	emmc_select_card (0x12);
-		
-	//emmc_host_set_bit_width(4);
-#if 0	
-	emmc_card_ext_csd_write( 179, (1 << BOOT_PARTITION_1_ENABLE) | (1 << BOOT_PARTITION_ACCESS));	// Boot partition 1 enable
+
+	for(int i=0;i<128;i++)
+	datag[i]=0;
+
+	emmc_card_csd_read((uint8_t*)datag);
+	printf("CSD %x %x %x %x\n",datag[0],datag[1],datag[2],datag[3]) ;
+
+
+//	emmc_host_set_bit_width(METAL_EMMC_BIT_WIDTH);
+
+	for(int i=0;i<128;i++)
+	datag[i]=0;
+
+	emmc_card_ext_csd_read((uint8_t*)datag);
+
+
+	//for(int i=0;i<128;i++)
+	//data[i]=0;
+
+	for(int i=0;i<128;i=i+4)
+	printf("CSD_EXT %x %x %x %x\n",datag[i],datag[i+1],datag[i+2],datag[i+3]) ;
+
+	if(METAL_EMMC_BOOT_PARTITION_ENABLE)
+	{
+		emmc_card_ext_csd_write( 179, (1 << BOOT_PARTITION_1_ENABLE) | (1 << BOOT_PARTITION_ACCESS));	// Boot partition 1 enable
+	}
 
 	input_cmd.cmd=EMMC_CMD0;
 	input_cmd.arg=GO_PRE_IDLE_STATE;
 	input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
 	input_cmd.data_present=0;
-
-	emmc_host_send_cmd(&input_cmd);// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), GO_PRE_IDLE_STATE);		// pre-idle state
-	
-	input_cmd.cmd=EMMC_CMD0;
-	input_cmd.arg=BOOT_INITIATION;
-	input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
-	input_cmd.data_present=0;
-
-	emmc_host_send_cmd(&input_cmd);// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), BOOT_INITIATION);		// initiate alternative boot operation
-#endif
+	emmc_host_send_cmd(&input_cmd);// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), GO_PRE_IDLE_STATE);	// pre-idle state
 	return 0;
 }
 
@@ -609,13 +717,12 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 
 int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int addr, const size_t len, char *rx_buff)
 {
-	//uint32_t temp_data[DEVICE_BLOCK_SIZE / 4];
 
 	uint32_t status;
 	uint32_t timeout1=0;
 	uint32_t timeout2=0;
 
-	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS01) = DEVICE_BLOCK_SIZE;
+	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = DEVICE_BLOCK_SIZE;
 
 	emmc_set_block_size(DEVICE_BLOCK_SIZE);
 
@@ -639,22 +746,22 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 			timeout1++;
 	}
 
-		input_cmd.dataptr=rx_buff;
-		input_cmd.dataRemaining=len;
-		input_cmd.blocklen=DEVICE_BLOCK_SIZE;
+	input_cmd.dataptr=rx_buff;
+	input_cmd.dataRemaining=len;
+	input_cmd.blocklen=DEVICE_BLOCK_SIZE;
 
-		process_databuffer_read(&input_cmd);
+	process_databuffer_read(&input_cmd);
 
-		do
-		{
-			status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
-			if(timeout2 > MAX_COUNT) {
-				printf("Exit from function \"__metal_driver_sifive_nb2emmc_read_block()\" due to timeout2");
-				exit(1);
-			}
-			else
-				timeout2++;
-		} while ((status & (1 << TC)) == 0); //to check complition of transmission
+	do
+	{
+		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+		if(timeout2 > MAX_COUNT) {
+			printf("Exit from function \"__metal_driver_sifive_nb2emmc_read_block()\" due to timeout2");
+			exit(1);
+		}
+		else
+			timeout2++;
+	} while ((status & (1 << TC)) == 0); //to check complition of transmission
 
 	return 0;
 }
@@ -709,23 +816,23 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 {
 
 	//eMMCRequest_t input_cmd;
-	
+
 	input_cmd.cmd=EMMC_CMD35;
 	input_cmd.cmd=start_addr;
 	input_cmd.response_type=EMMC_RESPONSE_R1;
 
 	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD35 << CI) |  (2 << CRCCE) |  (2 << RTS), start_addr);
-	
+
 	input_cmd.cmd=EMMC_CMD36;
 	input_cmd.cmd=end_addr;
 	input_cmd.response_type=EMMC_RESPONSE_R1;
-	
+
 	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD36 << CI) |  (2 << CRCCE) |  (2 << RTS), end_addr);
-	
+
 	input_cmd.cmd=EMMC_CMD38;
 	input_cmd.cmd=start_addr;
 	input_cmd.response_type=EMMC_RESPONSE_R1B;
-	
+
 	emmc_host_send_cmd(&input_cmd);//(38 << CI) |  (3 << CRCCE) |  (3 << RTS), ERASE_VAL);
 
 	return 0;

@@ -37,7 +37,7 @@
 #define METAL_QSPI_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_QSPI_REG(offset)))
 #define METAL_QSPI_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_QSPI_REG(offset)))
 
-//#define METAL_QSPI_AXI_BASE_ADDR		 0x20000000UL
+#define METAL_QSPI_AXI_BASE_ADDR		 0x20000000UL
 
 static unsigned long control_base=0;
 
