@@ -4,8 +4,7 @@
 #ifndef METAL__DRIVERS__SIFIVE_CLIC0_H
 #define METAL__DRIVERS__SIFIVE_CLIC0_H
 
-#include <metal/compiler.h>
-#include <metal/drivers/riscv_cpu.h>
+#include <metal/interrupt.h>
 
 #define METAL_CLIC_MAX_NMBITS 2
 #define METAL_CLIC_MAX_NLBITS 8
@@ -23,26 +22,80 @@
 
 #define METAL_MAX_INTERRUPT_LEVEL ((1 << METAL_CLIC_MAX_NLBITS) - 1)
 
-struct __metal_driver_vtable_sifive_clic0 {
-    struct metal_interrupt_vtable clic_vtable;
-};
+void __metal_driver_sifive_clic0_init(struct metal_interrupt controller);
 
-__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0)
+int
+__metal_driver_sifive_clic0_set_vector_mode(struct metal_interrupt controller,
+                                              metal_vector_mode mode);
 
-#define __METAL_MACHINE_MACROS
-#include <metal/machine.h>
-struct __metal_driver_sifive_clic0 {
-    struct metal_interrupt controller;
-    int init_done;
-    struct {
-    } __attribute__((aligned(64)));
-    metal_interrupt_vector_handler_t
-        metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
-    __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
-};
-#undef __METAL_MACHINE_MACROS
+metal_vector_mode
+__metal_driver_sifive_clic0_get_vector_mode(struct metal_interrupt controller);
 
-int __metal_driver_sifive_clic0_command_request(
-    struct metal_interrupt *controller, int command, void *data);
+int __metal_driver_sifive_clic0_set_privilege(struct metal_interrupt controller,
+                                                metal_intr_priv_mode privilege);
+
+metal_intr_priv_mode
+__metal_driver_sifive_clic0_get_privilege(struct metal_interrupt controller);
+
+int __metal_driver_sifive_clic0_clear(struct metal_interrupt controller,
+                                        int id);
+
+int __metal_driver_sifive_clic0_set(struct metal_interrupt controller, int id);
+
+int
+__metal_driver_sifive_clic0_register_handler(struct metal_interrupt controller, int id,
+                                               metal_interrupt_handler_t handler,
+                                               void *priv_data);
+
+int __metal_driver_sifive_clic0_register_vector_handler(
+    struct metal_interrupt controller, int id,
+    metal_interrupt_vector_handler_t handler, void *priv_data);
+
+int __metal_driver_sifive_clic0_enable(struct metal_interrupt controller, int id);
+
+int __metal_driver_sifive_clic0_disable(struct metal_interrupt controller, int id);
+
+int __metal_driver_sifive_clic0_set_threshold(struct metal_interrupt controller,
+                                                unsigned int level);
+
+unsigned int
+__metal_driver_sifive_clic0_get_threshold(struct metal_interrupt controller);
+
+int __metal_driver_sifive_clic0_set_priority(struct metal_interrupt controller,
+                                               int id, unsigned int priority);
+
+unsigned int
+__metal_driver_sifive_clic0_get_priority(struct metal_interrupt controller, int id);
+
+int
+__metal_driver_sifive_clic0_set_preemptive_level(struct metal_interrupt controller, int id,
+                                                   unsigned int level);
+
+unsigned int
+__metal_driver_sifive_clic0_get_preemptive_level(struct metal_interrupt controller, int id);
+
+int __metal_driver_sifive_clic0_vector_enable(struct metal_interrupt controller, int id);
+
+int
+__metal_driver_sifive_clic0_vector_disable(struct metal_interrupt controller, int id);
+
+metal_affinity
+__metal_driver_sifive_clic0_affinity_enable(struct metal_interrupt controller,
+                                              metal_affinity bitmask, int id);
+
+metal_affinity
+__metal_driver_sifive_clic0_affinity_disable(struct metal_interrupt controller,
+                                               metal_affinity bitmask, int id);
+
+metal_affinity
+__metal_driver_sifive_clic0_affinity_set_threshold(struct metal_interrupt controller,
+                                                     metal_affinity bitmask,
+                                                     unsigned int level);
+
+unsigned int
+__metal_driver_sifive_clic0_affinity_get_threshold(struct metal_interrupt controller,
+                                                     int context_id);
+
+
 
 #endif

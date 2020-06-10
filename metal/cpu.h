@@ -72,7 +72,7 @@ unsigned long long metal_cpu_get_timebase(struct metal_cpu cpu);
  * @param cpu The CPU device handle
  * @return The value of mtime, or 0 if failure
  */
-unsigned long long metal_cpu_get_mtime(struct metal_cpu cpu);
+uint64_t metal_cpu_get_mtime(struct metal_cpu cpu);
 
 /*! @brief Set the value of the RTC mtimecmp RTC
  *
@@ -84,7 +84,7 @@ unsigned long long metal_cpu_get_mtime(struct metal_cpu cpu);
  * @param time The value to set the compare register to
  * @return The value of mtimecmp or -1 if error
  */
-int metal_cpu_set_mtimecmp(struct metal_cpu cpu, unsigned long long time);
+int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time);
 
 /*! @brief Get a reference to RTC timer interrupt controller
  *
