@@ -17,7 +17,7 @@
 static const struct dt_wdog_data {
 	uintptr_t base_addr;
 	struct metal_clock clock;
-	bool has_pinmux;
+	struct metal_interrupt *interrupt_parent;
 	uint32_t interrupt_id;
 } dt_wdog_data[__METAL_DT_NUM_WDOGS] = {
 	{% for wdog in wdogs %}
