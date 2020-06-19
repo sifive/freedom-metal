@@ -10,17 +10,22 @@
 #include <metal/interrupt.h>
 #include <metal/drivers/sifive_buserror0.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 static struct dt_cpu_data {
     uint64_t timebase;
-    struct metal_interrupt interrupt_controller;
+    bool has_buserror;
     struct metal_buserror buserror;
 } dt_cpu_data[__METAL_DT_NUM_HARTS] = {
     {% for hart in harts %}
     {
-        .timebase = {{ hart.timebase_frequency }},
-        .interrupt_controller = (struct metal_interrupt) { {{ hart.interrupt_controller.id }} },
+        .timebase = {{ hart.timebase_frequency[0] }},
+    {% if hart.sifive_buserror is defined %}
+        .has_buserror = true,
         .buserror = (struct metal_buserror) { {{ hart.sifive_buserror[0].id }} }
+    {% else %}
+        .has_buserror = false,
+    {% endif %}
     },
     {% endfor %}
 };

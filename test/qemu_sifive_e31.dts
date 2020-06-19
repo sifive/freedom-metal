@@ -80,9 +80,10 @@
                 };
                 lfclk: clock@6 {
                         compatible = "sifive,fe310-g000,lfrosc";
-                        clocks = <&lfroscin>;
-                        reg = <&aon 0x70>;
-                        reg-names = "config";
+                        clocks = <&lfroscin &lfroscin>;
+                        clock-names = "lfrosc", "psdlfaltclk";
+                        reg = <&aon 0x70 &aon 0x7C>;
+                        reg-names = "config", "mux";
                 };
 
                 test: test@100000 {

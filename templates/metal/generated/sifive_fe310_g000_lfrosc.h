@@ -16,12 +16,12 @@ static const struct dt_sifive_fe310_g000_lfrosc_clock_data {
 	struct metal_clock lfrosc;
 	struct metal_clock psdlfaltclk;
 } dt_clock_data[__METAL_DT_NUM_SIFIVE_FE310_G000_LFROSC_CLOCKS] = {
-	{% for clk in sifive_fe310_g000_lfrosc_clocks %}
+	{% for clk in sifive_fe310_g000_lfroscs %}
 	{
-		.config = {{ clk.reg["config"] }},
-		.mux = {{ clk.reg["mux"] }}
-		.lfrosc = (struct metal_clock) { {{ clk.clocks["lfrosc"].id }} },
-		.lfrosc = (struct metal_clock) { {{ clk.clocks["psdlfaltclk"].id }} },
+		.config = {{ clk.regs_by_name["config"] }},
+		.mux = {{ clk.regs_by_name["mux"] }}
+		.lfrosc = (struct metal_clock) { {{ clk.clocks_by_name["lfrosc"].id }} },
+		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks_by_name["psdlfaltclk"].id }} },
 	},
 	{% endfor %}
 };

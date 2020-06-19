@@ -99,16 +99,40 @@ def node_to_dict(node, dts):
     d = dict()
     for prop in node.properties:
         key = to_snakecase(prop.name)
+
         values = []
-        for value in prop.values:
-            if isinstance(value, pydevicetree.ast.LabelReference):
-                values.append(node_to_dict(dts.get_by_reference(value), dts))
-            else:
-                values.append(value)
+        if key == "reg" and isinstance(prop.values[0], pydevicetree.ast.LabelReference):
+            # When the reg property looks like
+            #  reg = <&aon 0x70 &aon 0x73>;
+            # The pairs of Node References and offsets means
+            #  1. Look up the control registers of the referenced node
+            #  2. Add the offset to the base address
+            references = prop.values[0::2] # [&aon, &aon]
+            offsets = prop.values[1::2]    # [0x70, 0x7C]
+            for ref, offset in zip(references, offsets):
+                values.append(dts.get_by_reference(ref).get_reg()[0][0] + offset)
+        else:
+            for value in prop.values:
+                if isinstance(value, pydevicetree.ast.LabelReference):
+                    values.append(node_to_dict(dts.get_by_reference(value), dts))
+                else:
+                    values.append(value)
         d[key] = values
 
     if node in driver_ids:
         d['id'] = driver_ids[node]
+
+    if 'clock_names' in d:
+        clocks = dict()
+        for idx, name in enumerate(d['clock_names']):
+            clocks[name] = d['clocks'][idx]
+        d['clocks_by_name'] = clocks
+
+    if 'reg_names' in d:
+        regs = dict()
+        for idx, name in enumerate(d['reg_names']):
+            regs[name] = d['reg'][idx]
+        d['regs_by_name'] = regs
 
     return d
 
@@ -139,6 +163,7 @@ def main():
     # Convert the Devicetree object tree into dictionary data
     # which can be rendered by the templates
     template_data = {
+        'harts' : [node_to_dict(hart, dts) for hart in dts.match("^riscv$")],
         'uarts' : [node_to_dict(uart, dts) for uart in dts.match(args.uart_driver)],
         'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(args.gpio_driver)],
     }

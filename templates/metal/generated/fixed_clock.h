@@ -6,6 +6,8 @@
 
 {% include 'template_comment.h' %}
 
+{% if fixed_clocks is defined %}
+
 #include <metal/clock.h>
 
 #define __METAL_DT_NUM_FIXED_CLOCKS {{ fixed_clocks|length }}
@@ -15,5 +17,7 @@ static const uint64_t dt_clock_rate[__METAL_DT_NUM_FIXED_CLOCKS] = {
 		{{ clk.clock_frequency[0] }},
 	{% endfor %}
 };
+
+{% endif %}
 
 #endif
