@@ -21,7 +21,7 @@ static const struct dt_uart_data {
 	struct metal_gpio pinmux;
 	uint32_t pinmux_output_selector;
 	uint32_t pinmux_source_selector;
-	struct metal_interrupt *interrupt_parent;
+	struct metal_interrupt interrupt_parent;
 	uint32_t interrupt_id;
 } dt_uart_data[__METAL_DT_NUM_UARTS] = {
 	{% for uart in uarts %}
@@ -30,24 +30,26 @@ static const struct dt_uart_data {
 
 	    .clock = (struct metal_clock) { {{ uart.clocks[0].id }} },
 
-	    .has_pinmux = {{ defined(uart.pinmux) ? 1 : 0 }},
-	    {% if defined(uart.pinmux) %}
-		    .pinmux = (struct metal_gpio) { {{ uart.pinmux.id }} },
-			.pinmux_output_selector = {{ uart.pinmux.output_selector }},
-			.pinmux_source_selector = {{ uart.pinmux.source_selector }},
-		{% endif %}
+	{% if uart.pinmux is defined %}
+		.has_pinmux = 1,
+		.pinmux = (struct metal_gpio) { {{ uart.pinmux[0].id }} },
+		.pinmux_output_selector = {{ uart.pinmux[1] }},
+		.pinmux_source_selector = {{ uart.pinmux[2] }},
+	{% else %}
+		.has_pinmux = 0,
+	{% endif %}
 
-		{% if defined(uart.interrupt_parent) %}
-			.interrupt_parent = (struct metal_interrupt *) = {{ metal_interrupt(uart.interrupt_parent.id) }},
-			.interrupt_id = {{ uart.interrupts[0] }},
-		{% else %}
-			.interrupt_parent = NULL,
-		{% endif %}
+	{% if uart.interrupt_parent is defined %}
+		.interrupt_parent = (struct metal_interrupt) { {{ uart.interrupt_parent[0].id }} },
+		.interrupt_id = {{ uart.interrupts[0] }},
+	{% else %}
+		.interrupt_parent = NULL,
+	{% endif %}
 	},
 	{% endfor %}
 };
 
-{% set driver_string = tosnakecase(uarts[0].clocks[0].compatible[0]) }
+{% set driver_string = to_snakecase(uarts[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h' %}
 
 #endif

@@ -24,6 +24,10 @@ DEFAULT_TEMPLATE_PATHS = [
 
 DEFAULT_CLOCK_DRIVERS = [
     "fixed-clock",
+    "sifive,fe310-g000,hfrosc",
+    "sifive,fe310-g000,hfxosc",
+    "sifive,fe310-g000,lfrosc",
+    "sifive,fe310-g000,pll",
 ]
 
 DEFAULT_INTERRUPT_DRIVERS = [
@@ -146,6 +150,9 @@ def main():
     for driver in args.interrupt_drivers:
         key = to_snakecase(driver) + 's'
         template_data[key] = [node_to_dict(controller, dts) for controller in dts.match(driver)]
+
+    import pprint
+    pprint.pprint(template_data)
 
     render_templates(args.template_paths, args, template_data)
 

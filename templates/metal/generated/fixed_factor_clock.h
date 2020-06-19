@@ -6,9 +6,11 @@
 
 {% include 'template_comment.h' %}
 
+{% if fixed_factor_clocks is defined %}
+
 #include <metal/clock.h>
 
-#define __METAL_DT_NUM_FIXED_FACTOR_CLOCKS {{ len(fixed_factor_clocks) }}
+#define __METAL_DT_NUM_FIXED_FACTOR_CLOCKS {{ fixed_factor_clocks|length }}
 
 static const struct dt_fixed_factor_clock_data {
 	uint32_t mul;
@@ -22,7 +24,10 @@ static const struct dt_fixed_factor_clock_data {
 	{% endfor %}
 };
 
-{% set driver_string = tosnakecase(fixed_factor_clocks[0].clocks[0].compatible[0]) }\
+{% set driver_string = to_snakecase(fixed_factor_clocks[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h' %}
 
+{% endif %}
+
 #endif
+

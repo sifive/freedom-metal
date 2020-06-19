@@ -11,7 +11,7 @@
 #include <metal/drivers/sifive_fe310_g000_hfxosc.h>
 #include <stdbool.h>
 
-#define __METAL_DT_NUM_SIFIVE_FE310_G000_PLL_CLOCKS {{ len(sifive_fe310_g000_pll_clocks) }}
+#define __METAL_DT_NUM_SIFIVE_FE310_G000_PLL_CLOCKS {{ sifive_fe310_g000_pll_clocks|length }}
 
 static const struct dt_sifive_fe310_g000_pll_clock_data {
 	uint64_t init_rate;

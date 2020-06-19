@@ -8,7 +8,7 @@
 
 #include <metal/clock.h>
 
-#define __METAL_DT_NUM_SIFIVE_FE310_G000_HFROSC_CLOCKS {{ len(sifive_fe310_g000_hfrosc_clocks) }}
+#define __METAL_DT_NUM_SIFIVE_FE310_G000_HFROSC_CLOCKS {{ sifive_fe310_g000_hfroscs|length }}
 
 static const struct dt_sifive_fe310_g000_hfrosc_clock_data {
 	uintptr_t base;
@@ -22,7 +22,7 @@ static const struct dt_sifive_fe310_g000_hfrosc_clock_data {
 	{% endfor %}
 };
 
-{% set driver_string = tosnakecase(sifive_fe310_g000_hfrosc_clocks[0].clocks[0].compatible[0]) }
+{% set driver_string = to_snakecase(sifive_fe310_g000_hfroscs[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h' %}
 
 #endif

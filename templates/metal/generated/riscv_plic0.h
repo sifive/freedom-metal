@@ -10,7 +10,7 @@
 #include <metal/machine/platform.h>
 #include <stdint.h>
 
-#define __METAL_DT_NUM_RISCV_PLIC0S {{ len(riscv_plic0s) }}
+#define __METAL_DT_NUM_RISCV_PLIC0S {{ riscv_plic0s|length }}
 
 static const struct dt_intc_data {
     uintptr_t base;
@@ -22,7 +22,8 @@ static const struct dt_intc_data {
 } dt_intc_data[__METAL_DT_NUM_RISCV_PLIC0S] = {
     {% for intc in riscv_plic0s %}
     {
-        .base = {{ intc.reg["control"][0] }},
+        .base = METAL_RISCV_PLIC0_{{ intc.id }}_BASE_ADDR,
+
         .num_interrupts = {{ intc.riscv_ndev[0] }},
         .context_id = 0,
         .max_priority = {{ intc.riscv_max_priority[0] }},
@@ -32,7 +33,7 @@ static const struct dt_intc_data {
     {% endfor %}
 };
 
-{% set driver_string = tosnakecase(riscv_plic0s[0].interrupts_extended[0].compatible[0]) }
+{% set driver_string = to_snakecase(riscv_plic0s[0].interrupts_extended[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h' %}
 
 #endif
