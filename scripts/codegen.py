@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import glob 
+import os
 import sys
 
 import jinja2
@@ -17,7 +19,7 @@ METAL_APIS = [
 ]
 
 DEFAULT_TEMPLATE_PATHS = [
-    "../templates",
+    "templates",
 ]
 
 DEFAULT_CLOCK_DRIVERS = [
@@ -42,6 +44,7 @@ def parse_arguments(argv):
 
     arg_parser.add_argument("--template-paths",
             nargs='*',
+            type=list,
             default=DEFAULT_TEMPLATE_PATHS,
             help="The paths to look for template")
 
@@ -62,6 +65,14 @@ def parse_arguments(argv):
             help="The drivers for the interrupt API")
 
     return arg_parser.parse_args(argv)
+
+def get_template(template):
+    env = jinja2.Environment(
+            loader=jinja2.FileSystemLoader("templates"),
+            trim_blocks=True, lstrip_blocks=True)
+    env.globals['to_snakecase'] = to_snakecase
+
+    return env.get_template(template)
 
 def to_snakecase(s):
     return s.lower().replace(',', '_').replace('-', '_')
@@ -97,6 +108,21 @@ def node_to_dict(node, dts):
 
     return d
 
+def render_templates(template_dirs, args, template_data):
+    templates = []
+    for d in template_dirs:
+        templates += glob.glob("{}/metal/*.h".format(d))
+        templates += glob.glob("{}/metal/generated/*.h".format(d))
+
+    for template in templates:
+        template =  template.replace("templates/", "")
+        output_file = "{}/{}".format(args.output_dir, template)
+        dirname = os.path.dirname(output_file)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with open(output_file, 'w') as out:
+            out.write(get_template(template).render(template_data))
+
 def main():
     args = parse_arguments(sys.argv[1:])
 
@@ -121,8 +147,7 @@ def main():
         key = to_snakecase(driver) + 's'
         template_data[key] = [node_to_dict(controller, dts) for controller in dts.match(driver)]
 
-    import pprint
-    pprint.pprint(template_data)
+    render_templates(args.template_paths, args, template_data)
 
 if __name__ == "__main__":
     main()
