@@ -1,0 +1,2 @@
+pydevicetree==0.0.12
+Jinja2==2.11.2
