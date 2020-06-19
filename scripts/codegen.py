@@ -47,6 +47,8 @@ def parse_arguments(argv):
 
     arg_parser.add_argument("--uart-driver", default="sifive,uart0",
             help="The driver for the UART API")
+    arg_parser.add_argument("--gpio-driver", default="sifive,gpio0",
+            help="The driver for the GPIO API")
     arg_parser.add_argument("--shutdown-driver", default="sifive,test0",
             help="The driver for the Shutdown API")
 
@@ -69,6 +71,7 @@ driver_ids = dict()
 def assign_ids(dts, args):
     drivers = []
     drivers.append(args.uart_driver)
+    drivers.append(args.gpio_driver)
     drivers.append(args.shutdown_driver)
     drivers += args.clock_drivers
     drivers += args.interrupt_drivers
@@ -107,7 +110,16 @@ def main():
     # which can be rendered by the templates
     template_data = {
         'uarts' : [node_to_dict(uart, dts) for uart in dts.match(args.uart_driver)],
+        'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(args.gpio_driver)],
     }
+
+    for driver in args.clock_drivers:
+        key = to_snakecase(driver) + 's'
+        template_data[key] = [node_to_dict(clock, dts) for clock in dts.match(driver)]
+
+    for driver in args.interrupt_drivers:
+        key = to_snakecase(driver) + 's'
+        template_data[key] = [node_to_dict(controller, dts) for controller in dts.match(driver)]
 
     import pprint
     pprint.pprint(template_data)
