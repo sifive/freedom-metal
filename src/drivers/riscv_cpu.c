@@ -130,5 +130,6 @@ int metal_cpu_set_exception_pc(struct metal_cpu cpu, uintptr_t mepc) {
 }
 
 struct metal_buserror metal_cpu_get_buserror(struct metal_cpu cpu) {
+    assert(dt_cpu_data[get_hartid(cpu)].has_buserror);
     return dt_cpu_data[get_hartid(cpu)].buserror;
 }

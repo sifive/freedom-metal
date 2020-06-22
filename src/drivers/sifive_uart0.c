@@ -147,12 +147,11 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
 
     uart_state[index].baud_rate = baud_rate;
 
-    if (clock != NULL) {
-        long clock_rate =  dt_clock_get_rate_hz(clock);
-        UART_REGW(METAL_SIFIVE_UART0_DIV) = clock_rate / baud_rate - 1;
-        UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXEN;
-        UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXEN;
-    }
+    long clock_rate =  dt_clock_get_rate_hz(clock);
+    UART_REGW(METAL_SIFIVE_UART0_DIV) = clock_rate / baud_rate - 1;
+    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXEN;
+    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXEN;
+
     return 0;
 }
 

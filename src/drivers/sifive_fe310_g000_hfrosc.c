@@ -30,7 +30,7 @@ uint64_t __metal_driver_sifive_fe310_g000_hfrosc_get_rate_hz(
         return 0;
 
     struct metal_clock ref = dt_clock_data[get_index(clock)].ref;
-    uint64_t ref_rate = dt_clock_get_rate();
+    uint64_t ref_rate = dt_clock_get_rate(clock);
 
     return ref_rate / ((cfg & CONFIG_DIVIDER) + 1);
 }
