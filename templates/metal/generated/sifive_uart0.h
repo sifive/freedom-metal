@@ -52,4 +52,7 @@ static const struct dt_uart_data {
 {% set driver_string = to_snakecase(uarts[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h' %}
 
+{% set driver_string = to_snakecase(uarts[0].interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h' %}
+
 #endif

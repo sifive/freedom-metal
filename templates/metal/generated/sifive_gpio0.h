@@ -31,4 +31,7 @@ static const struct dt_gpio_data {
 	{% endfor %}
 };
 
+{% set driver_string = to_snakecase(gpios[0].interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h' %}
+
 #endif
