@@ -1,7 +1,14 @@
 
 #include <metal/drivers/{{ driver_string }}.h>
 
-#define dt_clock_get_rate_hz(clock) __metal_driver_{{ driver_string }}_get_rate_hz((clock))
-#define dt_clock_set_rate_hz(clock, rate) __metal_driver_{{ driver_string }}_set_rate_hz((clock), (rate))
-#define dt_clock_register_pre_rate_change_callback(clock, cb) __metal_driver_{{ driver_string }}_register_pre_rate_change_callback(((clock), (cb))
-#define dt_clock_register_post_rate_change_callback(clock, cb) __metal_driver_{{ driver_string }}_register_post_rate_change_callback((clock), (cb))
+/* These defines "redirect" the calls to the public Freedom Metal clock API
+ * to the driver for the device at compile time. Since they are the same
+ * as the actual public API symbols, when they aren't defined (for instance,
+ * if the Devicetree doesn't properly describe what clock drives a device)
+ * they will link to the stub functions in src/clock.c
+ */
+
+#define metal_clock_get_rate_hz(clock) __metal_driver_{{ driver_string }}_get_rate_hz((clock))
+#define metal_clock_set_rate_hz(clock, rate) __metal_driver_{{ driver_string }}_set_rate_hz((clock), (rate))
+#define metal_clock_register_pre_rate_change_callback(clock, cb) __metal_driver_{{ driver_string }}_register_pre_rate_change_callback(((clock), (cb))
+#define metal_clock_register_post_rate_change_callback(clock, cb) __metal_driver_{{ driver_string }}_register_post_rate_change_callback((clock), (cb))

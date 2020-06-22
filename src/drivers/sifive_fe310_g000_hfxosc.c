@@ -28,7 +28,7 @@ uint64_t __metal_driver_sifive_fe310_g000_hfxosc_get_rate_hz(
         return 0;
 
     struct metal_clock ref = dt_clock_data[get_index(clock)].ref;
-    return dt_clock_get_rate(ref);
+    return metal_clock_get_rate(ref);
 }
 
 uint64_t __metal_driver_sifive_fe310_g000_hfxosc_set_rate_hz(

@@ -34,14 +34,14 @@ uint64_t __metal_driver_sifive_fe310_g000_lfrosc_get_rate_hz(
 
     if (LFROSC_REGW(mux_reg) & METAL_LFCLKMUX_EXT_MUX_STATUS) {
         struct metal_clock lfrosc = dt_clock_data[get_index(clock)].lfrosc;
-        return dt_clock_get_rate_hz(lfrosc);
+        return metal_clock_get_rate_hz(lfrosc);
     }
 
     uint64_t div =
         (LFROSC_REGW(cfg_reg) & METAL_LFROSCCFG_DIV_MASK) + 1;
 
     struct metal_clock psdlfaltclk = dt_clock_data[get_index(clock)].psdlfaltclk;
-    return dt_clock_get_rate_hz(psdlfaltclk) / div;
+    return metal_clock_get_rate_hz(psdlfaltclk) / div;
 }
 
 uint64_t __metal_driver_sifive_fe310_g000_lfrosc_set_rate_hz(

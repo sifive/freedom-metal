@@ -17,7 +17,7 @@ uint64_t __metal_driver_fixed_factor_clock_get_rate_hz(
 
     /* Call get_rate_hz for the parent clock defined in the Devicetree */
     struct metal_clock ref = dt_clock_data[get_index(clk)].ref;
-    uint64_t parent_rate = dt_clock_get_rate_hz(ref);
+    uint64_t parent_rate = metal_clock_get_rate_hz(ref);
 
     return dt_clock_data[get_index(clk)].mul * parent_rate /
            dt_clock_data[get_index(clk)].mul;

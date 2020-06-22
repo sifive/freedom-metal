@@ -147,7 +147,7 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
 
     uart_state[index].baud_rate = baud_rate;
 
-    long clock_rate =  dt_clock_get_rate_hz(clock);
+    long clock_rate =  metal_clock_get_rate_hz(clock);
     UART_REGW(METAL_SIFIVE_UART0_DIV) = clock_rate / baud_rate - 1;
     UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXEN;
     UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXEN;
@@ -175,7 +175,7 @@ static void pre_rate_change_callback_func(void *priv) {
 
     long bits_per_symbol =
         (UART_REGW(METAL_SIFIVE_UART0_TXCTRL) & (1 << 1)) ? 9 : 10;
-    long clk_freq = dt_clock_get_rate_hz(clock);
+    long clk_freq = metal_clock_get_rate_hz(clock);
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
     long cycles_to_wait = bits_per_symbol * clk_freq / baud_rate;
 
@@ -198,11 +198,11 @@ void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
 
     pre_cb->callback = &pre_rate_change_callback_func;
     pre_cb->priv = uart;
-    dt_clock_register_pre_rate_change_callback(clock, pre_cb);
+    metal_clock_register_pre_rate_change_callback(clock, pre_cb);
 
     post_cb->callback = &post_rate_change_callback_func;
     post_cb->priv = uart;
-    dt_clock_register_post_rate_change_callback(clock, post_cb);
+    metal_clock_register_post_rate_change_callback(clock, post_cb);
 
     metal_uart_set_baud_rate(uart, baud_rate);
 
