@@ -10,6 +10,8 @@
 #include <metal/machine/platform.h>
 #include <stdint.h>
 
+{% if riscv_plic0s is defined %}
+
 #define __METAL_DT_NUM_RISCV_PLIC0S {{ riscv_plic0s|length }}
 
 static const struct dt_intc_data {
@@ -35,5 +37,7 @@ static const struct dt_intc_data {
 
 {% set driver_string = to_snakecase(riscv_plic0s[0].interrupts_extended[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h' %}
+
+{% endif %}
 
 #endif

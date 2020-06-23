@@ -22,16 +22,17 @@ static const struct dt_gpio_data {
 		.base_addr = METAL_SIFIVE_GPIO0_{{ gpio.id }}_BASE_ADDR,
 
 	{% if gpio.interrupt_parent is defined %}
+	    /* {{ uart.interrupt_parent[0].compatible[0] }} */
 		.interrupt_parent = (struct metal_interrupt) { {{ gpio.interrupt_parent[0].id }} },
 		.interrupt_id_base = {{ gpio.interrupts[0] }},
-	{% else %}
-		.interrupt_parent = NULL,
 	{% endif %}
 	},
 	{% endfor %}
 };
 
+{% if gpios[0].interrupt_parent is defined %}
 {% set driver_string = to_snakecase(gpios[0].interrupt_parent[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h' %}
+{% endif %}
 
 #endif

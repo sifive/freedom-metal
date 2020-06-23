@@ -8,12 +8,14 @@
 
 #include <metal/clock.h>
 
-#define __METAL_DT_NUM_SIFIVE_FE310_G000_HFROSC_CLOCKS {{ sifive_fe310_g000_hfroscs|length }}
+{% if sifive_fe310_g000_hfroscs is defined %}
+
+#define __METAL_DT_NUM_SIFIVE_FE310_G000_HFROSCS {{ sifive_fe310_g000_hfroscs|length }}
 
 static const struct dt_sifive_fe310_g000_hfrosc_clock_data {
 	uintptr_t base;
 	struct metal_clock ref;
-} dt_clock_data[__METAL_DT_NUM_SIFIVE_FE310_G000_HFROSC_CLOCKS] = {
+} dt_clock_data[__METAL_DT_NUM_SIFIVE_FE310_G000_HFROSCS] = {
 	{% for clk in sifive_fe310_g000_hfroscs %}
 	{
 		.base = {{ clk.regs_by_name['config'] }},
@@ -24,5 +26,7 @@ static const struct dt_sifive_fe310_g000_hfrosc_clock_data {
 
 {% set driver_string = to_snakecase(sifive_fe310_g000_hfroscs[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h' %}
+
+{% endif %}
 
 #endif

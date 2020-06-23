@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-static struct dt_cpu_data {
+static const struct dt_cpu_data {
     uint64_t timebase;
     bool has_buserror;
     struct metal_buserror buserror;

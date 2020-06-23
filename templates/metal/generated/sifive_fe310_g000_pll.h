@@ -11,7 +11,9 @@
 #include <metal/drivers/sifive_fe310_g000_hfxosc.h>
 #include <stdbool.h>
 
-#define __METAL_DT_NUM_SIFIVE_FE310_G000_PLL_CLOCKS {{ sifive_fe310_g000_plls|length }}
+{% if sifive_fe310_g000_plls is defined %}
+
+#define __METAL_DT_NUM_SIFIVE_FE310_G000_PLLS {{ sifive_fe310_g000_plls|length }}
 
 static const struct dt_sifive_fe310_g000_pll_clock_data {
 	uint64_t init_rate;
@@ -20,7 +22,7 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 	bool has_hfxosc;
 	struct metal_clock hfrosc;
 	struct metal_clock hfxosc;
-} dt_clock_data[__METAL_DT_NUM_SIFIVE_FE310_G000_PLL_CLOCKS] = {
+} dt_clock_data[__METAL_DT_NUM_SIFIVE_FE310_G000_PLLS] = {
 	{% for clk in sifive_fe310_g000_plls %}
 	{
 		.init_rate = {{ clk.clock_frequency[0] }},
@@ -29,13 +31,17 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 
 	{% if "pllref" in clk.clock_names %}
 		.has_hfxosc = true,
+		/* {{ clk.clocks_by_name["pllref"].compatible[0] }} */
 		.hfxosc = (struct metal_clock) { {{ clk.clocks_by_name["pllref"].id }} },
 	{% else %}
 		.has_hfxosc = false,
 	{% endif %}
+		/* {{ clk.clocks_by_name["pllsel0"].compatible[0] }} */
 		.hfrosc = (struct metal_clock) { {{ clk.clocks_by_name["pllsel0"].id }} },
 	},
 	{% endfor %}
 };
+
+{% endif %}
 
 #endif

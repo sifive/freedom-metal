@@ -28,7 +28,10 @@ static const struct dt_uart_data {
 	{
 	    .base_addr = METAL_SIFIVE_UART0_{{ uart.id }}_BASE_ADDR,
 
+	{% if uart.clocks is defined %}
+	    /* {{ uart.clocks[0].compatible[0] }} */
 	    .clock = (struct metal_clock) { {{ uart.clocks[0].id }} },
+	{% endif %}
 
 	{% if uart.pinmux is defined %}
 		.has_pinmux = 1,
@@ -40,19 +43,22 @@ static const struct dt_uart_data {
 	{% endif %}
 
 	{% if uart.interrupt_parent is defined %}
+	    /* {{ uart.interrupt_parent[0].compatible[0] }} */
 		.interrupt_parent = (struct metal_interrupt) { {{ uart.interrupt_parent[0].id }} },
 		.interrupt_id = {{ uart.interrupts[0] }},
-	{% else %}
-		.interrupt_parent = NULL,
 	{% endif %}
 	},
 	{% endfor %}
 };
 
+{% if uarts[0].clocks is defined %}
 {% set driver_string = to_snakecase(uarts[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h' %}
+{% endif %}
 
+{% if uarts[0].interrupt_parent is defined %}
 {% set driver_string = to_snakecase(uarts[0].interrupt_parent[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h' %}
+{% endif %}
 
 #endif
