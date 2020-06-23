@@ -37,7 +37,7 @@ IRQ_9:
 IRQ_10:
         j metal_riscv_cpu_intc_default_handler
 IRQ_11:
-{% if defined(external_interrupts) %}
+{% if external_interrupts is defined %}
         j metal_riscv_plic0_source_0_handler
 {% else %}
         j metal_riscv_cpu_intc_meip_handler
@@ -50,10 +50,10 @@ IRQ_14:
         j metal_riscv_cpu_intc_default_handler
 IRQ_15:
         j metal_riscv_cpu_intc_default_handler
-{% if defined(local_interrupts) %}
+{% if local_interrupts is defined %}
   {% for irq in local_interrupts.irqs %}
 IRQ_LOCAL_{{ irq.id }}:
-    {% if defined(irq.source) %}
+    {% if irq.source is defined %}
       j metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler
     {% else %}
       j metal_{{ local_interrupts.controller }}_{{ irq.id }}_handler
