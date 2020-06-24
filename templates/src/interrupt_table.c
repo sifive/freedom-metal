@@ -32,11 +32,7 @@ metal_interrupt_vector_handler_t __metal_vector_table[__METAL_NUM_LOCAL_INTERRUP
     metal_riscv_cpu_intc_default_handler,
 {% if local_interrupts is defined %}
 {% for irq in local_interrupts.irqs %}
-    {% if irq.source is defined %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
-    {% else %}
-    metal_{{ local_interrupts.controller }}_{{ irq.id }}_handler,
-    {% endif %}
 {% endfor %}
 {% endif %}
 };
@@ -49,11 +45,7 @@ metal_interrupt_vector_handler_t __metal_vector_table[__METAL_NUM_LOCAL_INTERRUP
 
 metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBAL_INTERRUPTS] = {
 {% for irq in global_interrupts.irqs %}
-    {% if irq.source is defined %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
-    {% else %}
-    metal_{{ global_interrupts.controller }}_{{ irq.id }}_handler,
-    {% endif %}
 {% endfor %}
 };
 

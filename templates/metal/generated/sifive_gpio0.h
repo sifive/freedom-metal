@@ -22,7 +22,7 @@ static const struct dt_gpio_data {
 		.base_addr = METAL_SIFIVE_GPIO0_{{ gpio.id }}_BASE_ADDR,
 
 	{% if gpio.interrupt_parent is defined %}
-	    /* {{ uart.interrupt_parent[0].compatible[0] }} */
+	    /* {{ gpio.interrupt_parent[0].compatible[0] }} */
 		.interrupt_parent = (struct metal_interrupt) { {{ gpio.interrupt_parent[0].id }} },
 		.interrupt_id_base = {{ gpio.interrupts[0] }},
 	{% endif %}
