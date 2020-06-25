@@ -4,10 +4,11 @@
 #ifndef METAL__PLATFORM__SIFIVE_TEST0_H
 #define METAL__PLATFORM__SIFIVE_TEST0_H
 
-{% for sifive_test0 in sifive_test0s %}
-#define METAL_SIFIVE_TEST0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % sifive_test0.regs_by_name["control"] }}
-{% endfor %}
+{% if shutdown is defined %}
+#define METAL_SIFIVE_TEST0_0_BASE_ADDR {{ '0x%x' % shutdown.regs_by_name["control"] }}
+{% endif %}
 
+#define __METAL_HAS_SHUTDOWN
 #define METAL_SIFIVE_TEST0
 #define METAL_SIFIVE_TEST0_FINISHER_OFFSET 0UL
 

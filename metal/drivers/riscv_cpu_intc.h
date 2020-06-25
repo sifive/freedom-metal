@@ -50,6 +50,7 @@
 #define METAL_LOCAL_INTR_EXCEPTION(X) (METAL_MCAUSE_INTR + METAL_LOCAL_INTR(X))
 #define METAL_LOCAL_INTR_RESERVE0 1
 #define METAL_LOCAL_INTR_RESERVE1 2
+#define METAL_LOCAL_INTERRUPT_SW  3
 #define METAL_LOCAL_INTR_RESERVE2 4
 #define METAL_LOCAL_INTR_RESERVE4 16
 #define METAL_LOCAL_INTR_RESERVE5 32
@@ -65,7 +66,7 @@
 #define METAL_MIE_INTERRUPT METAL_MSTATUS_MIE
 
 typedef enum {
-    METAL_INTERRUPT_ID_BASE,
+    METAL_INTERRUPT_ID_BASE = 0,
     METAL_INTERRUPT_ID_SW = (METAL_INTERRUPT_ID_BASE + 3),
     METAL_INTERRUPT_ID_TMR = (METAL_INTERRUPT_ID_BASE + 7),
     METAL_INTERRUPT_ID_EXT = (METAL_INTERRUPT_ID_BASE + 11),
@@ -160,7 +161,7 @@ __metal_driver_riscv_cpu_intc_set_preemptive_level(struct metal_interrupt contro
 unsigned int
 __metal_driver_riscv_cpu_intc_get_preemptive_level(struct metal_interrupt controller, int id);
 
-int __metal_driver_riscv_cpu_intc_vector_enable(struct metal_interrupt controller, int id);
+int __metal_driver_riscv_cpu_intc_vector_enable(struct metal_interrupt controller, int id, metal_vector_mode mode);
 
 int
 __metal_driver_riscv_cpu_intc_vector_disable(struct metal_interrupt controller, int id);

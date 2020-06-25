@@ -6,9 +6,9 @@
 
 {% include 'template_comment.h' %}
 
+#include <metal/cpu.h>
 #include <metal/generated/cpu.h>
 #include <metal/interrupt.h>
-#include <metal/drivers/sifive_buserror0.h>
 #include <stdint.h>
 #include <stdbool.h>
 

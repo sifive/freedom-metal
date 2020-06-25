@@ -1,6 +1,5 @@
 #include <errno.h>
 #include <metal/cpu.h>
-#include <metal/timer.h>
 #include <sys/time.h>
 #include <sys/times.h>
 

@@ -1,8 +1,6 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/init.h>
-#include <metal/machine.h>
 #include <metal/tty.h>
 #include <metal/uart.h>
 

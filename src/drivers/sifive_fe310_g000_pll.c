@@ -6,9 +6,9 @@
 #ifdef METAL_SIFIVE_FE310_G000_PLL
 
 #include <limits.h>
-#include <metal/drivers/sifive_fe310-g000_pll.h>
-#include <metal/generated/sifive_fe310-g000_pll.h>
-#include <metal/init.h>
+#include <metal/drivers/sifive_fe310_g000_pll.h>
+#include <metal/generated/sifive_fe310_g000_pll.h>
+#include <metal/io.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,6 +27,8 @@
 #define PLL_F_SHIFT(f) ((f << 4) & PLL_F)
 #define PLL_Q_SHIFT(q) ((q << 10) & PLL_Q)
 #define PLL_DIV_SHIFT(d) ((d << 0) & DIV_DIV)
+
+#define PLL_CONFIG_NOT_VALID -1
 
 struct pll_config_t {
     uint64_t multiplier;
@@ -167,10 +169,8 @@ static int find_closest_config(uint64_t ref_hz, uint64_t rate) {
     return closest_index;
 }
 
-#define PLL_CONFIG_NOT_VALID -1
-
-static metal_clock_callback pre_rate_change_callbacks[__METAL_DT_NUM_FE310_G000_PLLS];
-static metal_clock_callback post_rate_change_callbacks[__METAL_DT_NUM_FE310_G000_PLLS];
+static metal_clock_callback pre_rate_change_callbacks[__METAL_DT_NUM_SIFIVE_FE310_G000_PLLS];
+static metal_clock_callback post_rate_change_callbacks[__METAL_DT_NUM_SIFIVE_FE310_G000_PLLS];
 
 static uint32_t get_index(struct metal_clock clock) {
     return clock.__clock_index;
@@ -308,12 +308,11 @@ static void configure_pll(struct metal_clock clock,
             __METAL_DT_RISCV_CLIC0_HANDLE, METAL_TIMER_MTIME_GET, &mtime);
     }
 #else
-#pragma message(                                                               \
-    No handle for CLINT or CLIC found, PLL might race with lock signal !)
+#pragma message("No handle for CLINT or CLIC found, PLL might race with lock signal!")
 #endif
 
     /* Wait for PLL to lock */
-    while ((__METAL_ACCESS_ONCE(pllcfg) & PLL_LOCK) == 0)
+    while ((__METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) & PLL_LOCK) == 0)
         ;
 }
 
@@ -321,19 +320,19 @@ uint64_t __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clo
                                                           uint64_t rate) {
     /* If the PLL clock has had a _pre_rate_change_callback configured, call it
      */
-    _metal_clock_call_all_callbacks(pre_rate_change_callbacks[get_index(clock)]);
+    _metal_clock_call_all_callbacks(&pre_rate_change_callbacks[get_index(clock)]);
 
     uintptr_t pllcfg = dt_clock_data[get_index(clock)].config;
     uintptr_t plldiv = dt_clock_data[get_index(clock)].divider;
 
     /* We can't modify the PLL if coreclk is driven by it, so switch it off */
-    if (__METAL_ACCESS_ONCE(pllcfg) & PLL_SEL)
-        __METAL_ACCESS_ONCE(pllcfg) &= ~(PLL_SEL);
+    if (__METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) & PLL_SEL)
+        __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_SEL);
 
     /* There's a clock mux before the PLL that selects between the HFROSC and
      * the HFXOSC as the PLL's input clock. */
     uint64_t ref_hz;
-    if ((__METAL_ACCESS_ONCE(pllcfg) & PLL_REFSEL) == 0) {
+    if ((__METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) & PLL_REFSEL) == 0) {
         struct metal_clock hfrosc = dt_clock_data[get_index(clock)].hfrosc;
         ref_hz = __metal_driver_sifive_fe310_g000_hfrosc_get_rate_hz(hfrosc);
     } else {
@@ -344,22 +343,22 @@ uint64_t __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clo
     if ((ref_hz * 3 / 4) <= rate && (ref_hz * 5 / 4) >= rate) {
         /* if the desired rate is within 75%-125% of the input clock, bypass the PLL
          */
-        __METAL_ACCESS_ONCE(pllcfg) |= PLL_BYPASS;
+        __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_BYPASS;
     } else {
         int config_index = find_closest_config(ref_hz, rate);
         if (config_index != -1) {
             configure_pll(clock, &(pll_configs[config_index]));
         } else {
             /* unable to find a valid configuration */
-            __METAL_ACCESS_ONCE(pllcfg) |= PLL_BYPASS;
+            __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_BYPASS;
         }
     }
 
     /* Enable the PLL */
-    __METAL_ACCESS_ONCE(pllcfg) |= PLL_SEL;
+    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_SEL;
 
     /* If the PLL clock has had a rate_change_callback configured, call it */
-    _metal_clock_call_all_callbacks(post_rate_change_callbacks[get_index(clock)]);
+    _metal_clock_call_all_callbacks(&post_rate_change_callbacks[get_index(clock)]);
 
     return __metal_driver_sifive_fe310_g000_pll_get_rate_hz(clock);
 }

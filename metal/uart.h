@@ -95,7 +95,7 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate);
  * @param uart The UART device handle
  * @return The handle for the UART interrupt controller
  */
-struct metal_interrupt *
+struct metal_interrupt
 metal_uart_interrupt_controller(struct metal_uart uart);
 
 /*!

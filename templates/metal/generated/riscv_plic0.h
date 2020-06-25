@@ -14,6 +14,8 @@
 
 #define __METAL_DT_NUM_RISCV_PLIC0S {{ riscv_plic0s|length }}
 
+#define __METAL_PLIC_NUM_PARENTS 1
+
 static const struct dt_intc_data {
     uintptr_t base;
     uint32_t num_interrupts;

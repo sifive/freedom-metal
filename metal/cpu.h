@@ -95,7 +95,7 @@ int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time);
  * @param cpu The CPU device handle
  * @return A pointer to the timer interrupt handle
  */
-struct metal_interrupt *
+struct metal_interrupt
 metal_cpu_timer_interrupt_controller(struct metal_cpu cpu);
 
 /*! @brief Get the RTC timer interrupt id
@@ -116,7 +116,7 @@ int metal_cpu_timer_get_interrupt_id(struct metal_cpu cpu);
  * @param cpu The CPU device handle
  * @return A pointer to the software interrupt handle
  */
-struct metal_interrupt *
+struct metal_interrupt
 metal_cpu_software_interrupt_controller(struct metal_cpu cpu);
 
 /*! @brief Get the software interrupt id
@@ -179,7 +179,7 @@ int metal_cpu_get_msip(struct metal_cpu cpu, int hartid);
  * @param cpu The CPU device handle
  * @return The handle for the CPU interrupt controller
  */
-struct metal_interrupt *metal_cpu_interrupt_controller(struct metal_cpu cpu);
+struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu);
 
 /*!
  * @brief Register an exception handler
@@ -238,6 +238,11 @@ uintptr_t metal_cpu_get_exception_pc(struct metal_cpu cpu);
  * @return 0 upon success
  */
 int metal_cpu_set_exception_pc(struct metal_cpu cpu, uintptr_t epc);
+
+/* I ripped out the buserror driver but I'd rather not delete the code unnecessarily */
+struct metal_buserror {
+    uint32_t __buserror_index;
+};
 
 /*!
  * @brief Get the handle for the hart's bus error unit

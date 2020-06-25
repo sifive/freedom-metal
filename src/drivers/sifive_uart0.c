@@ -44,7 +44,7 @@ static inline uint32_t get_index(struct metal_uart uart) {
     return uart.__uart_index;
 }
 
-struct metal_interrupt *metal_uart_interrupt_controller(struct metal_uart uart) {
+struct metal_interrupt metal_uart_interrupt_controller(struct metal_uart uart) {
     return dt_uart_data[get_index(uart)].interrupt_parent;
 }
 

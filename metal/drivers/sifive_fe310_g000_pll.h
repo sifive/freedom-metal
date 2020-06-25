@@ -7,7 +7,7 @@
 #include <metal/clock.h>
 
 uint64_t __metal_driver_sifive_fe310_g000_pll_get_rate_hz(struct metal_clock clock);
-uint64_t __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clock);
+uint64_t __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clock, uint64_t rate);
 uint64_t __metal_driver_sifive_fe310_g000_pll_register_pre_rate_change_callback(struct metal_clock clock);
 uint64_t __metal_driver_sifive_fe310_g000_pll_register_post_rate_change_callback(struct metal_clock clock);
 

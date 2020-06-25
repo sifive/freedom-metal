@@ -177,6 +177,10 @@ def main():
         'devices' : devices,
     }
 
+    shutdown = dts.match(args.shutdown_driver)
+    if shutdown is not None:
+        template_data['shutdown'] = node_to_dict(shutdown[0], dts)
+
     for driver in args.clock_drivers:
         key = to_snakecase(driver) + 's'
         template_data[key] = [node_to_dict(clock, dts) for clock in dts.match(driver)]

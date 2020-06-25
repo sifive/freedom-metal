@@ -5,8 +5,8 @@
 
 #ifdef METAL_SIFIVE_FE310_G000_HFXOSC
 
-#include <metal/drivers/sifive_fe310-g000_hfxosc.h>
-#include <metal/generated/sifive_fe310-g000_hfxosc.h>
+#include <metal/drivers/sifive_fe310_g000_hfxosc.h>
+#include <metal/generated/sifive_fe310_g000_hfxosc.h>
 #include <metal/io.h>
 
 #define CONFIG_ENABLE 0x40000000UL
@@ -28,7 +28,7 @@ uint64_t __metal_driver_sifive_fe310_g000_hfxosc_get_rate_hz(
         return 0;
 
     struct metal_clock ref = dt_clock_data[get_index(clock)].ref;
-    return metal_clock_get_rate(ref);
+    return metal_clock_get_rate_hz(ref);
 }
 
 uint64_t __metal_driver_sifive_fe310_g000_hfxosc_set_rate_hz(

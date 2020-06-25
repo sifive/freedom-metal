@@ -1,7 +1,6 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine.h>
 #include <metal/uart.h>
 
 /* Stubs for when no driver is present */
@@ -31,7 +30,8 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
 struct metal_interrupt metal_uart_interrupt_controller(struct metal_uart uart)
     __attribute__((weak));
 struct metal_interrupt metal_uart_interrupt_controller(struct metal_uart uart) {
-    return NULL;
+    assert(0);
+    return (struct metal_interrupt) { 0 };
 }
 
 int metal_uart_get_interrupt_id(struct metal_uart uart) __attribute__((weak));

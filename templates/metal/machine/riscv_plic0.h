@@ -10,6 +10,8 @@
 #define METAL_RISCV_PLIC0_{{ loop.index0 }}_RISCV_NDEV {{ riscv_plic0.riscv_ndev[0] }}
 {% endfor %}
 
+#define __METAL_DT_RISCV_PLIC0_MAX_INTERRUPTS {{ riscv_plic0s[0].riscv_ndev[0] }}
+
 #define METAL_RISCV_PLIC0
 #define METAL_RISCV_PLIC0_PRIORITY_BASE 0UL
 #define METAL_RISCV_PLIC0_PENDING_BASE 4096UL

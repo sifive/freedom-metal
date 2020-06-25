@@ -2,7 +2,6 @@
 #define _POSIX_TIMERS
 #include <errno.h>
 #include <metal/drivers/riscv_cpu.h>
-#include <metal/machine.h>
 #include <time.h>
 
 #ifdef MTIME_RATE_HZ_DEF

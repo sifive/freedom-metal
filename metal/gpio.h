@@ -6,6 +6,7 @@
 
 #include <assert.h>
 #include <metal/interrupt.h>
+#include <metal/generated/gpio.h>
 #include <stdint.h>
 
 /*!

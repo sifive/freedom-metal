@@ -2,13 +2,10 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <assert.h>
-#include <cpu.h>
-#include <metal/drivers/riscv_clint0.h>
+#include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu.h>
-#include <metal/drivers/riscv_cpu_intc.h>
-#include <metal/drivers/sifive_clic0.h>
 #include <metal/generated/riscv_cpu.h>
-#include <metal/platform.h>
+#include <metal/machine/platform.h>
 #include <metal/io.h>
 #include <metal/shutdown.h>
 #include <stdint.h>
@@ -68,7 +65,7 @@ struct metal_interrupt metal_cpu_timer_interrupt_controller(struct metal_cpu cpu
 }
 
 int metal_cpu_timer_get_interrupt_id(struct metal_cpu cpu) {
-    return METAL_INTERRUPT_ID_TMR;
+    return 7;
 }
 
 struct metal_interrupt metal_cpu_software_interrupt_controller(struct metal_cpu cpu) {
@@ -84,7 +81,7 @@ struct metal_interrupt metal_cpu_software_interrupt_controller(struct metal_cpu 
 }
 
 int metal_cpu_software_get_interrupt_id(struct metal_cpu cpu) {
-    return METAL_INTERRUPT_ID_SW;
+    return 3;
 }
 
 int metal_cpu_software_set_ipi(struct metal_cpu cpu, int hartid) __attribute__((weak));
@@ -103,7 +100,7 @@ int metal_cpu_get_msip(struct metal_cpu cpu, int hartid) {
 }
 
 struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu) {
-    return dt_cpu_data[get_hartid(cpu)].interrupt_controller;
+    return (struct metal_interrupt) { cpu.__hartid };
 }
 
 int metal_cpu_get_instruction_length(struct metal_cpu cpu, uintptr_t epc) {

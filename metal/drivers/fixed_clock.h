@@ -4,6 +4,9 @@
 #ifndef __METAL__FIXED_CLOCK_H
 #define __METAL__FIXED_CLOCK_H
 
+#include <metal/clock.h>
+#include <stdint.h>
+
 uint64_t __metal_driver_fixed_clock_get_rate_hz(struct metal_clock clk);
 
 uint64_t __metal_driver_fixed_clock_set_rate_hz(struct metal_clock clk,

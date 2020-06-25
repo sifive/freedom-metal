@@ -1,8 +1,6 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/interrupt_handlers.h>
-
 #ifdef METAL_HLIC_VECTORED
 
 #if __riscv_xlen == 32

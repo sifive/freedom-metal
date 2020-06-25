@@ -9,6 +9,7 @@
  */
 
 #include <metal/interrupt_vector_handlers.h>
+#include <stdint.h>
 #include <stddef.h>
 
 /*!

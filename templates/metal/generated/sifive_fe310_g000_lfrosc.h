@@ -21,7 +21,7 @@ static const struct dt_sifive_fe310_g000_lfrosc_clock_data {
 	{% for clk in sifive_fe310_g000_lfroscs %}
 	{
 		.config = {{ clk.regs_by_name["config"] }},
-		.mux = {{ clk.regs_by_name["mux"] }}
+		.mux = {{ clk.regs_by_name["mux"] }},
 		.lfrosc = (struct metal_clock) { {{ clk.clocks_by_name["lfrosc"].id }} },
 		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks_by_name["psdlfaltclk"].id }} },
 	},

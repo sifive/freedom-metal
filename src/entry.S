@@ -67,17 +67,6 @@ _enter:
     j 1b
 1:
 
-    /* Check for an initialization routine and call it if one exists, otherwise
-     * just skip over the call entirely.   Note that __metal_initialize isn't
-     * actually a full C function, as it doesn't end up with the .bss or .data
-     * segments having been initialized.  This is done to avoid putting a
-     * burden on systems that can be initialized without having a C environment
-     * set up. */
-    la ra, __metal_before_start
-    beqz ra, 1f
-    jalr ra
-1:
-
     /* At this point we can enter the C runtime's startup file.  The arguments
      * to this function are designed to match those provided to the SEE, just
      * so we don't have to write another ABI. */

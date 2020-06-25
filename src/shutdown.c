@@ -1,10 +1,10 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine.h>
+#include <metal/machine/platform.h>
 #include <metal/shutdown.h>
 
-#if !defined(__METAL_DT_SHUTDOWN_HANDLE)
+#if !defined(__METAL_HAS_SHUTDOWN)
 #pragma message(                                                               \
     "There is no defined shutdown mechanism, metal_shutdown() will spin.")
 #endif

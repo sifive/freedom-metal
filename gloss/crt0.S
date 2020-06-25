@@ -142,12 +142,6 @@ _start:
   call atexit
   call __libc_init_array
 
-  /* Register metal_fini_run as a destructor and call metal_init_run to
-   * run and setup Metal constructors */
-  la a0, metal_fini_run
-  call atexit
-  call metal_init_run
-
 _skip_init:
 
   /* Synchronize harts so that secondary harts wait until hart 0 finishes
