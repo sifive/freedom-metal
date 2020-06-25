@@ -4,16 +4,7 @@
 {% include 'template_comment.h' %}
 
 {% for device in devices %}
-  #define {{ device.define }}
-  {% for reg in device.registers %}
-    #define {{ reg.define }} {{ reg.address }}
-  {% endfor %}
-
-  {% for instance in device.instances %}
-	{% for property in instance.properties %}
-      #define {{ property.define }} {{ property.value }}
-	{% endfor %}
-  {% endfor %}
+#include <metal/machine/{{ to_snakecase(device) }}.h>
 {% endfor %}
 
 #endif /* ! __METAL_PLATFORM__H */

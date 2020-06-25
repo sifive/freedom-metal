@@ -141,6 +141,7 @@ def render_templates(template_dirs, args, template_data):
     for d in template_dirs:
         templates += glob.glob("{}/metal/*.h".format(d))
         templates += glob.glob("{}/metal/generated/*.h".format(d))
+        templates += glob.glob("{}/metal/machine/*.h".format(d))
 
     for template in templates:
         template =  template.replace("templates/", "")
@@ -160,12 +161,20 @@ def main():
     # Assign driver IDs to all device instances
     assign_ids(dts, args)
 
+    devices = []
+    devices.append(args.uart_driver)
+    devices.append(args.gpio_driver)
+    devices.append(args.shutdown_driver)
+    devices += args.clock_drivers
+    devices += args.interrupt_drivers
+
     # Convert the Devicetree object tree into dictionary data
     # which can be rendered by the templates
     template_data = {
         'harts' : [node_to_dict(hart, dts) for hart in dts.match("^riscv$")],
         'uarts' : [node_to_dict(uart, dts) for uart in dts.match(args.uart_driver)],
         'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(args.gpio_driver)],
+        'devices' : devices,
     }
 
     for driver in args.clock_drivers:
