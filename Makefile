@@ -25,9 +25,15 @@ GLOSS_SRCS = $(wildcard gloss/*.c) $(wildcard gloss/*.S)
 build/src/interrupt_table.c: generate
 build/src/jump_table.S: generate
 
-CFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -Ibuild -I. --specs=nano.specs -DMTIME_RATE_HZ_DEF=32768 -O0 -g
-LDFLAGS=-Wl,--gc-sections -Wl,-Map,hello.map -nostartfiles -nostdlib -Ttest/qemu_sifive_e31.lds
-LDLIBS=-Wl,--start-group -lc -lgcc -lm -Wl,--end-group
+LIBC ?= picolibc
+LIBC_FLAGS = --specs=$(LIBC).specs
+ifeq ($(LIBC),picolibc)
+	LIBC_FLAGS += --oslib=semihost
+endif
+
+CFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -Ibuild -I. $(LIBC_FLAGS) -DMTIME_RATE_HZ_DEF=32768 -O0 -g
+LDFLAGS=-Wl,--gc-sections -Wl,-Map,hello.map -nostartfiles -Ttest/qemu_sifive_e31.lds
+LDLIBS=-lm
 
 CC=riscv64-unknown-elf-gcc
 
