@@ -7,6 +7,7 @@
 
 #include <metal/clock.h>
 #include <metal/generated/sifive_uart0.h>
+#include <metal/init.h>
 #include <metal/io.h>
 #include <metal/tty.h>
 #include <metal/uart.h>
@@ -224,9 +225,7 @@ void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
 #define __METAL_DT_STDOUT_UART_BAUD 115200
 #endif
 
-//METAL_CONSTRUCTOR(metal_tty_init) {
-void metal_uart_init_constructor() __attribute__((constructor));
-void metal_uart_init_constructor() {
+METAL_CONSTRUCTOR(metal_tty_init) {
     metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE,
                     __METAL_DT_STDOUT_UART_BAUD);
 }

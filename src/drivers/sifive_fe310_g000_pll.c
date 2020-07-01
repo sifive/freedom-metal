@@ -195,15 +195,15 @@ static void __metal_driver_sifive_fe310_g000_pll_init(struct metal_clock pll) {
     __metal_driver_sifive_fe310_g000_pll_set_rate_hz(pll, init_rate);
 }
 
-#ifdef __METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE
 METAL_CONSTRUCTOR(metal_sifive_fe310_g000_pll_init) {
-    uint64_t init_rate = dt_clock_data[get_index(pll)].init_rate;
-    /* If the PLL init_rate is zero, don't initialize the PLL */
-    if (init_rate != 0)
-        __metal_driver_sifive_fe310_g000_pll_init(
-            __METAL_DT_SIFIVE_FE310_G000_PLL_HANDLE);
+    for(int i = 0; i < __METAL_DT_NUM_SIFIVE_FE310_G000_PLLS; i++) {
+        struct metal_clock pll = (struct metal_clock) { i };
+        uint64_t init_rate = dt_clock_data[get_index(pll)].init_rate;
+        /* If the PLL init_rate is zero, don't initialize the PLL */
+        if (init_rate != 0)
+            __metal_driver_sifive_fe310_g000_pll_init(pll);
+    }
 }
-#endif /* __METAL_DT_SIFIVE_FE310_G000__PLL_HANDLE */
 
 uint64_t __metal_driver_sifive_fe310_g000_pll_get_rate_hz(
     struct metal_clock clock) {
