@@ -74,3 +74,8 @@ int metal_uart_set_receive_watermark(struct metal_uart uart, size_t level) {
 size_t metal_uart_get_receive_watermark(struct metal_uart uart)
     __attribute__((weak));
 size_t metal_uart_get_receive_watermark(struct metal_uart uart) { return 0; }
+
+void _metal_uart_pre_rate_change_callback(struct metal_uart uart) __attribute__((weak));
+void _metal_uart_pre_rate_change_callback(struct metal_uart uart) {}
+void _metal_uart_post_rate_change_callback(struct metal_uart uart) __attribute__((weak));
+void _metal_uart_post_rate_change_callback(struct metal_uart uart) {}

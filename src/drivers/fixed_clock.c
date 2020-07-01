@@ -21,12 +21,6 @@ uint64_t __metal_driver_fixed_clock_set_rate_hz(struct metal_clock clk,
 	return dt_clock_rate[get_index(clk)];
 }
 
-void __metal_driver_fixed_clock_register_pre_rate_change_callback(struct metal_clock clk,
-	metal_clock_callback *cb) {}
-
-void __metal_driver_fixed_clock_register_post_rate_change_callback(struct metal_clock clk,
-	metal_clock_callback *cb) {}
-
 #endif /* METAL_FIXED_CLOCK */
 
 typedef int no_empty_translation_units;

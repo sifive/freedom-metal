@@ -12,10 +12,4 @@ uint64_t __metal_driver_fixed_clock_get_rate_hz(struct metal_clock clk);
 uint64_t __metal_driver_fixed_clock_set_rate_hz(struct metal_clock clk,
                                             uint64_t target_hz);
 
-void __metal_driver_fixed_clock_register_pre_rate_change_callback(struct metal_clock clk,
-	metal_clock_callback *cb);
-
-void __metal_driver_fixed_clock_register_post_rate_change_callback(struct metal_clock clk,
-	metal_clock_callback *cb);
-
 #endif /* __METAL__FIXED_CLOCK_H */

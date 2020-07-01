@@ -9,6 +9,7 @@
 #include <metal/clock.h>
 #include <metal/drivers/sifive_fe310_g000_hfrosc.h>
 #include <metal/drivers/sifive_fe310_g000_hfxosc.h>
+#include <metal/uart.h>
 #include <stdbool.h>
 
 {% if sifive_fe310_g000_plls is defined %}
@@ -41,6 +42,26 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 	},
 	{% endfor %}
 };
+
+static __inline__ void pre_rate_change_callbacks() {
+{% if sifive_fe310_g000_plls|length == 1 %}
+    {% if uarts[0].clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
+        {% for uart in uarts %}
+	_metal_uart_pre_rate_change_callback((struct metal_uart) { {{ uart.id }} });
+		{% endfor %}
+	{% endif %}
+{% endif %}
+}
+
+static __inline__ void post_rate_change_callbacks() {
+{% if sifive_fe310_g000_plls|length == 1 %}
+    {% if uarts[0].clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
+        {% for uart in uarts %}
+	_metal_uart_post_rate_change_callback((struct metal_uart) { {{ uart.id }} });
+		{% endfor %}
+	{% endif %}
+{% endif %}
+}
 
 {% endif %}
 

@@ -13,10 +13,4 @@ uint64_t __metal_driver_sifive_fe310_g000_hfxosc_get_rate_hz(
 uint64_t __metal_driver_sifive_fe310_g000_hfxosc_set_rate_hz(
     struct metal_clock clock, uint64_t rate);
 
-void __metal_driver_sifive_fe310_g000_hfxosc_register_pre_rate_change_callback(struct metal_clock clk,
-    metal_clock_callback *cb);
-
-void __metal_driver_sifive_fe310_g000_hfxosc_register_post_rate_change_callback(struct metal_clock clk,
-    metal_clock_callback *cb);
-
 #endif

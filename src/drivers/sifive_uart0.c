@@ -39,8 +39,6 @@
 
 static struct {
     uint64_t baud_rate;
-    metal_clock_callback pre_rate_change_callback;
-    metal_clock_callback post_rate_change_callback;
 } uart_state[__METAL_DT_NUM_UARTS];
 
 static inline uint32_t get_index(struct metal_uart uart) {
@@ -158,8 +156,7 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
     return 0;
 }
 
-static void pre_rate_change_callback_func(void *priv) {
-    struct metal_uart uart = (struct metal_uart) { (uint32_t) priv };
+void _metal_uart_pre_rate_change_callback(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
     struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
@@ -186,26 +183,13 @@ static void pre_rate_change_callback_func(void *priv) {
         __asm__("nop");
 }
 
-static void post_rate_change_callback_func(void *priv) {
-    struct metal_uart uart = (struct metal_uart) { (uint32_t) priv };
+void _metal_uart_post_rate_change_callback(struct metal_uart uart) {
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
     metal_uart_set_baud_rate(uart, baud_rate);
 }
 
 void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
     uint32_t index = get_index(uart);
-
-    struct metal_clock clock = dt_uart_data[index].clock;
-    metal_clock_callback *pre_cb = &uart_state[index].pre_rate_change_callback;
-    metal_clock_callback *post_cb = &uart_state[index].post_rate_change_callback;
-
-    pre_cb->callback = &pre_rate_change_callback_func;
-    pre_cb->priv = (void *) get_index(uart);
-    metal_clock_register_pre_rate_change_callback(clock, pre_cb);
-
-    post_cb->callback = &post_rate_change_callback_func;
-    post_cb->priv = (void *) get_index(uart);
-    metal_clock_register_post_rate_change_callback(clock, post_cb);
 
     metal_uart_set_baud_rate(uart, baud_rate);
 

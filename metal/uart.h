@@ -163,4 +163,20 @@ int metal_uart_set_receive_watermark(struct metal_uart uart, size_t level);
  */
 size_t metal_uart_get_receive_watermark(struct metal_uart uart);
 
+/*!
+ * @brief Callback to allow the UART to prepare for a change of clock rate
+ * @param uart The UART device handle
+ *
+ * For internal use only.
+ */
+void _metal_uart_pre_rate_change_callback(struct metal_uart uart);
+
+/*!
+ * @brief Callback to allow the UART to adapt to a new clock rate
+ * @param uart The UART device handle
+ *
+ * For internal use only.
+ */
+void _metal_uart_post_rate_change_callback(struct metal_uart uart);
+
 #endif

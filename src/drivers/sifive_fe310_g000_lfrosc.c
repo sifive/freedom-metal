@@ -49,12 +49,6 @@ uint64_t __metal_driver_sifive_fe310_g000_lfrosc_set_rate_hz(
     return __metal_driver_sifive_fe310_g000_lfrosc_get_rate_hz(clock);
 }
 
-uint64_t __metal_driver_sifive_fe310_g000_lfrosc_register_pre_rate_change_callback(
-    struct metal_clock clock, uint64_t rate) {}
-
-uint64_t __metal_driver_sifive_fe310_g000_lfrosc_register_post_rate_change_callback(
-    struct metal_clock clock, uint64_t rate) {}
-
 #endif /* METAL_SIFIVE_FE310_G000_LFROSC */
 
 typedef int no_empty_translation_units;

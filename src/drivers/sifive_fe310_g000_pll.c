@@ -171,9 +171,6 @@ static int find_closest_config(uint64_t ref_hz, uint64_t rate) {
     return closest_index;
 }
 
-static metal_clock_callback *pre_rate_change_callbacks[__METAL_DT_NUM_SIFIVE_FE310_G000_PLLS] = { NULL };
-static metal_clock_callback *post_rate_change_callbacks[__METAL_DT_NUM_SIFIVE_FE310_G000_PLLS] = { NULL };
-
 static uint32_t get_index(struct metal_clock clock) {
     return clock.__clock_index;
 }
@@ -190,9 +187,7 @@ static void __metal_driver_sifive_fe310_g000_pll_init(struct metal_clock pll) {
     if (dt_clock_data[get_index(pll)].has_hfxosc)
         __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_REFSEL;
 
-    /* Configure the PLL to run at the requested init frequency.
-     * Using the vtable instead of the user API because we want to control
-     * when the callbacks occur. */
+    /* Configure the PLL to run at the requested init frequency. */
     uint64_t init_rate = dt_clock_data[get_index(pll)].init_rate;
     __metal_driver_sifive_fe310_g000_pll_set_rate_hz(pll, init_rate);
 }
@@ -305,9 +300,7 @@ static void configure_pll(struct metal_clock clock,
 
 uint64_t __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clock,
                                                           uint64_t rate) {
-    /* If the PLL clock has had a _pre_rate_change_callback configured, call it
-     */
-    _metal_clock_call_all_callbacks(pre_rate_change_callbacks[get_index(clock)]);
+    pre_rate_change_callbacks();
 
     uintptr_t pllcfg = dt_clock_data[get_index(clock)].config;
     uintptr_t plldiv = dt_clock_data[get_index(clock)].divider;
@@ -344,22 +337,9 @@ uint64_t __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clo
     /* Enable the PLL */
     __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_SEL;
 
-    /* If the PLL clock has had a rate_change_callback configured, call it */
-    _metal_clock_call_all_callbacks(post_rate_change_callbacks[get_index(clock)]);
+    post_rate_change_callbacks();
 
     return __metal_driver_sifive_fe310_g000_pll_get_rate_hz(clock);
-}
-
-uint64_t __metal_driver_sifive_fe310_g000_pll_register_pre_rate_change_callback(struct metal_clock clock, metal_clock_callback *cb) {
-    metal_clock_callback *list = pre_rate_change_callbacks[get_index(clock)];
-    pre_rate_change_callbacks[get_index(clock)] = _metal_clock_append_to_callbacks(list, cb);
-    return 0;
-}
-
-uint64_t __metal_driver_sifive_fe310_g000_pll_register_post_rate_change_callback(struct metal_clock clock, metal_clock_callback *cb) {
-    metal_clock_callback *list = post_rate_change_callbacks[get_index(clock)];
-    post_rate_change_callbacks[get_index(clock)] = _metal_clock_append_to_callbacks(list, cb);
-    return 0;
 }
 
 #endif /* METAL_SIFIVE_FE310_G000_PLL */
