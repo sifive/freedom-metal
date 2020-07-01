@@ -61,4 +61,12 @@ static const struct dt_uart_data {
 {% include 'interrupt_dispatch.h' %}
 {% endif %}
 
+{% if chosen.stdout_path is defined %}
+{% if chosen.stdout_path[0].compatible[0] == "sifive,uart0" %}
+#define METAL_STDOUT_SIFIVE_UART0
+#define __METAL_DT_STDOUT_UART_HANDLE ((struct metal_uart) { {{ chosen.stdout_path[0].id }} })
+#define __METAL_DT_STDOUT_UART_BAUD {{ chosen.stdout_path[1] }}
+{% endif %}
+{% endif %}
+
 #endif

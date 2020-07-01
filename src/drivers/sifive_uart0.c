@@ -1,10 +1,12 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/machine/platform.h>
+
 #ifdef METAL_SIFIVE_UART0
 
+#include <metal/clock.h>
 #include <metal/generated/sifive_uart0.h>
-#include <metal/init.h>
 #include <metal/io.h>
 #include <metal/tty.h>
 #include <metal/uart.h>
@@ -36,8 +38,8 @@
 
 static struct {
     uint64_t baud_rate;
-    metal_clock_callback_t pre_rate_change_callback;
-    metal_clock_callback_t post_rate_change_callback;
+    metal_clock_callback pre_rate_change_callback;
+    metal_clock_callback post_rate_change_callback;
 } uart_state[__METAL_DT_NUM_UARTS];
 
 static inline uint32_t get_index(struct metal_uart uart) {
@@ -126,7 +128,7 @@ int metal_uart_getc(struct metal_uart uart, int *c) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     /* No seperate status register, we get status and the byte at same time */
-    ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
+    uint32_t ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
     ;
     if (ch & UART_RXEMPTY) {
         *c = -1; /* aka: EOF in most of the world */
@@ -136,7 +138,7 @@ int metal_uart_getc(struct metal_uart uart, int *c) {
     return 0;
 }
 
-int metal_uart_get_baud_rate(struct metal_uart guart) {
+int metal_uart_get_baud_rate(struct metal_uart uart) {
     return uart_state[get_index(uart)].baud_rate;
 }
 
@@ -156,7 +158,7 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
 }
 
 static void pre_rate_change_callback_func(void *priv) {
-    struct metal_uart uart = priv;
+    struct metal_uart uart = (struct metal_uart) { (uint32_t) priv };
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
     struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
@@ -184,7 +186,7 @@ static void pre_rate_change_callback_func(void *priv) {
 }
 
 static void post_rate_change_callback_func(void *priv) {
-    struct metal_uart uart = priv;
+    struct metal_uart uart = (struct metal_uart) { (uint32_t) priv };
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
     metal_uart_set_baud_rate(uart, baud_rate);
 }
@@ -193,15 +195,15 @@ void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
     uint32_t index = get_index(uart);
 
     struct metal_clock clock = dt_uart_data[index].clock;
-    metal_clock_callback_t pre_cb = &uart_state[index].pre_rate_change_callback;
-    metal_clock_callback_t post_cb = &uart_state[index].post_rate_change_callback;
+    metal_clock_callback *pre_cb = &uart_state[index].pre_rate_change_callback;
+    metal_clock_callback *post_cb = &uart_state[index].post_rate_change_callback;
 
     pre_cb->callback = &pre_rate_change_callback_func;
-    pre_cb->priv = uart;
+    pre_cb->priv = (void *) get_index(uart);
     metal_clock_register_pre_rate_change_callback(clock, pre_cb);
 
     post_cb->callback = &post_rate_change_callback_func;
-    post_cb->priv = uart;
+    post_cb->priv = (void *) get_index(uart);
     metal_clock_register_post_rate_change_callback(clock, post_cb);
 
     metal_uart_set_baud_rate(uart, baud_rate);
@@ -211,18 +213,20 @@ void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
         struct metal_gpio pinmux = dt_uart_data[index].pinmux;
         uint32_t output_sel = dt_uart_data[index].pinmux_output_selector;
         uint32_t source_sel = dt_uart_data[index].pinmux_source_selector;
-        metal_gpio_enable_io(pinmux, output_sel, source_sel);
+        metal_gpio_enable_pinmux(pinmux, output_sel, source_sel);
     }
 }
 
 #ifdef METAL_STDOUT_SIFIVE_UART0
-#if defined(__METAL_DT_STDOUT_UART_HANDLE)
+#ifdef __METAL_DT_STDOUT_UART_HANDLE
 
 #ifndef __METAL_DT_STDOUT_UART_BAUD
 #define __METAL_DT_STDOUT_UART_BAUD 115200
 #endif
 
-METAL_CONSTRUCTOR(metal_tty_init) {
+//METAL_CONSTRUCTOR(metal_tty_init) {
+void metal_uart_init_constructor() __attribute__((constructor));
+void metal_uart_init_constructor() {
     metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE,
                     __METAL_DT_STDOUT_UART_BAUD);
 }

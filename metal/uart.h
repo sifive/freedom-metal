@@ -42,7 +42,7 @@ inline const struct metal_uart metal_uart_get_device(uint32_t index) {
  * @param uart The UART device handle
  * @param baud_rate the baud rate to set the UART to
  */
-void metal_uart_init(struct metal_uart uart, int baud_rate);
+void metal_uart_init(struct metal_uart uart, uint32_t baud_rate);
 
 /*!
  * @brief Output a character over the UART

@@ -363,6 +363,18 @@ uint64_t __metal_driver_sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clo
     return __metal_driver_sifive_fe310_g000_pll_get_rate_hz(clock);
 }
 
+uint64_t __metal_driver_sifive_fe310_g000_pll_register_pre_rate_change_callback(struct metal_clock clock, metal_clock_callback *cb) {
+    metal_clock_callback *list = &pre_rate_change_callbacks[get_index(clock)];
+    _metal_clock_append_to_callbacks(list, cb);
+    return 0;
+}
+
+uint64_t __metal_driver_sifive_fe310_g000_pll_register_post_rate_change_callback(struct metal_clock clock, metal_clock_callback *cb) {
+    metal_clock_callback *list = &post_rate_change_callbacks[get_index(clock)];
+    _metal_clock_append_to_callbacks(list, cb);
+    return 0;
+}
+
 #endif /* METAL_SIFIVE_FE310_G000_PLL */
 
 typedef int no_empty_translation_units;

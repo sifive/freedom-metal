@@ -5,9 +5,9 @@
 
 /* Stubs for when no driver is present */
 
-void metal_uart_init(struct metal_uart uart, int baud_rate)
+void metal_uart_init(struct metal_uart uart, uint32_t baud_rate)
     __attribute__((weak));
-void metal_uart_init(struct metal_uart uart, int baud_rate) { return; }
+void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) { return; }
 
 int metal_uart_putc(struct metal_uart uart, int c) __attribute__((weak));
 int metal_uart_putc(struct metal_uart uart, int c) { return -1; }

@@ -171,11 +171,18 @@ def main():
     # Convert the Devicetree object tree into dictionary data
     # which can be rendered by the templates
     template_data = {
+        'chosen' : node_to_dict(dts.get_by_path("/chosen"), dts),
         'harts' : [node_to_dict(hart, dts) for hart in dts.match("^riscv$")],
         'uarts' : [node_to_dict(uart, dts) for uart in dts.match(args.uart_driver)],
         'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(args.gpio_driver)],
         'devices' : devices,
     }
+
+    if 'stdout_path' in  template_data['chosen']:
+        path, baud = template_data['chosen']['stdout_path'][0].split(':')
+        node = dts.get_by_path(path)
+        template_data['chosen']['stdout_path'] = [node_to_dict(node, dts), baud]
+               
 
     shutdown = dts.match(args.shutdown_driver)
     if shutdown is not None:
