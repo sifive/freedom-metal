@@ -4,6 +4,8 @@
 #include <metal/cpu.h>
 #include <metal/generated/cpu.h>
 
+extern inline struct metal_cpu metal_cpu_get(unsigned int hartid);
+
 int metal_cpu_get_current_hartid() {
     int mhartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(mhartid));
