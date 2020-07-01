@@ -6,6 +6,7 @@
 #ifdef METAL_SIFIVE_UART0
 
 #include <metal/clock.h>
+#include <metal/cpu.h>
 #include <metal/generated/sifive_uart0.h>
 #include <metal/init.h>
 #include <metal/io.h>
@@ -39,7 +40,11 @@
 
 static struct {
     uint64_t baud_rate;
-} uart_state[__METAL_DT_NUM_UARTS];
+} uart_state[__METAL_DT_NUM_UARTS] = {
+    {
+        .baud_rate = 0    
+    },
+};
 
 static inline uint32_t get_index(struct metal_uart uart) {
     return uart.__uart_index;
@@ -175,12 +180,18 @@ void _metal_uart_pre_rate_change_callback(struct metal_uart uart) {
 
     long bits_per_symbol =
         (UART_REGW(METAL_SIFIVE_UART0_TXCTRL) & (1 << 1)) ? 9 : 10;
-    long clk_freq = metal_clock_get_rate_hz(clock);
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
-    long cycles_to_wait = bits_per_symbol * clk_freq / baud_rate;
 
-    for (volatile long x = 0; x < cycles_to_wait; x++)
-        __asm__("nop");
+    if (baud_rate != 0) {
+        uint64_t ticks_to_wait = bits_per_symbol * MTIME_RATE_HZ_DEF / baud_rate;
+
+        struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
+        uint64_t mtime = metal_cpu_get_mtime(cpu);
+        uint64_t mtime_end = mtime + ticks_to_wait;
+        while (mtime <= mtime_end) {
+            mtime = metal_cpu_get_mtime(cpu);
+        }
+    }
 }
 
 void _metal_uart_post_rate_change_callback(struct metal_uart uart) {
