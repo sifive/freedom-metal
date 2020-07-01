@@ -35,7 +35,7 @@ IRQ_9:
 IRQ_10:
         j metal_riscv_cpu_intc_default_handler
 IRQ_11:
-{% if external_interrupts is defined %}
+{% if global_interrupts is defined %}
         j metal_riscv_plic0_source_0_handler
 {% else %}
         j metal_riscv_cpu_intc_meip_handler

@@ -45,6 +45,14 @@ int metal_cpu_get_current_hartid(void);
  * @return The number of CPU harts */
 int metal_cpu_get_num_harts(void);
 
+int metal_cpu_enable_interrupts(struct metal_cpu cpu);
+
+int metal_cpu_disable_interrupts(struct metal_cpu cpu);
+
+int metal_cpu_enable_ipi(struct metal_cpu cpu);
+
+int metal_cpu_disable_ipi(struct metal_cpu cpu);
+
 /*! @brief Get the CPU cycle count timer value
  *
  * Get the value of the cycle count timer for a given CPU
@@ -86,48 +94,6 @@ uint64_t metal_cpu_get_mtime(struct metal_cpu cpu);
  */
 int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time);
 
-/*! @brief Get a reference to RTC timer interrupt controller
- *
- * Get a reference to the interrupt controller for the real-time clock
- * interrupt. The controller returned by this function must be initialized
- * before any interrupts are registered or enabled with it.
- *
- * @param cpu The CPU device handle
- * @return A pointer to the timer interrupt handle
- */
-struct metal_interrupt
-metal_cpu_timer_interrupt_controller(struct metal_cpu cpu);
-
-/*! @brief Get the RTC timer interrupt id
- *
- * Get the interrupt ID of the real-time clock interrupt
- *
- * @param cpu The CPU device handle
- * @return The timer interrupt ID
- */
-int metal_cpu_timer_get_interrupt_id(struct metal_cpu cpu);
-
-/*! @brief Get a reference to the software interrupt controller
- *
- * Get a reference to the interrupt controller for the software/inter-process
- * interrupt. The controller returned by this function must be initialized
- * before any interrupts are registered or enabled with it.
- *
- * @param cpu The CPU device handle
- * @return A pointer to the software interrupt handle
- */
-struct metal_interrupt
-metal_cpu_software_interrupt_controller(struct metal_cpu cpu);
-
-/*! @brief Get the software interrupt id
- *
- * Get the interrupt ID for the software/inter-process interrupt
- *
- * @param cpu The CPU device handle
- * @return the software interrupt ID
- */
-int metal_cpu_software_get_interrupt_id(struct metal_cpu cpu);
-
 /*!
  * @brief Set the inter-process interrupt for a hart
  *
@@ -135,11 +101,10 @@ int metal_cpu_software_get_interrupt_id(struct metal_cpu cpu);
  * controller for the CPU handle passed to this function must be initialized
  * before this function is called.
  *
- * @param cpu The CPU device handle
- * @param hartid The CPU hart ID to be interrupted
+ * @param cpu The CPU device handle for the hart to be interrupted
  * @return 0 upon success
  */
-int metal_cpu_software_set_ipi(struct metal_cpu cpu, int hartid);
+int metal_cpu_set_ipi(struct metal_cpu cpu);
 
 /*!
  * @brief Clear the inter-process interrupt for a hart
@@ -148,11 +113,10 @@ int metal_cpu_software_set_ipi(struct metal_cpu cpu, int hartid);
  * controller for the CPU handle passed to this function must be initialized
  * before this function is called.
  *
- * @param cpu The CPU device handle
- * @param hartid The CPU hart ID to clear
+ * @param cpu The CPU device handle for the hart to clear
  * @return 0 upon success
  */
-int metal_cpu_software_clear_ipi(struct metal_cpu cpu, int hartid);
+int metal_cpu_clear_ipi(struct metal_cpu cpu);
 
 /*!
  * @brief Get the value of MSIP for the given hart
@@ -162,38 +126,10 @@ int metal_cpu_software_clear_ipi(struct metal_cpu cpu, int hartid);
  * as argument to this function must be initialized before this function
  * is called.
  *
- * @param cpu the CPU device handle
- * @param hartid The CPU hart to read
+ * @param cpu the CPU device handle for the hart
  * @return 0 upon success
  */
-int metal_cpu_get_msip(struct metal_cpu cpu, int hartid);
-
-/*!
- * @brief Get the interrupt controller for the CPU
- *
- * Get the CPU interrupt controller. The controller returned by this
- * function must be initialized before any interrupts are registered
- * or enabled and before any exception handlers are registered with
- * this CPU.
- *
- * @param cpu The CPU device handle
- * @return The handle for the CPU interrupt controller
- */
-struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu);
-
-/*!
- * @brief Register an exception handler
- *
- * Register an exception handler for the CPU. The CPU interrupt controller must
- * be initialized before this function is called.
- *
- * @param cpu The CPU device handle
- * @param ecode The exception code to register a handler for
- * @param handler Callback function for the exception handler
- * @return 0 upon success
- */
-int metal_cpu_exception_register(struct metal_cpu cpu, int ecode,
-                                 metal_exception_handler_t handler);
+int metal_cpu_get_ipi(struct metal_cpu cpu);
 
 /*!
  * @brief Get the length of an instruction in bytes

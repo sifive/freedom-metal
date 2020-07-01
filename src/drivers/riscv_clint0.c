@@ -10,18 +10,18 @@
 
 #define CLINT_REGW(offset) __METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_RISCV_CLINT0_0_BASE_ADDR + (offset)))
 
-int metal_cpu_software_clear_ipi(struct metal_cpu cpu, int hartid) {
-    CLINT_REGW(METAL_RISCV_CLINT0_MSIP_BASE + (4 * hartid)) = 0;
+int metal_cpu_clear_ipi(struct metal_cpu cpu) {
+    CLINT_REGW(METAL_RISCV_CLINT0_MSIP_BASE + (4 * cpu.__hartid)) = 0;
     return 0;
 }
 
-int metal_cpu_software_set_ipi(struct metal_cpu cpu, int hartid) {
-    CLINT_REGW(METAL_RISCV_CLINT0_MSIP_BASE + (4 * hartid)) = 1;
+int metal_cpu_set_ipi(struct metal_cpu cpu) {
+    CLINT_REGW(METAL_RISCV_CLINT0_MSIP_BASE + (4 * cpu.__hartid)) = 1;
     return 0;
 }
 
-int metal_cpu_get_msip(struct metal_cpu cpu, int hartid) {
-    return CLINT_REGW(4 * hartid) == 1;
+int metal_cpu_get_ipi(struct metal_cpu cpu) {
+    return CLINT_REGW(METAL_RISCV_CLINT0_MSIP_BASE + (4 * cpu.__hartid)) == 1;
 }
 
 uint64_t metal_cpu_get_mtime(struct metal_cpu cpu) {

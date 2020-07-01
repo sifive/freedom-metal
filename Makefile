@@ -2,11 +2,8 @@
 DEVICETREE ?= test/qemu_sifive_e31.dts
 OUTPUT_DIR ?= build
 
-generate: virtualenv $(OUTPUT_DIR) scripts/codegen.py scripts/intgen.py
+generate: virtualenv $(OUTPUT_DIR) scripts/codegen.py
 	. venv/bin/activate && python3 scripts/codegen.py \
-		--dts $(DEVICETREE) \
-		--output-dir $(OUTPUT_DIR)
-	. venv/bin/activate && python3 scripts/intgen.py \
 		--dts $(DEVICETREE) \
 		--output-dir $(OUTPUT_DIR)
 
@@ -19,7 +16,7 @@ venv/bin/activate: requirements.txt
 	python3 -m venv venv
 	. venv/bin/activate && python3 -m pip install -r requirements.txt
 
-METAL_SRCS = $(wildcard src/*.c src/*.S src/drivers/*.c) build/src/interrupt_table.c build/src/jump_table.S
+METAL_SRCS = $(wildcard src/*.c src/*.S src/drivers/*.c build/src/*.c build/src/*.S)
 GLOSS_SRCS = $(wildcard gloss/*.c) $(wildcard gloss/*.S)
 
 build/src/interrupt_table.c: generate

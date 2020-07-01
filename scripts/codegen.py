@@ -96,6 +96,57 @@ def assign_ids(dts, args):
         for node_id, node in enumerate(dts.match(driver)):
             driver_ids[node] = node_id
 
+def local_interrupts(dts):
+    irqs = []
+    
+    for node in dts.match("sifive,local-external-interrupts0"):
+        for source_id, irq_id in enumerate(node.get_fields("interrupts")):
+            irqs.append({
+                'source': {
+                    'compatible': "sifive,local-external-interrupts0",
+                    'id': source_id,
+                },
+                'id': irq_id,
+            })
+
+    irqs.sort(key=lambda x: x['id'])
+
+    local_interrupts = {
+        'irqs': irqs,
+    }
+
+    return local_interrupts
+
+def global_interrupts(dts):
+    def is_global_int_source(node):
+        ref = node.get_field("interrupt-parent")
+        if ref == None:
+            return False
+        intc = dts.get_by_reference(ref)
+        return intc.get_field("compatible") == "riscv,plic0"
+    
+    plic_sources = dts.filter(is_global_int_source)
+
+    irqs = []
+
+    for node in plic_sources:
+        for source_id, irq_id in enumerate(node.get_fields("interrupts")):
+            irqs.append({
+                'source': {
+                    'compatible': node.get_field("compatible"),
+                    'id': source_id,
+                },
+                'id': irq_id,
+            })
+
+    irqs.sort(key=lambda x: x['id'])
+
+    global_interrupts = {
+        'irqs': irqs,
+    }
+
+    return global_interrupts
+
 def node_to_dict(node, dts):
     d = dict()
     for prop in node.properties:
@@ -143,6 +194,8 @@ def render_templates(template_dirs, args, template_data):
         templates += glob.glob("{}/metal/*.h".format(d))
         templates += glob.glob("{}/metal/generated/*.h".format(d))
         templates += glob.glob("{}/metal/machine/*.h".format(d))
+        templates += glob.glob("{}/src/*.S".format(d))
+        templates += glob.glob("{}/src/*.c".format(d))
 
     for template in templates:
         template =  template.replace("templates/", "")
@@ -177,6 +230,8 @@ def main():
         'uarts' : [node_to_dict(uart, dts) for uart in dts.match(args.uart_driver)],
         'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(args.gpio_driver)],
         'devices' : devices,
+        'local_interrupts' : local_interrupts(dts),
+        'global_interrupts' : global_interrupts(dts),
     }
 
     if 'stdout_path' in  template_data['chosen']:

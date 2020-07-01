@@ -83,10 +83,8 @@ static inline int __metal_plic0_enable(struct metal_interrupt plic,
 
 static inline void __metal_plic0_default_handler(int id, void *priv) { metal_shutdown(300); }
 
-static void __metal_plic0_handler(int id, void *priv) {
-    struct metal_interrupt plic = {
-        .__interrupt_index = (uint32_t) priv,
-    };
+void metal_riscv_plic0_source_0_handler() {
+    struct metal_interrupt plic = { 0 };
     int context_id = dt_intc_data[get_index(plic)].context_id;
     unsigned int idx = __metal_plic0_claim_interrupt(plic, context_id);
     unsigned int num_interrupts = dt_intc_data[get_index(plic)].num_interrupts;

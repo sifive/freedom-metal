@@ -21,7 +21,7 @@ metal_interrupt_vector_handler_t __metal_vector_table[__METAL_NUM_LOCAL_INTERRUP
     metal_riscv_cpu_intc_default_handler,
     metal_riscv_cpu_intc_default_handler,
     metal_riscv_cpu_intc_mtip_handler,
-{% if external_interrupts is defined %}
+{% if global_interrupts is defined %}
     metal_riscv_plic0_source_0_handler,
 {% else %}
     metal_riscv_cpu_intc_meip_handler,

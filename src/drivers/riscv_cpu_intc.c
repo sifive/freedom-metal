@@ -4,6 +4,7 @@
 #include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/generated/cpu.h>
+#include <metal/init.h>
 #include <metal/interrupt.h>
 #include <metal/interrupt_handlers.h>
 #include <metal/shutdown.h>
@@ -99,7 +100,7 @@ void __metal_default_exception_handler(struct metal_cpu cpu, int ecode) {
     metal_shutdown(100);
 }
 
-void __metal_default_interrupt_handler(int id, void *priv) {
+void metal_riscv_cpu_intc_default_handler() {
     metal_shutdown(200);
 }
 
@@ -141,7 +142,7 @@ void __metal_exception_handler(void) {
     int id = RISCV_MCAUSE_ID(mcause);
 
     if (RISCV_MCAUSE_IS_INTERRUPT(mcause)) {
-        __metal_vector_table[id]();
+        __metal_vector_table[id + 1]();
     } else {
         intc_state[hartid].exception_table[id](metal_cpu_get(hartid), id);
     }
@@ -179,6 +180,13 @@ void __metal_driver_riscv_cpu_intc_interrupt_init(
         }
 
         intc_state[get_index(intc)].init_done = 1;
+    }
+}
+
+METAL_CONSTRUCTOR(riscv_cpu_intc_init) {
+    for (int i = 0; i < __METAL_DT_NUM_HARTS; i++) {
+        struct metal_interrupt intc = (struct metal_interrupt) { i };
+        __metal_driver_riscv_cpu_intc_interrupt_init(intc);
     }
 }
 

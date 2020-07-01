@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu.h>
+#include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/generated/riscv_cpu.h>
 #include <metal/machine/platform.h>
 #include <metal/io.h>
@@ -52,50 +53,38 @@ int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time) {
     return -1;
 }
 
-struct metal_interrupt metal_cpu_timer_interrupt_controller(struct metal_cpu cpu) {
-#ifdef METAL_RISCV_CLINT0
-    return (struct metal_interrupt) { cpu.__hartid };
-#else
-#ifdef METAL_SIFIVE_CLIC0
-    return (struct metal_interrupt) { cpu.__hartid };
-#endif
-#endif
-    assert(0);
-    return (struct metal_interrupt) { 0 };
+int metal_cpu_enable_interrupts(struct metal_cpu cpu) __attribute__((weak));
+int metal_cpu_enable_interrupts(struct metal_cpu cpu) {
+    __asm__ volatile("csrs mstatus, %0" :: "r"(METAL_MSTATUS_MIE));
 }
 
-int metal_cpu_timer_get_interrupt_id(struct metal_cpu cpu) {
-    return 7;
+int metal_cpu_disable_interrupts(struct metal_cpu cpu) __attribute__((weak));
+int metal_cpu_disable_interrupts(struct metal_cpu cpu) {
+    __asm__ volatile("csrc mstatus, %0" :: "r"(METAL_MSTATUS_MIE));
 }
 
-struct metal_interrupt metal_cpu_software_interrupt_controller(struct metal_cpu cpu) {
-#ifdef METAL_RISCV_CLINT0
-    return (struct metal_interrupt) { cpu.__hartid };
-#else
-#ifdef METAL_SIFIVE_CLIC0
-    return (struct metal_interrupt) { cpu.__hartid };
-#endif
-#endif
-    assert(0);
-    return (struct metal_interrupt) { 0 };
+int metal_cpu_enable_ipi(struct metal_cpu cpu) __attribute__((weak));
+int metal_cpu_enable_ipi(struct metal_cpu cpu) {
+    __asm__ volatile("csrs mie, %0" :: "r"(1 << METAL_LOCAL_INTERRUPT_SW));
 }
 
-int metal_cpu_software_get_interrupt_id(struct metal_cpu cpu) {
-    return 3;
+int metal_cpu_disable_ipi(struct metal_cpu cpu) __attribute__((weak));
+int metal_cpu_disable_ipi(struct metal_cpu cpu) {
+    __asm__ volatile("csrc mie, %0" :: "r"(1 << METAL_LOCAL_INTERRUPT_SW));
 }
 
-int metal_cpu_software_set_ipi(struct metal_cpu cpu, int hartid) __attribute__((weak));
-int metal_cpu_software_set_ipi(struct metal_cpu cpu, int hartid) {
+int metal_cpu_set_ipi(struct metal_cpu cpu) __attribute__((weak));
+int metal_cpu_set_ipi(struct metal_cpu cpu) {
     return -1;
 }
 
-int metal_cpu_software_clear_ipi(struct metal_cpu cpu, int hartid) __attribute__((weak));
-int metal_cpu_software_clear_ipi(struct metal_cpu cpu, int hartid) {
+int metal_cpu_clear_ipi(struct metal_cpu cpu) __attribute__((weak));
+int metal_cpu_clear_ipi(struct metal_cpu cpu) {
     return -1;
 }
 
-int metal_cpu_get_msip(struct metal_cpu cpu, int hartid) __attribute__((weak));
-int metal_cpu_get_msip(struct metal_cpu cpu, int hartid) {
+int metal_cpu_get_ipi(struct metal_cpu cpu) __attribute__((weak));
+int metal_cpu_get_ipi(struct metal_cpu cpu) {
     return 0;
 }
 
