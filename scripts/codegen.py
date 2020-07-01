@@ -31,6 +31,7 @@ DEFAULT_CLOCK_DRIVERS = [
 ]
 
 DEFAULT_INTERRUPT_DRIVERS = [
+    "riscv,clint0",
     "riscv,cpu-intc",
     "riscv,plic0",
 ]
