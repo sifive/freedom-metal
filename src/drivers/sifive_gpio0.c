@@ -104,7 +104,7 @@ int metal_gpio_disable_pinmux(struct metal_gpio gpio, long pin_mask) {
     return 0;
 }
 
-int metal_gpio_config_int(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type) {
+int metal_gpio_config_interrupt(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type) {
     uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
 
     switch (int_type) {
@@ -141,10 +141,14 @@ int metal_gpio_config_int(struct metal_gpio gpio, int pin, enum metal_gpio_int_t
         GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IE) |= (1 << pin);
         break;
     }
-    return 0;
+
+    struct metal_interrupt intc = dt_gpio_data[get_index(gpio)].interrupt_parent;
+    int id = dt_gpio_data[get_index(gpio)].interrupt_id_base + pin;
+
+    return metal_interrupt_enable(intc, id);
 }
 
-int metal_gpio_clear_int(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type) {
+int metal_gpio_clear_interrupt(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type) {
     uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
 
     switch (int_type) {
@@ -176,15 +180,6 @@ int metal_gpio_clear_int(struct metal_gpio gpio, int pin, enum metal_gpio_int_ty
         break;
     }
     return 0;
-}
-
-struct metal_interrupt *
-metal_gpio_interrupt_controller(struct metal_gpio gpio) {
-    return dt_gpio_data[get_index(gpio)].interrupt_parent;
-}
-
-int metal_gpio_get_interrupt_id(struct metal_gpio gpio, int pin) {
-    return dt_gpio_data[get_index(gpio)].interrupt_id_base + pin;
 }
 
 #endif /* METAL_SIFIVE_GPIO0 */

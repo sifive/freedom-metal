@@ -56,17 +56,6 @@ int metal_gpio_disable_pinmux(struct metal_gpio gpio, long pin_mask) {
     return -1;
 }
 
-struct metal_interrupt *metal_gpio_interrupt_controller(struct metal_gpio gpio)
-    __attribute__((weak));
-struct metal_interrupt *
-metal_gpio_interrupt_controller(struct metal_gpio gpio) {
-    return NULL;
-}
-
-int metal_gpio_get_interrupt_id(struct metal_gpio gpio, int pin)
-    __attribute__((weak));
-int metal_gpio_get_interrupt_id(struct metal_gpio gpio, int pin) { return -1; }
-
 int metal_gpio_config_interrupt(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type)
     __attribute__((weak));
 int metal_gpio_config_interrupt(struct metal_gpio gpio, int pin,

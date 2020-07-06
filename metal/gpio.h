@@ -153,23 +153,4 @@ int metal_gpio_config_interrupt(struct metal_gpio gpio, int pin,
  */
 int metal_gpio_clear_interrupt(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type);
 
-/*!
- * @brief Get the interrupt controller for a gpio
- *
- * @param gpio The handle for the gpio
- * @return A pointer to the interrupt controller responsible for handling
- * gpio interrupts.
- */
-struct metal_interrupt *
-metal_gpio_interrupt_controller(struct metal_gpio gpio);
-
-/*!
- * @brief Get the interrupt id for a gpio
- *
- * @param gpio The handle for the gpio
- * @param pin The bitmask for the pin to get gpio interrupt id
- * @return The interrupt id corresponding to a gpio.
- */
-int metal_gpio_get_interrupt_id(struct metal_gpio gpio, int pin);
-
 #endif
