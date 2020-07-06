@@ -164,7 +164,7 @@ int metal_cpu_exception_register(struct metal_cpu cpu, int ecode,
 
 extern void early_trap_vector(void);
 
-void __metal_driver_riscv_cpu_intc_interrupt_init(
+void __metal_driver_riscv_cpu_intc_init(
     struct metal_interrupt intc) {
 
     if (!intc_state[get_index(intc)].init_done) {
@@ -186,7 +186,7 @@ void __metal_driver_riscv_cpu_intc_interrupt_init(
 METAL_CONSTRUCTOR(riscv_cpu_intc_init) {
     for (int i = 0; i < __METAL_DT_NUM_HARTS; i++) {
         struct metal_interrupt intc = (struct metal_interrupt) { i };
-        __metal_driver_riscv_cpu_intc_interrupt_init(intc);
+        __metal_driver_riscv_cpu_intc_init(intc);
     }
 }
 
@@ -249,7 +249,7 @@ int __metal_driver_riscv_cpu_intc_register_vector_handler(
     return -1;
 }
 
-int __metal_driver_riscv_cpu_intc_interrupt_enable(
+int __metal_driver_riscv_cpu_intc_enable(
     struct metal_interrupt controller, int id) {
     switch (id) {
     case METAL_INTERRUPT_ID_BASE:

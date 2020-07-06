@@ -27,16 +27,6 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
     return -1;
 }
 
-struct metal_interrupt metal_uart_interrupt_controller(struct metal_uart uart)
-    __attribute__((weak));
-struct metal_interrupt metal_uart_interrupt_controller(struct metal_uart uart) {
-    assert(0);
-    return (struct metal_interrupt) { 0 };
-}
-
-int metal_uart_get_interrupt_id(struct metal_uart uart) __attribute__((weak));
-int metal_uart_get_interrupt_id(struct metal_uart uart) { return -1; }
-
 int metal_uart_transmit_interrupt_enable(struct metal_uart uart)
     __attribute__((weak));
 int metal_uart_transmit_interrupt_enable(struct metal_uart uart) { return -1; }

@@ -50,25 +50,38 @@ static inline uint32_t get_index(struct metal_uart uart) {
     return uart.__uart_index;
 }
 
-struct metal_interrupt metal_uart_interrupt_controller(struct metal_uart uart) {
-    return dt_uart_data[get_index(uart)].interrupt_parent;
+static __inline__ int enable_parent_interrupt(struct metal_uart uart) {
+    struct metal_interrupt intc = dt_uart_data[get_index(uart)].interrupt_parent;
+    int id = dt_uart_data[get_index(uart)].interrupt_id;
+
+    return metal_interrupt_enable(intc, id);
 }
 
-int metal_uart_get_interrupt_id(struct metal_uart uart) {
-    return dt_uart_data[get_index(uart)].interrupt_id;
+static __inline__ int disable_parent_interrupt(struct metal_uart uart) {
+    struct metal_interrupt intc = dt_uart_data[get_index(uart)].interrupt_parent;
+    int id = dt_uart_data[get_index(uart)].interrupt_id;
+
+    return metal_interrupt_disable(intc, id);
 }
 
 int metal_uart_tx_interrupt_enable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_TXWM;
-    return 0;
+
+    return enable_parent_interrupt(uart);
 }
 
 int metal_uart_tx_interrupt_disable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_TXWM;
+
+    if ((UART_REGW(METAL_SIFIVE_UART0_IE) & UART_RXWM) == 0) {
+        /* Disable the UART interrupt line on the interrupt controller
+         * when no UART interrupt sources are enabled */
+        return disable_parent_interrupt(uart); 
+    }
     return 0;
 }
 
@@ -76,14 +89,20 @@ int metal_uart_rx_interrupt_enable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_RXWM;
-    return 0;
+
+    return enable_parent_interrupt(uart);
 }
 
 int metal_uart_rx_interrupt_disable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_RXWM;
-    return 0;
+
+    if ((UART_REGW(METAL_SIFIVE_UART0_IE) & UART_TXWM) == 0) {
+        /* Disable the UART interrupt line on the interrupt controller
+         * when no UART interrupt sources are enabled */
+        return disable_parent_interrupt(uart); 
+    }
 }
 
 int metal_uart_txready(struct metal_uart uart) {

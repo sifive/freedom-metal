@@ -86,26 +86,6 @@ int metal_uart_get_baud_rate(struct metal_uart uart);
 int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate);
 
 /*!
- * @brief Get the interrupt controller of the UART peripheral
- *
- * Get the interrupt controller for the UART peripheral. The interrupt
- * controller must be initialized before any interrupts can be registered
- * or enabled with it.
- *
- * @param uart The UART device handle
- * @return The handle for the UART interrupt controller
- */
-struct metal_interrupt
-metal_uart_interrupt_controller(struct metal_uart uart);
-
-/*!
- * @brief Get the interrupt ID of the UART controller
- * @param uart The UART device handle
- * @return The UART interrupt id
- */
-int metal_uart_get_interrupt_id(struct metal_uart uart);
-
-/*!
  * @brief Enable the UART transmit interrupt
  * @param uart The UART device handle
  * @return 0 upon success

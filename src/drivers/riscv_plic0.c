@@ -9,6 +9,7 @@
 #include <metal/drivers/riscv_plic0.h>
 #include <metal/generated/riscv_plic0.h>
 #include <metal/interrupt.h>
+#include <metal/init.h>
 #include <metal/io.h>
 #include <metal/shutdown.h>
 #include <stdbool.h>
@@ -121,6 +122,13 @@ void __metal_driver_riscv_plic0_init(struct metal_interrupt plic) {
             metal_interrupt_enable(intc, line);
         }
         plic_state[get_index(plic)].init_done = 1;
+    }
+}
+
+METAL_CONSTRUCTOR(riscv_plic0_init) {
+    for(int i = 0; i < __METAL_DT_NUM_RISCV_PLIC0S; i++) {
+        struct metal_interrupt plic = (struct metal_interrupt) { i };
+        __metal_driver_riscv_plic0_init(plic);    
     }
 }
 
