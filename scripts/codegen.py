@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
+import configparser
 import glob 
 import os
 import sys
@@ -11,29 +12,16 @@ import jinja2
 import pydevicetree
 
 METAL_APIS = [
-    "clock"
+    "clock",
     "cpu",
     "interrupt",
     "shutdown",
     "uart",
+    "gpio",
 ]
 
 DEFAULT_TEMPLATE_PATHS = [
     "templates",
-]
-
-DEFAULT_CLOCK_DRIVERS = [
-    "fixed-clock",
-    "sifive,fe310-g000,hfrosc",
-    "sifive,fe310-g000,hfxosc",
-    "sifive,fe310-g000,lfrosc",
-    "sifive,fe310-g000,pll",
-]
-
-DEFAULT_INTERRUPT_DRIVERS = [
-    "riscv,clint0",
-    "riscv,cpu-intc",
-    "riscv,plic0",
 ]
 
 def parse_arguments(argv):
@@ -53,22 +41,6 @@ def parse_arguments(argv):
             default=DEFAULT_TEMPLATE_PATHS,
             help="The paths to look for template")
 
-    arg_parser.add_argument("--uart-driver", default="sifive,uart0",
-            help="The driver for the UART API")
-    arg_parser.add_argument("--gpio-driver", default="sifive,gpio0",
-            help="The driver for the GPIO API")
-    arg_parser.add_argument("--shutdown-driver", default="sifive,test0",
-            help="The driver for the Shutdown API")
-
-    arg_parser.add_argument("--clock-drivers",
-            nargs='*',
-            default=DEFAULT_CLOCK_DRIVERS,
-            help="The drivers for the clock API")
-    arg_parser.add_argument("--interrupt-drivers",
-            nargs='*',
-            default=DEFAULT_INTERRUPT_DRIVERS,
-            help="The drivers for the interrupt API")
-
     return arg_parser.parse_args(argv)
 
 def get_template(template):
@@ -84,17 +56,11 @@ def to_snakecase(s):
 
 driver_ids = dict()
 
-def assign_ids(dts, args):
-    drivers = []
-    drivers.append(args.uart_driver)
-    drivers.append(args.gpio_driver)
-    drivers.append(args.shutdown_driver)
-    drivers += args.clock_drivers
-    drivers += args.interrupt_drivers
-
-    for driver in drivers:
-        for node_id, node in enumerate(dts.match(driver)):
-            driver_ids[node] = node_id
+def assign_ids(dts, devices):
+    for api in devices:
+        for device in devices[api]:
+            for node_id, node in enumerate(dts.match(device)):
+                driver_ids[node] = node_id
 
 def local_interrupts(dts):
     irqs = []
@@ -188,9 +154,9 @@ def node_to_dict(node, dts):
 
     return d
 
-def render_templates(template_dirs, args, template_data):
+def render_templates(template_paths, args, template_data):
     templates = []
-    for d in template_dirs:
+    for d in template_paths:
         templates += glob.glob("{}/metal/*.h".format(d))
         templates += glob.glob("{}/metal/generated/*.h".format(d))
         templates += glob.glob("{}/metal/machine/*.h".format(d))
@@ -206,29 +172,44 @@ def render_templates(template_dirs, args, template_data):
         with open(output_file, 'w') as out:
             out.write(get_template(template).render(template_data))
 
+def get_devices_from_manifests(template_paths):
+    devices = dict()
+
+    for d in template_paths:
+        with open("{}/MANIFEST.ini".format(d), 'r') as manifest:
+            config = configparser.ConfigParser()
+            config.read_file(manifest)
+
+            for api in METAL_APIS:
+                if api not in devices:
+                    devices[api] = []
+                if api in config:
+                    devices[api] += config[api]['compatible'].split()
+
+    print(devices)
+
+    return devices
+
+
 def main():
     args = parse_arguments(sys.argv[1:])
 
     dts = pydevicetree.Devicetree.parseFile(
             args.dts, followIncludes=True)
 
-    # Assign driver IDs to all device instances
-    assign_ids(dts, args)
+    # Get list of supported devices from template manifests
+    devices = get_devices_from_manifests(args.template_paths)
 
-    devices = []
-    devices.append(args.uart_driver)
-    devices.append(args.gpio_driver)
-    devices.append(args.shutdown_driver)
-    devices += args.clock_drivers
-    devices += args.interrupt_drivers
+    # Assign driver IDs to all device instances
+    assign_ids(dts, devices)
 
     # Convert the Devicetree object tree into dictionary data
     # which can be rendered by the templates
     template_data = {
         'chosen' : node_to_dict(dts.get_by_path("/chosen"), dts),
         'harts' : [node_to_dict(hart, dts) for hart in dts.match("^riscv$")],
-        'uarts' : [node_to_dict(uart, dts) for uart in dts.match(args.uart_driver)],
-        'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(args.gpio_driver)],
+        'uarts' : [node_to_dict(uart, dts) for uart in dts.match(devices['uart'][0])],
+        'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(devices['gpio'][0])],
         'devices' : devices,
         'local_interrupts' : local_interrupts(dts),
         'global_interrupts' : global_interrupts(dts),
@@ -240,15 +221,15 @@ def main():
         template_data['chosen']['stdout_path'] = [node_to_dict(node, dts), baud]
                
 
-    shutdown = dts.match(args.shutdown_driver)
+    shutdown = dts.match(devices['shutdown'][0])
     if shutdown is not None:
         template_data['shutdown'] = node_to_dict(shutdown[0], dts)
 
-    for driver in args.clock_drivers:
+    for driver in devices['clock']:
         key = to_snakecase(driver) + 's'
         template_data[key] = [node_to_dict(clock, dts) for clock in dts.match(driver)]
 
-    for driver in args.interrupt_drivers:
+    for driver in devices['interrupt']:
         key = to_snakecase(driver) + 's'
         template_data[key] = [node_to_dict(controller, dts) for controller in dts.match(driver)]
 
