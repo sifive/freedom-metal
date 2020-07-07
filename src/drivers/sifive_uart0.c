@@ -64,7 +64,7 @@ static __inline__ int disable_parent_interrupt(struct metal_uart uart) {
     return metal_interrupt_disable(intc, id);
 }
 
-int metal_uart_tx_interrupt_enable(struct metal_uart uart) {
+int sifive_uart0_tx_interrupt_enable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_TXWM;
@@ -72,7 +72,7 @@ int metal_uart_tx_interrupt_enable(struct metal_uart uart) {
     return enable_parent_interrupt(uart);
 }
 
-int metal_uart_tx_interrupt_disable(struct metal_uart uart) {
+int sifive_uart0_tx_interrupt_disable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_TXWM;
@@ -85,7 +85,7 @@ int metal_uart_tx_interrupt_disable(struct metal_uart uart) {
     return 0;
 }
 
-int metal_uart_rx_interrupt_enable(struct metal_uart uart) {
+int sifive_uart0_rx_interrupt_enable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_RXWM;
@@ -93,7 +93,7 @@ int metal_uart_rx_interrupt_enable(struct metal_uart uart) {
     return enable_parent_interrupt(uart);
 }
 
-int metal_uart_rx_interrupt_disable(struct metal_uart uart) {
+int sifive_uart0_rx_interrupt_disable(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_RXWM;
@@ -105,49 +105,49 @@ int metal_uart_rx_interrupt_disable(struct metal_uart uart) {
     }
 }
 
-int metal_uart_txready(struct metal_uart uart) {
+int sifive_uart0_txready(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     return !!((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
 }
 
-int metal_uart_set_tx_watermark(struct metal_uart uart, size_t level) {
+int sifive_uart0_set_tx_watermark(struct metal_uart uart, size_t level) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXCNT(level);
     return 0;
 }
 
-size_t metal_uart_get_tx_watermark(struct metal_uart uart) {
+size_t sifive_uart0_get_tx_watermark(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     return ((UART_REGW(METAL_SIFIVE_UART0_TXCTRL) >> 16) & 0x7);
 }
 
-int metal_uart_set_rx_watermark(struct metal_uart uart, size_t level) {
+int sifive_uart0_set_rx_watermark(struct metal_uart uart, size_t level) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXCNT(level);
     return 0;
 }
 
-size_t metal_uart_get_rx_watermark(struct metal_uart uart) {
+size_t sifive_uart0_get_rx_watermark(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     return ((UART_REGW(METAL_SIFIVE_UART0_RXCTRL) >> 16) & 0x7);
 }
 
-int metal_uart_putc(struct metal_uart uart, int c) {
+int sifive_uart0_putc(struct metal_uart uart, int c) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
-    while (metal_uart_txready(uart) != 0) {
+    while (sifive_uart0_txready(uart) != 0) {
         /* wait */
     }
     UART_REGW(METAL_SIFIVE_UART0_TXDATA) = c;
     return 0;
 }
 
-int metal_uart_getc(struct metal_uart uart, int *c) {
+int sifive_uart0_getc(struct metal_uart uart, int *c) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
 
     /* No seperate status register, we get status and the byte at same time */
@@ -161,11 +161,11 @@ int metal_uart_getc(struct metal_uart uart, int *c) {
     return 0;
 }
 
-int metal_uart_get_baud_rate(struct metal_uart uart) {
+int sifive_uart0_get_baud_rate(struct metal_uart uart) {
     return uart_state[get_index(uart)].baud_rate;
 }
 
-int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
+int sifive_uart0_set_baud_rate(struct metal_uart uart, int baud_rate) {
     uint32_t index = get_index(uart);
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
     struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
@@ -180,7 +180,7 @@ int metal_uart_set_baud_rate(struct metal_uart uart, int baud_rate) {
     return 0;
 }
 
-void _metal_uart_pre_rate_change_callback(struct metal_uart uart) {
+void _sifive_uart0_pre_rate_change_callback(struct metal_uart uart) {
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
     struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
@@ -213,15 +213,15 @@ void _metal_uart_pre_rate_change_callback(struct metal_uart uart) {
     }
 }
 
-void _metal_uart_post_rate_change_callback(struct metal_uart uart) {
+void _sifive_uart0_post_rate_change_callback(struct metal_uart uart) {
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
-    metal_uart_set_baud_rate(uart, baud_rate);
+    sifive_uart0_set_baud_rate(uart, baud_rate);
 }
 
-void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
+void sifive_uart0_init(struct metal_uart uart, uint32_t baud_rate) {
     uint32_t index = get_index(uart);
 
-    metal_uart_set_baud_rate(uart, baud_rate);
+    sifive_uart0_set_baud_rate(uart, baud_rate);
 
     int has_pinmux = dt_uart_data[index].has_pinmux;
     if (has_pinmux) {
@@ -240,17 +240,17 @@ void metal_uart_init(struct metal_uart uart, uint32_t baud_rate) {
 #endif
 
 METAL_CONSTRUCTOR(metal_tty_init) {
-    metal_uart_init(__METAL_DT_STDOUT_UART_HANDLE,
+    sifive_uart0_init(__METAL_DT_STDOUT_UART_HANDLE,
                     __METAL_DT_STDOUT_UART_BAUD);
 }
 
 int metal_tty_putc(int c) {
-    return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
+    return sifive_uart0_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
 }
 
 int metal_tty_getc(int *c) {
     do {
-        metal_uart_getc(__METAL_DT_STDOUT_UART_HANDLE, c);
+        sifive_uart0_getc(__METAL_DT_STDOUT_UART_HANDLE, c);
         /* -1 means no key pressed, getc waits */
     } while (-1 == *c);
     return 0;

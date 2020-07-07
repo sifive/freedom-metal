@@ -43,11 +43,14 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 	{% endfor %}
 };
 
+void _{{ to_snakecase(uarts[0].compatible[0]) }}_pre_rate_change_callback(struct metal_uart uart);
+void _{{ to_snakecase(uarts[0].compatible[0]) }}_post_rate_change_callback(struct metal_uart uart);
+
 static __inline__ void pre_rate_change_callbacks() {
 {% if sifive_fe310_g000_plls|length == 1 %}
     {% if uarts[0].clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
         {% for uart in uarts %}
-	_metal_uart_pre_rate_change_callback((struct metal_uart) { {{ uart.id }} });
+	_{{ to_snakecase(uarts[0].compatible[0]) }}_pre_rate_change_callback((struct metal_uart) { {{ uart.id }} });
 		{% endfor %}
 	{% endif %}
 {% endif %}
@@ -57,7 +60,7 @@ static __inline__ void post_rate_change_callbacks() {
 {% if sifive_fe310_g000_plls|length == 1 %}
     {% if uarts[0].clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
         {% for uart in uarts %}
-	_metal_uart_post_rate_change_callback((struct metal_uart) { {{ uart.id }} });
+	_{{ to_snakecase(uarts[0].compatible[0]) }}_post_rate_change_callback((struct metal_uart) { {{ uart.id }} });
 		{% endfor %}
 	{% endif %}
 {% endif %}
