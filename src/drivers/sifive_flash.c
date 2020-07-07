@@ -223,7 +223,7 @@ int __metal_driver_sifive_flash_init(struct metal_flash *gflash,void *ptr)
 /* Implement flash read operation here */
 int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, const size_t size, char *rx_buf)
 {
-	uint32_t *axi_addr = (uint32_t*)(addr);
+	uint32_t *axi_addr = addr;
 	qspi_static_config_t *cfg=&qcfg;
 
 	cfg->addrlen   = QSPI_ADDR_32BIT;

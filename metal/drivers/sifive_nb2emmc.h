@@ -134,6 +134,8 @@ typedef enum
 } eMMC_DataDirection;
 
 
+
+
 /** Structure describes a request which should be executed by host. */
 typedef struct eMMCRequest
 {
