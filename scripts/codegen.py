@@ -162,12 +162,13 @@ def render_templates(template_paths, args, template_data):
         templates += glob.glob("{}/src/*.j2".format(d))
 
     for template in templates:
-        template =  template.replace("templates/", "")
+        template = template.replace("templates/", "")
         output_file = "{}/{}".format(args.output_dir, template)
-        output_file.replace(".j2", "")
+        output_file = output_file.replace(".j2", "")
         dirname = os.path.dirname(output_file)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
+
         with open(output_file, 'w') as out:
             out.write(get_template(template, args).render(template_data))
 
