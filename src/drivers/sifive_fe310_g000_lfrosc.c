@@ -22,9 +22,7 @@
 
 #define LFROSC_REGW(addr) (__METAL_ACCESS_ONCE((__metal_io_u32 *)addr))
 
-static inline uint32_t get_index(struct metal_clock clock) {
-    return clock.__clock_index;
-}
+#define get_index(clk) ((clk).__clock_index)
 
 uint64_t __metal_driver_sifive_fe310_g000_lfrosc_get_rate_hz(
     struct metal_clock clock) {

@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define get_index(intc) ((intc).__interrupt_index)
+
 static struct intc_state {
     bool init_done;
     metal_exception_handler_t exception_table[METAL_MAX_ME];
@@ -19,10 +21,6 @@ static struct intc_state {
         .init_done = false,
     },
 };
-
-static uint32_t get_index(struct metal_interrupt intc) {
-    return intc.__interrupt_index;
-}
 
 /* MIE CSR Manipulation */
 

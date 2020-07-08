@@ -32,6 +32,8 @@
 
 #define PLL_CONFIG_NOT_VALID -1
 
+#define get_index(clk) ((clk).__clock_index)
+
 struct pll_config_t {
     uint64_t multiplier;
     uint64_t divisor;
@@ -169,10 +171,6 @@ static int find_closest_config(uint64_t ref_hz, uint64_t rate) {
     }
 
     return closest_index;
-}
-
-static __inline__ uint32_t get_index(struct metal_clock clock) {
-    return clock.__clock_index;
 }
 
 static void __metal_driver_sifive_fe310_g000_pll_init(struct metal_clock pll) {

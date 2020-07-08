@@ -8,9 +8,7 @@
 #include <metal/drivers/fixed_factor_clock.h>
 #include <metal/generated/fixed_factor_clock.h>
 
-static inline uint32_t get_index(struct metal_clock clk) {
-    return clk.__clock_index;
-}
+#define get_index(clk) ((clk).__clock_index)
 
 uint64_t __metal_driver_fixed_factor_clock_get_rate_hz(
     struct metal_clock clk) {

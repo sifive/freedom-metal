@@ -14,16 +14,14 @@
 #include <metal/shutdown.h>
 #include <stdbool.h>
 
+#define get_index(plic) ((plic).__interrupt_index)
+
 extern metal_interrupt_handler_t *__metal_global_interrupt_table;
 
 static struct plic_state {
     bool init_done;
     void *int_data[__METAL_DT_RISCV_PLIC0_MAX_INTERRUPTS];
 } plic_state[__METAL_DT_NUM_RISCV_PLIC0S];
-
-static inline uint32_t get_index(struct metal_interrupt plic) {
-    return plic.__interrupt_index;
-}
 
 static inline unsigned int
 __metal_plic0_claim_interrupt(struct metal_interrupt plic,

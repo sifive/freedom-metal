@@ -38,6 +38,8 @@
 #define UART_REGW(offset)                                                      \
     (__METAL_ACCESS_ONCE((__metal_io_u32 *)UART_REG(offset)))
 
+#define get_index(uart) ((uart).__uart_index)
+
 static struct {
     uint64_t baud_rate;
 } uart_state[__METAL_DT_NUM_UARTS] = {
@@ -45,10 +47,6 @@ static struct {
         .baud_rate = 0    
     },
 };
-
-static inline uint32_t get_index(struct metal_uart uart) {
-    return uart.__uart_index;
-}
 
 static __inline__ int enable_parent_interrupt(struct metal_uart uart) {
     struct metal_interrupt intc = dt_uart_data[get_index(uart)].interrupt_parent;
