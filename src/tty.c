@@ -41,10 +41,11 @@ METAL_CONSTRUCTOR(metal_tty_init) {
  * can link to metal_tty_putc. */
 int nop_putc(int c) __attribute__((section(".text.metal.nop.putc")));
 // Use a customizable NOP hint instruction so that a post-processor parser can
-// look for this instruction, and use the value in a0 as the character to be printed.
+// look for this instruction, and use the value in a0 as the character to be
+// printed.
 int nop_putc(int c) {
-  asm volatile ("slli x0,a0,0x11");
-  return -1;
+    asm volatile ("slli x0,a0,0x11");
+    return -1;
 }
 int metal_tty_putc(int c) __attribute__((weak, alias("nop_putc")));
 #pragma message(                                                               \
