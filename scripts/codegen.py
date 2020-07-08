@@ -12,14 +12,6 @@ import sys
 import jinja2
 import pydevicetree
 
-METAL_APIS = [
-    "clock",
-    "interrupt",
-    "shutdown",
-    "uart",
-    "gpio",
-]
-
 DEFAULT_TEMPLATE_PATHS = [
     "templates",
 ]
@@ -183,7 +175,7 @@ def get_devices_from_manifests(template_paths):
                 config = configparser.ConfigParser()
                 config.read_file(manifest)
 
-                for api in METAL_APIS:
+                for api in config.sections():
                     if api not in devices:
                         devices[api] = []
                     if api in config:
@@ -192,7 +184,7 @@ def get_devices_from_manifests(template_paths):
             sys.stderr.write("ERROR: Template path {} does not contain MANIFEST.ini\n".format(d))
 
     print("Template directories contain support for the following devices:")
-    for api in METAL_APIS:
+    for api in devices:
         print(api)
         for device in devices[api]:
             print("\t- {}".format(device))
@@ -227,7 +219,7 @@ def main():
         node = dts.get_by_path(path)
         template_data['chosen']['stdout_path'] = [node_to_dict(node, dts), baud]
                
-    for api in METAL_APIS:
+    for api in devices:
         for device in devices[api]:
             template_data[to_snakecase(device + 's')] = [node_to_dict(node, dts) for node in dts.match(device)]
             template_data[api + 's'] = [node_to_dict(node, dts) for node in dts.match(device)]
