@@ -5,6 +5,7 @@ OUTPUT_DIR ?= build
 generate: virtualenv $(OUTPUT_DIR) scripts/codegen.py
 	. venv/bin/activate && python3 scripts/codegen.py \
 		--dts $(DEVICETREE) \
+		--template-path templates sifive-blocks/templates \
 		--output-dir $(OUTPUT_DIR)
 
 $(OUTPUT_DIR):
@@ -16,7 +17,7 @@ venv/bin/activate: requirements.txt
 	python3 -m venv venv
 	. venv/bin/activate && python3 -m pip install -r requirements.txt
 
-METAL_SRCS = $(wildcard src/*.c src/*.S src/drivers/*.c build/src/*.c build/src/*.S)
+METAL_SRCS = $(wildcard src/*.c src/*.S src/drivers/*.c sifive-blocks/src/drivers/*.c build/src/*.c build/src/*.S)
 GLOSS_SRCS = $(wildcard gloss/*.c) $(wildcard gloss/*.S)
 
 build/src/interrupt_table.c: generate
@@ -28,7 +29,7 @@ ifeq ($(LIBC),picolibc)
 	LIBC_FLAGS += --oslib=semihost
 endif
 
-CFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -Ibuild -I. $(LIBC_FLAGS) -DMTIME_RATE_HZ_DEF=32768 -O0 -g
+CFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -Ibuild -I. -Isifive-blocks $(LIBC_FLAGS) -DMTIME_RATE_HZ_DEF=32768 -O0 -g
 LDFLAGS=-Wl,--gc-sections -Wl,-Map,hello.map -nostartfiles -Ttest/qemu_sifive_e31.lds
 LDLIBS=-lm
 
