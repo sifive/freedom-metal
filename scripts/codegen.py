@@ -37,15 +37,14 @@ def parse_arguments(argv):
 
     arg_parser.add_argument("--template-paths",
             nargs='*',
-            type=list,
             default=DEFAULT_TEMPLATE_PATHS,
             help="The paths to look for template")
 
     return arg_parser.parse_args(argv)
 
-def get_template(template):
+def get_template(template, args):
     env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader("templates"),
+            loader=jinja2.ChoiceLoader([jinja2.FileSystemLoader(d) for d in args.template_paths]),
             trim_blocks=True, lstrip_blocks=True)
     env.globals['to_snakecase'] = to_snakecase
 
@@ -170,21 +169,25 @@ def render_templates(template_paths, args, template_data):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         with open(output_file, 'w') as out:
-            out.write(get_template(template).render(template_data))
+            out.write(get_template(template, args).render(template_data))
 
 def get_devices_from_manifests(template_paths):
     devices = dict()
 
     for d in template_paths:
-        with open("{}/MANIFEST.ini".format(d), 'r') as manifest:
-            config = configparser.ConfigParser()
-            config.read_file(manifest)
+        try:
+            with open("{}/MANIFEST.ini".format(d), 'r') as manifest:
+                config = configparser.ConfigParser()
+                config.read_file(manifest)
 
-            for api in METAL_APIS:
-                if api not in devices:
-                    devices[api] = []
-                if api in config:
-                    devices[api] += config[api]['compatible'].split()
+                for api in METAL_APIS:
+                    if api not in devices:
+                        devices[api] = []
+                    if api in config:
+                        devices[api] += config[api]['compatible'].split()
+        except FileNotFoundError:
+            sys.stderr.write("ERROR: Template path {} does not contain MANIFEST.ini\n".format(d))
+
 
     print(devices)
 
