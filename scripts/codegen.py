@@ -6,6 +6,7 @@ import argparse
 import configparser
 import glob 
 import os
+import pprint
 import sys
 
 import jinja2
@@ -169,6 +170,7 @@ def render_templates(template_paths, args, template_data):
             os.makedirs(dirname)
 
         with open(output_file, 'w') as out:
+            print("Rendering template {}".format(template))
             out.write(get_template(template, args).render(template_data))
 
 def get_devices_from_manifests(template_paths):
@@ -177,6 +179,7 @@ def get_devices_from_manifests(template_paths):
     for d in template_paths:
         try:
             with open("{}/MANIFEST.ini".format(d), 'r') as manifest:
+                print("Loading templates from \"{}\"".format(d))
                 config = configparser.ConfigParser()
                 config.read_file(manifest)
 
@@ -188,8 +191,11 @@ def get_devices_from_manifests(template_paths):
         except FileNotFoundError:
             sys.stderr.write("ERROR: Template path {} does not contain MANIFEST.ini\n".format(d))
 
-
-    print(devices)
+    print("Template directories contain support for the following devices:")
+    for api in METAL_APIS:
+        print(api)
+        for device in devices[api]:
+            print("\t- {}".format(device))
 
     return devices
 
@@ -226,8 +232,8 @@ def main():
             template_data[to_snakecase(device + 's')] = [node_to_dict(node, dts) for node in dts.match(device)]
             template_data[api + 's'] = [node_to_dict(node, dts) for node in dts.match(device)]
 
-    import pprint
-    pprint.pprint(template_data)
+    with open("{}/template_data.log".format(args.output_dir), "w") as log:
+        log.write(pprint.pformat(template_data))
 
     render_templates(args.template_paths, args, template_data)
 
