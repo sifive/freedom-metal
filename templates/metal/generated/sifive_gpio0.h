@@ -17,7 +17,7 @@ static const struct dt_gpio_data {
 	struct metal_interrupt interrupt_parent;
 	uint32_t interrupt_id_base;
 } dt_gpio_data[__METAL_DT_NUM_GPIOS] = {
-	{% for gpio in gpios %}
+	{% for gpio in sifive_gpio0s %}
 	{
 		.base_addr = METAL_SIFIVE_GPIO0_{{ gpio.id }}_BASE_ADDR,
 
@@ -30,8 +30,8 @@ static const struct dt_gpio_data {
 	{% endfor %}
 };
 
-{% if gpios[0].interrupt_parent is defined %}
-{% set driver_string = to_snakecase(gpios[0].interrupt_parent[0].compatible[0]) %}
+{% if sifive_gpio0s[0].interrupt_parent is defined %}
+{% set driver_string = to_snakecase(sifive_gpio0s[0].interrupt_parent[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h' %}
 {% endif %}
 

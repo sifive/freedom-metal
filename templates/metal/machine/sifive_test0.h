@@ -4,8 +4,8 @@
 #ifndef METAL__PLATFORM__SIFIVE_TEST0_H
 #define METAL__PLATFORM__SIFIVE_TEST0_H
 
-{% if shutdown is defined %}
-#define METAL_SIFIVE_TEST0_0_BASE_ADDR {{ '0x%x' % shutdown.regs_by_name["control"] }}
+{% if shutdowns is defined %}
+#define METAL_SIFIVE_TEST0_0_BASE_ADDR {{ '0x%x' % shutdowns[0].regs_by_name["control"] }}
 {% endif %}
 
 #define __METAL_HAS_SHUTDOWN

@@ -24,7 +24,7 @@ static const struct dt_uart_data {
 	struct metal_interrupt interrupt_parent;
 	uint32_t interrupt_id;
 } dt_uart_data[__METAL_DT_NUM_UARTS] = {
-	{% for uart in uarts %}
+	{% for uart in sifive_uart0s %}
 	{
 	    .base_addr = METAL_SIFIVE_UART0_{{ uart.id }}_BASE_ADDR,
 
@@ -51,13 +51,13 @@ static const struct dt_uart_data {
 	{% endfor %}
 };
 
-{% if uarts[0].clocks is defined %}
-{% set driver_string = to_snakecase(uarts[0].clocks[0].compatible[0]) %}
+{% if sifive_uart0s[0].clocks is defined %}
+{% set driver_string = to_snakecase(sifive_uart0s[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h' %}
 {% endif %}
 
-{% if uarts[0].interrupt_parent is defined %}
-{% set driver_string = to_snakecase(uarts[0].interrupt_parent[0].compatible[0]) %}
+{% if sifive_uart0s[0].interrupt_parent is defined %}
+{% set driver_string = to_snakecase(sifive_uart0s[0].interrupt_parent[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h' %}
 {% endif %}
 

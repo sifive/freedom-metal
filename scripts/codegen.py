@@ -208,11 +208,9 @@ def main():
     template_data = {
         'chosen' : node_to_dict(dts.get_by_path("/chosen"), dts),
         'harts' : [node_to_dict(hart, dts) for hart in dts.match("^riscv$")],
-        'uarts' : [node_to_dict(uart, dts) for uart in dts.match(devices['uart'][0])],
-        'gpios' : [node_to_dict(gpio, dts) for gpio in dts.match(devices['gpio'][0])],
-        'devices' : devices,
         'local_interrupts' : local_interrupts(dts),
         'global_interrupts' : global_interrupts(dts),
+        'devices' : devices,
     }
 
     if 'stdout_path' in  template_data['chosen']:
@@ -220,18 +218,10 @@ def main():
         node = dts.get_by_path(path)
         template_data['chosen']['stdout_path'] = [node_to_dict(node, dts), baud]
                
-
-    shutdown = dts.match(devices['shutdown'][0])
-    if shutdown is not None:
-        template_data['shutdown'] = node_to_dict(shutdown[0], dts)
-
-    for driver in devices['clock']:
-        key = to_snakecase(driver) + 's'
-        template_data[key] = [node_to_dict(clock, dts) for clock in dts.match(driver)]
-
-    for driver in devices['interrupt']:
-        key = to_snakecase(driver) + 's'
-        template_data[key] = [node_to_dict(controller, dts) for controller in dts.match(driver)]
+    for api in METAL_APIS:
+        for device in devices[api]:
+            template_data[to_snakecase(device + 's')] = [node_to_dict(node, dts) for node in dts.match(device)]
+            template_data[api + 's'] = [node_to_dict(node, dts) for node in dts.match(device)]
 
     import pprint
     pprint.pprint(template_data)
