@@ -221,8 +221,11 @@ def main():
                
     for api in devices:
         for device in devices[api]:
-            template_data[to_snakecase(device + 's')] = [node_to_dict(node, dts) for node in dts.match(device)]
-            template_data[api + 's'] = [node_to_dict(node, dts) for node in dts.match(device)]
+            nodes = [node_to_dict(node, dts) for node in dts.match(device)]
+            if len(nodes) > 0:
+                print("Found {} instances of device {}".format(len(nodes), device))
+                template_data[to_snakecase(device + 's')] = nodes
+                template_data[api + 's'] = nodes
 
     with open("{}/template_data.log".format(args.output_dir), "w") as log:
         log.write(pprint.pformat(template_data))
