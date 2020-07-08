@@ -12,6 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+{% if sifive_gpio0s is defined %}
+
 static const struct dt_gpio_data {
 	uintptr_t base_addr;
 	struct metal_interrupt interrupt_parent;
@@ -33,6 +35,8 @@ static const struct dt_gpio_data {
 {% if sifive_gpio0s[0].interrupt_parent is defined %}
 {% set driver_string = to_snakecase(sifive_gpio0s[0].interrupt_parent[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h.j2' %}
+{% endif %}
+
 {% endif %}
 
 #endif

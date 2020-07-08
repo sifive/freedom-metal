@@ -4,7 +4,9 @@
 #ifndef METAL__PLATFORM__SIFIVE_GPIO0_H
 #define METAL__PLATFORM__SIFIVE_GPIO0_H
 
-{% for gpio in gpios %}
+{% if sifive_gpio0s is defined %}
+
+{% for gpio in sifive_gpio0s %}
 #define METAL_SIFIVE_GPIO0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % gpio.regs_by_name["control"] }}
 {% endfor %}
 
@@ -26,5 +28,7 @@
 #define METAL_SIFIVE_GPIO0_IOF_EN 56UL
 #define METAL_SIFIVE_GPIO0_IOF_SEL 60UL
 #define METAL_SIFIVE_GPIO0_OUT_XOR 64UL
+
+{% endif %}
 
 #endif

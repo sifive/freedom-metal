@@ -4,6 +4,8 @@
 #ifndef METAL__PLATFORM__RISCV_PLIC0_H
 #define METAL__PLATFORM__RISCV_PLIC0_H
 
+{% if riscv_plic0s is defined %}
+
 {% for riscv_plic0 in riscv_plic0s %}
 #define METAL_RISCV_PLIC0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % riscv_plic0.regs_by_name["control"] }}
 #define METAL_RISCV_PLIC0_{{ loop.index0 }}_RISCV_MAX_PRIORITY {{ riscv_plic0.riscv_max_priority[0] }}
@@ -21,5 +23,7 @@
 #define METAL_RISCV_PLIC0_CONTEXT_PER_HART 4096UL
 #define METAL_RISCV_PLIC0_CONTEXT_THRESHOLD 0UL
 #define METAL_RISCV_PLIC0_CONTEXT_CLAIM 4UL
+
+{% endif %}
 
 #endif
