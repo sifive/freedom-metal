@@ -171,7 +171,7 @@ static int find_closest_config(uint64_t ref_hz, uint64_t rate) {
     return closest_index;
 }
 
-static uint32_t get_index(struct metal_clock clock) {
+static __inline__ uint32_t get_index(struct metal_clock clock) {
     return clock.__clock_index;
 }
 

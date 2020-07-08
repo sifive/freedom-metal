@@ -3,17 +3,22 @@
 
 #include <metal/interrupt_handlers.h>
 
+void _metal_local_interrupt_handler_nop() __attribute((interrupt));
+void _metal_local_interrupt_handler_nop() {}
+
+void _metal_global_interrupt_handler_nop();
+void _metal_global_interrupt_handler_nop() {}
+
 {% if local_interrupts is defined %}
 {% for irq in local_interrupts.irqs %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute((interrupt, weak));
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() {}
+void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute((interrupt, weak, alias ("_metal_local_interrupt_handler_nop")));
 
 {% endfor %}
 {% endif %}
 
 {% if global_interrupts is defined %}
 {% for irq in global_interrupts.irqs %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute((weak));
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() {}
+void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute((weak, alias ("_metal_global_interrupt_handler_nop")));
+
 {% endfor %}
 {% endif %}
