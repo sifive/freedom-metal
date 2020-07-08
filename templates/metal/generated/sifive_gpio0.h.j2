@@ -4,7 +4,7 @@
 #ifndef METAL__DRIVERS__SIFIVE_GPIO0_H
 #define METAL__DRIVERS__SIFIVE_GPIO0_H
 
-{% include 'template_comment.h' %}
+{% include 'template_comment.h.j2' %}
 
 #include <metal/generated/gpio.h>
 #include <metal/interrupt.h>
@@ -32,7 +32,7 @@ static const struct dt_gpio_data {
 
 {% if sifive_gpio0s[0].interrupt_parent is defined %}
 {% set driver_string = to_snakecase(sifive_gpio0s[0].interrupt_parent[0].compatible[0]) %}
-{% include 'interrupt_dispatch.h' %}
+{% include 'interrupt_dispatch.h.j2' %}
 {% endif %}
 
 #endif

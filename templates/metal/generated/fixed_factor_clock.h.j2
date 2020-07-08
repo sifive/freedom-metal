@@ -4,7 +4,7 @@
 #ifndef METAL__DRIVERS__FIXED_FACTOR_CLOCK_H
 #define METAL__DRIVERS__FIXED_FACTOR_CLOCK_H
 
-{% include 'template_comment.h' %}
+{% include 'template_comment.h.j2' %}
 
 {% if fixed_factor_clocks is defined %}
 
@@ -25,7 +25,7 @@ static const struct dt_fixed_factor_clock_data {
 };
 
 {% set driver_string = to_snakecase(fixed_factor_clocks[0].clocks[0].compatible[0]) %}
-{% include 'clock_dispatch.h' %}
+{% include 'clock_dispatch.h.j2' %}
 
 {% endif %}
 

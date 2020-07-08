@@ -157,15 +157,15 @@ def node_to_dict(node, dts):
 def render_templates(template_paths, args, template_data):
     templates = []
     for d in template_paths:
-        templates += glob.glob("{}/metal/*.h".format(d))
-        templates += glob.glob("{}/metal/generated/*.h".format(d))
-        templates += glob.glob("{}/metal/machine/*.h".format(d))
-        templates += glob.glob("{}/src/*.S".format(d))
-        templates += glob.glob("{}/src/*.c".format(d))
+        templates += glob.glob("{}/metal/*.j2".format(d))
+        templates += glob.glob("{}/metal/generated/*.j2".format(d))
+        templates += glob.glob("{}/metal/machine/*.j2".format(d))
+        templates += glob.glob("{}/src/*.j2".format(d))
 
     for template in templates:
         template =  template.replace("templates/", "")
         output_file = "{}/{}".format(args.output_dir, template)
+        output_file.replace(".j2", "")
         dirname = os.path.dirname(output_file)
         if not os.path.exists(dirname):
             os.makedirs(dirname)

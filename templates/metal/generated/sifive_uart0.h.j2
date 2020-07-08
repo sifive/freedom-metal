@@ -4,7 +4,7 @@
 #ifndef METAL__DRIVERS__SIFIVE_UART0_H
 #define METAL__DRIVERS__SIFIVE_UART0_H
 
-{% include 'template_comment.h' %}
+{% include 'template_comment.h.j2' %}
 
 #include <metal/clock.h>
 #include <metal/generated/uart.h>
@@ -53,12 +53,12 @@ static const struct dt_uart_data {
 
 {% if sifive_uart0s[0].clocks is defined %}
 {% set driver_string = to_snakecase(sifive_uart0s[0].clocks[0].compatible[0]) %}
-{% include 'clock_dispatch.h' %}
+{% include 'clock_dispatch.h.j2' %}
 {% endif %}
 
 {% if sifive_uart0s[0].interrupt_parent is defined %}
 {% set driver_string = to_snakecase(sifive_uart0s[0].interrupt_parent[0].compatible[0]) %}
-{% include 'interrupt_dispatch.h' %}
+{% include 'interrupt_dispatch.h.j2' %}
 {% endif %}
 
 {% if chosen.stdout_path is defined %}

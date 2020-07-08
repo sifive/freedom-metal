@@ -1,7 +1,7 @@
 #ifndef __METAL_PLATFORM__H
 #define __METAL_PLATFORM__H
 
-{% include 'template_comment.h' %}
+{% include 'template_comment.h.j2' %}
 
 {% for api in devices %}
     {% for device in devices[api] %}

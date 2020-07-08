@@ -4,7 +4,7 @@
 #ifndef METAL__DRIVERS__SIFIVE_FE310_G000_HFROSC_CLOCK_H
 #define METAL__DRIVERS__SIFIVE_FE310_G000_HFROSC_CLOCK_H
 
-{% include 'template_comment.h' %}
+{% include 'template_comment.h.j2' %}
 
 #include <metal/clock.h>
 
@@ -25,7 +25,7 @@ static const struct dt_sifive_fe310_g000_hfrosc_clock_data {
 };
 
 {% set driver_string = to_snakecase(sifive_fe310_g000_hfroscs[0].clocks[0].compatible[0]) %}
-{% include 'clock_dispatch.h' %}
+{% include 'clock_dispatch.h.j2' %}
 
 {% endif %}
 
