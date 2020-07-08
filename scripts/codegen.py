@@ -13,7 +13,6 @@ import pydevicetree
 
 METAL_APIS = [
     "clock",
-    "cpu",
     "interrupt",
     "shutdown",
     "uart",
