@@ -44,7 +44,7 @@ int nop_putc(int c) __attribute__((section(".text.metal.nop.putc")));
 // look for this instruction, and use the value in a0 as the character to be
 // printed.
 int nop_putc(int c) {
-    asm volatile("slli x0,a0,0x11");
+    __asm__ volatile("slli x0,a0,0x11");
     return -1;
 }
 int metal_tty_putc(int c) __attribute__((weak, alias("nop_putc")));
