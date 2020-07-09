@@ -6,7 +6,7 @@
 
 #include <metal/interrupt.h>
 
-metal_interrupt_vector_handler_t __metal_vector_table[32];
+const metal_interrupt_vector_handler_t __metal_vector_table[32];
 
 void __metal_exception_handler();
 void metal_riscv_cpu_intc_default_handler();

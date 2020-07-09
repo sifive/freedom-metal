@@ -11,7 +11,7 @@
 #define __METAL_NUM_LOCAL_INTERRUPTS 16
 {% endif %}
 
-metal_interrupt_vector_handler_t __metal_vector_table[__METAL_NUM_LOCAL_INTERRUPTS] = {
+const metal_interrupt_vector_handler_t __metal_vector_table[__METAL_NUM_LOCAL_INTERRUPTS] = {
     __metal_exception_handler,
     metal_riscv_cpu_intc_default_handler,
     metal_riscv_cpu_intc_default_handler,
@@ -43,7 +43,7 @@ metal_interrupt_vector_handler_t __metal_vector_table[__METAL_NUM_LOCAL_INTERRUP
 
 #define __METAL_NUM_GLOBAL_INTERRUPTS {{ global_interrupts.irqs|length }}
 
-metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBAL_INTERRUPTS] = {
+const metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBAL_INTERRUPTS] = {
 {% for irq in global_interrupts.irqs %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
 {% endfor %}
