@@ -12,8 +12,6 @@
 .global __metal_vector_table
 __metal_vector_table:
         j __metal_exception_handler
-IRQ_0:
-        j metal_riscv_cpu_intc_default_handler
 IRQ_1:
         j metal_riscv_cpu_intc_default_handler
 IRQ_2:

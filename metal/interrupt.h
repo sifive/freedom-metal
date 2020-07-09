@@ -8,7 +8,8 @@
  *  @brief API for registering and manipulating interrupts
  */
 
-#include <metal/interrupt_vector_handlers.h>
+#include <metal/cpu.h>
+#include <metal/interrupt_handlers.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -46,12 +47,6 @@ typedef struct metal_affinity_ {
 
 #define metal_affinity_set_bit(metal_affinity, bit, val)                       \
     metal_affinity.bitmask |= ((val & 0x1) << bit);
-
-/*!
- * @brief Function signature for interrupt callback handlers
- */
-typedef void (*metal_interrupt_handler_t)(int, void *);
-typedef void (*metal_interrupt_vector_handler_t)(void);
 
 /*!
  * @brief A handle for an interrupt controller
@@ -143,30 +138,6 @@ int metal_interrupt_clear(struct metal_interrupt controller,
  * @return 0 upon success
  */
 int metal_interrupt_set(struct metal_interrupt controller, int id);
-
-/*!
- * @brief Register an interrupt handler
- * @param controller The handle for the interrupt controller
- * @param id The interrupt ID to register
- * @param handler The interrupt handler callback
- * @param priv_data Private data for the interrupt handler
- * @return 0 upon success
- */
-int
-metal_interrupt_register_handler(struct metal_interrupt controller, int id,
-                                 metal_interrupt_handler_t handler,
-                                 void *priv_data);
-/*!
- * @brief Register an interrupt vector handler
- * @param controller The handle for the interrupt controller
- * @param id The interrupt ID to register
- * @param handler The interrupt vector handler callback
- * @param priv_data Private data for the interrupt handler
- * @return 0 upon success
- */
-int metal_interrupt_register_vector_handler(
-    struct metal_interrupt controller, int id,
-    metal_interrupt_vector_handler_t handler, void *priv_data);
 
 /*!
  * @brief Enable an interrupt

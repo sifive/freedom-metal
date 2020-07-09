@@ -11,7 +11,6 @@
 
 #include <assert.h>
 #include <metal/generated/cpu.h>
-#include <metal/interrupt.h>
 #include <stdint.h>
 
 /*! @brief A device handle for a CPU hart
@@ -19,11 +18,6 @@
 struct metal_cpu {
     uint32_t __hartid;
 };
-
-/*!
- * @brief Function signature for exception handlers
- */
-typedef void (*metal_exception_handler_t)(struct metal_cpu cpu, int ecode);
 
 /*! @brief Get a reference to a CPU hart
  *

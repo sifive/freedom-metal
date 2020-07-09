@@ -99,7 +99,7 @@ void __metal_exception_handler(void) {
     int id = RISCV_MCAUSE_ID(mcause);
 
     if (RISCV_MCAUSE_IS_INTERRUPT(mcause)) {
-        __metal_vector_table[id + 1]();
+        __metal_vector_table[id]();
     } else {
         __metal_exception_table[id](metal_cpu_get(hartid), id);
     }
@@ -121,7 +121,11 @@ void __metal_driver_riscv_cpu_intc_init(
         uintptr_t mtvec;
         __asm__ volatile("csrr %0, mtvec" : "=r"(mtvec));
         if (mtvec == (uintptr_t)&early_trap_vector) {
+#ifdef METAL_HLIC_VECTORED
+            __metal_driver_riscv_cpu_intc_set_vector_mode(intc, METAL_VECTORED_MODE);
+#else
             __metal_driver_riscv_cpu_intc_set_vector_mode(intc, METAL_DIRECT_MODE);
+#endif
         }
 
         init_done[get_index(intc)] = 1;
@@ -151,6 +155,10 @@ int __metal_driver_riscv_cpu_intc_set_vector_mode(
         __asm__ volatile(
             "csrw mtvec, %0" ::"r"((uintptr_t)__metal_exception_handler & ~METAL_MTVEC_CLIC_VECTORED));
         break;
+    case METAL_VECTORED_MODE:
+        /* Write the jump table address with the vectored bit set */
+        __asm__ volatile(
+            "csrw mtvec, %0" :: "r"((uintptr_t)__metal_vector_table | METAL_MTVEC_VECTORED));
     }
 
     return 0;

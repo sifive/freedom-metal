@@ -30,6 +30,7 @@ ifeq ($(LIBC),picolibc)
 endif
 
 CFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -Ibuild -I. -Isifive-blocks $(LIBC_FLAGS) -DMTIME_RATE_HZ_DEF=32768 -Og -g
+CFLAGS += -DMETAL_HLIC_VECTORED
 LDFLAGS=-Wl,--gc-sections -Wl,-Map,hello.map -nostartfiles -Ttest/qemu_sifive_e31.lds
 LDLIBS=-lm
 

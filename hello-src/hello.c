@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <metal/cpu.h>
+#include <metal/interrupt.h>
 
 void metal_riscv_cpu_intc_msip_handler() {
     printf("Hello from the software interrupt handler!\n");
