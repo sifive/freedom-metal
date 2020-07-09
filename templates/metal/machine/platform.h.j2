@@ -3,10 +3,8 @@
 
 {% include 'template_comment.h.j2' %}
 
-{% for api in devices %}
-    {% for device in devices[api] %}
-#include <metal/machine/{{ to_snakecase(device) }}.h>
-    {% endfor %}
+{% for compat in devices %}
+#include <metal/machine/{{ to_snakecase(compat) }}.h>
 {% endfor %}
 
 #endif /* ! __METAL_PLATFORM__H */

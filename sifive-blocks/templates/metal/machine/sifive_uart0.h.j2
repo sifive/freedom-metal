@@ -4,7 +4,8 @@
 #ifndef METAL__PLATFORM__SIFIVE_UART0_H
 #define METAL__PLATFORM__SIFIVE_UART0_H
 
-{% if sifive_uart0s is defined %}
+{% if 'sifive,uart0' in devices %}
+{% set sifive_uart0s = devices['sifive,uart0'] %}
 
 {% for uart in sifive_uart0s %}
 #define METAL_SIFIVE_UART0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % uart.regs_by_name["control"] }}

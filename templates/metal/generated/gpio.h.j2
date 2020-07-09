@@ -3,21 +3,28 @@
 
 {% include 'template_comment.h.j2' %}
 
-#define __METAL_DT_NUM_GPIOS {{ gpios|length }}
+{% if 'gpio' in default_drivers and default_drivers['gpio'] in devices %}
+{% set gpio_compatible = default_drivers['gpio'] %}
 
-{% set compatible_string = to_snakecase(gpios[0].compatible[0]) %}
-#define metal_gpio_enable_input {{ compatible_string }}_enable_input
-#define metal_gpio_disable_input {{ compatible_string }}_disable_input
-#define metal_gpio_enable_output {{ compatible_string }}_enable_output
-#define metal_gpio_disable_output {{ compatible_string }}_disable_output
-#define metal_gpio_set_pin {{ compatible_string }}_set_pin
-#define metal_gpio_input_pin {{ compatible_string }}_input_pin
-#define metal_gpio_output_pin {{ compatible_string }}_output_pin
-#define metal_gpio_clear_pin {{ compatible_string }}_clear_pin
-#define metal_gpio_toggle_pin {{ compatible_string }}_toggle_pin
-#define metal_gpio_enable_pinmux {{ compatible_string }}_enable_pinmux
-#define metal_gpio_disable_pinmux {{ compatible_string }}_disable_pinmux
-#define metal_gpio_config_interrupt {{ compatible_string }}_config_interrupt
-#define metal_gpio_clear_interrupt {{ compatible_string }}_clear_interrupt
+#define __METAL_DT_NUM_GPIOS {{ devices[gpio_compatible]|length }}
+
+{% set driver_string = to_snakecase(gpio_compatible) %}
+#define metal_gpio_enable_input {{ driver_string }}_enable_input
+#define metal_gpio_disable_input {{ driver_string }}_disable_input
+#define metal_gpio_enable_output {{ driver_string }}_enable_output
+#define metal_gpio_disable_output {{ driver_string }}_disable_output
+#define metal_gpio_set_pin {{ driver_string }}_set_pin
+#define metal_gpio_input_pin {{ driver_string }}_input_pin
+#define metal_gpio_output_pin {{ driver_string }}_output_pin
+#define metal_gpio_clear_pin {{ driver_string }}_clear_pin
+#define metal_gpio_toggle_pin {{ driver_string }}_toggle_pin
+#define metal_gpio_enable_pinmux {{ driver_string }}_enable_pinmux
+#define metal_gpio_disable_pinmux {{ driver_string }}_disable_pinmux
+#define metal_gpio_config_interrupt {{ driver_string }}_config_interrupt
+#define metal_gpio_clear_interrupt {{ driver_string }}_clear_interrupt
+
+{% else %}
+#define __METAL_DT_NUM_GPIOS 0
+{% endif %}
 
 #endif /* ! __METAL_DT_GPIO__H */

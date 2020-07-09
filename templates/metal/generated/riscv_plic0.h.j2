@@ -10,7 +10,8 @@
 #include <metal/machine/platform.h>
 #include <stdint.h>
 
-{% if riscv_plic0s is defined %}
+{% if 'riscv,plic0' in devices %}
+{% set riscv_plic0s = devices['riscv,plic0'] %}
 
 #define __METAL_DT_NUM_RISCV_PLIC0S {{ riscv_plic0s|length }}
 

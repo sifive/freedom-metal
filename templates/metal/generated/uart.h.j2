@@ -3,13 +3,20 @@
 
 {% include 'template_comment.h.j2' %}
 
-#define __METAL_DT_NUM_UARTS {{ uarts|length }}
+{% if 'uart' in default_drivers and default_drivers['uart'] in devices %}
+{% set uart_compatible = default_drivers['uart'] %}
 
-{% set compat_string = to_snakecase(uarts[0].compatible[0]) %}
-#define metal_uart_init {{ compat_string }}_init
-#define metal_uart_putc {{ compat_string }}_putc
-#define metal_uart_getc {{ compat_string }}_getc
-#define metal_uart_get_baud_rate {{ compat_string }}_get_baud_rate
-#define metal_uart_set_baud_rate {{ compat_string }}_set_baud_rate
+#define __METAL_DT_NUM_UARTS {{ devices[uart_compatible]|length }}
+
+{% set driver_string = to_snakecase(uart_compatible) %}
+#define metal_uart_init {{ driver_string }}_init
+#define metal_uart_putc {{ driver_string }}_putc
+#define metal_uart_getc {{ driver_string }}_getc
+#define metal_uart_get_baud_rate {{ driver_string }}_get_baud_rate
+#define metal_uart_set_baud_rate {{ driver_string }}_set_baud_rate
+
+{% else %}
+#define __METAL_DT_NUM_UARTS 0
+{% endif %}
 
 #endif /* ! __METAL_DT_UART__H */

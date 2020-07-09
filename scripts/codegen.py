@@ -208,21 +208,24 @@ def main():
         'harts' : [node_to_dict(hart, dts) for hart in dts.match("^riscv$")],
         'local_interrupts' : local_interrupts(dts),
         'global_interrupts' : global_interrupts(dts),
-        'devices' : devices,
+        'devices' : dict(),
+        'default_drivers' : dict(),
     }
 
+    for api in devices:
+        for compat in devices[api]:
+            nodes = [node_to_dict(node, dts) for node in dts.match(compat)]
+            if len(nodes) > 0:
+                print("Found {} instances of device {}".format(len(nodes), compat))
+                template_data['devices'][compat] = nodes
+                template_data['default_drivers'][api] = compat
+                
     if 'stdout_path' in  template_data['chosen']:
         path, baud = template_data['chosen']['stdout_path'][0].split(':')
         node = dts.get_by_path(path)
         template_data['chosen']['stdout_path'] = [node_to_dict(node, dts), baud]
+        template_data['default_drivers']['uart'] = node.get_field("compatible")
                
-    for api in devices:
-        for device in devices[api]:
-            nodes = [node_to_dict(node, dts) for node in dts.match(device)]
-            if len(nodes) > 0:
-                print("Found {} instances of device {}".format(len(nodes), device))
-                template_data[to_snakecase(device + 's')] = nodes
-                template_data[api + 's'] = nodes
 
     with open("{}/template_data.log".format(args.output_dir), "w") as log:
         log.write(pprint.pformat(template_data))

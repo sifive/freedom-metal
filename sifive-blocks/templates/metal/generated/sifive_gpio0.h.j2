@@ -12,7 +12,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-{% if sifive_gpio0s is defined %}
+{% if 'sifive,gpio0' in devices %}
+{% set sifive_gpio0s = devices['sifive,gpio0'] %}
 
 static const struct dt_gpio_data {
 	uintptr_t base_addr;

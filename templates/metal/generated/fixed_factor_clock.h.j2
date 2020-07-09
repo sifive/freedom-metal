@@ -6,11 +6,12 @@
 
 {% include 'template_comment.h.j2' %}
 
-{% if fixed_factor_clocks is defined %}
+{% if 'fixed-factor-clock' in devices %}
+{% set fixed_factor_clocks = devices['fixed-factor-clock'] %}
 
 #include <metal/clock.h>
 
-#define __METAL_DT_NUM_FIXED_FACTOR_CLOCKS {{ fixed_factor_clocks|length }}
+#define __METAL_DT_NUM_FIXED_FACTOR_CLOCKS {{ devices['fixed-factor-clock']|length }}
 
 static const struct dt_fixed_factor_clock_data {
 	uint32_t mul;

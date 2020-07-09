@@ -8,7 +8,8 @@
 
 #include <metal/clock.h>
 
-{% if sifive_fe310_g000_lfroscs is defined %}
+{% if 'sifive,fe310-g000,lfrosc' in devices %}
+{% set sifive_fe310_g000_lfroscs = devices['sifive,fe310-g000,lfrosc'] %}
 
 #define __METAL_DT_NUM_SIFIVE_FE310_G000_LFROSCS {{ sifive_fe310_g000_lfroscs|length }}
 

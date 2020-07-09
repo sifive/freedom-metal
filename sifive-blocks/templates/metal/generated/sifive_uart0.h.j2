@@ -14,7 +14,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-{% if sifive_uart0s is defined %}
+{% if 'sifive,uart0' in devices %}
+{% set sifive_uart0s = devices['sifive,uart0'] %}
 
 static const struct dt_uart_data {
 	uintptr_t base_addr;
