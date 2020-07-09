@@ -137,16 +137,8 @@ _start:
   jalr a2
 1:
 
-  /* The RISC-V port only uses new-style constructors and destructors. */
-  la a0, __libc_fini_array
-  call atexit
+  /* The RISC-V port only uses new-style constructors */
   call __libc_init_array
-
-  /* Register metal_fini_run as a destructor and call metal_init_run to
-   * run and set up Metal constructors */
-  la a0, metal_fini_run
-  call atexit
-  call metal_init_run
 
 _skip_init:
 
