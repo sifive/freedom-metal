@@ -10,12 +10,8 @@
 #define GPIO_REG(offset) ((uintptr_t)((base) + (offset)))
 #define GPIO_REGW(offset) (__METAL_ACCESS_ONCE((__metal_io_u32 *)GPIO_REG(offset)))
 
-static inline uint32_t get_index(const struct sifive_gpio0 gpio) {
-    return gpio.__gpio_index;
-}
-
 int sifive_gpio0_enable_input(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_INPUT_EN) |= (1 << pin);
 
@@ -23,7 +19,7 @@ int sifive_gpio0_enable_input(struct sifive_gpio0 gpio, int pin) {
 }
 
 int sifive_gpio0_disable_input(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_INPUT_EN) &= ~(1 << pin);
 
@@ -31,7 +27,7 @@ int sifive_gpio0_disable_input(struct sifive_gpio0 gpio, int pin) {
 }
 
 int sifive_gpio0_disable_output(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_OUTPUT_EN) &= ~(1 << pin);
 
@@ -39,7 +35,7 @@ int sifive_gpio0_disable_output(struct sifive_gpio0 gpio, int pin) {
 }
 
 int sifive_gpio0_enable_output(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_OUTPUT_EN) |= (1 << pin);
 
@@ -47,7 +43,7 @@ int sifive_gpio0_enable_output(struct sifive_gpio0 gpio, int pin) {
 }
 
 int sifive_gpio0_set_pin(struct sifive_gpio0 gpio, int pin, int value) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     if (value == 1) {
         GPIO_REGW(METAL_SIFIVE_GPIO0_PORT) |= (1 << pin);
@@ -57,19 +53,19 @@ int sifive_gpio0_set_pin(struct sifive_gpio0 gpio, int pin, int value) {
 }
 
 int sifive_gpio0_get_input_pin(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     return GPIO_REGW(METAL_SIFIVE_GPIO0_VALUE) & (1 << pin);
 }
 
 int sifive_gpio0_get_output_pin(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     return GPIO_REGW(METAL_SIFIVE_GPIO0_PORT) & (1 << pin);
 }
 
 int sifive_gpio0_clear_pin(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_PORT) &= ~(1 << pin);
 
@@ -77,7 +73,7 @@ int sifive_gpio0_clear_pin(struct sifive_gpio0 gpio, int pin) {
 }
 
 int sifive_gpio0_toggle_pin(struct sifive_gpio0 gpio, int pin) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_PORT) ^= (1 << pin);
 
@@ -86,7 +82,7 @@ int sifive_gpio0_toggle_pin(struct sifive_gpio0 gpio, int pin) {
 
 int sifive_gpio0_enable_pinmux(struct sifive_gpio0 gpio, long pin_mask,
                              long io_function_mask) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_IOF_SEL) |= pin_mask;
 
@@ -97,7 +93,7 @@ int sifive_gpio0_enable_pinmux(struct sifive_gpio0 gpio, long pin_mask,
 }
 
 int sifive_gpio0_disable_pinmux(struct sifive_gpio0 gpio, long pin_mask) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_IOF_EN) &= ~pin_mask;
 
@@ -105,7 +101,7 @@ int sifive_gpio0_disable_pinmux(struct sifive_gpio0 gpio, long pin_mask) {
 }
 
 int sifive_gpio0_config_interrupt(struct sifive_gpio0 gpio, int pin, enum sifive_gpio0_int_type int_type) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     switch (int_type) {
     case METAL_GPIO_INT_DISABLE:
@@ -142,14 +138,14 @@ int sifive_gpio0_config_interrupt(struct sifive_gpio0 gpio, int pin, enum sifive
         break;
     }
 
-    struct metal_interrupt intc = dt_gpio_data[get_index(gpio)].interrupt_parent;
-    int id = dt_gpio_data[get_index(gpio)].interrupt_id_base + pin;
+    struct metal_interrupt intc = INTERRUPT_PARENT(gpio);
+    int id = INTERRUPT_ID_BASE(gpio) + pin;
 
     return metal_interrupt_enable(intc, id);
 }
 
 int sifive_gpio0_clear_interrupt(struct sifive_gpio0 gpio, int pin, enum sifive_gpio0_int_type int_type) {
-    uintptr_t base = dt_gpio_data[get_index(gpio)].base_addr;
+    uintptr_t base = BASE_ADDR(gpio);
 
     switch (int_type) {
     case METAL_GPIO_INT_RISING:

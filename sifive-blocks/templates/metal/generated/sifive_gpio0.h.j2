@@ -15,6 +15,16 @@
 {% if 'sifive,gpio0' in devices %}
 {% set sifive_gpio0s = devices['sifive,gpio0'] %}
 
+{% if sifive_gpio0s|length == 1 %}
+
+/* Only one sifive,gpio0 exists so all devicetree data is constant */
+#define get_index(gpio) 0
+#define BASE_ADDR(gpio) METAL_SIFIVE_GPIO0_0_BASE_ADDR
+#define INTERRUPT_PARENT(gpio) ((struct metal_interrupt) { {{ sifive_gpio0s[0].interrupt_parent[0].id }} })
+#define INTERRUPT_ID_BASE(gpio) {{ sifive_gpio0s[0].interrupts[0] }}
+
+{% else %}
+
 static const struct dt_gpio_data {
 	uintptr_t base_addr;
 	struct metal_interrupt interrupt_parent;
@@ -32,6 +42,13 @@ static const struct dt_gpio_data {
 	},
 	{% endfor %}
 };
+
+#define get_index(gpio)
+#define BASE_ADDR(gpio) (dt_gpio_data[get_index((gpio))].base_addr)
+#define INTERRUPT_PARENT(gpio) (dt_gpio_data[get_index((gpio))].interrupt_parent)
+#define INTERRUPT_ID_BASE(gpio) (dt_gpio_data[get_index((gpio))].interrupt_id_base)
+
+{% endif %}
 
 {% if sifive_gpio0s[0].interrupt_parent is defined %}
 {% set driver_string = to_snakecase(sifive_gpio0s[0].interrupt_parent[0].compatible[0]) %}
