@@ -29,7 +29,7 @@ ifeq ($(LIBC),picolibc)
 	LIBC_FLAGS += --oslib=semihost
 endif
 
-CFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -Ibuild -I. -Isifive-blocks $(LIBC_FLAGS) -DMTIME_RATE_HZ_DEF=32768 -O0 -g
+CFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medlow -ffunction-sections -fdata-sections -Ibuild -I. -Isifive-blocks $(LIBC_FLAGS) -DMTIME_RATE_HZ_DEF=32768 -Og -g
 LDFLAGS=-Wl,--gc-sections -Wl,-Map,hello.map -nostartfiles -Ttest/qemu_sifive_e31.lds
 LDLIBS=-lm
 
