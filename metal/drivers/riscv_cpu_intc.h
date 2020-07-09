@@ -10,6 +10,7 @@
 #define METAL_MAX_ME 12 /* Per ISA Exception codes 12+ are Reserved   */
 #define METAL_DEFAULT_RTC_FREQ 32768
 
+#define METAL_MTVEC_MODE 0x03
 #define METAL_MTVEC_DIRECT 0x00
 #define METAL_MTVEC_VECTORED 0x01
 #define METAL_MTVEC_CLIC 0x02

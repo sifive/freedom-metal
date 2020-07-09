@@ -166,12 +166,21 @@ int __metal_driver_riscv_cpu_intc_set_vector_mode(
 
 metal_vector_mode __metal_driver_riscv_cpu_intc_get_vector_mode(
     struct metal_interrupt controller) {
+
     uintptr_t mtvec;
     __asm__ volatile("csrr %0, mtvec" : "=r"(mtvec));
 
-    /* TODO */
-
-    return METAL_DIRECT_MODE;
+    switch (mtvec & METAL_MTVEC_MODE) {
+        default:
+        case METAL_MTVEC_DIRECT:
+            return METAL_DIRECT_MODE;
+        case METAL_MTVEC_VECTORED:
+            return METAL_VECTORED_MODE;
+        case METAL_MTVEC_CLIC:
+            return METAL_CLIC_DIRECT_MODE;
+        case METAL_MTVEC_CLIC_VECTORED:
+            return METAL_CLIC_VECTORED_MODE;
+    }
 }
 
 int __metal_driver_riscv_cpu_intc_set_privilege(struct metal_interrupt controller,
@@ -193,12 +202,6 @@ int __metal_driver_riscv_cpu_intc_clear(struct metal_interrupt controller,
 }
 
 int __metal_driver_riscv_cpu_intc_set(struct metal_interrupt controller, int id) {
-    return -1;
-}
-
-int __metal_driver_riscv_cpu_intc_register_vector_handler(
-    struct metal_interrupt controller, int id,
-    metal_interrupt_vector_handler_t handler, void *priv_data) {
     return -1;
 }
 
@@ -314,14 +317,22 @@ __metal_driver_riscv_cpu_intc_get_preemptive_level(struct metal_interrupt contro
 int __metal_driver_riscv_cpu_intc_vector_enable(
     struct metal_interrupt intc, int id, metal_vector_mode mode) {
 
-    return __metal_driver_riscv_cpu_intc_set_vector_mode(intc, mode);
+#ifdef METAL_HLIC_VECTORED
+    return 0;
+#else
+    return -1;
+#endif
 }
 
 int
 __metal_driver_riscv_cpu_intc_vector_disable(
     struct metal_interrupt controller, int id) {
     
-    return __metal_driver_riscv_cpu_intc_set_vector_mode(controller, METAL_DIRECT_MODE);
+#ifdef METAL_HLIC_VECTORED
+    return -1;
+#else
+    return 0;
+#endif
 }
 
 metal_affinity
