@@ -4,28 +4,36 @@
 #ifndef __INTERRUPT_HANDLERS_H
 #define __INTERRUPT_HANDLERS_H
 
+#include <metal/cpu.h>
 #include <metal/interrupt.h>
 
+const metal_exception_handler_t __metal_exception_table[12];
 const metal_interrupt_vector_handler_t __metal_vector_table[32];
 
 void __metal_exception_handler();
-void metal_riscv_cpu_intc_default_handler();
-void metal_riscv_cpu_intc_default_handler();
+
+void metal_exception_instruction_address_misaligned_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_instruction_address_fault_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_illegal_instruction_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_breakpoint_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_load_address_misaligned_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_load_access_fault_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_store_amo_address_misaligned_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_store_amo_access_fault_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_ecall_from_u_mode_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_ecall_from_s_mode_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_default_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_ecall_from_m_mode_handler(struct metal_cpu cpu, int ecode);
+
 void metal_riscv_cpu_intc_default_handler();
 void metal_riscv_cpu_intc_msip_handler();
-void metal_riscv_cpu_intc_default_handler();
-void metal_riscv_cpu_intc_default_handler();
-void metal_riscv_cpu_intc_default_handler();
 void metal_riscv_cpu_intc_mtip_handler();
 {% if global_interrupts is defined %}
 void metal_riscv_plic0_source_0_handler();
 {% else %}
 void metal_riscv_cpu_intc_meip_handler();
 {% endif %}
-void metal_riscv_cpu_intc_default_handler();
-void metal_riscv_cpu_intc_default_handler();
-void metal_riscv_cpu_intc_default_handler();
-void metal_riscv_cpu_intc_default_handler();
+
 {% if local_interrupts is defined %}
 {% for irq in local_interrupts.irqs %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler();

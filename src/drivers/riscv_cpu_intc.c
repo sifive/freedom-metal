@@ -13,14 +13,7 @@
 
 #define get_index(intc) ((intc).__interrupt_index)
 
-static struct intc_state {
-    bool init_done;
-    metal_exception_handler_t exception_table[METAL_MAX_ME];
-} intc_state[__METAL_DT_NUM_HARTS] = {
-    {
-        .init_done = false,
-    },
-};
+static bool init_done[__METAL_DT_NUM_HARTS] = { false };
 
 /* MIE CSR Manipulation */
 
@@ -94,40 +87,6 @@ static void __metal_interrupt_local_disable(int id) {
 
 /* Default handlers */
 
-void __metal_default_exception_handler(struct metal_cpu cpu, int ecode) {
-    metal_shutdown(100);
-}
-
-void metal_riscv_cpu_intc_default_handler() {
-    metal_shutdown(200);
-}
-
-/* The metal_interrupt_vector_handler() function can be redefined. */
-void __attribute__((weak, interrupt)) metal_interrupt_vector_handler(void) {
-    metal_shutdown(300);
-}
-
-void metal_riscv_cpu_intc_msip_handler() __attribute__((weak, interrupt));
-void metal_riscv_cpu_intc_msip_handler() {
-    uintptr_t mcause;
-    __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
-
-    uint32_t hartid = metal_cpu_get_current_hartid();
-    struct metal_cpu cpu = metal_cpu_get(hartid);
-    intc_state[hartid].exception_table[RISCV_MCAUSE_ID(mcause)](cpu, 3);
-}
-
-void metal_riscv_cpu_intc_mtip_handler() __attribute__((weak, interrupt));
-void metal_riscv_cpu_intc_mtip_handler() {
-    struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
-    unsigned long long time = metal_cpu_get_mtime(cpu);
-
-    /* Set a 10 cycle timer */
-    metal_cpu_set_mtimecmp(cpu, time + 10);
-}
-
-void __metal_default_beu_handler(int id, void *priv) {}
-
 void __metal_exception_handler(void) __attribute__((interrupt, aligned(128)));
 void __metal_exception_handler(void) {
     uint32_t hartid = metal_cpu_get_current_hartid();
@@ -142,20 +101,8 @@ void __metal_exception_handler(void) {
     if (RISCV_MCAUSE_IS_INTERRUPT(mcause)) {
         __metal_vector_table[id + 1]();
     } else {
-        intc_state[hartid].exception_table[id](metal_cpu_get(hartid), id);
+        __metal_exception_table[id](metal_cpu_get(hartid), id);
     }
-}
-
-/* Exception API */
-
-int metal_cpu_exception_register(struct metal_cpu cpu, int ecode,
-                                 metal_exception_handler_t isr) {
-    struct metal_interrupt intc = (struct metal_interrupt) { cpu.__hartid };
-    if ((ecode < METAL_MAX_EXCEPTION_CODE) && isr) {
-        intc_state[get_index(intc)].exception_table[ecode] = isr;
-        return 0;
-    }
-    return -1;
 }
 
 /* Interrupt API */
@@ -165,7 +112,7 @@ extern void early_trap_vector(void);
 void __metal_driver_riscv_cpu_intc_init(
     struct metal_interrupt intc) {
 
-    if (!intc_state[get_index(intc)].init_done) {
+    if (!init_done[get_index(intc)]) {
         /*
          * Set the real trap handler if the value of mtvec is equal to
          * early_trap_vector. If mtvec is not equal to early_trap_vector,
@@ -177,7 +124,7 @@ void __metal_driver_riscv_cpu_intc_init(
             __metal_driver_riscv_cpu_intc_set_vector_mode(intc, METAL_DIRECT_MODE);
         }
 
-        intc_state[get_index(intc)].init_done = 1;
+        init_done[get_index(intc)] = 1;
     }
 }
 

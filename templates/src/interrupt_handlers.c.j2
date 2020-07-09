@@ -3,22 +3,53 @@
 
 #include <metal/interrupt_handlers.h>
 
+/* Define all default interrupt and exception handlers to weak no-ops so that if no
+ * driver or application overrides them we still have a definition for the interrupt
+ * and exception tables
+ */
+
+/* No-op functions get defined once so we can alias all undefined handlers to a single
+ * copy of the no-op handler
+ */
+void _metal_exception_handler_nop(struct metal_cpu cpu, int ecode) {}
+
 void _metal_local_interrupt_handler_nop() __attribute((interrupt));
 void _metal_local_interrupt_handler_nop() {}
 
-void _metal_global_interrupt_handler_nop();
 void _metal_global_interrupt_handler_nop() {}
 
-{% if local_interrupts is defined %}
-{% for irq in local_interrupts.irqs %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute((interrupt, weak, alias ("_metal_local_interrupt_handler_nop")));
+/* Alias default exception handlers to _metal_exception_handler_nop() */
+void metal_exception_instruction_address_misaligned_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_instruction_address_fault_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_illegal_instruction_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_breakpoint_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_load_address_misaligned_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_load_access_fault_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_store_amo_address_misaligned_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_store_amo_access_fault_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_ecall_from_u_mode_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_ecall_from_s_mode_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_default_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
+void metal_exception_ecall_from_m_mode_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
 
-{% endfor %}
+/* Alias default local interrupt handlers to _metal_local_interrupt_handler_nop() */
+void metal_riscv_cpu_intc_default_handler() __attribute__((interrupt, weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_msip_handler() __attribute__((interrupt, weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_mtip_handler() __attribute__((interrupt, weak, alias("_metal_local_interrupt_handler_nop")));
+{% if global_interrupts is defined %}
+void metal_riscv_plic0_source_0_handler() __attribute((interrupt, weak, alias("_metal_local_interrupt_handler_nop")));
+{% else %}
+void metal_riscv_cpu_intc_meip_handler() __attribute__((interrupt, weak, alias("_metal_local_interrupt_handler_nop")));
+{% endif %}
+{% if local_interrupts is defined %}
+    {% for irq in local_interrupts.irqs %}
+void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((interrupt, weak, alias ("_metal_local_interrupt_handler_nop")));
+    {% endfor %}
 {% endif %}
 
+/* Alias default global interrupt handlers to _metal_global_interrupt_handler_nop() */
 {% if global_interrupts is defined %}
-{% for irq in global_interrupts.irqs %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute((weak, alias ("_metal_global_interrupt_handler_nop")));
-
-{% endfor %}
+    {% for irq in global_interrupts.irqs %}
+void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((weak, alias ("_metal_global_interrupt_handler_nop")));
+    {% endfor %}
 {% endif %}
