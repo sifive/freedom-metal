@@ -99,7 +99,7 @@ void __metal_exception_handler(void) {
     int id = RISCV_MCAUSE_ID(mcause);
 
     if (RISCV_MCAUSE_IS_INTERRUPT(mcause)) {
-        __metal_vector_table[id]();
+        __metal_local_interrupt_table[id]();
     } else {
         __metal_exception_table[id](metal_cpu_get(hartid), id);
     }
@@ -138,6 +138,8 @@ METAL_CONSTRUCTOR(riscv_cpu_intc_init) {
         __metal_driver_riscv_cpu_intc_init(intc);
     }
 }
+
+extern void __metal_vector_table(void);
 
 int __metal_driver_riscv_cpu_intc_set_vector_mode(
     struct metal_interrupt controller, metal_vector_mode mode) {

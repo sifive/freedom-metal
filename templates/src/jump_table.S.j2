@@ -1,8 +1,6 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifdef METAL_HLIC_VECTORED
-
 #if __riscv_xlen == 32
 .balign 128, 0
 #else
@@ -11,6 +9,10 @@
 .option norvc
 .global __metal_vector_table
 __metal_vector_table:
+/* IRQ 0 can't be vectored because synchronous exceptions also have to be handled
+ * by this first position of the jump table. The user-mode software interrupt
+ * handler will be invoked by the exception handler, just as in the unvectored
+ * case. */
         j __metal_exception_handler
 IRQ_1:
         j metal_riscv_cpu_intc_default_handler
@@ -56,5 +58,3 @@ IRQ_LOCAL_{{ irq.id }}:
     {% endif %}
   {% endfor %}
 {% endif %}
-
-#endif /* METAL_HLIC_VECTORED */

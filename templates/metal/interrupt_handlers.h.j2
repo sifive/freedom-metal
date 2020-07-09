@@ -20,7 +20,7 @@ typedef void (*metal_exception_handler_t)(struct metal_cpu cpu, int ecode);
 
 
 const metal_exception_handler_t __metal_exception_table[12];
-const metal_interrupt_vector_handler_t __metal_vector_table[32];
+const metal_interrupt_vector_handler_t __metal_local_interrupt_table[32];
 
 void __metal_exception_handler();
 
