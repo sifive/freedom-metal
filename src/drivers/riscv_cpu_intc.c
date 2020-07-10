@@ -1,13 +1,9 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
-#include <metal/generated/cpu.h>
 #include <metal/init.h>
 #include <metal/interrupt.h>
-#include <metal/interrupt_handlers.h>
-#include <metal/shutdown.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -35,8 +31,7 @@ void __metal_exception_handler(void) {
 
 extern void early_trap_vector(void);
 
-void __metal_driver_riscv_cpu_intc_init(
-    struct metal_interrupt intc) {
+void __metal_driver_riscv_cpu_intc_init(struct metal_interrupt intc) {
 
     if (!init_done[get_index(intc)]) {
         /*
@@ -70,23 +65,17 @@ extern void __metal_vector_table(void);
 int __metal_driver_riscv_cpu_intc_set_vector_mode(
     struct metal_interrupt controller, metal_vector_mode mode) {
 
-    uintptr_t mtvec;
-    __asm__ volatile("csrr %0, mtvec" : "=r"(mtvec));
-    
-    /* Zero the mtvec CLIC config bits */
-    mtvec &= ~(METAL_MTVEC_CLIC_VECTORED | METAL_MTVEC_CLIC_RESERVED);
-
     switch (mode) {
     default:
     case METAL_DIRECT_MODE:
         /* Write the trap vector address with the vectored bit unset */
-        __asm__ volatile(
-            "csrw mtvec, %0" ::"r"((uintptr_t)__metal_exception_handler & ~METAL_MTVEC_CLIC_VECTORED));
+        __asm__ volatile("csrw mtvec, %0" ::"r" ((uintptr_t)__metal_exception_handler));
         break;
     case METAL_VECTORED_MODE:
         /* Write the jump table address with the vectored bit set */
-        __asm__ volatile(
-            "csrw mtvec, %0" :: "r"((uintptr_t)__metal_vector_table | METAL_MTVEC_VECTORED));
+        __asm__ volatile("csrw mtvec, %0"
+                         :: "r" ((uintptr_t)__metal_vector_table | METAL_MTVEC_VECTORED));
+        break;
     }
 
     return 0;
@@ -126,10 +115,16 @@ __metal_driver_riscv_cpu_intc_get_privilege(struct metal_interrupt controller) {
 
 int __metal_driver_riscv_cpu_intc_clear(struct metal_interrupt controller,
                                         int id) {
+    /* The hart-local interrupt controller can't clear any of the interrupts
+     * it controls. To clear the machine software interrupt, use
+     * metal_cpu_clear_ipi() */
     return -1;
 }
 
 int __metal_driver_riscv_cpu_intc_set(struct metal_interrupt controller, int id) {
+    /* The hart-local interrupt controller can't trigger any of the interrupts
+     * it controls. To set the machine software interrupt, use
+     * metal_cpu_set_ipi() */
     return -1;
 }
 
