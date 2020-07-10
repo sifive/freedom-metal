@@ -43,16 +43,16 @@
 #}
 {% set num_contexts = (riscv_plic0.interrupts_extended|length) // 2 %}
 {% if num_contexts == 1 %}
-#define PLIC_CONTEXT_BASE(hartid) 0x0UL
+#define PLIC_CONTEXT_BASE(hartid) METAL_RISCV_PLIC0_CONTEXT_BASE
 {% else %}
     {% for context in range(num_contexts) %}
-static const uintptr_t plic_context_base[__METAL_DT_NUM_HARTS] = {
+static const uintptr_t plic_context_offset[__METAL_DT_NUM_HARTS] = {
         {% if riscv_plic0.interrupts_extended[2 * context + 1] == 11 %}
     {{ "0x%xUL" % (4092 * context) }},
         {% endif %}
 };
     {% endfor %}
-#define PLIC_CONTEXT_BASE(hartid) plic_context_base[hartid]
+#define PLIC_CONTEXT_BASE(hartid) (METAL_RISCV_PLIC0_CONTEXT_BASE + plic_context_offset[hartid])
 {% endif %}
 
 {% set driver_string = to_snakecase(riscv_plic0.interrupts_extended[0].compatible[0]) %}
