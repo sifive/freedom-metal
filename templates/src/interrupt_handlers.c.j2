@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/interrupt_handlers.h>
+#include <metal/shutdown.h>
 
 /* Define all default interrupt and exception handlers to weak no-ops so that if no
  * driver or application overrides them we still have a definition for the interrupt
@@ -11,12 +12,18 @@
 /* No-op functions get defined once so we can alias all undefined handlers to a single
  * copy of the no-op handler
  */
-void _metal_exception_handler_nop(struct metal_cpu cpu, int ecode) {}
+void _metal_exception_handler_nop(struct metal_cpu cpu, int ecode) {
+    metal_shutdown(100);
+}
 
 void _metal_local_interrupt_handler_nop() __attribute((interrupt));
-void _metal_local_interrupt_handler_nop() {}
+void _metal_local_interrupt_handler_nop() {
+    metal_shutdown(200);
+}
 
-void _metal_global_interrupt_handler_nop() {}
+void _metal_global_interrupt_handler_nop() {
+    metal_shutdown(300);
+}
 
 /* Alias default exception handlers to _metal_exception_handler_nop() */
 void metal_exception_instruction_address_misaligned_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
