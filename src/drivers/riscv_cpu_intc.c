@@ -31,7 +31,7 @@ void __metal_exception_handler(void) {
 
 extern void early_trap_vector(void);
 
-void __metal_driver_riscv_cpu_intc_init(struct metal_interrupt intc) {
+void riscv_cpu_intc_init(struct metal_interrupt intc) {
 
     if (!init_done[get_index(intc)]) {
         /*
@@ -43,9 +43,9 @@ void __metal_driver_riscv_cpu_intc_init(struct metal_interrupt intc) {
         __asm__ volatile("csrr %0, mtvec" : "=r"(mtvec));
         if (mtvec == (uintptr_t)&early_trap_vector) {
 #ifdef METAL_HLIC_VECTORED
-            __metal_driver_riscv_cpu_intc_set_vector_mode(intc, METAL_VECTORED_MODE);
+            riscv_cpu_intc_set_vector_mode(intc, METAL_VECTORED_MODE);
 #else
-            __metal_driver_riscv_cpu_intc_set_vector_mode(intc, METAL_DIRECT_MODE);
+            riscv_cpu_intc_set_vector_mode(intc, METAL_DIRECT_MODE);
 #endif
         }
 
@@ -53,16 +53,16 @@ void __metal_driver_riscv_cpu_intc_init(struct metal_interrupt intc) {
     }
 }
 
-METAL_CONSTRUCTOR(riscv_cpu_intc_init) {
+METAL_CONSTRUCTOR(init_riscv_cpu_intc) {
     for (int i = 0; i < __METAL_DT_NUM_HARTS; i++) {
         struct metal_interrupt intc = (struct metal_interrupt) { i };
-        __metal_driver_riscv_cpu_intc_init(intc);
+        riscv_cpu_intc_init(intc);
     }
 }
 
 extern void __metal_vector_table(void);
 
-int __metal_driver_riscv_cpu_intc_set_vector_mode(
+int riscv_cpu_intc_set_vector_mode(
     struct metal_interrupt controller, metal_vector_mode mode) {
 
     switch (mode) {
@@ -81,7 +81,7 @@ int __metal_driver_riscv_cpu_intc_set_vector_mode(
     return 0;
 }
 
-metal_vector_mode __metal_driver_riscv_cpu_intc_get_vector_mode(
+metal_vector_mode riscv_cpu_intc_get_vector_mode(
     struct metal_interrupt controller) {
 
     uintptr_t mtvec;
@@ -100,7 +100,7 @@ metal_vector_mode __metal_driver_riscv_cpu_intc_get_vector_mode(
     }
 }
 
-int __metal_driver_riscv_cpu_intc_set_privilege(struct metal_interrupt controller,
+int riscv_cpu_intc_set_privilege(struct metal_interrupt controller,
                                                 metal_intr_priv_mode privilege) {
     if (privilege == METAL_INTR_PRIV_M_MODE) {
         return 0;
@@ -109,11 +109,11 @@ int __metal_driver_riscv_cpu_intc_set_privilege(struct metal_interrupt controlle
 }
 
 metal_intr_priv_mode
-__metal_driver_riscv_cpu_intc_get_privilege(struct metal_interrupt controller) {
+riscv_cpu_intc_get_privilege(struct metal_interrupt controller) {
     return METAL_INTR_PRIV_M_MODE;
 }
 
-int __metal_driver_riscv_cpu_intc_clear(struct metal_interrupt controller,
+int riscv_cpu_intc_clear(struct metal_interrupt controller,
                                         int id) {
     /* The hart-local interrupt controller can't clear any of the interrupts
      * it controls. To clear the machine software interrupt, use
@@ -121,14 +121,14 @@ int __metal_driver_riscv_cpu_intc_clear(struct metal_interrupt controller,
     return -1;
 }
 
-int __metal_driver_riscv_cpu_intc_set(struct metal_interrupt controller, int id) {
+int riscv_cpu_intc_set(struct metal_interrupt controller, int id) {
     /* The hart-local interrupt controller can't trigger any of the interrupts
      * it controls. To set the machine software interrupt, use
      * metal_cpu_set_ipi() */
     return -1;
 }
 
-int __metal_driver_riscv_cpu_intc_enable(
+int riscv_cpu_intc_enable(
     struct metal_interrupt controller, int id) {
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
@@ -169,7 +169,7 @@ int __metal_driver_riscv_cpu_intc_enable(
     return 0;
 }
 
-int __metal_driver_riscv_cpu_intc_interrupt_disable(
+int riscv_cpu_intc_interrupt_disable(
     struct metal_interrupt controller, int id) {
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
@@ -209,38 +209,38 @@ int __metal_driver_riscv_cpu_intc_interrupt_disable(
     return 0;
 }
 
-int __metal_driver_riscv_cpu_intc_set_threshold(struct metal_interrupt controller,
+int riscv_cpu_intc_set_threshold(struct metal_interrupt controller,
                                                 unsigned int level) {
     return -1;
 }
 
 unsigned int
-__metal_driver_riscv_cpu_intc_get_threshold(struct metal_interrupt controller) {
+riscv_cpu_intc_get_threshold(struct metal_interrupt controller) {
     return 0;
 }
 
-int __metal_driver_riscv_cpu_intc_set_priority(struct metal_interrupt controller,
+int riscv_cpu_intc_set_priority(struct metal_interrupt controller,
                                                int id, unsigned int priority) {
     return -1;
 }
 
 unsigned int
-__metal_driver_riscv_cpu_intc_get_priority(struct metal_interrupt controller, int id) {
+riscv_cpu_intc_get_priority(struct metal_interrupt controller, int id) {
     return 0;
 }
 
 int
-__metal_driver_riscv_cpu_intc_set_preemptive_level(struct metal_interrupt controller, int id,
+riscv_cpu_intc_set_preemptive_level(struct metal_interrupt controller, int id,
                                                    unsigned int level) {
     return -1;
 }
 
 unsigned int
-__metal_driver_riscv_cpu_intc_get_preemptive_level(struct metal_interrupt controller, int id) {
+riscv_cpu_intc_get_preemptive_level(struct metal_interrupt controller, int id) {
     return 0;
 }
 
-int __metal_driver_riscv_cpu_intc_vector_enable(
+int riscv_cpu_intc_vector_enable(
     struct metal_interrupt intc, int id, metal_vector_mode mode) {
 
 #ifdef METAL_HLIC_VECTORED
@@ -251,7 +251,7 @@ int __metal_driver_riscv_cpu_intc_vector_enable(
 }
 
 int
-__metal_driver_riscv_cpu_intc_vector_disable(
+riscv_cpu_intc_vector_disable(
     struct metal_interrupt controller, int id) {
     
 #ifdef METAL_HLIC_VECTORED
@@ -262,27 +262,27 @@ __metal_driver_riscv_cpu_intc_vector_disable(
 }
 
 metal_affinity
-__metal_driver_riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
+riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
                                               metal_affinity bitmask, int id) {
     /* Return a 1 for each hart in the bitmask, representing failure. */
     return (metal_affinity) { (1 << __METAL_DT_NUM_HARTS) - 1 };
 }
 
 metal_affinity
-__metal_driver_riscv_cpu_intc_affinity_disable(struct metal_interrupt controller,
+riscv_cpu_intc_affinity_disable(struct metal_interrupt controller,
                                                metal_affinity bitmask, int id) {
     return (metal_affinity) { (1 << __METAL_DT_NUM_HARTS) - 1 };
 }
 
 metal_affinity
-__metal_driver_riscv_cpu_intc_affinity_set_threshold(struct metal_interrupt controller,
+riscv_cpu_intc_affinity_set_threshold(struct metal_interrupt controller,
                                                      metal_affinity bitmask,
                                                      unsigned int level) {
     return (metal_affinity) { (1 << __METAL_DT_NUM_HARTS) - 1 };
 }
 
 unsigned int
-__metal_driver_riscv_cpu_intc_affinity_get_threshold(struct metal_interrupt controller,
+riscv_cpu_intc_affinity_get_threshold(struct metal_interrupt controller,
                                                      int context_id) {
     return 0;
 }

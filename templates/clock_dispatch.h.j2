@@ -8,5 +8,5 @@
  * they will link to the stub functions in src/clock.c
  */
 
-#define metal_clock_get_rate_hz(clock) __metal_driver_{{ driver_string }}_get_rate_hz((clock))
-#define metal_clock_set_rate_hz(clock, rate) __metal_driver_{{ driver_string }}_set_rate_hz((clock), (rate))
+#define metal_clock_get_rate_hz(clock) {{ driver_string }}_get_rate_hz((clock))
+#define metal_clock_set_rate_hz(clock, rate) {{ driver_string }}_set_rate_hz((clock), (rate))

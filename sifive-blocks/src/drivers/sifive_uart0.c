@@ -237,7 +237,7 @@ void sifive_uart0_init(struct metal_uart uart, uint32_t baud_rate) {
 #define __METAL_DT_STDOUT_UART_BAUD 115200
 #endif
 
-METAL_CONSTRUCTOR(metal_tty_init) {
+METAL_CONSTRUCTOR(init_metal_tty) {
     sifive_uart0_init(__METAL_DT_STDOUT_UART_HANDLE,
                     __METAL_DT_STDOUT_UART_BAUD);
 }

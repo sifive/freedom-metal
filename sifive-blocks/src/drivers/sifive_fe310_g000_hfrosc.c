@@ -16,7 +16,7 @@
 
 #define get_index(clk) ((clk).__clock_index)
 
-uint64_t __metal_driver_sifive_fe310_g000_hfrosc_get_rate_hz(
+uint64_t sifive_fe310_g000_hfrosc_get_rate_hz(
     struct metal_clock clock) {
 
     uintptr_t base = dt_clock_data[get_index(clock)].base;
@@ -33,9 +33,9 @@ uint64_t __metal_driver_sifive_fe310_g000_hfrosc_get_rate_hz(
     return ref_rate / ((cfg & CONFIG_DIVIDER) + 1);
 }
 
-uint64_t __metal_driver_sifive_fe310_g000_hfrosc_set_rate_hz(
+uint64_t sifive_fe310_g000_hfrosc_set_rate_hz(
     struct metal_clock clock, uint64_t rate) {
-    return __metal_driver_sifive_fe310_g000_hfrosc_get_rate_hz(clock);
+    return sifive_fe310_g000_hfrosc_get_rate_hz(clock);
 }
 
 #endif /* METAL_SIFIVE_FE310_G000_HFROSC */
