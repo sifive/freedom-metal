@@ -24,8 +24,7 @@
 /*!
  * @brief Function signature for interrupt callback handlers
  */
-typedef void (*metal_interrupt_handler_t)(int, void *);
-typedef void (*metal_interrupt_vector_handler_t)(void);
+typedef void (*metal_interrupt_handler_t)();
 
 /*!
  * @brief Function signature for exception handlers
@@ -34,7 +33,7 @@ typedef void (*metal_exception_handler_t)(struct metal_cpu cpu, int ecode);
 
 
 const metal_exception_handler_t __metal_exception_table[__METAL_NUM_EXCEPTIONS];
-const metal_interrupt_vector_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_INTERRUPTS];
+const metal_interrupt_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_INTERRUPTS];
 
 void __metal_exception_handler();
 

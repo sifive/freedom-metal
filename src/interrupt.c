@@ -62,28 +62,6 @@ metal_interrupt_get_preemptive_level(struct metal_interrupt controller,
     return 0;
 }
 
-int metal_interrupt_clear(struct metal_interrupt controller,
-                                            int id) {
-    return -1;
-}
-
-int metal_interrupt_set(struct metal_interrupt controller,
-                                          int id) {
-    return -1;
-}
-
-int
-metal_interrupt_register_handler(struct metal_interrupt controller, int id,
-                                 metal_interrupt_handler_t handler, void *priv) {
-    return -1;
-}
-
-int metal_interrupt_register_vector_handler(
-    struct metal_interrupt controller, int id,
-    metal_interrupt_vector_handler_t handler, void *priv_data) {
-    return -1;
-}
-
 int metal_interrupt_enable(struct metal_interrupt controller,
                                              int id) {
     return -1;

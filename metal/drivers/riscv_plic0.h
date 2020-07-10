@@ -26,20 +26,6 @@ int riscv_plic0_set_privilege(struct metal_interrupt controller,
 metal_intr_priv_mode
 riscv_plic0_get_privilege(struct metal_interrupt controller);
 
-int riscv_plic0_clear(struct metal_interrupt controller,
-                                        int id);
-
-int riscv_plic0_set(struct metal_interrupt controller, int id);
-
-int
-riscv_plic0_register_handler(struct metal_interrupt controller, int id,
-                                               metal_interrupt_handler_t handler,
-                                               void *priv_data);
-
-int riscv_plic0_register_vector_handler(
-    struct metal_interrupt controller, int id,
-    metal_interrupt_vector_handler_t handler, void *priv_data);
-
 int riscv_plic0_enable(struct metal_interrupt controller, int id);
 
 int riscv_plic0_disable(struct metal_interrupt controller, int id);

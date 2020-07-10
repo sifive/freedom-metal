@@ -24,7 +24,7 @@ const metal_exception_handler_t __metal_exception_table[__METAL_NUM_EXCEPTIONS] 
 #endif
 };
 
-const metal_interrupt_vector_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_INTERRUPTS] = {
+const metal_interrupt_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_INTERRUPTS] = {
     metal_riscv_cpu_intc_default_handler,
     metal_riscv_cpu_intc_default_handler,
     metal_riscv_cpu_intc_default_handler,

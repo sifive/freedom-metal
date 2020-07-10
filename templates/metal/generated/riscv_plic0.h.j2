@@ -11,34 +11,51 @@
 #include <stdint.h>
 
 {% if 'riscv,plic0' in devices %}
-{% set riscv_plic0s = devices['riscv,plic0'] %}
+{% set riscv_plic0 = devices['riscv,plic0'][0] %}
 
+{% if devices['riscv,plic0']|length > 1 %}
+#pragma warning("Multiple PLICs detected, currently Metal only supports a singleton PLIC.")
+{% endif %}
 #define __METAL_DT_NUM_RISCV_PLIC0S {{ riscv_plic0s|length }}
 
-#define __METAL_PLIC_NUM_PARENTS 1
+{#
+   The PLIC has a claim/complete context window for each external interrupt line
+   implemented for each hart. This means that for this design:
 
-static const struct dt_intc_data {
-    uintptr_t base;
-    uint32_t num_interrupts;
-    uint32_t context_id;
-    uint32_t max_priority;
-    struct metal_interrupt interrupt_parent;
-    uint32_t interrupt_id;
-} dt_intc_data[__METAL_DT_NUM_RISCV_PLIC0S] = {
-    {% for intc in riscv_plic0s %}
-    {
-        .base = METAL_RISCV_PLIC0_{{ intc.id }}_BASE_ADDR,
+     Hart 0 - only machine external interrupt
+     Hart 1 - machine and supervisor external interrupts
+     hart 2 - machine and supervisor extarnal interrupts
 
-        .num_interrupts = {{ intc.riscv_ndev[0] }},
-        .context_id = 0,
-        .max_priority = {{ intc.riscv_max_priority[0] }},
-        .interrupt_parent = (struct metal_interrupt) { {{ intc.interrupts_extended[0].id }} },
-        .interrupt_id = {{ intc.interrupts_extended[1] }},
-    },
-    {% endfor %}
+   the PLIC will have the following memory map:
+
+     BASE + 0x0000 - Hart 0 M mode context window
+     BASE + 0x1000 - Hart 1 M mode context window
+     BASE + 0x2000 - Hart 1 S mode context window
+     BASE + 0x3000 - Hart 2 M mode context window
+     BASE + 0x4000 - Hart 2 S mode context window
+
+   and this will be represented in the Devicetree node for the PLIC as:
+
+     interrupts-extended = <&hlic0 11 &hlic1 11 &hlic1 13 &hlic2 11 &hlic2 13>;
+
+   The following template extracts the M mode context window base addresses for
+   each hart.
+#}
+{% set num_contexts = (riscv_plic0.interrupts_extended|length) // 2 %}
+{% if num_contexts == 1 %}
+#define PLIC_CONTEXT_BASE(hartid) 0x0UL
+{% else %}
+    {% for context in range(num_contexts) %}
+static const uintptr_t plic_context_base[__METAL_DT_NUM_HARTS] = {
+        {% if riscv_plic0.interrupts_extended[2 * context + 1] == 11 %}
+    {{ "0x%xUL" % (4092 * context) }},
+        {% endif %}
 };
+    {% endfor %}
+#define PLIC_CONTEXT_BASE(hartid) plic_context_base[hartid]
+{% endif %}
 
-{% set driver_string = to_snakecase(riscv_plic0s[0].interrupts_extended[0].compatible[0]) %}
+{% set driver_string = to_snakecase(riscv_plic0.interrupts_extended[0].compatible[0]) %}
 {% include 'interrupt_dispatch.h.j2' %}
 
 {% endif %}

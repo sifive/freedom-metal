@@ -113,21 +113,6 @@ riscv_cpu_intc_get_privilege(struct metal_interrupt controller) {
     return METAL_INTR_PRIV_M_MODE;
 }
 
-int riscv_cpu_intc_clear(struct metal_interrupt controller,
-                                        int id) {
-    /* The hart-local interrupt controller can't clear any of the interrupts
-     * it controls. To clear the machine software interrupt, use
-     * metal_cpu_clear_ipi() */
-    return -1;
-}
-
-int riscv_cpu_intc_set(struct metal_interrupt controller, int id) {
-    /* The hart-local interrupt controller can't trigger any of the interrupts
-     * it controls. To set the machine software interrupt, use
-     * metal_cpu_set_ipi() */
-    return -1;
-}
-
 int riscv_cpu_intc_enable(
     struct metal_interrupt controller, int id) {
 

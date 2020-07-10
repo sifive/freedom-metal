@@ -123,23 +123,6 @@ metal_intr_priv_mode
 metal_interrupt_get_privilege(struct metal_interrupt controller);
 
 /*!
- * @brief clear an interrupt
- * @param controller The handle for the interrupt controller
- * @param id The interrupt ID to trigger
- * @return 0 upon success
- */
-int metal_interrupt_clear(struct metal_interrupt controller,
-                          int id);
-
-/*!
- * @brief Set an interrupt
- * @param controller The handle for the interrupt controller
- * @param id The interrupt ID to trigger
- * @return 0 upon success
- */
-int metal_interrupt_set(struct metal_interrupt controller, int id);
-
-/*!
  * @brief Enable an interrupt
  * @param controller The handle for the interrupt controller
  * @param id The interrupt ID to enable

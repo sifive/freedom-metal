@@ -73,15 +73,6 @@ int riscv_cpu_intc_clear(struct metal_interrupt controller,
 
 int riscv_cpu_intc_set(struct metal_interrupt controller, int id);
 
-int
-riscv_cpu_intc_register_handler(struct metal_interrupt controller, int id,
-                                               metal_interrupt_handler_t handler,
-                                               void *priv_data);
-
-int riscv_cpu_intc_register_vector_handler(
-    struct metal_interrupt controller, int id,
-    metal_interrupt_vector_handler_t handler, void *priv_data);
-
 int riscv_cpu_intc_enable(struct metal_interrupt controller, int id);
 
 int riscv_cpu_intc_disable(struct metal_interrupt controller, int id);
