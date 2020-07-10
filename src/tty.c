@@ -50,7 +50,7 @@ int nop_putc(int c) {
     // truly in a0, for easier post-processing, and so there is a single
     // 32-bit opcode to match against.
     // So explicitly ensure that the argument is placed into a0 first.
-    __asm__ volatile("mv a0, %0; slli x0,a0,0x11" :: "r"(c));
+    __asm__ volatile("mv a0, %0; slli x0,a0,0x11" ::"r"(c));
     return -1;
 }
 int metal_tty_putc(int c) __attribute__((weak, alias("nop_putc")));
