@@ -15,78 +15,6 @@
 
 static bool init_done[__METAL_DT_NUM_HARTS] = { false };
 
-/* MIE CSR Manipulation */
-
-static void __metal_interrupt_global_enable(void) {
-    uintptr_t m;
-    __asm__ volatile("csrrs %0, mstatus, %1"
-                     : "=r"(m)
-                     : "r"(METAL_MIE_INTERRUPT));
-}
-
-static void __metal_interrupt_global_disable(void) {
-    uintptr_t m;
-    __asm__ volatile("csrrc %0, mstatus, %1"
-                     : "=r"(m)
-                     : "r"(METAL_MIE_INTERRUPT));
-}
-
-static void __metal_interrupt_software_enable(void) {
-    uintptr_t m;
-    __asm__ volatile("csrrs %0, mie, %1"
-                     : "=r"(m)
-                     : "r"(METAL_LOCAL_INTERRUPT_SW));
-}
-
-static void __metal_interrupt_software_disable(void) {
-    uintptr_t m;
-    __asm__ volatile("csrrc %0, mie, %1"
-                     : "=r"(m)
-                     : "r"(METAL_LOCAL_INTERRUPT_SW));
-}
-
-static void __metal_interrupt_timer_enable(void) {
-    uintptr_t m;
-    __asm__ volatile("csrrs %0, mie, %1"
-                     : "=r"(m)
-                     : "r"(METAL_LOCAL_INTERRUPT_TMR));
-}
-
-static void __metal_interrupt_timer_disable(void) {
-    uintptr_t m;
-    __asm__ volatile("csrrc %0, mie, %1"
-                     : "=r"(m)
-                     : "r"(METAL_LOCAL_INTERRUPT_TMR));
-}
-
-static void __metal_interrupt_external_enable(void) {
-    uintptr_t m;
-    __asm__ volatile("csrrs %0, mie, %1"
-                     : "=r"(m)
-                     : "r"(METAL_LOCAL_INTERRUPT_EXT));
-}
-
-static void __metal_interrupt_external_disable(void) {
-    unsigned long m;
-    __asm__ volatile("csrrc %0, mie, %1"
-                     : "=r"(m)
-                     : "r"(METAL_LOCAL_INTERRUPT_EXT));
-}
-
-static void __metal_interrupt_local_enable(int id) {
-    uintptr_t b = 1 << id;
-    uintptr_t m;
-    __asm__ volatile("csrrs %0, mie, %1" : "=r"(m) : "r"(b));
-}
-
-static void __metal_interrupt_local_disable(int id) {
-    uintptr_t b = 1 << id;
-    uintptr_t m;
-    __asm__ volatile("csrrc %0, mie, %1" : "=r"(m) : "r"(b));
-}
-
-/* Default handlers */
-
 void __metal_exception_handler(void) __attribute__((interrupt, aligned(128)));
 void __metal_exception_handler(void) {
     uint32_t hartid = metal_cpu_get_current_hartid();
@@ -104,8 +32,6 @@ void __metal_exception_handler(void) {
         __metal_exception_table[id](metal_cpu_get(hartid), id);
     }
 }
-
-/* Interrupt API */
 
 extern void early_trap_vector(void);
 
@@ -209,18 +135,20 @@ int __metal_driver_riscv_cpu_intc_set(struct metal_interrupt controller, int id)
 
 int __metal_driver_riscv_cpu_intc_enable(
     struct metal_interrupt controller, int id) {
+
+    if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
+        return -1;
+    }
+
     switch (id) {
-    case METAL_INTERRUPT_ID_BASE:
-        __metal_interrupt_global_enable();
-        break;
     case METAL_INTERRUPT_ID_SW:
-        __metal_interrupt_software_enable();
+        __asm__ volatile("csrs mie, %0" :: "r"(METAL_MIE_MSIE));
         break;
     case METAL_INTERRUPT_ID_TMR:
-        __metal_interrupt_timer_enable();
+        __asm__ volatile("csrs mie, %0" :: "r"(METAL_MIE_MTIE));
         break;
     case METAL_INTERRUPT_ID_EXT:
-        __metal_interrupt_external_enable();
+        __asm__ volatile("csrs mie, %0" :: "r"(METAL_MIE_MEIE));
         break;
     case METAL_INTERRUPT_ID_LC0:
     case METAL_INTERRUPT_ID_LC1:
@@ -238,7 +166,7 @@ int __metal_driver_riscv_cpu_intc_enable(
     case METAL_INTERRUPT_ID_LC13:
     case METAL_INTERRUPT_ID_LC14:
     case METAL_INTERRUPT_ID_LC15:
-        __metal_interrupt_local_enable(id);
+        __asm__ volatile("csrs mie, %0" :: "r"(1 << id));
         break;
     default:
         return -1;
@@ -248,18 +176,20 @@ int __metal_driver_riscv_cpu_intc_enable(
 
 int __metal_driver_riscv_cpu_intc_interrupt_disable(
     struct metal_interrupt controller, int id) {
+
+    if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
+        return -1;
+    }
+
     switch (id) {
-    case METAL_INTERRUPT_ID_BASE:
-        __metal_interrupt_global_disable();
-        break;
     case METAL_INTERRUPT_ID_SW:
-        __metal_interrupt_software_disable();
+        __asm__ volatile("csrc mie, %0" :: "r"(METAL_MIE_MSIE));
         break;
     case METAL_INTERRUPT_ID_TMR:
-        __metal_interrupt_timer_disable();
+        __asm__ volatile("csrc mie, %0" :: "r"(METAL_MIE_MTIE));
         break;
     case METAL_INTERRUPT_ID_EXT:
-        __metal_interrupt_external_disable();
+        __asm__ volatile("csrc mie, %0" :: "r"(METAL_MIE_MEIE));
         break;
     case METAL_INTERRUPT_ID_LC0:
     case METAL_INTERRUPT_ID_LC1:
@@ -277,8 +207,7 @@ int __metal_driver_riscv_cpu_intc_interrupt_disable(
     case METAL_INTERRUPT_ID_LC13:
     case METAL_INTERRUPT_ID_LC14:
     case METAL_INTERRUPT_ID_LC15:
-        __metal_interrupt_local_disable(id);
-        break;
+        __asm__ volatile("csrc mie, %0" :: "r"(1 << id));
     default:
         return -1;
     }

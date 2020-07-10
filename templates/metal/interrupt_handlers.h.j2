@@ -7,6 +7,20 @@
 #include <metal/cpu.h>
 #include <metal/interrupt.h>
 
+{% if harts|length > 1 and 'mmu_type' in harts[1] %}
+#define __METAL_NUM_EXCEPTIONS 16
+{% elif 'mmu_type' in harts[0] %}
+#define __METAL_NUM_EXCEPTIONS 16
+{% else %}
+#define __METAL_NUM_EXCEPTIONS 12
+{% endif %}
+
+{% if local_interrupts is defined %}
+#define __METAL_NUM_LOCAL_INTERRUPTS {{ 16 + local_interrupts.irqs|length }}
+{% else %}
+#define __METAL_NUM_LOCAL_INTERRUPTS 16
+{% endif %}
+
 /*!
  * @brief Function signature for interrupt callback handlers
  */
@@ -19,8 +33,8 @@ typedef void (*metal_interrupt_vector_handler_t)(void);
 typedef void (*metal_exception_handler_t)(struct metal_cpu cpu, int ecode);
 
 
-const metal_exception_handler_t __metal_exception_table[12];
-const metal_interrupt_vector_handler_t __metal_local_interrupt_table[32];
+const metal_exception_handler_t __metal_exception_table[__METAL_NUM_EXCEPTIONS];
+const metal_interrupt_vector_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_INTERRUPTS];
 
 void __metal_exception_handler();
 
@@ -36,6 +50,9 @@ void metal_exception_ecall_from_u_mode_handler(struct metal_cpu cpu, int ecode);
 void metal_exception_ecall_from_s_mode_handler(struct metal_cpu cpu, int ecode);
 void metal_exception_default_handler(struct metal_cpu cpu, int ecode);
 void metal_exception_ecall_from_m_mode_handler(struct metal_cpu cpu, int ecode);
+void metal_exception_instruction_page_fault(struct metal_cpu cpu, int ecode);
+void metal_exception_load_page_fault(struct metal_cpu cpu, int ecode);
+void metal_exception_store_amo_page_fault(struct metal_cpu cpu, int ecode);
 
 #ifdef METAL_HLIC_VECTORED
 void metal_riscv_cpu_intc_default_handler() __attribute__((interrupt));

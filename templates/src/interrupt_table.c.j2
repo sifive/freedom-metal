@@ -3,7 +3,7 @@
 
 #include <metal/interrupt_handlers.h>
 
-const metal_exception_handler_t __metal_exception_table[12] = {
+const metal_exception_handler_t __metal_exception_table[__METAL_NUM_EXCEPTIONS] = {
     metal_exception_instruction_address_misaligned_handler,
     metal_exception_instruction_address_fault_handler,
     metal_exception_illegal_instruction_handler,
@@ -16,13 +16,13 @@ const metal_exception_handler_t __metal_exception_table[12] = {
     metal_exception_ecall_from_s_mode_handler,
     metal_exception_default_handler,
     metal_exception_ecall_from_m_mode_handler,
+#if __METAL_NUM_EXCEPTIONS > 12
+    metal_exception_instruction_page_fault,
+    metal_exception_load_page_fault,
+    metal_exception_default_handler,
+    metal_exception_store_amo_page_fault,
+#endif
 };
-
-{% if local_interrupts is defined %}
-#define __METAL_NUM_LOCAL_INTERRUPTS {{ 16 + local_interrupts.irqs|length }}
-{% else %}
-#define __METAL_NUM_LOCAL_INTERRUPTS 16
-{% endif %}
 
 const metal_interrupt_vector_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_INTERRUPTS] = {
     metal_riscv_cpu_intc_default_handler,
