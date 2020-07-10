@@ -25,23 +25,26 @@ const metal_exception_handler_t __metal_exception_table[__METAL_NUM_EXCEPTIONS] 
 };
 
 const metal_interrupt_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_INTERRUPTS] = {
-    metal_riscv_cpu_intc_default_handler,
-    metal_riscv_cpu_intc_default_handler,
-    metal_riscv_cpu_intc_default_handler,
+    metal_riscv_cpu_intc_usip_handler,
+    metal_riscv_cpu_intc_ssip_handler,
+    metal_riscv_cpu_intc_default_handler, /* reserved */
     metal_riscv_cpu_intc_msip_handler,
-    metal_riscv_cpu_intc_default_handler,
-    metal_riscv_cpu_intc_default_handler,
-    metal_riscv_cpu_intc_default_handler,
+    metal_riscv_cpu_intc_utip_handler,
+    metal_riscv_cpu_intc_stip_handler,
+    metal_riscv_cpu_intc_default_handler, /* reserved */
     metal_riscv_cpu_intc_mtip_handler,
+    metal_riscv_cpu_intc_ueip_handler,
+    metal_riscv_cpu_intc_seip_handler,
+    metal_riscv_cpu_intc_default_handler, /* reserved */
 {% if global_interrupts is defined %}
     metal_riscv_plic0_source_0_handler,
 {% else %}
     metal_riscv_cpu_intc_meip_handler,
 {% endif %}
-    metal_riscv_cpu_intc_default_handler,
-    metal_riscv_cpu_intc_default_handler,
-    metal_riscv_cpu_intc_default_handler,
-    metal_riscv_cpu_intc_default_handler,
+    metal_riscv_cpu_intc_default_handler, /* reserved */
+    metal_riscv_cpu_intc_default_handler, /* reserved */
+    metal_riscv_cpu_intc_default_handler, /* reserved */
+    metal_riscv_cpu_intc_default_handler, /* reserved */
 {% if local_interrupts is defined %}
 {% for irq in local_interrupts.irqs %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
@@ -50,16 +53,9 @@ const metal_interrupt_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_
 };
 
 {% if global_interrupts is defined %}
-#define __METAL_NUM_GLOBAL_INTERRUPTS {{ global_interrupts.irqs|length }}
-
 const metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBAL_INTERRUPTS] = {
 {% for irq in global_interrupts.irqs %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
 {% endfor %}
 };
-
-{% else %}
-
-#define __METAL_NUM_GLOBAL_INTERRUPTS 0
-
 {% endif %}

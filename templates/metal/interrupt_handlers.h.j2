@@ -21,6 +21,12 @@
 #define __METAL_NUM_LOCAL_INTERRUPTS 16
 {% endif %}
 
+{% if global_interrupts is defined %}
+#define __METAL_NUM_GLOBAL_INTERRUPTS {{ global_interrupts.irqs|length }}
+{% else %}
+#define __METAL_NUM_GLOBAL_INTERRUPTS 0
+{% endif %}
+
 /*!
  * @brief Function signature for interrupt callback handlers
  */
@@ -55,8 +61,14 @@ void metal_exception_store_amo_page_fault(struct metal_cpu cpu, int ecode);
 
 #ifdef METAL_HLIC_VECTORED
 void metal_riscv_cpu_intc_default_handler() __attribute__((interrupt));
+void metal_riscv_cpu_intc_usip_handler() __attribute__((interrupt));
+void metal_riscv_cpu_intc_ssip_handler() __attribute__((interrupt));
 void metal_riscv_cpu_intc_msip_handler() __attribute__((interrupt));
+void metal_riscv_cpu_intc_utip_handler() __attribute__((interrupt));
+void metal_riscv_cpu_intc_stip_handler() __attribute__((interrupt));
 void metal_riscv_cpu_intc_mtip_handler() __attribute__((interrupt));
+void metal_riscv_cpu_intc_ueip_handler() __attribute__((interrupt));
+void metal_riscv_cpu_intc_seip_handler() __attribute__((interrupt));
 {% if global_interrupts is defined %}
 void metal_riscv_plic0_source_0_handler() __attribute__((interrupt));
 {% else %}
@@ -69,8 +81,14 @@ void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_
 {% endif %}
 #else
 void metal_riscv_cpu_intc_default_handler();
+void metal_riscv_cpu_intc_usip_handler();
+void metal_riscv_cpu_intc_ssip_handler();
 void metal_riscv_cpu_intc_msip_handler();
+void metal_riscv_cpu_intc_utip_handler();
+void metal_riscv_cpu_intc_stip_handler();
 void metal_riscv_cpu_intc_mtip_handler();
+void metal_riscv_cpu_intc_ueip_handler();
+void metal_riscv_cpu_intc_seip_handler();
 {% if global_interrupts is defined %}
 void metal_riscv_plic0_source_0_handler();
 {% else %}
