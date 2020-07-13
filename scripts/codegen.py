@@ -151,10 +151,13 @@ def node_to_dict(node, dts):
 
     return d
 
-def get_templates(template_paths):
+def get_templates(template_paths, strip_dir=True):
     templates = []
     for d in template_paths:
-        templates += [g.replace(d + "/", "") for g in glob.iglob("{}/**/*.j2".format(d), recursive=True)]
+        if strip_dir:
+            templates += [g.replace(d + "/", "") for g in glob.iglob("{}/**/*.j2".format(d), recursive=True)]
+        else:
+            templates += [g for g in glob.iglob("{}/**/*.j2".format(d), recursive=True)]
 
     return templates
 
@@ -173,6 +176,14 @@ def get_asm_sources(args):
     sources += [t.replace(".j2", "") for t in get_templates(args.template_paths) if ".S" in t]
 
     return sources
+
+def get_source_dirs(args):
+    dirs = []
+    for d in args.source_paths:
+        dirs += [os.path.join(d, 'src')]
+        for root, subdirs, files in os.walk(os.path.join(d, 'src')):
+            dirs += [os.path.join(root,d) for d in subdirs]
+    return dirs
 
 def render_templates(args, template_data):
     for template in get_templates(args.template_paths):
@@ -237,7 +248,8 @@ def main():
         'devicetree_path' : args.dts,
         'c_sources' : get_c_sources(args),
         'asm_sources' : get_asm_sources(args),
-        'templates' : get_templates(args.source_paths),
+        'source_dirs' : get_source_dirs(args),
+        'templates' : get_templates(args.source_paths, strip_dir=False),
         'source_paths' : args.source_paths,
     }
 
