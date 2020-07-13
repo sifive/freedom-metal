@@ -1,0 +1,8 @@
+METAL_C = {% for file in c_sources %} {{ file }} {% endfor %}
+
+METAL_S = {% for file in asm_sources %} {{ file }} {% endfor %}
+
+METAL_CFLAGS = {% for path in source_paths %} -I{{ path }} {% endfor %}
+
+METAL_MK_DEPEND = {{ devicetree_path }} {% for template in templates %} {{ template }} {% endfor %}
+
