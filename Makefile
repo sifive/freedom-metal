@@ -5,7 +5,7 @@ OUTPUT_DIR ?= build
 generate: virtualenv $(OUTPUT_DIR) scripts/codegen.py
 	. venv/bin/activate && python3 scripts/codegen.py \
 		--dts $(DEVICETREE) \
-		--template-path templates sifive-blocks/templates \
+		--source-paths . sifive-blocks \
 		--output-dir $(OUTPUT_DIR)
 
 $(OUTPUT_DIR):

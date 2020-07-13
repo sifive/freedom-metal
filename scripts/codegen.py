@@ -12,8 +12,9 @@ import sys
 import jinja2
 import pydevicetree
 
-DEFAULT_TEMPLATE_PATHS = [
-    "templates",
+DEFAULT_SOURCE_PATHS = [
+    ".",
+    "sifive-blocks",
 ]
 
 def parse_arguments(argv):
@@ -27,12 +28,17 @@ def parse_arguments(argv):
             required=True,
             help="The path to the directory to output generated code")
 
-    arg_parser.add_argument("--template-paths",
+    arg_parser.add_argument("--source-paths",
             nargs='*',
-            default=DEFAULT_TEMPLATE_PATHS,
+            default=DEFAULT_SOURCE_PATHS,
             help="The paths to look for template")
 
-    return arg_parser.parse_args(argv)
+    args =  arg_parser.parse_args(argv)
+
+    args.template_paths = [ d + "/templates" for d in args.source_paths ]
+
+    return args
+
 
 def get_template(template, args):
     env = jinja2.Environment(
