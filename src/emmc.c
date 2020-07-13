@@ -4,7 +4,7 @@
 #include <metal/machine.h>
 #include <metal/emmc.h>
 
-extern inline int metal_emmc_boot(struct metal_emmc *emmc,eMMC_Parition_t partition,bool boot_ack,uint8_t *rx_data,uint8_t size);
+extern inline int metal_emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,uint32_t size);
 extern inline int metal_emmc_set_partition(struct metal_emmc *emmc,eMMC_Parition_t partition, eMMC_ParitionAccess_t access);
 extern inline int metal_emmc_get_partition(struct metal_emmc *emmc,eMMC_Parition_t *partition, eMMC_ParitionAccess_t *access);
 extern inline int metal_emmc_get_boot_partition_size(struct metal_emmc *emmc,uint32_t bootpartion,uint32_t *size);

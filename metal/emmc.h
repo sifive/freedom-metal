@@ -60,11 +60,10 @@ struct metal_emmc_vtable {
 
 	int (*set_partition)(struct metal_emmc *emmc,eMMC_Parition_t partition, eMMC_ParitionAccess_t access);
 	int (*get_partition)(struct metal_emmc *emmc,eMMC_Parition_t *partition, eMMC_ParitionAccess_t *access);
-	int (*boot)(struct metal_emmc *emmc,eMMC_Parition_t partition,bool boot_ack,uint8_t *rx_data,uint8_t size);
+	int (*boot)(struct metal_emmc *emmc,uint8_t *rx_data,uint32_t size);
 
 	int (*get_boot_partition_size)(struct metal_emmc *emmc,eMMC_Parition_t bootpartion,uint32_t *size);
 	int (*set_boot_write_protect)(struct metal_emmc *emmc,eMMC_Parition_t bootpartition,uint32_t wp);
-
 
 };
 
@@ -104,23 +103,23 @@ inline int metal_emmc_erase_block(struct metal_emmc *emmc, long int start_addr, 
 
 
 
-inline int metal_set_partition(struct metal_emmc *emmc,eMMC_Parition_t partition, eMMC_ParitionAccess_t access)
+inline int metal_emmc_set_partition(struct metal_emmc *emmc,eMMC_Parition_t partition, eMMC_ParitionAccess_t access)
 {
 
 	return emmc->vtable->set_partition(emmc,partition, access);
 
 }
 
-inline int metal_get_partition(struct metal_emmc *emmc,eMMC_Parition_t *partition, eMMC_ParitionAccess_t *access)
+inline int metal_emmc_get_partition(struct metal_emmc *emmc,eMMC_Parition_t *partition, eMMC_ParitionAccess_t *access)
 {
 
 	return emmc->vtable->get_partition(emmc,partition, access);
 }
 
 //for EMMC boot mode
-inline int metal_emmc_boot(struct metal_emmc *emmc,eMMC_Parition_t bootpartition,bool boot_ack,uint8_t *rx_data,uint8_t size)
+inline int metal_emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,uint32_t size)
 {
-	return emmc->vtable->boot(emmc,bootpartition,boot_ack,rx_data, size);
+	return emmc->vtable->boot(emmc,rx_data,size);
 }
 
 inline	int metal_emmc_get_boot_partition_size(struct metal_emmc *emmc,uint32_t bootpartion,uint32_t *size)
