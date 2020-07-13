@@ -12,3 +12,6 @@ METAL_CFLAGS = {% for path in source_paths %} -I{{ path }} {% endfor %}
 METAL_MK_DEPEND = \
 	{{ devicetree_path }} \
 	{{ templates|join('\\\n        ') }}
+
+
+METAL_SRC_PATH = {{ source_dirs|join(':') }}
