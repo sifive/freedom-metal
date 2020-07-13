@@ -29,6 +29,9 @@
 #define BOOT_PARTITION_1_ENABLE 3
 #define BOOT_PARTITION_ACCESS 0
 #define GO_PRE_IDLE_STATE 0xF0F0F0F0
+#define GO_IDLE_STATE 0x0
+
+
 #define BOOT_INITIATION 0xFFFFFFFA
 #define ERROR_STATUS_MASK 0xFFFF8000
 #define BIT_WIDTH_MASK 0x0F
@@ -323,18 +326,24 @@ static void process_databuffer_read(eMMCRequest_t* request)
 
 	request->dataRemaining -= data_tocopy;
 
-	uint8_t *tempdataptr=request->dataptr;
+	uint8_t *tempdataptr=request->dataptrpos;
+
 
 	while(data_tocopy > 0U) 
 	{
 		uint32_t data = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS08);
 		uint8_t byte_count = 4;
+	
+	//	data_tocopy-=4;	
+		
+
 		while(data_tocopy && byte_count) {
 			*((uint8_t*)tempdataptr) = data & 0xFF;
 			data >>= 8;
 			byte_count--;
 			data_tocopy--;
 			tempdataptr++;
+			request->dataptrpos++;
 		}
 	}
 }
@@ -556,6 +565,7 @@ static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 	long int arg;
 	uint32_t timeout=0;
 
+
 	arg = ((val << 8) | (index << 16) | (3 << 24));
 
 	//MMCRequest_t input_cmd;
@@ -590,7 +600,7 @@ static int  emmc_card_ext_csd_read(uint8_t *rx_data)
 
 	printf("Reading eMMC CSD EXT\n");
 
-	emmc_select_card(EMMC_RCA);
+	//emmc_select_card(EMMC_RCA);
 
 	input_cmd.cmd=EMMC_CMD8;
 	input_cmd.arg=0;
@@ -599,6 +609,7 @@ static int  emmc_card_ext_csd_read(uint8_t *rx_data)
 	input_cmd.data_direction=EMMC_TRANSFER_READ;
 
 	input_cmd.dataptr=rx_data;
+	input_cmd.dataptrpos=rx_data;
 	input_cmd.dataRemaining=512;
 	input_cmd.blockcnt=1;
 	input_cmd.blocklen=512;
@@ -609,10 +620,11 @@ static int  emmc_card_ext_csd_read(uint8_t *rx_data)
 	while( ((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
 	// wait for BRE(buffer read enable)
 
-	process_databuffer_read(&input_cmd);
 
 	do
 	{
+		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BRR) & 0x01) == 0 );
+		process_databuffer_read(&input_cmd);
 		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
 	} while ((status & (1 << TC)) == 0);
 
@@ -656,7 +668,7 @@ static void emmc_card_csd_read(uint8_t *rx_data)
 
 	printf("Reading eMMC CSD : CMD9\n");
 
-	emmc_select_card(0);
+	emmc_select_card(EMMC_RCA);
 
 	input_cmd.cmd=EMMC_CMD9;
 	input_cmd.arg=EMMC_RCA<<16;
@@ -796,6 +808,8 @@ static int emmc_set_bootpartition_access(eMMC_Parition_t partitionen,eMMC_Pariti
 	uint8_t PartConfigEn=0;
 	int retval=0;
 
+	emmc_select_card(EMMC_RCA);
+
 	switch(partitionen) {
 		case EMMC_PAR_NONE:
 			PartConfigEn = MMC_EXCSD_BOOTPART_CFG_BOOT_DISABLE;
@@ -815,21 +829,28 @@ static int emmc_set_bootpartition_access(eMMC_Parition_t partitionen,eMMC_Pariti
 
 	PartConfigAccess=access;
 	
-	uint8_t ByteNew = ((boot_ack&1)<<6)| ((PartConfigEn&7UL)<<3)| (PartConfigAccess&7UL) ;
+	uint8_t ByteNew = ((boot_ack&1)<<6)| (PartConfigEn)| (PartConfigAccess&7UL) ;
 
 	retval=emmc_card_ext_csd_write(MMC_EXCSD_BOOT_PART_CONFIG,ByteNew);	// Boot partition 1 enable
 
+	emmc_select_card(0);
 	return retval;
 }
 
 static int emmc_get_partition_access(eMMC_Parition_t *partition,eMMC_ParitionAccess_t *access)
 {
 	int retval=0;
+	
+	emmc_select_card(EMMC_RCA);
+
 
 	retval=emmc_card_ext_csd_read((uint8_t*)g_data_buffer);
 
+
+//	printf("########### BYTE 177 %d\n",GET_BYTE_FROM_BUFFER(g_data_buffer,177));
 	uint8_t bootcfg=GET_BYTE_FROM_BUFFER(g_data_buffer,MMC_EXCSD_BOOT_PART_CONFIG);//179
 
+	
 	uint8_t boot_partition_en=((bootcfg>>3)&0x7);	
 	uint8_t boot_partition_access=(bootcfg&0x7);	
 
@@ -852,27 +873,26 @@ static int emmc_get_partition_access(eMMC_Parition_t *partition,eMMC_ParitionAcc
 
 	*access=(eMMC_ParitionAccess_t)boot_partition_access;
 
+	emmc_select_card(0);
 	return retval;
 }
 
 
 
 
-int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,eMMC_Parition_t bootpartion,bool bootack,uint8_t *rx_data,uint8_t size)
+int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,uint32_t size)
 {
+
 	int retval=0;
+	unsigned int status=0;
 	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
-
-	//return of partiton size
-	//int BootSize =  128U * 1024U * GET_BYTE_FROM_BUFFER(g_data_buffer,MMC_EXCSD_BOOT_SIZE_MULTI);
-
 
 	input_cmd.cmd=EMMC_CMD0;
 	input_cmd.arg=GO_PRE_IDLE_STATE;
 	input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
 	input_cmd.data_present=0;
-
 	retval=emmc_host_send_cmd(&input_cmd);// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), GO_PRE_IDLE_STATE);	// pre-idle state
+
 	if(retval==0)
 	{
 		input_cmd.cmd=EMMC_CMD0;
@@ -880,13 +900,41 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,eMMC_Parition_t b
 		input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
 		input_cmd.data_present=1;
 		input_cmd.data_direction=EMMC_TRANSFER_READ;
-		input_cmd.dataRemaining=DEVICE_BLOCK_SIZE;
+		input_cmd.dataRemaining=size;
 		input_cmd.blockcnt=size/DEVICE_BLOCK_SIZE;
 		input_cmd.blocklen=DEVICE_BLOCK_SIZE;
+		input_cmd.dataptr=rx_data;
+		input_cmd.dataptrpos=rx_data;
 
 		// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), BOOT_INITIATION);	// initiate alternative boot operational
 		retval=emmc_host_send_cmd(&input_cmd);
+
+		// wait for BRE(buffer read enable)
+
+		while( ((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
+
+
+
+		for(int i=0;i<3;i++)
+		{
+		
+			while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BRR) & 0x01) == 0 );
+			process_databuffer_read(&input_cmd);
+		}
+/*
+		do
+		{
+		//	while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BRR) & 0x01) == 0 );
+			process_databuffer_read(&input_cmd);
+			status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+			printf("status %x\n",status);
+		} while ((status & (1 << TC)) == 0);
+*/
+
+
 	}
+
+
 	return retval;
 }
 
@@ -898,18 +946,25 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
 
 	emmc->deviceblocklen=DEVICE_BLOCK_SIZE;
-	
+
 	emmc_host_initialization();
 
 	retval=emmc_card_init(1);
 
-#if 0	
+	/*
+	   input_cmd.cmd=EMMC_CMD0;
+	   input_cmd.arg=GO_IDLE_STATE;
+	   input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
+	   input_cmd.data_present=0;
+	   retval=emmc_host_send_cmd(&input_cmd);	//idle state
+	   */
+#if 0
 	//TO Be Remvoed
 	for(int i=0;i<128;i++)
 		g_data_buffer[i]=0;
 
 	emmc_card_csd_read((uint8_t*)g_data_buffer);
-	printf("CSD %x %x %x %x\n",datag[0],datag[1],datag[2],datag[3]) ;
+	printf("CSD %x %x %x %x\n",g_data_buffer[0],g_data_buffer[1],g_data_buffer[2],g_data_buffer[3]) ;
 
 
 	//	emmc_host_set_bit_width(METAL_EMMC_BIT_WIDTH);
@@ -923,14 +978,9 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 		g_data_buffer[i]=0;
 
 	for(int i=0;i<128;i=i+4)
-		printf("CSD_EXT %x %x %x %x\n",datag[i],datag[i+1],datag[i+2],datag[i+3]) ;
+		printf("CSD_EXT %x %x %x %x\n",g_data_buffer[i],g_data_buffer[i+1],g_data_buffer[i+2],g_data_buffer[i+3]) ;
 #endif
 
-	input_cmd.cmd=EMMC_CMD0;
-	input_cmd.arg=GO_PRE_IDLE_STATE;
-	input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
-	input_cmd.data_present=0;
-	retval=emmc_host_send_cmd(&input_cmd);// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), GO_PRE_IDLE_STATE);	// pre-idle state
 	return retval;
 }
 
@@ -1063,7 +1113,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 
 int __metal_driver_sifive_nb2emmc_set_partition(struct metal_emmc *emmc,eMMC_Parition_t partition, eMMC_ParitionAccess_t access)
 {
-       return  emmc_set_bootpartition_access(partition,access,false);
+	return  emmc_set_bootpartition_access(partition,access,false);
 }
 
 int __metal_driver_sifive_nb2emmc_get_partition(struct metal_emmc *emmc,eMMC_Parition_t *partition, eMMC_ParitionAccess_t *access)

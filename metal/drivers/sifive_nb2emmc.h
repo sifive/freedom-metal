@@ -166,6 +166,7 @@ typedef struct eMMCRequest
     unsigned int dataRemaining;
 
     unsigned char  *dataptr;
+    unsigned char  *dataptrpos;
 
 
 }eMMCRequest_t;
