@@ -1,8 +1,14 @@
-METAL_C = {% for file in c_sources %} {{ file }} {% endfor %}
+METAL_C = \
+        {{ c_sources|join('\\\n        ') }}
 
-METAL_S = {% for file in asm_sources %} {{ file }} {% endfor %}
+
+METAL_S = \
+	{{ asm_sources|join('\\\n        ') }}
+
 
 METAL_CFLAGS = {% for path in source_paths %} -I{{ path }} {% endfor %}
 
-METAL_MK_DEPEND = {{ devicetree_path }} {% for template in templates %} {{ template }} {% endfor %}
 
+METAL_MK_DEPEND = \
+	{{ devicetree_path }} \
+	{{ templates|join('\\\n        ') }}
