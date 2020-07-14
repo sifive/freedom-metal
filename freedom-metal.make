@@ -56,20 +56,20 @@ endif
 quiet ?= $($1)
 
 .c.o:
-	$(call quiet,CC) -c $(CFLAGS) -o $@ $<
+	@mkdir -p .deps
+	$(call quiet,CC) -c $(CFLAGS) -o $@ -MT $@ -MF .deps/$*.Po -MP -MD $<
 
 .S.o:
-	$(call quiet,CC) -c $(CFLAGS) -o $@ $<
+	@mkdir -p .deps
+	$(call quiet,CC) -c $(CFLAGS) -o $@ -MT $@ -MF .deps/$*.Po -MP -MD $<
 endif
 
 $(PROGRAM): $(OBJ) $(LDSCRIPT)
 	$(CC) $(CFLAGS) -o $@ $(OBJ) -Wl,-Map=$(PROGRAM).map $(LIBS)
 
-$(OBJ): $(HDR) 
-
 clean::
 	rm -f $(PROGRAM) $(PROGRAM).map *.o
-	rm -rf metal
+	rm -rf metal .deps
 
 echo::
 	echo $(OBJ)

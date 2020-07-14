@@ -45,11 +45,15 @@ def get_template(template, args):
             loader=jinja2.ChoiceLoader([jinja2.FileSystemLoader(d) for d in args.template_paths]),
             trim_blocks=True, lstrip_blocks=True)
     env.globals['to_snakecase'] = to_snakecase
+    env.filters['rootname'] = rootname
 
     return env.get_template(template)
 
 def to_snakecase(s):
     return s.lower().replace(',', '_').replace('-', '_')
+
+def rootname(path):
+    return os.path.splitext(os.path.basename(path))[0]
 
 driver_ids = dict()
 

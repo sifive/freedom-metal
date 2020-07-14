@@ -15,3 +15,11 @@ METAL_MK_DEPEND = \
 
 
 METAL_SRC_PATH = {{ source_dirs|join(':') }}
+
+{% for c in c_sources %}
+-include .deps/{{ c|rootname() }}.Po
+{% endfor %}
+
+{% for s in asm_sources %}
+-include .deps/{{ s|rootname() }}.Po
+{% endfor %}
