@@ -8,7 +8,7 @@
 #include <metal/cpu.h>
 #include <metal/io.h>
 
-#define CLINT_REGW(offset) __METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_RISCV_CLINT0_0_BASE_ADDR + (offset)))
+#define CLINT_REGW(offset) __METAL_ACCESS_ONCE((__metal_io_u32 *)(uintptr_t)(METAL_RISCV_CLINT0_0_BASE_ADDR + (offset)))
 
 int metal_cpu_clear_ipi(struct metal_cpu cpu) {
     CLINT_REGW(METAL_RISCV_CLINT0_MSIP_BASE + (4 * cpu.__hartid)) = 0;
