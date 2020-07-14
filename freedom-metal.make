@@ -30,6 +30,18 @@ include metal/settings.mk
 
 CC = riscv64-unknown-elf-gcc
 
+ifeq ($(LDSCRIPT),)
+ifeq ($(LAYOUT),)
+LAYOUT = default
+endif
+ifeq ($(LAYOUT),default)
+LDSCRIPT_OPTION =
+else
+LDSCRIPT_OPTION = --$(LAYOUT)
+endif
+LDSCRIPT = metal.$(LAYOUT).lds
+endif
+
 LDSCRIPT ?= metal.default.lds
 
 LDFLAGS = -nostartfiles -T$(LDSCRIPT)
@@ -83,8 +95,11 @@ metal/settings.mk: $(DEVICETREE)
 	mkdir -p metal
 	python3 $(ESDK_SETTINGS_GENERATOR)/generate_settings.py -t rtl -d $(DEVICETREE) -o $@
 
+ifneq ($(LAYOUT),)
+
 LDSCRIPT_GENERATOR ?= $(FREEDOM_METAL)/../scripts/ldscript-generator/generate_ldscript.py
 
 $(LDSCRIPT): $(DEVICETREE)
-	$(LDSCRIPT_GENERATOR) -d $(DEVICETREE) -o $@
+	$(LDSCRIPT_GENERATOR) $(LDSCRIPT_OPTION) -d $(DEVICETREE) -o $@
+endif
 
