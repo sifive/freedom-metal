@@ -7,7 +7,11 @@
 {% if 'sifive,test0' in devices %}
 {% set sifive_test0s = devices['sifive,test0'] %}
 
+{% if "reg_names" in sifive_test0s[0] %}
 #define METAL_SIFIVE_TEST0_0_BASE_ADDR {{ '0x%x' % sifive_test0s[0].regs_by_name["control"][0] }}
+{% else %}
+#define METAL_SIFIVE_TEST0_0_BASE_ADDR {{ '0x%x' % sifive_test0s[0].reg[0][0] }}
+{% endif %}
 
 #define __METAL_HAS_SHUTDOWN
 
