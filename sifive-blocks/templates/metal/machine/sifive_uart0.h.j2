@@ -8,7 +8,11 @@
 {% set sifive_uart0s = devices['sifive,uart0'] %}
 
 {% for uart in sifive_uart0s %}
+    {% if uart.reg_names is defined %}
 #define METAL_SIFIVE_UART0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % uart.regs_by_name["control"][0] }}
+    {% else %}
+#define METAL_SIFIVE_UART0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % uart.reg[0][0] }}
+    {% endif %}
 {% endfor %}
 
 #define METAL_SIFIVE_UART0

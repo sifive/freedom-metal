@@ -159,16 +159,19 @@ def node_to_dict(node, dts):
         key = to_snakecase(prop.name)
 
         values = []
-        if key == "reg" and is_reference(prop.values[0]):
-            # When the reg property looks like
-            #  reg = <&aon 0x70 &aon 0x73>;
-            # The pairs of Node References and offsets means
-            #  1. Look up the control registers of the referenced node
-            #  2. Add the offset to the base address
-            references = prop.values[0::2] # [&aon, &aon]
-            offsets = prop.values[1::2]    # [0x70, 0x7C]
-            for ref, offset in zip(references, offsets):
-                values.append([dts.get_by_reference(ref).get_reg()[0][0] + offset, 0])
+        if key == "reg":
+            if is_reference(prop.values[0]):
+                # When the reg property looks like
+                #  reg = <&aon 0x70 &aon 0x73>;
+                # The pairs of Node References and offsets means
+                #  1. Look up the control registers of the referenced node
+                #  2. Add the offset to the base address
+                references = prop.values[0::2] # [&aon, &aon]
+                offsets = prop.values[1::2]    # [0x70, 0x7C]
+                for ref, offset in zip(references, offsets):
+                    values.append([dts.get_by_reference(ref).get_reg()[0][0] + offset, 0])
+            else:
+                values = node.get_reg()
         else:
             for value in prop.values:
                 if is_reference(value):
