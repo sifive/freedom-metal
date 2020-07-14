@@ -3,6 +3,8 @@
 
 .DEFAULT_GOAL = $(PROGRAM)
 
+RISCV_LIBC ?= picolibc
+
 ifeq ($(RISCV_LIBC),picolibc)
 include $(FREEDOM_METAL)/metal_pico.make
 endif
