@@ -55,6 +55,20 @@ def to_snakecase(s):
 def rootname(path):
     return os.path.splitext(os.path.basename(path))[0]
 
+def unique_irqs(irqs):
+    """
+    Takes a dictionary containing the list of interrupt lines and filters them to just
+    the unique interrupt sources.
+
+    This function is made available to the template environment so that interrupt handler
+    declarations and definitions aren't repeated when multiple instances of a single IP block exist.
+    """
+    filtered_irqs = []
+    for irq in irqs:
+        if all([irq['source'] != i['source'] for i in filtered_irqs]):
+            filtered_irqs.append(irq)
+    return filtered_irqs
+
 driver_ids = dict()
 
 def assign_ids(dts, devices):
@@ -278,4 +292,5 @@ def main():
     render_templates(args, template_data)
 
 if __name__ == "__main__":
+    jinja2.filters.FILTERS['unique_irqs'] = unique_irqs
     main()
