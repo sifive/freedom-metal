@@ -11,6 +11,16 @@ ifeq ($(RISCV_LIBC),nano)
 include $(FREEDOM_METAL)/metal_nano.make
 endif
 
+ifeq ($(CONFIGURATION),release)
+OPT ?= -Os -g
+else
+OPT ?= -O0 -g
+endif
+
+ifneq ($(TARGET),)
+DEVICETREE = ../../bsp/$(TARGET)/design.dts
+endif
+
 include metal/metal.mk
 
 vpath %.S metal/src:$(METAL_SRC_PATH):$(METAL_HELPER_VPATH)
@@ -25,8 +35,6 @@ LDSCRIPT ?= metal.default.lds
 LDFLAGS = -nostartfiles -T$(LDSCRIPT)
 
 ABIFLAGS = -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -mcmodel=$(RISCV_CMODEL) -msave-restore
-
-OPT ?= -Os -g
 
 CFLAGS = -DMTIME_RATE_HZ_DEF=32768 --specs=$(RISCV_LIBC).specs -fno-common -ffunction-sections -fdata-sections $(OPT) $(ABIFLAGS) $(LDFLAGS) $(SOURCE_CFLAGS) $(FEATURE_DEFINES) -Imetal $(METAL_CFLAGS)
 LIBS = $(SOURCE_LIBS)
