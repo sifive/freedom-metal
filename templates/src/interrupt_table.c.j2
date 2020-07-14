@@ -17,10 +17,10 @@ const metal_exception_handler_t __metal_exception_table[__METAL_NUM_EXCEPTIONS] 
     metal_exception_default_handler,
     metal_exception_ecall_from_m_mode_handler,
 #if __METAL_NUM_EXCEPTIONS > 12
-    metal_exception_instruction_page_fault,
-    metal_exception_load_page_fault,
+    metal_exception_instruction_page_fault_handler,
+    metal_exception_load_page_fault_handler,
     metal_exception_default_handler,
-    metal_exception_store_amo_page_fault,
+    metal_exception_store_amo_page_fault_handler,
 #endif
 };
 
