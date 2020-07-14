@@ -59,13 +59,17 @@ void metal_riscv_cpu_intc_meip_handler() __attribute__((interrupt, weak, alias("
 {% endif %}
 {% if local_interrupts is defined %}
     {% for irq in local_interrupts.irqs|unique_irqs %}
+        {% if irq.source.compatible != None %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((interrupt, weak, alias ("_metal_local_interrupt_handler_nop")));
+        {% endif %}
     {% endfor %}
 {% endif %}
 
 /* Alias default global interrupt handlers to _metal_global_interrupt_handler_nop() */
 {% if global_interrupts is defined %}
     {% for irq in global_interrupts.irqs|unique_irqs %}
+        {% if irq.source.compatible != None %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((weak, alias ("_metal_global_interrupt_handler_nop")));
+        {% endif %}
     {% endfor %}
 {% endif %}

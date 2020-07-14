@@ -74,9 +74,11 @@ void metal_riscv_plic0_source_0_handler() __attribute__((interrupt));
 void metal_riscv_cpu_intc_meip_handler() __attribute__((interrupt));
 {% endif %}
 {% if local_interrupts is defined %}
-{% for irq in local_interrupts.irqs|unique_irqs %}
+    {% for irq in local_interrupts.irqs|unique_irqs %}
+        {% if irq.source.compatible != None %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((interrupt));
-{% endfor %}
+        {% endif %}
+    {% endfor %}
 {% endif %}
 #else
 void metal_riscv_cpu_intc_default_handler();
@@ -94,16 +96,20 @@ void metal_riscv_plic0_source_0_handler();
 void metal_riscv_cpu_intc_meip_handler();
 {% endif %}
 {% if local_interrupts is defined %}
-{% for irq in local_interrupts.irqs|unique_irqs %}
+    {% for irq in local_interrupts.irqs|unique_irqs %}
+        {% if irq.source.compatible != None %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler();
-{% endfor %}
+        {% endif %}
+    {% endfor %}
 {% endif %}
 #endif
 
 {% if global_interrupts is defined %}
-{% for irq in global_interrupts.irqs|unique_irqs %}
+    {% for irq in global_interrupts.irqs|unique_irqs %}
+        {% if irq.source.compatible != None %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler();
-{% endfor %}
+        {% endif %}
+    {% endfor %}
 {% endif %}
 
 #endif 

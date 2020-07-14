@@ -47,7 +47,11 @@ const metal_interrupt_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_
     metal_riscv_cpu_intc_default_handler, /* reserved */
 {% if local_interrupts is defined %}
 {% for irq in local_interrupts.irqs %}
+    {% if irq.source.compatible != None %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
+    {% else %}
+    metal_riscv_cpu_intc_default_handler, /* IRQ source has no compatible string */
+    {% endif %}
 {% endfor %}
 {% endif %}
 };
@@ -55,7 +59,11 @@ const metal_interrupt_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_
 {% if global_interrupts is defined %}
 const metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBAL_INTERRUPTS] = {
 {% for irq in global_interrupts.irqs %}
+    {% if irq.source.compatible != None %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
+    {% else %}
+    metal_riscv_cpu_intc_default_handler, /* IRQ source has no compatible string */
+    {% endif %}
 {% endfor %}
 };
 {% endif %}
