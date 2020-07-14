@@ -7,7 +7,7 @@
 {% if 'riscv,clint0' in devices %}
 
 {% for clint in devices['riscv,clint0'] %}
-#define METAL_RISCV_CLINT0_{{ loop.index0 }}_BASE_ADDR {{ "0x%x" % clint.regs_by_name["control"] }}
+#define METAL_RISCV_CLINT0_{{ loop.index0 }}_BASE_ADDR {{ "0x%x" % clint.regs_by_name["control"][0] }}
 {% endfor %}
 
 #define METAL_RISCV_CLINT0

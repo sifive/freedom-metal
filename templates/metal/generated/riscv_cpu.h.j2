@@ -19,7 +19,9 @@ static const struct dt_cpu_data {
 } dt_cpu_data[__METAL_DT_NUM_HARTS] = {
     {% for hart in harts %}
     {
+    {% if hart.timebase_frequency is defined %}
         .timebase = {{ hart.timebase_frequency[0] }},
+    {% endif %}
     {% if hart.sifive_buserror is defined %}
         .has_buserror = true,
         .buserror = (struct metal_buserror) { {{ hart.sifive_buserror[0].id }} }

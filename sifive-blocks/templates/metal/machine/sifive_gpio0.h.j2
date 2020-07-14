@@ -8,7 +8,7 @@
 {% set sifive_gpio0s = devices['sifive,gpio0'] %}
 
 {% for gpio in sifive_gpio0s %}
-#define METAL_SIFIVE_GPIO0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % gpio.regs_by_name["control"] }}
+#define METAL_SIFIVE_GPIO0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % gpio.regs_by_name["control"][0] }}
 {% endfor %}
 
 #define METAL_SIFIVE_GPIO0

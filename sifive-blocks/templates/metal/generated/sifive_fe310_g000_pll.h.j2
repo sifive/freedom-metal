@@ -28,8 +28,8 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 	{% for clk in sifive_fe310_g000_plls %}
 	{
 		.init_rate = {{ clk.clock_frequency[0] }},
-		.config = {{ clk.regs_by_name["config"] }},
-		.divider = {{ clk.regs_by_name["divider"] }},
+		.config = {{ clk.regs_by_name["config"][0] }},
+		.divider = {{ clk.regs_by_name["divider"][0] }},
 
 	{% if "pllref" in clk.clock_names %}
 		.has_hfxosc = true,

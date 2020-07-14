@@ -50,7 +50,7 @@ def get_template(template, args):
     return env.get_template(template)
 
 def to_snakecase(s):
-    return s.lower().replace(',', '_').replace('-', '_')
+    return s.lower().replace(',', '_').replace('-', '_').replace('.', '_')
 
 def rootname(path):
     return os.path.splitext(os.path.basename(path))[0]
@@ -143,7 +143,7 @@ def node_to_dict(node, dts):
             references = prop.values[0::2] # [&aon, &aon]
             offsets = prop.values[1::2]    # [0x70, 0x7C]
             for ref, offset in zip(references, offsets):
-                values.append(dts.get_by_reference(ref).get_reg()[0][0] + offset)
+                values.append([dts.get_by_reference(ref).get_reg()[0][0] + offset, 0])
         else:
             for value in prop.values:
                 if isinstance(value, pydevicetree.ast.LabelReference):
@@ -164,7 +164,10 @@ def node_to_dict(node, dts):
     if 'reg_names' in d:
         regs = dict()
         for idx, name in enumerate(d['reg_names']):
-            regs[name] = d['reg'][idx]
+            if isinstance(node.get_field("reg"), pydevicetree.ast.LabelReference):
+                regs[name] = d['reg'][idx]
+            else:
+                regs[name] = node.get_reg()[idx]
         d['regs_by_name'] = regs
 
     return d
