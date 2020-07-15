@@ -214,7 +214,7 @@ def get_c_sources(args):
     sources = []
     for d in args.source_paths:
         sources += [g for g in glob.glob("{}/src/**/*.c".format(d), recursive=True)]
-    sources += [t.replace(".j2", "") for t in get_templates(args.template_paths) if ".c" in t]
+    sources += [os.path.join(args.output_dir, t.replace(".j2", "")) for t in get_templates(args.template_paths) if ".c" in t]
 
     return sources
 
@@ -222,7 +222,7 @@ def get_asm_sources(args):
     sources = []
     for d in args.source_paths:
         sources += [g for g in glob.glob("{}/src/**/*.S".format(d), recursive=True)]
-    sources += [t.replace(".j2", "") for t in get_templates(args.template_paths) if ".S" in t]
+    sources += [os.path.join(args.output_dir, t.replace(".j2", "")) for t in get_templates(args.template_paths) if ".S" in t]
 
     return sources
 
