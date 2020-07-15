@@ -9,21 +9,13 @@
  * @brief API for reading toggle switches
  */
 
-#include <metal/interrupt.h>
-
-struct metal_switch;
-
-struct metal_switch_vtable {
-    int (*switch_exist)(struct metal_switch *sw, char *label);
-    struct metal_interrupt *(*interrupt_controller)(struct metal_switch *sw);
-    int (*get_interrupt_id)(struct metal_switch *sw);
-};
+#include <stdint.h>
 
 /*!
  * @brief A handle for a switch
  */
 struct metal_switch {
-    const struct metal_switch_vtable *vtable;
+    uint32_t __switch_index;
 };
 
 /*!
@@ -32,25 +24,6 @@ struct metal_switch {
  * @return A handle to the switch, or NULL if none is found for the requested
  * label
  */
-struct metal_switch *metal_switch_get(char *label);
-
-/*!
- * @brief Get the interrupt controller for a switch
- * @param sw The handle for the switch
- * @return The interrupt controller handle
- */
-__inline__ struct metal_interrupt *
-metal_switch_interrupt_controller(struct metal_switch *sw) {
-    return sw->vtable->interrupt_controller(sw);
-}
-
-/*!
- * @brief Get the interrupt id for a switch
- * @param sw The handle for the switch
- * @return The interrupt ID for the switch
- */
-__inline__ int metal_switch_get_interrupt_id(struct metal_switch *sw) {
-    return sw->vtable->get_interrupt_id(sw);
-}
+struct metal_switch metal_switch_get(char *label);
 
 #endif

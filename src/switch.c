@@ -1,26 +1,12 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine.h>
+#include <assert.h>
 #include <metal/switch.h>
+#include <stdbool.h>
 
-struct metal_switch *metal_switch_get(char *label) {
-    int i;
-    struct metal_switch *flip;
-
-    if ((__METAL_DT_MAX_BUTTONS == 0) || (label == NULL)) {
-        return NULL;
-    }
-
-    for (i = 0; i < __METAL_DT_MAX_BUTTONS; i++) {
-        flip = (struct metal_switch *)__metal_switch_table[i];
-        if (flip->vtable->switch_exist(flip, label)) {
-            return flip;
-        }
-    }
-    return NULL;
+struct metal_switch metal_switch_get(char *label) __attribute__((weak));
+struct metal_switch metal_switch_get(char *label) {
+    assert(false);
+    return (struct metal_switch) { 0 };
 }
-
-extern __inline__ struct metal_interrupt *
-metal_switch_interrupt_controller(struct metal_switch *flip);
-extern __inline__ int metal_switch_get_interrupt_id(struct metal_switch *flip);
