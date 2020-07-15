@@ -20,29 +20,17 @@
 
 /* Only one led exists so all devicetree data is constant */
 #define get_index(led) 0
-{% if 'label' in leds[0] %}
-#define LED_LABEL(led) "{{ leds[0].label[0] }}"
-{% else %}
-#define LED_LABEL(led) ""
-{% endif %}
 #define LED_GPIO(led) {{ leds[0].gpios[0].id }}
 #define LED_GPIO_PIN(led) {{ leds[0].gpios[1] }}
 
 {% else %}
 
 static const struct dt_led_data {
-	char *label;
 	struct metal_gpio gpio;
 	uint32_t pin;
 } dt_led_data[__METAL_DT_NUM_SIFIVE_GPIO_LEDS] = {
 	{% for led in leds %}
 	{
-		{% if 'label' in led %}
-		.label = "{{ led.label[0] }}",
-		{% else %}
-		.label = "",
-		{% endif %}
-
 		.gpio = {{ led.gpios[0].id }},
 		.pin = {{ led.gpios[1] }},
 	},
@@ -50,7 +38,6 @@ static const struct dt_led_data {
 };
 
 #define get_index(led) ((led).__led_index)
-#define LED_LABEL(led) (dt_led_data[get_index(led)].label)
 #define LED_GPIO(led) (dt_led_data[get_index(led)].gpio)
 #define LED_GPIO_PIN(led) (dt_led_data[get_index(led)].pin)
 
