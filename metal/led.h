@@ -9,6 +9,7 @@
  * @brief API for manipulating LEDs
  */
 
+#include <metal/generated/led.h>
 #include <stdint.h>
 
 /*!

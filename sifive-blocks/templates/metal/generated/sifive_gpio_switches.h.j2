@@ -1,0 +1,72 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__DRIVERS__SIFIVE_GPIO_SWITCHES_H
+#define METAL__DRIVERS__SIFIVE_GPIO_SWITCHES_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/gpio.h>
+#include <metal/interrupt.h>
+#include <metal/machine/platform.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+{% if 'sifive,gpio-switches' in devices %}
+{% set switches = devices['sifive,gpio-switches'] %}
+
+#define __METAL_DT_NUM_SIFIVE_GPIO_SWITCHES {{ switches|length }}
+
+{% if switches|length == 1 %}
+
+/* Only one switch exists so all devicetree data is constant */
+#define get_index(switch) 0
+#define SWITCH_HAS_GPIO(switch) {{ 'gpios' in switches[0] }}
+#define SWITCH_GPIO(switch) {{ switches[0].gpios[0].id }}
+#define SWITCH_GPIO_PIN(switch) {{ switches[0].gpios[1] }}
+#define SWITCH_INTC {{ switch.interrupts_extended[0].interrupt_parent[0].id }},
+#define SWITCH_INTERRUPT_ID = {{ switch.interrupts-extended[1] }},
+
+{% else %}
+
+static const struct dt_switch_data {
+	bool has_gpio;
+	struct metal_gpio gpio;
+	uint32_t pin;
+	struct metal_interrupt intc;
+	uint32_t interrupt_id;
+} dt_switch_data[__METAL_DT_NUM_SIFIVE_GPIO_SWITCHES] = {
+	{% for switch in switches %}
+	{
+		{% if 'gpios' in switch %}
+		.has_gpio = true,
+		.gpio = {{ switch.gpios[0].id }},
+		.pin = {{ switch.gpios[1] }},
+		{% else %}
+		.has_gpio = false,
+		{% endif %}
+
+		.intc = {{ switch.interrupts_extended[0].interrupt_parent[0].id }},
+		.interrupt_id = {{ switch.interrupts_extended[0].interrupts[switch.interrupts_extended[1]] }},
+	},
+	{% endfor %}
+};
+
+#define get_index(switch) ((switch).__switch_index)
+#define SWITCH_HAS_GPIO(switch) (dt_switch_data[get_index(switch)].has_gpio)
+#define SWITCH_GPIO(switch) (dt_switch_data[get_index(switch)].gpio)
+#define SWITCH_GPIO_PIN(switch) (dt_switch_data[get_index(switch)].pin)
+#define SWITCH_INTC(switch) (dt_switch_data[get_index(switch)].intc)
+#define SWITCH_INTERRUPT_ID(switch) (dt_switch_data[get_index(switch)].interrupt_id)
+
+{% endif %}
+
+{% if switches[0].interrupts_extended is defined %}
+{% set driver_string = to_snakecase(switches[0].interrupts_extended[0].interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h.j2' %}
+{% endif %}
+
+{% endif %}
+
+#endif

@@ -1,0 +1,22 @@
+#ifndef __METAL_DT_LED__H
+#define __METAL_DT_LED__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'led' in default_drivers and default_drivers['led'] in devices %}
+#define __METAL_DT_NUM_LEDS {{ devices[default_drivers['led']]|length }}
+
+{% set driver_string = to_snakecase(default_drivers['led']) %}
+#define metal_led_get {{ driver_string }}_get
+#define metal_led_get_rgb {{ driver_string }}_get_rgb
+#define metal_led_enable {{ driver_string }}_enable
+#define metal_led_on {{ driver_string }}_on
+#define metal_led_off {{ driver_string }}_off
+#define metal_led_toggle {{ driver_string }}_toggle
+
+{% else %}
+#define __METAL_DT_NUM_LEDS 0
+{% endif %}
+
+#endif /* ! __METAL_DT_LED__H */
+

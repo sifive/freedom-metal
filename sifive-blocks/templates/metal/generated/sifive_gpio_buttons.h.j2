@@ -1,0 +1,47 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__DRIVERS__SIFIVE_GPIO_BUTTONS_H
+#define METAL__DRIVERS__SIFIVE_GPIO_BUTTONS_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/gpio.h>
+#include <metal/machine/platform.h>
+#include <stddef.h>
+#include <stdint.h>
+
+{% if 'sifive,gpio-buttons' in devices %}
+{% set buttons = devices['sifive,gpio-buttons'] %}
+
+#define __METAL_DT_NUM_SIFIVE_GPIO_BUTTONS {{ buttons|length }}
+
+{% if buttons|length == 1 %}
+
+/* Only one button exists so all devicetree data is constant */
+#define get_index(button) 0
+#define BUTTON_GPIO(button) {{ buttons[0].gpios[0].id }}
+#define BUTTON_GPIO_PIN(button) {{ buttons[0].gpios[1] }}
+
+{% else %}
+
+static const struct dt_button_data {
+	struct metal_gpio gpio;
+	uint32_t pin;
+} dt_button_data[__METAL_DT_NUM_SIFIVE_GPIO_BUTTONS] = {
+	{% for button in buttons %}
+	{
+		.gpio = {{ button.gpios[0].id }},
+		.pin = {{ button.gpios[1] }},
+	},
+	{% endfor %}
+};
+
+#define get_index(button) ((button).__button_index)
+#define BUTTON_GPIO(button) (dt_button_data[get_index(button)].gpio)
+#define BUTTON_GPIO_PIN(button) (dt_button_data[get_index(button)].pin)
+
+{% endif %}
+{% endif %}
+
+#endif

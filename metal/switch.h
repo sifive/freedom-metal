@@ -9,6 +9,8 @@
  * @brief API for reading toggle switches
  */
 
+#include <metal/generated/switch.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 /*!
@@ -20,10 +22,31 @@ struct metal_switch {
 
 /*!
  * @brief Get a handle for a switch
- * @param label The DeviceTree label for the desired switch
- * @return A handle to the switch, or NULL if none is found for the requested
+ * @param index The index of the switch
+ * @return A handle to the switch
  * label
  */
-struct metal_switch metal_switch_get(char *label);
+struct metal_switch metal_switch_get(uint32_t index);
+
+/*!
+ * @brief Check if a switch is currently on
+ * @param sw The switch handle
+ * @return True if the switch is on
+ */
+bool metal_switch_is_on(struct metal_switch sw);
+
+/*!
+ * @brief Enable the interrupt for a switch
+ * @param sw The switch handle
+ * @return 0 upon success
+ */
+int metal_switch_enable_interrupt(struct metal_switch sw);
+
+/*!
+ * @brief Disable the interrupt for a switch
+ * @param sw The switch handle
+ * @return 0 upon success
+ */
+int metal_switch_disable_interrupt(struct metal_switch sw);
 
 #endif

@@ -1,0 +1,25 @@
+#ifndef __METAL_DT_BUTTON__H
+#define __METAL_DT_BUTTON__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'button' in default_drivers and default_drivers['button'] in devices %}
+#define __METAL_DT_NUM_BUTTONS {{ devices[button_compatible]|length }}
+
+{% for button in devices[default_drivers['button']] %}
+    {% if 'gpios' in button %}
+#define metal_{{ to_snakecase(button.compatible[0]) }}_{{ button.id }}_interrupt_handler metal_{{ to_snakecase(button.gpios[0].compatible[0]) }}_source_{{ button.gpios[1] }}_handler
+    {% endif %}
+{% endfor %}
+
+{% set driver_string = to_snakecase(default_drivers['button']) %}
+#define metal_button_is_pressed {{ driver_string}}_is_pressed
+#define metal_buttenable_interrupt_enable_interrupt {{ driver_string }}_enable_interrupt
+#define metal_button_disable_interrupt {{ driver_string }}_disable_interrupt
+
+{% else %}
+#define __METAL_DT_NUM_BUTTONS 0
+{% endif %}
+
+#endif /* ! __METAL_DT_BUTTON__H */
+
