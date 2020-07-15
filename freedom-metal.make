@@ -53,10 +53,15 @@ ABIFLAGS = -march=$(RISCV_ARCH) -mabi=$(RISCV_ABI) -mcmodel=$(RISCV_CMODEL) -msa
 CFLAGS = -DMTIME_RATE_HZ_DEF=32768 --specs=$(RISCV_LIBC).specs -fno-common -ffunction-sections -fdata-sections $(OPT) $(ABIFLAGS) $(LDFLAGS) $(SOURCE_CFLAGS) $(FEATURE_DEFINES) -Imetal $(METAL_CFLAGS)
 LIBS = $(SOURCE_LIBS)
 
-SRC_C += $(METAL_C) $(METAL_HELPER_C)
-SRC_S += $(METAL_S) $(METAL_HELPER_S)
+SRC += $(METAL_SRC) $(METAL_HELPER_SRC)
+
+SRC_C = $(filter %.c,$(SRC))
+SRC_S = $(filter %.S,$(SRC))
 
 OBJ = $(notdir $(SRC_C:.c=.o)) $(notdir $(SRC_S:.S=.o))
+
+echo::
+	echo $(OBJ)
 
 ifndef quiet
 
@@ -84,9 +89,6 @@ $(PROGRAM): $(OBJ) $(LDSCRIPT)
 clean::
 	rm -f $(PROGRAM) $(PROGRAM).map *.o
 	rm -rf metal .deps
-
-echo::
-	echo $(OBJ)
 
 metal/metal.mk: $(METAL_MK_DEPEND)
 	python3 $(FREEDOM_METAL)/scripts/codegen.py --dts $(DEVICETREE) --source-paths $(FREEDOM_METAL) $(FREEDOM_METAL)/sifive-blocks --output-dir=metal

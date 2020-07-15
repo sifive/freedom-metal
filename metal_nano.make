@@ -1,39 +1,37 @@
-METAL_HELPER_C = \
-	nanosleep.c \
-	sys_access.c \
-	sys_chdir.c \
-	sys_chmod.c \
-	sys_chown.c \
-	sys_clock_gettime.c \
-	sys_close.c \
-	sys_execve.c \
-	sys_exit.c \
-	sys_faccessat.c \
-	sys_fork.c \
-	sys_fstat.c \
-	sys_fstatat.c \
-	sys_ftime.c \
-	sys_getcwd.c \
-	sys_getpid.c \
-	sys_gettimeofday.c \
-	sys_isatty.c \
-	sys_kill.c \
-	sys_link.c \
-	sys_lseek.c \
-	sys_lstat.c \
-	sys_open.c \
-	sys_openat.c \
-	sys_read.c \
-	sys_sbrk.c \
-	sys_stat.c \
-	sys_sysconf.c \
-	sys_times.c \
-	sys_unlink.c \
-	sys_utime.c \
-	sys_wait.c \
-	sys_write.c
-
-METAL_HELPER_S = \
-	crt0.S
+METAL_HELPER_SRC = \
+	$(FREEDOM_METAL)/gloss/nanosleep.c \
+	$(FREEDOM_METAL)/gloss/sys_access.c \
+	$(FREEDOM_METAL)/gloss/sys_chdir.c \
+	$(FREEDOM_METAL)/gloss/sys_chmod.c \
+	$(FREEDOM_METAL)/gloss/sys_chown.c \
+	$(FREEDOM_METAL)/gloss/sys_clock_gettime.c \
+	$(FREEDOM_METAL)/gloss/sys_close.c \
+	$(FREEDOM_METAL)/gloss/sys_execve.c \
+	$(FREEDOM_METAL)/gloss/sys_exit.c \
+	$(FREEDOM_METAL)/gloss/sys_faccessat.c \
+	$(FREEDOM_METAL)/gloss/sys_fork.c \
+	$(FREEDOM_METAL)/gloss/sys_fstat.c \
+	$(FREEDOM_METAL)/gloss/sys_fstatat.c \
+	$(FREEDOM_METAL)/gloss/sys_ftime.c \
+	$(FREEDOM_METAL)/gloss/sys_getcwd.c \
+	$(FREEDOM_METAL)/gloss/sys_getpid.c \
+	$(FREEDOM_METAL)/gloss/sys_gettimeofday.c \
+	$(FREEDOM_METAL)/gloss/sys_isatty.c \
+	$(FREEDOM_METAL)/gloss/sys_kill.c \
+	$(FREEDOM_METAL)/gloss/sys_link.c \
+	$(FREEDOM_METAL)/gloss/sys_lseek.c \
+	$(FREEDOM_METAL)/gloss/sys_lstat.c \
+	$(FREEDOM_METAL)/gloss/sys_open.c \
+	$(FREEDOM_METAL)/gloss/sys_openat.c \
+	$(FREEDOM_METAL)/gloss/sys_read.c \
+	$(FREEDOM_METAL)/gloss/sys_sbrk.c \
+	$(FREEDOM_METAL)/gloss/sys_stat.c \
+	$(FREEDOM_METAL)/gloss/sys_sysconf.c \
+	$(FREEDOM_METAL)/gloss/sys_times.c \
+	$(FREEDOM_METAL)/gloss/sys_unlink.c \
+	$(FREEDOM_METAL)/gloss/sys_utime.c \
+	$(FREEDOM_METAL)/gloss/sys_wait.c \
+	$(FREEDOM_METAL)/gloss/sys_write.c \
+	$(FREEDOM_METAL)/gloss/crt0.S
 
 METAL_HELPER_VPATH=$(FREEDOM_METAL)/gloss
