@@ -15,7 +15,7 @@
 
 #define PLIC_REGW(offset) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_RISCV_PLIC0_0_BASE_ADDR + (offset))))
 
-extern metal_interrupt_handler_t *__metal_global_interrupt_table;
+extern metal_interrupt_handler_t __metal_global_interrupt_table[];
 
 static __inline__ unsigned int
 __metal_plic0_claim_interrupt(uint32_t hartid) {
