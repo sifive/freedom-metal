@@ -13,26 +13,32 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define PLIC_REGW(offset) (__METAL_ACCESS_ONCE((__metal_io_u32 *)(METAL_RISCV_PLIC0_0_BASE_ADDR + (offset))))
+#define PLIC_REGW(offset)                                                      \
+    (__METAL_ACCESS_ONCE(                                                      \
+        (__metal_io_u32 *)(METAL_RISCV_PLIC0_0_BASE_ADDR + (offset))))
 
 extern metal_interrupt_handler_t __metal_global_interrupt_table[];
 
-static __inline__ unsigned int
-__metal_plic0_claim_interrupt(uint32_t hartid) {
-    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_CLAIM);
+static __inline__ unsigned int __metal_plic0_claim_interrupt(uint32_t hartid) {
+    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) +
+                     METAL_RISCV_PLIC0_CONTEXT_CLAIM);
 }
 
-static __inline__ void __metal_plic0_complete_interrupt(int hartid, unsigned int id) {
+static __inline__ void __metal_plic0_complete_interrupt(int hartid,
+                                                        unsigned int id) {
     PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_CLAIM) = id;
 }
 
-static __inline__ int __metal_riscv_plic0_set_threshold(int hartid, unsigned int threshold) {
-    PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_THRESHOLD) = threshold;
+static __inline__ int
+__metal_riscv_plic0_set_threshold(int hartid, unsigned int threshold) {
+    PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_THRESHOLD) =
+        threshold;
     return 0;
 }
 
 static __inline__ unsigned int __metal_riscv_plic0_get_threshold(int hartid) {
-    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_THRESHOLD);
+    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) +
+                     METAL_RISCV_PLIC0_CONTEXT_THRESHOLD);
 }
 
 static __inline__ int __metal_plic0_enable(int hartid, int id) {
@@ -80,7 +86,7 @@ void riscv_plic0_init(struct metal_interrupt plic) {
     static bool init_done = false;
     if (!init_done) {
         for (int hartid = 0; hartid < __METAL_DT_NUM_HARTS; hartid++) {
-            struct metal_interrupt intc = (struct metal_interrupt) { hartid };
+            struct metal_interrupt intc = (struct metal_interrupt){hartid};
 
             /* Initialize riscv,cpu-intc */
             metal_interrupt_init(intc);
@@ -100,8 +106,8 @@ void riscv_plic0_init(struct metal_interrupt plic) {
 }
 
 METAL_CONSTRUCTOR(init_riscv_plic0) {
-    struct metal_interrupt plic = (struct metal_interrupt) { 0 };
-    riscv_plic0_init(plic);    
+    struct metal_interrupt plic = (struct metal_interrupt){0};
+    riscv_plic0_init(plic);
 }
 
 int riscv_plic0_set_vector_mode(struct metal_interrupt controller,
@@ -130,19 +136,17 @@ riscv_plic0_get_privilege(struct metal_interrupt controller) {
     return METAL_INTR_PRIV_M_MODE;
 }
 
-int riscv_plic0_enable(struct metal_interrupt plic,
-                       int id) {
+int riscv_plic0_enable(struct metal_interrupt plic, int id) {
     return __metal_plic0_enable(metal_cpu_get_current_hartid(), id);
 }
 
-int riscv_plic0_disable(struct metal_interrupt plic,
-                        int id) {
+int riscv_plic0_disable(struct metal_interrupt plic, int id) {
     __metal_plic0_disable(metal_cpu_get_current_hartid(), id);
     return 0;
 }
 
-int riscv_plic0_set_priority(struct metal_interrupt plic,
-                             int id, unsigned int priority) {
+int riscv_plic0_set_priority(struct metal_interrupt plic, int id,
+                             unsigned int priority) {
     if (id >= METAL_RISCV_PLIC0_0_RISCV_NDEV) {
         return -1;
     }
@@ -164,8 +168,8 @@ int riscv_plic0_set_preemptive_level(struct metal_interrupt controller, int id,
     return -1;
 }
 
-unsigned int
-riscv_plic0_get_preemptive_level(struct metal_interrupt controller, int id) {
+unsigned int riscv_plic0_get_preemptive_level(struct metal_interrupt controller,
+                                              int id) {
     return 0;
 }
 
@@ -189,9 +193,8 @@ metal_affinity riscv_plic0_affinity_enable(struct metal_interrupt plic,
     int hartid;
     for_each_metal_affinity(hartid, bitmask) {
         if (hartid != 0)
-            metal_affinity_set_bit(
-                ret, hartid,
-                __metal_plic0_enable(hartid, id));
+            metal_affinity_set_bit(ret, hartid,
+                                   __metal_plic0_enable(hartid, id));
     }
 
     return ret;
@@ -209,9 +212,8 @@ metal_affinity riscv_plic0_affinity_disable(struct metal_interrupt plic,
     int hartid;
     for_each_metal_affinity(hartid, bitmask) {
         if (hartid != 0)
-            metal_affinity_set_bit(
-                ret, hartid,
-                __metal_plic0_disable(hartid, id));
+            metal_affinity_set_bit(ret, hartid,
+                                   __metal_plic0_disable(hartid, id));
     }
 
     return ret;
@@ -219,7 +221,7 @@ metal_affinity riscv_plic0_affinity_disable(struct metal_interrupt plic,
 
 metal_affinity riscv_plic0_affinity_set_threshold(struct metal_interrupt plic,
                                                   metal_affinity bitmask,
-    unsigned int threshold) {
+                                                  unsigned int threshold) {
     metal_affinity ret = {0};
     int hartid;
 

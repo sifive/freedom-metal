@@ -28,7 +28,7 @@ struct metal_uart {
  * @return A handle to the UART device, or NULL if the device does not exist*/
 inline const struct metal_uart metal_uart_get_device(uint32_t index) {
     assert(index < __METAL_DT_NUM_UARTS);
-    return (const struct metal_uart) { index };
+    return (const struct metal_uart){index};
 }
 
 /*!

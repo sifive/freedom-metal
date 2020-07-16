@@ -24,8 +24,7 @@
 
 #define get_index(clk) ((clk).__clock_index)
 
-uint64_t sifive_fe310_g000_lfrosc_get_rate_hz(
-    struct metal_clock clock) {
+uint64_t sifive_fe310_g000_lfrosc_get_rate_hz(struct metal_clock clock) {
 
     uintptr_t cfg_reg = dt_clock_data[get_index(clock)].config;
     uintptr_t mux_reg = dt_clock_data[get_index(clock)].mux;
@@ -35,15 +34,15 @@ uint64_t sifive_fe310_g000_lfrosc_get_rate_hz(
         return metal_clock_get_rate_hz(lfrosc);
     }
 
-    uint64_t div =
-        (LFROSC_REGW(cfg_reg) & METAL_LFROSCCFG_DIV_MASK) + 1;
+    uint64_t div = (LFROSC_REGW(cfg_reg) & METAL_LFROSCCFG_DIV_MASK) + 1;
 
-    struct metal_clock psdlfaltclk = dt_clock_data[get_index(clock)].psdlfaltclk;
+    struct metal_clock psdlfaltclk =
+        dt_clock_data[get_index(clock)].psdlfaltclk;
     return metal_clock_get_rate_hz(psdlfaltclk) / div;
 }
 
-uint64_t sifive_fe310_g000_lfrosc_set_rate_hz(
-    struct metal_clock clock, uint64_t rate) {
+uint64_t sifive_fe310_g000_lfrosc_set_rate_hz(struct metal_clock clock,
+                                              uint64_t rate) {
     return sifive_fe310_g000_lfrosc_get_rate_hz(clock);
 }
 

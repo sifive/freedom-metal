@@ -10,8 +10,8 @@
 
 #include <metal/cpu.h>
 #include <metal/interrupt_handlers.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /*!
  * @brief Possible mode of interrupts to operate
@@ -77,9 +77,8 @@ void metal_interrupt_init(struct metal_interrupt controller);
  * @param mode The vector mode of the interrupt controller.
  * @return 0 upon success
  */
-int
-metal_interrupt_set_vector_mode(struct metal_interrupt controller,
-                                metal_vector_mode mode);
+int metal_interrupt_set_vector_mode(struct metal_interrupt controller,
+                                    metal_vector_mode mode);
 
 /*!
  * @brief Get vector mode of a given an interrupt controller
@@ -152,8 +151,7 @@ int metal_interrupt_set_threshold(struct metal_interrupt controller,
  * @param controller The handle for the interrupt controller
  * @return The interrupt threshold level
  */
-unsigned int
-metal_interrupt_get_threshold(struct metal_interrupt controller);
+unsigned int metal_interrupt_get_threshold(struct metal_interrupt controller);
 
 /*!
  * @brief Set an interrupt priority level
@@ -162,8 +160,8 @@ metal_interrupt_get_threshold(struct metal_interrupt controller);
  * @param priority The interrupt priority level
  * @return 0 upon success
  */
-int metal_interrupt_set_priority(struct metal_interrupt controller,
-                                 int id, unsigned int priority);
+int metal_interrupt_set_priority(struct metal_interrupt controller, int id,
+                                 unsigned int priority);
 
 /*!
  * @brief Get an interrupt priority level
@@ -171,8 +169,8 @@ int metal_interrupt_set_priority(struct metal_interrupt controller,
  * @param id The interrupt ID to enable
  * @return The interrupt priority level
  */
-unsigned int
-metal_interrupt_get_priority(struct metal_interrupt controller, int id);
+unsigned int metal_interrupt_get_priority(struct metal_interrupt controller,
+                                          int id);
 
 /*!
  * @brief Set preemptive level and priority for a given interrupt ID
@@ -184,9 +182,8 @@ metal_interrupt_get_priority(struct metal_interrupt controller, int id);
  * @param level The interrupt level and priority are encoded together
  * @return 0 upon success
  */
-int
-metal_interrupt_set_preemptive_level(struct metal_interrupt controller, int id,
-                                     unsigned int level);
+int metal_interrupt_set_preemptive_level(struct metal_interrupt controller,
+                                         int id, unsigned int level);
 
 /*!
  * @brief Get an interrupt preemptive level
@@ -211,8 +208,7 @@ int metal_interrupt_vector_enable(struct metal_interrupt controller, int id);
  * @param id The interrupt ID to disable
  * @return 0 upon success
  */
-int
-metal_interrupt_vector_disable(struct metal_interrupt controller, int id);
+int metal_interrupt_vector_disable(struct metal_interrupt controller, int id);
 
 /*!
  * @brief Enable an interrupt for the hart contexts

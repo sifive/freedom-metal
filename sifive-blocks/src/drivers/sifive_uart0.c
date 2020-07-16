@@ -43,20 +43,20 @@
 static struct {
     uint64_t baud_rate;
 } uart_state[__METAL_DT_NUM_UARTS] = {
-    {
-        .baud_rate = 0    
-    },
+    {.baud_rate = 0},
 };
 
 static __inline__ int enable_parent_interrupt(struct metal_uart uart) {
-    struct metal_interrupt intc = dt_uart_data[get_index(uart)].interrupt_parent;
+    struct metal_interrupt intc =
+        dt_uart_data[get_index(uart)].interrupt_parent;
     int id = dt_uart_data[get_index(uart)].interrupt_id;
 
     return metal_interrupt_enable(intc, id);
 }
 
 static __inline__ int disable_parent_interrupt(struct metal_uart uart) {
-    struct metal_interrupt intc = dt_uart_data[get_index(uart)].interrupt_parent;
+    struct metal_interrupt intc =
+        dt_uart_data[get_index(uart)].interrupt_parent;
     int id = dt_uart_data[get_index(uart)].interrupt_id;
 
     return metal_interrupt_disable(intc, id);
@@ -78,7 +78,7 @@ int sifive_uart0_tx_interrupt_disable(struct metal_uart uart) {
     if ((UART_REGW(METAL_SIFIVE_UART0_IE) & UART_RXWM) == 0) {
         /* Disable the UART interrupt line on the interrupt controller
          * when no UART interrupt sources are enabled */
-        return disable_parent_interrupt(uart); 
+        return disable_parent_interrupt(uart);
     }
     return 0;
 }
@@ -99,7 +99,7 @@ int sifive_uart0_rx_interrupt_disable(struct metal_uart uart) {
     if ((UART_REGW(METAL_SIFIVE_UART0_IE) & UART_TXWM) == 0) {
         /* Disable the UART interrupt line on the interrupt controller
          * when no UART interrupt sources are enabled */
-        return disable_parent_interrupt(uart); 
+        return disable_parent_interrupt(uart);
     }
 }
 
@@ -170,7 +170,7 @@ int sifive_uart0_set_baud_rate(struct metal_uart uart, int baud_rate) {
 
     uart_state[index].baud_rate = baud_rate;
 
-    long clock_rate =  metal_clock_get_rate_hz(clock);
+    long clock_rate = metal_clock_get_rate_hz(clock);
     UART_REGW(METAL_SIFIVE_UART0_DIV) = clock_rate / baud_rate - 1;
     UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXEN;
     UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXEN;
@@ -200,7 +200,8 @@ void _sifive_uart0_pre_rate_change_callback(struct metal_uart uart) {
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
 
     if (baud_rate != 0) {
-        uint64_t ticks_to_wait = bits_per_symbol * MTIME_RATE_HZ_DEF / baud_rate;
+        uint64_t ticks_to_wait =
+            bits_per_symbol * MTIME_RATE_HZ_DEF / baud_rate;
 
         struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
         uint64_t mtime = metal_cpu_get_mtime(cpu);
@@ -239,7 +240,7 @@ void sifive_uart0_init(struct metal_uart uart, uint32_t baud_rate) {
 
 METAL_CONSTRUCTOR(init_metal_tty) {
     sifive_uart0_init(__METAL_DT_STDOUT_UART_HANDLE,
-                    __METAL_DT_STDOUT_UART_BAUD);
+                      __METAL_DT_STDOUT_UART_BAUD);
 }
 
 int metal_tty_putc(int c) {

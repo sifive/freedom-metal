@@ -10,8 +10,7 @@
 
 #define get_index(clk) ((clk).__clock_index)
 
-uint64_t fixed_factor_clock_get_rate_hz(
-    struct metal_clock clk) {
+uint64_t fixed_factor_clock_get_rate_hz(struct metal_clock clk) {
 
     /* Call get_rate_hz for the parent clock defined in the Devicetree */
     struct metal_clock ref = dt_clock_data[get_index(clk)].ref;
@@ -22,7 +21,7 @@ uint64_t fixed_factor_clock_get_rate_hz(
 }
 
 uint64_t fixed_factor_clock_set_rate_hz(struct metal_clock clk,
-                                                       uint64_t target_hz) {
+                                        uint64_t target_hz) {
     return fixed_factor_clock_get_rate_hz(clk);
 }
 

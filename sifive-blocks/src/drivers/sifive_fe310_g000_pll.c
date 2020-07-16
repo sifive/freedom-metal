@@ -136,7 +136,7 @@ static const struct pll_config_t pll_configs[] = {
  * frequency
  *  - the output frequency, in hertz */
 static uint64_t get_pll_config_freq(uint64_t pll_input_rate,
-                                const struct pll_config_t *config) {
+                                    const struct pll_config_t *config) {
     if (pll_input_rate < config->min_input_rate ||
         pll_input_rate > config->max_input_rate)
         return PLL_CONFIG_NOT_VALID;
@@ -191,8 +191,8 @@ static void sifive_fe310_g000_pll_init(struct metal_clock pll) {
 }
 
 METAL_CONSTRUCTOR(init_sifive_fe310_g000_pll) {
-    for(int i = 0; i < __METAL_DT_NUM_SIFIVE_FE310_G000_PLLS; i++) {
-        struct metal_clock pll = (struct metal_clock) { i };
+    for (int i = 0; i < __METAL_DT_NUM_SIFIVE_FE310_G000_PLLS; i++) {
+        struct metal_clock pll = (struct metal_clock){i};
         uint64_t init_rate = dt_clock_data[get_index(pll)].init_rate;
         /* If the PLL init_rate is zero, don't initialize the PLL */
         if (init_rate != 0)
@@ -200,8 +200,7 @@ METAL_CONSTRUCTOR(init_sifive_fe310_g000_pll) {
     }
 }
 
-uint64_t sifive_fe310_g000_pll_get_rate_hz(
-    struct metal_clock clock) {
+uint64_t sifive_fe310_g000_pll_get_rate_hz(struct metal_clock clock) {
     uintptr_t config = dt_clock_data[get_index(clock)].config;
     uintptr_t divider = dt_clock_data[get_index(clock)].divider;
 
@@ -278,7 +277,8 @@ static void configure_pll(struct metal_clock clock,
         __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) &= ~(DIV_1);
 
         __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) &= ~(DIV_DIV);
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) |= PLL_DIV_SHIFT(config->d);
+        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) |=
+            PLL_DIV_SHIFT(config->d);
     }
 
     __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_BYPASS);
@@ -297,7 +297,7 @@ static void configure_pll(struct metal_clock clock,
 }
 
 uint64_t sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clock,
-                                                          uint64_t rate) {
+                                           uint64_t rate) {
     pre_rate_change_callbacks();
 
     uintptr_t pllcfg = dt_clock_data[get_index(clock)].config;
@@ -319,7 +319,8 @@ uint64_t sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clock,
     }
 
     if ((ref_hz * 3 / 4) <= rate && (ref_hz * 5 / 4) >= rate) {
-        /* if the desired rate is within 75%-125% of the input clock, bypass the PLL
+        /* if the desired rate is within 75%-125% of the input clock, bypass the
+         * PLL
          */
         __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_BYPASS;
     } else {

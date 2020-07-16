@@ -22,9 +22,9 @@
 #define RISCV_MCAUSE_INTERRUPT 0x8000000000000000ULL
 #define RISCV_MCAUSE_CODE_MASK 0x00000000000003FFULL
 #endif
-#define RISCV_MCAUSE_IS_INTERRUPT(mcause) ((mcause) & RISCV_MCAUSE_INTERRUPT)
+#define RISCV_MCAUSE_IS_INTERRUPT(mcause) ((mcause)&RISCV_MCAUSE_INTERRUPT)
 #define RISCV_MCAUSE_IS_EXCEPTION(mcause) (!(RISCV_MCAUSE_IS_INTERRUPT(mcause))
-#define RISCV_MCAUSE_ID(mcause) ((mcause) & RISCV_MCAUSE_CODE_MASK)
+#define RISCV_MCAUSE_ID(mcause) ((mcause)&RISCV_MCAUSE_CODE_MASK)
 
 #define METAL_MSTATUS_MIE 0x00000008UL
 
@@ -55,21 +55,19 @@
 
 void riscv_cpu_intc_init(struct metal_interrupt controller);
 
-int
-riscv_cpu_intc_set_vector_mode(struct metal_interrupt controller,
-                                              metal_vector_mode mode);
+int riscv_cpu_intc_set_vector_mode(struct metal_interrupt controller,
+                                   metal_vector_mode mode);
 
 metal_vector_mode
 riscv_cpu_intc_get_vector_mode(struct metal_interrupt controller);
 
 int riscv_cpu_intc_set_privilege(struct metal_interrupt controller,
-                                                metal_intr_priv_mode privilege);
+                                 metal_intr_priv_mode privilege);
 
 metal_intr_priv_mode
 riscv_cpu_intc_get_privilege(struct metal_interrupt controller);
 
-int riscv_cpu_intc_clear(struct metal_interrupt controller,
-                                        int id);
+int riscv_cpu_intc_clear(struct metal_interrupt controller, int id);
 
 int riscv_cpu_intc_set(struct metal_interrupt controller, int id);
 
@@ -78,44 +76,41 @@ int riscv_cpu_intc_enable(struct metal_interrupt controller, int id);
 int riscv_cpu_intc_disable(struct metal_interrupt controller, int id);
 
 int riscv_cpu_intc_set_threshold(struct metal_interrupt controller,
-                                                unsigned int level);
+                                 unsigned int level);
 
-unsigned int
-riscv_cpu_intc_get_threshold(struct metal_interrupt controller);
+unsigned int riscv_cpu_intc_get_threshold(struct metal_interrupt controller);
 
-int riscv_cpu_intc_set_priority(struct metal_interrupt controller,
-                                               int id, unsigned int priority);
+int riscv_cpu_intc_set_priority(struct metal_interrupt controller, int id,
+                                unsigned int priority);
 
-unsigned int
-riscv_cpu_intc_get_priority(struct metal_interrupt controller, int id);
+unsigned int riscv_cpu_intc_get_priority(struct metal_interrupt controller,
+                                         int id);
 
-int
-riscv_cpu_intc_set_preemptive_level(struct metal_interrupt controller, int id,
-                                                   unsigned int level);
+int riscv_cpu_intc_set_preemptive_level(struct metal_interrupt controller,
+                                        int id, unsigned int level);
 
 unsigned int
 riscv_cpu_intc_get_preemptive_level(struct metal_interrupt controller, int id);
 
-int riscv_cpu_intc_vector_enable(struct metal_interrupt controller, int id, metal_vector_mode mode);
+int riscv_cpu_intc_vector_enable(struct metal_interrupt controller, int id,
+                                 metal_vector_mode mode);
 
-int
-riscv_cpu_intc_vector_disable(struct metal_interrupt controller, int id);
+int riscv_cpu_intc_vector_disable(struct metal_interrupt controller, int id);
 
-metal_affinity
-riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
+metal_affinity riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
                                               metal_affinity bitmask, int id);
 
 metal_affinity
 riscv_cpu_intc_affinity_disable(struct metal_interrupt controller,
-                                               metal_affinity bitmask, int id);
+                                metal_affinity bitmask, int id);
 
 metal_affinity
 riscv_cpu_intc_affinity_set_threshold(struct metal_interrupt controller,
-                                                     metal_affinity bitmask,
-                                                     unsigned int level);
+                                      metal_affinity bitmask,
+                                      unsigned int level);
 
 unsigned int
 riscv_cpu_intc_affinity_get_threshold(struct metal_interrupt controller,
-                                                     int context_id);
+                                      int context_id);
 
 #endif

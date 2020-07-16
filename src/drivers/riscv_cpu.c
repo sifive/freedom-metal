@@ -6,14 +6,12 @@
 #include <metal/drivers/riscv_cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/generated/riscv_cpu.h>
-#include <metal/machine/platform.h>
 #include <metal/io.h>
+#include <metal/machine/platform.h>
 #include <metal/shutdown.h>
 #include <stdint.h>
 
-static inline uint32_t get_hartid(struct metal_cpu cpu) {
-    return cpu.__hartid;
-}
+static inline uint32_t get_hartid(struct metal_cpu cpu) { return cpu.__hartid; }
 
 unsigned long long metal_cpu_get_timer(struct metal_cpu cpu) {
     unsigned long long val = 0;
@@ -41,55 +39,44 @@ unsigned long long metal_cpu_get_timebase(struct metal_cpu cpu) {
     return dt_cpu_data[get_hartid(cpu)].timebase;
 }
 
-
 uint64_t metal_cpu_get_mtime(struct metal_cpu cpu) __attribute__((weak));
-uint64_t metal_cpu_get_mtime(struct metal_cpu cpu) {
-    return 0;
-}
+uint64_t metal_cpu_get_mtime(struct metal_cpu cpu) { return 0; }
 
-
-int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time) __attribute__((weak));
-int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time) {
-    return -1;
-}
+int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time)
+    __attribute__((weak));
+int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time) { return -1; }
 
 int metal_cpu_enable_interrupts(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_enable_interrupts(struct metal_cpu cpu) {
-    __asm__ volatile("csrs mstatus, %0" :: "r"(METAL_MSTATUS_MIE));
+    __asm__ volatile("csrs mstatus, %0" ::"r"(METAL_MSTATUS_MIE));
 }
 
 int metal_cpu_disable_interrupts(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_disable_interrupts(struct metal_cpu cpu) {
-    __asm__ volatile("csrc mstatus, %0" :: "r"(METAL_MSTATUS_MIE));
+    __asm__ volatile("csrc mstatus, %0" ::"r"(METAL_MSTATUS_MIE));
 }
 
 int metal_cpu_enable_ipi(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_enable_ipi(struct metal_cpu cpu) {
-    __asm__ volatile("csrs mie, %0" :: "r"(1 << METAL_LOCAL_INTERRUPT_SW));
+    __asm__ volatile("csrs mie, %0" ::"r"(1 << METAL_LOCAL_INTERRUPT_SW));
 }
 
 int metal_cpu_disable_ipi(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_disable_ipi(struct metal_cpu cpu) {
-    __asm__ volatile("csrc mie, %0" :: "r"(1 << METAL_LOCAL_INTERRUPT_SW));
+    __asm__ volatile("csrc mie, %0" ::"r"(1 << METAL_LOCAL_INTERRUPT_SW));
 }
 
 int metal_cpu_set_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_set_ipi(struct metal_cpu cpu) {
-    return -1;
-}
+int metal_cpu_set_ipi(struct metal_cpu cpu) { return -1; }
 
 int metal_cpu_clear_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_clear_ipi(struct metal_cpu cpu) {
-    return -1;
-}
+int metal_cpu_clear_ipi(struct metal_cpu cpu) { return -1; }
 
 int metal_cpu_get_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_get_ipi(struct metal_cpu cpu) {
-    return 0;
-}
+int metal_cpu_get_ipi(struct metal_cpu cpu) { return 0; }
 
 struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu) {
-    return (struct metal_interrupt) { cpu.__hartid };
+    return (struct metal_interrupt){cpu.__hartid};
 }
 
 int metal_cpu_get_instruction_length(struct metal_cpu cpu, uintptr_t epc) {

@@ -14,9 +14,9 @@
 
 struct metal_led sifive_gpio_leds_get(char *label) {
     assert(label != NULL);
-    for(uint32_t i = 0; i < __METAL_DT_NUM_SIFIVE_GPIO_LEDS; i++) {
-        struct metal_led led = (struct metal_led) { i };
-        if(strcmp(LED_LABEL(led), label) == 0) {
+    for (uint32_t i = 0; i < __METAL_DT_NUM_SIFIVE_GPIO_LEDS; i++) {
+        struct metal_led led = (struct metal_led){i};
+        if (strcmp(LED_LABEL(led), label) == 0) {
             return led;
         }
     }
@@ -37,9 +37,9 @@ struct metal_led sifive_gpio_leds_get_rgb(char *label, char *color) {
         strncat(led_label, color, sizeof(led_label) - label_length);
     }
 
-    for(uint32_t i = 0; i < __METAL_DT_NUM_SIFIVE_GPIO_LEDS; i++) {
-        struct metal_led led = (struct metal_led) { i };
-        if(strcmp(LED_LABEL(led), led_label) == 0) {
+    for (uint32_t i = 0; i < __METAL_DT_NUM_SIFIVE_GPIO_LEDS; i++) {
+        struct metal_led led = (struct metal_led){i};
+        if (strcmp(LED_LABEL(led), led_label) == 0) {
             return led;
         }
     }
