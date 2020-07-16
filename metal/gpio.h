@@ -5,8 +5,8 @@
 #define METAL__GPIO_H
 
 #include <assert.h>
-#include <metal/interrupt.h>
 #include <metal/generated/gpio.h>
+#include <metal/interrupt.h>
 #include <stdint.h>
 
 /*!
@@ -15,14 +15,14 @@
  */
 
 enum metal_gpio_int_type {
-	METAL_GPIO_INT_DISABLE = 0,
-	METAL_GPIO_INT_RISING = 1,
-	METAL_GPIO_INT_FALLING = 2,
-	METAL_GPIO_INT_BOTH_EDGE = 3,
-	METAL_GPIO_INT_LOW = 4,
-	METAL_GPIO_INT_HIGH = 5,
-	METAL_GPIO_INT_BOTH_LEVEL = 6,
-	METAL_GPIO_INT_MAX = 7,
+    METAL_GPIO_INT_DISABLE = 0,
+    METAL_GPIO_INT_RISING = 1,
+    METAL_GPIO_INT_FALLING = 2,
+    METAL_GPIO_INT_BOTH_EDGE = 3,
+    METAL_GPIO_INT_LOW = 4,
+    METAL_GPIO_INT_HIGH = 5,
+    METAL_GPIO_INT_BOTH_LEVEL = 6,
+    METAL_GPIO_INT_MAX = 7,
 };
 
 /*!
@@ -39,8 +39,8 @@ struct metal_gpio {
  * @param device_num The index of the desired GPIO device
  * @return A handle to the GPIO device */
 inline const struct metal_gpio metal_gpio_get_device(uint32_t index) {
-	assert(index < __METAL_DT_NUM_GPIOS);
-    return (const struct metal_gpio) { index };
+    assert(index < __METAL_DT_NUM_GPIOS);
+    return (const struct metal_gpio){index};
 }
 
 /*!
@@ -151,6 +151,7 @@ int metal_gpio_config_interrupt(struct metal_gpio gpio, int pin,
  * @param intr_type The interrupt type to be clear
  * @return 0 if the interrupt is cleared
  */
-int metal_gpio_clear_interrupt(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type);
+int metal_gpio_clear_interrupt(struct metal_gpio gpio, int pin,
+                               enum metal_gpio_int_type int_type);
 
 #endif

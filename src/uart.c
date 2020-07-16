@@ -33,9 +33,7 @@ int metal_uart_transmit_interrupt_enable(struct metal_uart uart) { return -1; }
 
 int metal_uart_transmit_interrupt_disable(struct metal_uart uart)
     __attribute__((weak));
-int metal_uart_transmit_interrupt_disable(struct metal_uart uart) {
-    return -1;
-}
+int metal_uart_transmit_interrupt_disable(struct metal_uart uart) { return -1; }
 
 int metal_uart_receive_interrupt_enable(struct metal_uart uart)
     __attribute__((weak));
@@ -65,7 +63,9 @@ size_t metal_uart_get_receive_watermark(struct metal_uart uart)
     __attribute__((weak));
 size_t metal_uart_get_receive_watermark(struct metal_uart uart) { return 0; }
 
-void _metal_uart_pre_rate_change_callback(struct metal_uart uart) __attribute__((weak));
+void _metal_uart_pre_rate_change_callback(struct metal_uart uart)
+    __attribute__((weak));
 void _metal_uart_pre_rate_change_callback(struct metal_uart uart) {}
-void _metal_uart_post_rate_change_callback(struct metal_uart uart) __attribute__((weak));
+void _metal_uart_post_rate_change_callback(struct metal_uart uart)
+    __attribute__((weak));
 void _metal_uart_post_rate_change_callback(struct metal_uart uart) {}

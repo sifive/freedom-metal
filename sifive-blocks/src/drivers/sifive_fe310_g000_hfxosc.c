@@ -14,8 +14,7 @@
 
 #define get_index(clk) ((clk).__clock_index)
 
-uint64_t sifive_fe310_g000_hfxosc_get_rate_hz(
-    struct metal_clock clock) {
+uint64_t sifive_fe310_g000_hfxosc_get_rate_hz(struct metal_clock clock) {
 
     uintptr_t base = dt_clock_data[get_index(clock)].base;
     uint32_t cfg = __METAL_ACCESS_ONCE((__metal_io_u32 *)base);
@@ -29,8 +28,8 @@ uint64_t sifive_fe310_g000_hfxosc_get_rate_hz(
     return metal_clock_get_rate_hz(ref);
 }
 
-uint64_t sifive_fe310_g000_hfxosc_set_rate_hz(
-    struct metal_clock clock, uint64_t rate) {
+uint64_t sifive_fe310_g000_hfxosc_set_rate_hz(struct metal_clock clock,
+                                              uint64_t rate) {
     return sifive_fe310_g000_hfxosc_get_rate_hz(clock);
 }
 

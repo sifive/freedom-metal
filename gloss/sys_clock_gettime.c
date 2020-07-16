@@ -38,7 +38,7 @@ int clock_getres(clockid_t clk_id, struct timespec *res) {
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp) {
     unsigned long long ticks;
-    struct metal_cpu cpu = (struct metal_cpu) { 0 };
+    struct metal_cpu cpu = (struct metal_cpu){0};
 
     switch (clk_id) {
     case CLOCK_MONOTONIC:

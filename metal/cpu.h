@@ -25,8 +25,8 @@ struct metal_cpu {
  * @return A pointer to the CPU device handle
  */
 inline struct metal_cpu metal_cpu_get(unsigned int hartid) {
-	assert(hartid < __METAL_DT_NUM_HARTS);
-	return (struct metal_cpu) { hartid };
+    assert(hartid < __METAL_DT_NUM_HARTS);
+    return (struct metal_cpu){hartid};
 }
 
 /*! @brief Get the hartid of the CPU hart executing this function
@@ -169,7 +169,8 @@ uintptr_t metal_cpu_get_exception_pc(struct metal_cpu cpu);
  */
 int metal_cpu_set_exception_pc(struct metal_cpu cpu, uintptr_t epc);
 
-/* I ripped out the buserror driver but I'd rather not delete the code unnecessarily */
+/* I ripped out the buserror driver but I'd rather not delete the code
+ * unnecessarily */
 struct metal_buserror {
     uint32_t __buserror_index;
 };

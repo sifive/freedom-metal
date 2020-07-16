@@ -11,12 +11,11 @@
 #define get_index(clk) ((clk).__clock_index)
 
 uint64_t fixed_clock_get_rate_hz(struct metal_clock clk) {
-	return dt_clock_rate[get_index(clk)];
+    return dt_clock_rate[get_index(clk)];
 }
 
-uint64_t fixed_clock_set_rate_hz(struct metal_clock clk,
-                                            uint64_t target_hz) {
-	return dt_clock_rate[get_index(clk)];
+uint64_t fixed_clock_set_rate_hz(struct metal_clock clk, uint64_t target_hz) {
+    return dt_clock_rate[get_index(clk)];
 }
 
 #endif /* METAL_FIXED_CLOCK */

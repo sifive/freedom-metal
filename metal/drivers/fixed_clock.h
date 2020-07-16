@@ -9,7 +9,6 @@
 
 uint64_t fixed_clock_get_rate_hz(struct metal_clock clk);
 
-uint64_t fixed_clock_set_rate_hz(struct metal_clock clk,
-                                            uint64_t target_hz);
+uint64_t fixed_clock_set_rate_hz(struct metal_clock clk, uint64_t target_hz);
 
 #endif /* __METAL__FIXED_CLOCK_H */

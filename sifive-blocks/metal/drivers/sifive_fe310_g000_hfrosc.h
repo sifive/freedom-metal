@@ -7,10 +7,9 @@
 #include <metal/clock.h>
 #include <stdint.h>
 
-uint64_t sifive_fe310_g000_hfrosc_get_rate_hz(
-    struct metal_clock clock);
+uint64_t sifive_fe310_g000_hfrosc_get_rate_hz(struct metal_clock clock);
 
-uint64_t sifive_fe310_g000_hfrosc_set_rate_hz(
-    struct metal_clock clock, uint64_t rate);
+uint64_t sifive_fe310_g000_hfrosc_set_rate_hz(struct metal_clock clock,
+                                              uint64_t rate);
 
 #endif

@@ -9,7 +9,7 @@
 
 #define get_index(intc) ((intc).__interrupt_index)
 
-static bool init_done[__METAL_DT_NUM_HARTS] = { false };
+static bool init_done[__METAL_DT_NUM_HARTS] = {false};
 
 void __metal_exception_handler(void) __attribute__((interrupt, aligned(128)));
 void __metal_exception_handler(void) {
@@ -55,53 +55,54 @@ void riscv_cpu_intc_init(struct metal_interrupt intc) {
 
 METAL_CONSTRUCTOR(init_riscv_cpu_intc) {
     for (int i = 0; i < __METAL_DT_NUM_HARTS; i++) {
-        struct metal_interrupt intc = (struct metal_interrupt) { i };
+        struct metal_interrupt intc = (struct metal_interrupt){i};
         riscv_cpu_intc_init(intc);
     }
 }
 
 extern void __metal_vector_table(void);
 
-int riscv_cpu_intc_set_vector_mode(
-    struct metal_interrupt controller, metal_vector_mode mode) {
+int riscv_cpu_intc_set_vector_mode(struct metal_interrupt controller,
+                                   metal_vector_mode mode) {
 
     switch (mode) {
     default:
     case METAL_DIRECT_MODE:
         /* Write the trap vector address with the vectored bit unset */
-        __asm__ volatile("csrw mtvec, %0" ::"r" ((uintptr_t)__metal_exception_handler));
+        __asm__ volatile(
+            "csrw mtvec, %0" ::"r"((uintptr_t)__metal_exception_handler));
         break;
     case METAL_VECTORED_MODE:
         /* Write the jump table address with the vectored bit set */
-        __asm__ volatile("csrw mtvec, %0"
-                         :: "r" ((uintptr_t)__metal_vector_table | METAL_MTVEC_VECTORED));
+        __asm__ volatile("csrw mtvec, %0" ::"r"(
+            (uintptr_t)__metal_vector_table | METAL_MTVEC_VECTORED));
         break;
     }
 
     return 0;
 }
 
-metal_vector_mode riscv_cpu_intc_get_vector_mode(
-    struct metal_interrupt controller) {
+metal_vector_mode
+riscv_cpu_intc_get_vector_mode(struct metal_interrupt controller) {
 
     uintptr_t mtvec;
     __asm__ volatile("csrr %0, mtvec" : "=r"(mtvec));
 
     switch (mtvec & METAL_MTVEC_MODE) {
-        default:
-        case METAL_MTVEC_DIRECT:
-            return METAL_DIRECT_MODE;
-        case METAL_MTVEC_VECTORED:
-            return METAL_VECTORED_MODE;
-        case METAL_MTVEC_CLIC:
-            return METAL_CLIC_DIRECT_MODE;
-        case METAL_MTVEC_CLIC_VECTORED:
-            return METAL_CLIC_VECTORED_MODE;
+    default:
+    case METAL_MTVEC_DIRECT:
+        return METAL_DIRECT_MODE;
+    case METAL_MTVEC_VECTORED:
+        return METAL_VECTORED_MODE;
+    case METAL_MTVEC_CLIC:
+        return METAL_CLIC_DIRECT_MODE;
+    case METAL_MTVEC_CLIC_VECTORED:
+        return METAL_CLIC_VECTORED_MODE;
     }
 }
 
 int riscv_cpu_intc_set_privilege(struct metal_interrupt controller,
-                                                metal_intr_priv_mode privilege) {
+                                 metal_intr_priv_mode privilege) {
     if (privilege == METAL_INTR_PRIV_M_MODE) {
         return 0;
     }
@@ -113,8 +114,7 @@ riscv_cpu_intc_get_privilege(struct metal_interrupt controller) {
     return METAL_INTR_PRIV_M_MODE;
 }
 
-int riscv_cpu_intc_enable(
-    struct metal_interrupt controller, int id) {
+int riscv_cpu_intc_enable(struct metal_interrupt controller, int id) {
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
         return -1;
@@ -122,13 +122,13 @@ int riscv_cpu_intc_enable(
 
     switch (id) {
     case METAL_INTERRUPT_ID_SW:
-        __asm__ volatile("csrs mie, %0" :: "r"(METAL_MIE_MSIE));
+        __asm__ volatile("csrs mie, %0" ::"r"(METAL_MIE_MSIE));
         break;
     case METAL_INTERRUPT_ID_TMR:
-        __asm__ volatile("csrs mie, %0" :: "r"(METAL_MIE_MTIE));
+        __asm__ volatile("csrs mie, %0" ::"r"(METAL_MIE_MTIE));
         break;
     case METAL_INTERRUPT_ID_EXT:
-        __asm__ volatile("csrs mie, %0" :: "r"(METAL_MIE_MEIE));
+        __asm__ volatile("csrs mie, %0" ::"r"(METAL_MIE_MEIE));
         break;
     case METAL_INTERRUPT_ID_LC0:
     case METAL_INTERRUPT_ID_LC1:
@@ -146,7 +146,7 @@ int riscv_cpu_intc_enable(
     case METAL_INTERRUPT_ID_LC13:
     case METAL_INTERRUPT_ID_LC14:
     case METAL_INTERRUPT_ID_LC15:
-        __asm__ volatile("csrs mie, %0" :: "r"(1 << id));
+        __asm__ volatile("csrs mie, %0" ::"r"(1 << id));
         break;
     default:
         return -1;
@@ -154,8 +154,8 @@ int riscv_cpu_intc_enable(
     return 0;
 }
 
-int riscv_cpu_intc_interrupt_disable(
-    struct metal_interrupt controller, int id) {
+int riscv_cpu_intc_interrupt_disable(struct metal_interrupt controller,
+                                     int id) {
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
         return -1;
@@ -163,13 +163,13 @@ int riscv_cpu_intc_interrupt_disable(
 
     switch (id) {
     case METAL_INTERRUPT_ID_SW:
-        __asm__ volatile("csrc mie, %0" :: "r"(METAL_MIE_MSIE));
+        __asm__ volatile("csrc mie, %0" ::"r"(METAL_MIE_MSIE));
         break;
     case METAL_INTERRUPT_ID_TMR:
-        __asm__ volatile("csrc mie, %0" :: "r"(METAL_MIE_MTIE));
+        __asm__ volatile("csrc mie, %0" ::"r"(METAL_MIE_MTIE));
         break;
     case METAL_INTERRUPT_ID_EXT:
-        __asm__ volatile("csrc mie, %0" :: "r"(METAL_MIE_MEIE));
+        __asm__ volatile("csrc mie, %0" ::"r"(METAL_MIE_MEIE));
         break;
     case METAL_INTERRUPT_ID_LC0:
     case METAL_INTERRUPT_ID_LC1:
@@ -187,7 +187,7 @@ int riscv_cpu_intc_interrupt_disable(
     case METAL_INTERRUPT_ID_LC13:
     case METAL_INTERRUPT_ID_LC14:
     case METAL_INTERRUPT_ID_LC15:
-        __asm__ volatile("csrc mie, %0" :: "r"(1 << id));
+        __asm__ volatile("csrc mie, %0" ::"r"(1 << id));
     default:
         return -1;
     }
@@ -195,28 +195,26 @@ int riscv_cpu_intc_interrupt_disable(
 }
 
 int riscv_cpu_intc_set_threshold(struct metal_interrupt controller,
-                                                unsigned int level) {
+                                 unsigned int level) {
     return -1;
 }
 
-unsigned int
-riscv_cpu_intc_get_threshold(struct metal_interrupt controller) {
+unsigned int riscv_cpu_intc_get_threshold(struct metal_interrupt controller) {
     return 0;
 }
 
-int riscv_cpu_intc_set_priority(struct metal_interrupt controller,
-                                               int id, unsigned int priority) {
+int riscv_cpu_intc_set_priority(struct metal_interrupt controller, int id,
+                                unsigned int priority) {
     return -1;
 }
 
-unsigned int
-riscv_cpu_intc_get_priority(struct metal_interrupt controller, int id) {
+unsigned int riscv_cpu_intc_get_priority(struct metal_interrupt controller,
+                                         int id) {
     return 0;
 }
 
-int
-riscv_cpu_intc_set_preemptive_level(struct metal_interrupt controller, int id,
-                                                   unsigned int level) {
+int riscv_cpu_intc_set_preemptive_level(struct metal_interrupt controller,
+                                        int id, unsigned int level) {
     return -1;
 }
 
@@ -225,8 +223,8 @@ riscv_cpu_intc_get_preemptive_level(struct metal_interrupt controller, int id) {
     return 0;
 }
 
-int riscv_cpu_intc_vector_enable(
-    struct metal_interrupt intc, int id, metal_vector_mode mode) {
+int riscv_cpu_intc_vector_enable(struct metal_interrupt intc, int id,
+                                 metal_vector_mode mode) {
 
 #ifdef METAL_HLIC_VECTORED
     return 0;
@@ -235,10 +233,8 @@ int riscv_cpu_intc_vector_enable(
 #endif
 }
 
-int
-riscv_cpu_intc_vector_disable(
-    struct metal_interrupt controller, int id) {
-    
+int riscv_cpu_intc_vector_disable(struct metal_interrupt controller, int id) {
+
 #ifdef METAL_HLIC_VECTORED
     return -1;
 #else
@@ -246,28 +242,27 @@ riscv_cpu_intc_vector_disable(
 #endif
 }
 
-metal_affinity
-riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
+metal_affinity riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
                                               metal_affinity bitmask, int id) {
     /* Return a 1 for each hart in the bitmask, representing failure. */
-    return (metal_affinity) { (1 << __METAL_DT_NUM_HARTS) - 1 };
+    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
 }
 
 metal_affinity
 riscv_cpu_intc_affinity_disable(struct metal_interrupt controller,
-                                               metal_affinity bitmask, int id) {
-    return (metal_affinity) { (1 << __METAL_DT_NUM_HARTS) - 1 };
+                                metal_affinity bitmask, int id) {
+    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
 }
 
 metal_affinity
 riscv_cpu_intc_affinity_set_threshold(struct metal_interrupt controller,
-                                                     metal_affinity bitmask,
-                                                     unsigned int level) {
-    return (metal_affinity) { (1 << __METAL_DT_NUM_HARTS) - 1 };
+                                      metal_affinity bitmask,
+                                      unsigned int level) {
+    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
 }
 
 unsigned int
 riscv_cpu_intc_affinity_get_threshold(struct metal_interrupt controller,
-                                                     int context_id) {
+                                      int context_id) {
     return 0;
 }

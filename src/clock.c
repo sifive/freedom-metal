@@ -9,4 +9,6 @@
 
 uint64_t metal_clock_get_rate_hz(struct metal_clock clk) { return 0; }
 
-uint64_t metal_clock_set_rate_hz(struct metal_clock clk, uint64_t hz) { return 0; }
+uint64_t metal_clock_set_rate_hz(struct metal_clock clk, uint64_t hz) {
+    return 0;
+}

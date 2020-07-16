@@ -10,7 +10,8 @@
 #include <metal/io.h>
 
 #define GPIO_REG(offset) ((uintptr_t)((base) + (offset)))
-#define GPIO_REGW(offset) (__METAL_ACCESS_ONCE((__metal_io_u32 *)GPIO_REG(offset)))
+#define GPIO_REGW(offset)                                                      \
+    (__METAL_ACCESS_ONCE((__metal_io_u32 *)GPIO_REG(offset)))
 
 int sifive_gpio0_enable_input(struct metal_gpio gpio, int pin) {
     uintptr_t base = BASE_ADDR(gpio);
@@ -83,7 +84,7 @@ int sifive_gpio0_toggle_pin(struct metal_gpio gpio, int pin) {
 }
 
 int sifive_gpio0_enable_pinmux(struct metal_gpio gpio, long pin_mask,
-                             long io_function_mask) {
+                               long io_function_mask) {
     uintptr_t base = BASE_ADDR(gpio);
 
     GPIO_REGW(METAL_SIFIVE_GPIO0_IOF_SEL) |= pin_mask;
@@ -102,7 +103,8 @@ int sifive_gpio0_disable_pinmux(struct metal_gpio gpio, long pin_mask) {
     return 0;
 }
 
-int sifive_gpio0_config_interrupt(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type) {
+int sifive_gpio0_config_interrupt(struct metal_gpio gpio, int pin,
+                                  enum metal_gpio_int_type int_type) {
     uintptr_t base = BASE_ADDR(gpio);
 
     switch (int_type) {
@@ -146,7 +148,8 @@ int sifive_gpio0_config_interrupt(struct metal_gpio gpio, int pin, enum metal_gp
     return metal_interrupt_enable(intc, id);
 }
 
-int sifive_gpio0_clear_interrupt(struct metal_gpio gpio, int pin, enum metal_gpio_int_type int_type) {
+int sifive_gpio0_clear_interrupt(struct metal_gpio gpio, int pin,
+                                 enum metal_gpio_int_type int_type) {
     uintptr_t base = BASE_ADDR(gpio);
 
     switch (int_type) {

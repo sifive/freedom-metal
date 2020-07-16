@@ -39,8 +39,6 @@ muldiv(unsigned long long v, unsigned long long num, unsigned long long den) {
    children's times to zero. Eventually we might want to separately
    account for user vs system time, but for now we just return the total
    number of cycles since starting the program.  */
-clock_t _times(struct tms *buf) {
-    return -1;
-}
+clock_t _times(struct tms *buf) { return -1; }
 
 extern __typeof(_times) times __attribute__((__weak__, __alias__("_times")));
