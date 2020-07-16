@@ -50,6 +50,10 @@ _start:
   la t0, __metal_boot_hart
   bne a0, t0, _skip_init
 
+  // Put the L2 flush address 0x02010200 (64-bit) into t3.
+  lui t3, 0x2010
+  addi t3, t3, 0x200
+
   /* Embedded systems frequently require relocating the data segment before C
    * code can be run -- for example, the data segment may exist in flash upon
    * boot and then need to get relocated into a non-persistant writable memory
@@ -64,6 +68,8 @@ _start:
   beq t0, t1, 2f
   bge t1, t2, 2f
 
+  // Mark that we are doing data copy with a recognizable instruction.
+  xori a1, a1, 0
 1:
 #if __riscv_xlen == 32
   lw   a0, 0(t0)
@@ -80,6 +86,27 @@ _start:
 #endif
 2:
 
+  /* Now flush out the data section. */
+  la t0, metal_segment_data_source_start
+  la t1, metal_segment_data_target_start
+  la t2, metal_segment_data_target_end
+
+  beq t0, t1, 2f
+  bge t1, t2, 2f
+  // t1 is the starting destination ptr.
+1:
+#if __riscv_xlen == 32
+  sw   t1, 0(t3)
+  addi t1, t1, 64
+  blt  t1, t2, 1b
+#else
+  sd   t1, 0(t3)
+  addi t1, t1, 64
+  blt  t1, t2, 1b
+#endif
+
+2:
+
   /* Copy the ITIM section */
   la t0, metal_segment_itim_source_start
   la t1, metal_segment_itim_target_start
@@ -88,6 +115,8 @@ _start:
   beq t0, t1, 2f
   bge t1, t2, 2f
 
+  // Mark that we are doing instruction copy with a recognizable instruction.
+  xori a2, a2, 0
 1:
 #if __riscv_xlen == 32
   lw   a0, 0(t0)
@@ -108,12 +137,36 @@ _start:
      complete */
   fence.i
 
+  /* Now flush out the ITIM. */
+  la t0, metal_segment_itim_source_start
+  la t1, metal_segment_itim_target_start
+  la t2, metal_segment_itim_target_end
+
+  beq t0, t1, 2f
+  bge t1, t2, 2f
+
+  // t1 is the starting destination ptr.
+1:
+#if __riscv_xlen == 32
+  sw   t1, 0(t3)
+  addi t1, t1, 64
+  blt  t1, t2, 1b
+#else
+  sd   t1, 0(t3)
+  addi t1, t1, 64
+  blt  t1, t2, 1b
+#endif
+
+2:
+
   /* Zero the BSS segment. */
   la t1, metal_segment_bss_target_start
   la t2, metal_segment_bss_target_end
 
   bge t1, t2, 2f
 
+  // Mark that we are doing BSS zero with a recognizable instruction.
+  xori a3, a3, 0
 1:
 #if __riscv_xlen == 32
   sw   x0, 0(t1)
@@ -124,6 +177,25 @@ _start:
   addi t1, t1, 8
   blt  t1, t2, 1b
 #endif
+2:
+
+  // And now flush the BSS as well.
+  la t1, metal_segment_bss_target_start
+  la t2, metal_segment_bss_target_end
+  bge t1, t2, 2f
+
+  // t1 is the starting destination ptr.
+1:
+#if __riscv_xlen == 32
+  sw   t1, 0(t3)
+  addi t1, t1, 64
+  blt  t1, t2, 1b
+#else
+  sd   t1, 0(t3)
+  addi t1, t1, 64
+  blt  t1, t2, 1b
+#endif
+
 2:
 
   /* Set TLS pointer */
