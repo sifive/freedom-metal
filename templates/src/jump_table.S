@@ -1,0 +1,64 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#include <metal/interrupt_handlers.h>
+
+#ifdef METAL_HLIC_VECTORED
+
+#if __riscv_xlen == 32
+.balign 128, 0
+#else
+.balign 256, 0
+#endif
+.option norvc
+.global __metal_vector_table
+__metal_vector_table:
+        j __metal_exception_handler
+IRQ_0:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_1:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_2:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_3:
+        j metal_riscv_cpu_intc_msip_handler
+IRQ_4:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_5:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_6:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_7:
+        j metal_riscv_cpu_intc_mtip_handler
+IRQ_8:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_9:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_10:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_11:
+{% if defined(external_interrupts) %}
+        j metal_riscv_plic0_source_0_handler
+{% else %}
+        j metal_riscv_cpu_intc_meip_handler
+{% endif %}
+IRQ_12:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_13:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_14:
+        j metal_riscv_cpu_intc_default_handler
+IRQ_15:
+        j metal_riscv_cpu_intc_default_handler
+{% if defined(local_interrupts) %}
+  {% for irq in local_interrupts.irqs %}
+IRQ_LOCAL_{{ irq.id }}:
+    {% if defined(irq.source) %}
+      j metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler
+    {% else %}
+      j metal_{{ local_interrupts.controller }}_{{ irq.id }}_handler
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+#endif /* METAL_HLIC_VECTORED */

@@ -2,19 +2,14 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/cpu.h>
+#include <metal/generated/pmp.h>
 #include <metal/machine.h>
 #include <metal/pmp.h>
 
 #define CONFIG_TO_INT(_config) (*((char *)&(_config)))
 #define INT_TO_CONFIG(_int) (*((struct metal_pmp_config *)(char *)&(_int)))
 
-struct metal_pmp *metal_pmp_get_device(void) {
-#ifdef __METAL_DT_PMP_HANDLE
-    return __METAL_DT_PMP_HANDLE;
-#else
-    return NULL;
-#endif
-}
+static uintptr_t granularity[__METAL_DT_NUM_HARTS];
 
 /* This function calculates the minimum granularity from the address
  * that pmpaddr takes on after writing all ones to pmpaddr when pmpcfg = 0.
@@ -64,9 +59,7 @@ static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
 
 /* Get the number of pmp regions for the given hart */
 int metal_pmp_num_regions(int hartid) {
-    struct metal_cpu *cpu = metal_cpu_get(hartid);
-
-    return __metal_driver_cpu_num_pmp_regions(cpu);
+    return num_pmp_regions[hartid];
 }
 
 /* Get the number of pmp regions for the current hart */
@@ -74,11 +67,7 @@ static unsigned int _pmp_regions() {
     return metal_pmp_num_regions(metal_cpu_get_current_hartid());
 }
 
-void metal_pmp_init(struct metal_pmp *pmp) {
-    if (!pmp) {
-        return;
-    }
-
+void metal_pmp_init(void) {
     struct metal_pmp_config init_config = {
         .L = METAL_PMP_UNLOCKED,
         .A = METAL_PMP_OFF,
@@ -88,25 +77,25 @@ void metal_pmp_init(struct metal_pmp *pmp) {
     };
 
     for (unsigned int i = 0; i < _pmp_regions(); i++) {
-        metal_pmp_set_region(pmp, i, init_config, 0);
+        metal_pmp_set_region(i, init_config, 0);
     }
 
     /* Detect the region granularity by writing all 1s to pmpaddr0 while
      * pmpcfg0 = 0. */
-    if (metal_pmp_set_address(pmp, 0, -1) != 0) {
+    if (metal_pmp_set_address(0, -1) != 0) {
         /* Failed to detect granularity */
         return;
     }
 
     /* Calculate the granularity based on the value that pmpaddr0 takes on */
-    pmp->_granularity[metal_cpu_get_current_hartid()] =
-        _get_detected_granularity(metal_pmp_get_address(pmp, 0));
+    granularity[metal_cpu_get_current_hartid()] =
+        _get_detected_granularity(metal_pmp_get_address(0));
 
     /* Clear pmpaddr0 */
-    metal_pmp_set_address(pmp, 0, 0);
+    metal_pmp_set_address(0, 0);
 }
 
-int metal_pmp_set_region(struct metal_pmp *pmp, unsigned int region,
+int metal_pmp_set_region(unsigned int region,
                          struct metal_pmp_config config, size_t address) {
     struct metal_pmp_config old_config;
     size_t old_address;
@@ -114,30 +103,25 @@ int metal_pmp_set_region(struct metal_pmp *pmp, unsigned int region,
     size_t pmpcfg;
     int rc = 0;
 
-    if (!pmp) {
-        /* Device handle cannot be NULL */
-        return 1;
-    }
-
     if (region > _pmp_regions()) {
         /* Region outside of supported range */
         return 2;
     }
 
     if (config.A == METAL_PMP_NA4 &&
-        pmp->_granularity[metal_cpu_get_current_hartid()] > 4) {
+        granularity[metal_cpu_get_current_hartid()] > 4) {
         /* The requested granularity is too small */
         return 3;
     }
 
     if (config.A == METAL_PMP_NAPOT &&
-        pmp->_granularity[metal_cpu_get_current_hartid()] >
+        granularity[metal_cpu_get_current_hartid()] >
             _get_pmpaddr_granularity(address)) {
         /* The requested granularity is too small */
         return 3;
     }
 
-    rc = metal_pmp_get_region(pmp, region, &old_config, &old_address);
+    rc = metal_pmp_get_region(region, &old_config, &old_address);
     if (rc) {
         /* Error reading region */
         return rc;
@@ -258,7 +242,7 @@ int metal_pmp_set_region(struct metal_pmp *pmp, unsigned int region,
     return 0;
 }
 
-int metal_pmp_get_region(struct metal_pmp *pmp, unsigned int region,
+int metal_pmp_get_region(unsigned int region,
                          struct metal_pmp_config *config, size_t *address) {
     size_t pmpcfg = 0;
     char *pmpcfg_convert = (char *)&pmpcfg;
@@ -363,12 +347,12 @@ int metal_pmp_get_region(struct metal_pmp *pmp, unsigned int region,
     return 0;
 }
 
-int metal_pmp_lock(struct metal_pmp *pmp, unsigned int region) {
+int metal_pmp_lock(unsigned int region) {
     struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = metal_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(region, &config, &address);
     if (rc) {
         return rc;
     }
@@ -379,139 +363,139 @@ int metal_pmp_lock(struct metal_pmp *pmp, unsigned int region) {
 
     config.L = METAL_PMP_LOCKED;
 
-    rc = metal_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(region, config, address);
 
     return rc;
 }
 
-int metal_pmp_set_address(struct metal_pmp *pmp, unsigned int region,
+int metal_pmp_set_address(unsigned int region,
                           size_t address) {
     struct metal_pmp_config config;
     size_t old_address;
     int rc = 0;
 
-    rc = metal_pmp_get_region(pmp, region, &config, &old_address);
+    rc = metal_pmp_get_region(region, &config, &old_address);
     if (rc) {
         return rc;
     }
 
-    rc = metal_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(region, config, address);
 
     return rc;
 }
 
-size_t metal_pmp_get_address(struct metal_pmp *pmp, unsigned int region) {
+size_t metal_pmp_get_address(unsigned int region) {
     struct metal_pmp_config config;
     size_t address = 0;
 
-    metal_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(region, &config, &address);
 
     return address;
 }
 
-int metal_pmp_set_address_mode(struct metal_pmp *pmp, unsigned int region,
+int metal_pmp_set_address_mode(unsigned int region,
                                enum metal_pmp_address_mode mode) {
     struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = metal_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(region, &config, &address);
     if (rc) {
         return rc;
     }
 
     config.A = mode;
 
-    rc = metal_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(region, config, address);
 
     return rc;
 }
 
-enum metal_pmp_address_mode metal_pmp_get_address_mode(struct metal_pmp *pmp,
+enum metal_pmp_address_mode metal_pmp_get_address_mode(,
                                                        unsigned int region) {
     struct metal_pmp_config config;
     size_t address = 0;
 
-    metal_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(region, &config, &address);
 
     return config.A;
 }
 
-int metal_pmp_set_executable(struct metal_pmp *pmp, unsigned int region,
+int metal_pmp_set_executable(unsigned int region,
                              int X) {
     struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = metal_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(region, &config, &address);
     if (rc) {
         return rc;
     }
 
     config.X = X;
 
-    rc = metal_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(region, config, address);
 
     return rc;
 }
 
-int metal_pmp_get_executable(struct metal_pmp *pmp, unsigned int region) {
+int metal_pmp_get_executable(unsigned int region) {
     struct metal_pmp_config config;
     size_t address = 0;
 
-    metal_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(region, &config, &address);
 
     return config.X;
 }
 
-int metal_pmp_set_writeable(struct metal_pmp *pmp, unsigned int region, int W) {
+int metal_pmp_set_writeable(unsigned int region, int W) {
     struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = metal_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(region, &config, &address);
     if (rc) {
         return rc;
     }
 
     config.W = W;
 
-    rc = metal_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(region, config, address);
 
     return rc;
 }
 
-int metal_pmp_get_writeable(struct metal_pmp *pmp, unsigned int region) {
+int metal_pmp_get_writeable(unsigned int region) {
     struct metal_pmp_config config;
     size_t address = 0;
 
-    metal_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(region, &config, &address);
 
     return config.W;
 }
 
-int metal_pmp_set_readable(struct metal_pmp *pmp, unsigned int region, int R) {
+int metal_pmp_set_readable(unsigned int region, int R) {
     struct metal_pmp_config config;
     size_t address;
     int rc = 0;
 
-    rc = metal_pmp_get_region(pmp, region, &config, &address);
+    rc = metal_pmp_get_region(region, &config, &address);
     if (rc) {
         return rc;
     }
 
     config.R = R;
 
-    rc = metal_pmp_set_region(pmp, region, config, address);
+    rc = metal_pmp_set_region(region, config, address);
 
     return rc;
 }
 
-int metal_pmp_get_readable(struct metal_pmp *pmp, unsigned int region) {
+int metal_pmp_get_readable(unsigned int region) {
     struct metal_pmp_config config;
     size_t address = 0;
 
-    metal_pmp_get_region(pmp, region, &config, &address);
+    metal_pmp_get_region(region, &config, &address);
 
     return config.R;
 }

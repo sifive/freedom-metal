@@ -39,11 +39,11 @@ int clock_getres(clockid_t clk_id, struct timespec *res) {
 
 int clock_gettime(clockid_t clk_id, struct timespec *tp) {
     unsigned long long ticks;
+    struct metal_cpu cpu = (struct metal_cpu) { 0 };
 
     switch (clk_id) {
     case CLOCK_MONOTONIC:
-        mtime_interrupt_controller->vtable->command_request(
-            mtime_interrupt_controller, METAL_TIMER_MTIME_GET, &ticks);
+        ticks = metal_cpu_get_mtime(cpu);
         tp->tv_sec = ticks / MTIME_RATE_HZ;
         tp->tv_nsec = ((ticks % (MTIME_RATE_HZ)) * 1000000000) / MTIME_RATE_HZ;
         return 0;

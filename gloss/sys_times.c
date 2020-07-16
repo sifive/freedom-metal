@@ -41,27 +41,7 @@ muldiv(unsigned long long v, unsigned long long num, unsigned long long den) {
    account for user vs system time, but for now we just return the total
    number of cycles since starting the program.  */
 clock_t _times(struct tms *buf) {
-    unsigned long long mcc;
-    unsigned long long timebase;
-    int hartid = metal_cpu_get_current_hartid();
-
-    metal_timer_get_timebase_frequency(hartid, &timebase);
-    metal_timer_get_cyclecount(hartid, &mcc);
-
-    /*
-     * Convert from native resolution to published resolution.
-     *
-     * Truncating this to 64 bits works because a change of 'c' in
-     * cyclecount will change the return value by
-     * c * CLOCKS_PER_SEC / timebase, so applications will see
-     * time marching forward.
-     */
-    mcc = muldiv(mcc, CLOCKS_PER_SEC, timebase);
-
-    buf->tms_stime = 0;
-    buf->tms_cutime = 0;
-    buf->tms_cstime = 0;
-    return buf->tms_utime = mcc;
+    return -1;
 }
 
 extern __typeof(_times) times __attribute__((__weak__, __alias__("_times")));
