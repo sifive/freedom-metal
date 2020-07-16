@@ -13,17 +13,23 @@
 
 #define __METAL_DT_NUM_SIFIVE_FE310_G000_HFXOSCS {{ sifive_fe310_g000_hfxoscs|length }}
 
-static const struct dt_sifive_fe310_g000_hfxosc_clock_data {
-	uintptr_t base;
-	struct metal_clock ref;
-} dt_clock_data[__METAL_DT_NUM_SIFIVE_FE310_G000_HFXOSCS] = {
-	{% for clk in sifive_fe310_g000_hfxoscs %}
-	{
-		.base = {{ clk.regs_by_name['config'][0] }},
-		.ref = (struct metal_clock) { {{ clk.clocks[0].id }} },
-	},
-	{% endfor %}
+{% if sifive_fe310_g000_hfxoscs|length > 1 %}
+
+static const struct metal_clock ref_clocks[__METAL_DT_NUM_SIFIVE_FE310_G000_HFXOSCS] = {
+{% for clk in sifive_fe310_g000_hfxoscs %}
+	.ref = (struct metal_clock) { {{ clk.clocks[0].id }} },
+{% endfor %}
 };
+
+#define get_index(clock) ((clock).__clock_index)
+#define REF_CLOCK(clock) ref_clocks[get_index(clock)]
+
+{% else %}
+
+#define get_index(clock) 0
+#define REF_CLOCK(clock) ((struct metal_clock) { {{ sifive_fe310_g000_hfxoscs[0].clocks[0].id }} })
+
+{% endif %}
 
 {% set driver_string = to_snakecase(sifive_fe310_g000_hfxoscs[0].clocks[0].compatible[0]) %} 
 {% include 'clock_dispatch.h.j2' %}
