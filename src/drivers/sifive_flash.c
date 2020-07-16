@@ -238,12 +238,15 @@ int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, c
 
 	/*set command enable, address enable phase,dummy phase enable,mode phase enable,read enable phase*/
 
-	cmd_cfg.custom_command = (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN 
-			| QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
+	//cmd_cfg.custom_command = (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN 
+	//		| QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
 
-	cmd_cfg.dummy_stg = QSPI_SET_DUMMY_DLP(0 , 3 , 0);
-	cmd_cfg.mode_stg  = QSPI_SET_MODE_REG(0x1 , 0x0);
-	cmd_cfg.opcode    = FLASH_CMD_QUAD_READ_CMD;
+	cmd_cfg.custom_command = (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_RX_DATA_PH_EN);
+
+	//cmd_cfg.dummy_stg = QSPI_SET_DUMMY_DLP(0 , 3 , 0);
+	//cmd_cfg.mode_stg  = QSPI_SET_MODE_REG(0x1 , 0x0);
+	//cmd_cfg.opcode    = FLASH_CMD_QUAD_READ_CMD;
+	cmd_cfg.opcode    = FLASH_CMD_READ_CMD;
 
 	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
 
@@ -259,6 +262,15 @@ int __metal_driver_sifive_flash_write(struct metal_flash *flash, uint32_t mem_ad
 	qspi_static_config_t *cfg = &qcfg;
 
 	flash_send_write_en(flash);
+	
+	cfg->addrlen   = QSPI_ADDR_24BIT;
+	cfg->rxlen     = QSPI_32BIT;
+	cfg->txlen     = QSPI_32BIT;
+	cfg->wrmode    = QSPI_WRITE;
+	cfg->opmode    = QSPI_SPI;
+	cfg->speedmode = QSPI_CMD_SERIAL;
+	cfg->burstmode = QSPI_SINGLE_BURST;
+
 
 	cmd_cfg.opcode = FLASH_CMD_PAGE_PROGRAM;
 	/*set cmd_en and tx_data, address enable phase*/
