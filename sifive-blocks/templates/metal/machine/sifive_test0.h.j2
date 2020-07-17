@@ -9,8 +9,10 @@
 
 {% if "reg_names" in sifive_test0s[0] %}
 #define METAL_SIFIVE_TEST0_0_BASE_ADDRESS {{ '0x%x' % sifive_test0s[0].regs_by_name["control"][0] }}
+#define METAL_SIFIVE_TEST0_0_SIZE {{ '0x%x' % sifive_test0s[0].regs_by_name["control"][1] }}
 {% else %}
 #define METAL_SIFIVE_TEST0_0_BASE_ADDRESS {{ '0x%x' % sifive_test0s[0].reg[0][0] }}
+#define METAL_SIFIVE_TEST0_0_SIZE {{ '0x%x' % sifive_test0s[0].reg[0][1] }}
 {% endif %}
 
 #define __METAL_HAS_SHUTDOWN

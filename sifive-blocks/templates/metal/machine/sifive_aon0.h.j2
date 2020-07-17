@@ -8,6 +8,7 @@
 
 {% for aon in devices['sifive,aon0'] %}
 #define METAL_SIFIVE_AON0_{{ loop.index0 }}_BASE_ADDRESS {{ "0x%x" % aon.reg[0][0] }}UL
+#define METAL_SIFIVE_AON0_{{ loop.index0 }}_SIZE {{ "0x%x" % aon.reg[0][1] }}UL
 {% endfor %}
 
 #define METAL_SIFIVE_AON0

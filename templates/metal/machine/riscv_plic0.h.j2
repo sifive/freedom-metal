@@ -9,6 +9,7 @@
 
 {% for plic in riscv_plic0s %}
 #define METAL_RISCV_PLIC0_{{ loop.index0 }}_BASE_ADDRESS {{ '0x%x' % plic.regs_by_name["control"][0] }}
+#define METAL_RISCV_PLIC0_{{ loop.index0 }}_SIZE {{ '0x%x' % plic.regs_by_name["control"][1] }}
 #define METAL_RISCV_PLIC0_{{ loop.index0 }}_RISCV_MAX_PRIORITY {{ plic.riscv_max_priority[0] }}
 #define METAL_RISCV_PLIC0_{{ loop.index0 }}_RISCV_NDEV {{ plic.riscv_ndev[0] }}
 {% endfor %}

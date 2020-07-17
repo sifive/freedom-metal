@@ -8,6 +8,7 @@
 
 {% for prci in devices['sifive,fe310-g000,prci'] %}
 #define METAL_SIFIVE_FE310_G000_PRCI_{{ loop.index0 }}_BASE_ADDRESS {{ "0x%x" % prci.reg[0][0] }}UL
+#define METAL_SIFIVE_FE310_G000_PRCI_{{ loop.index0 }}_SIZE{{ "0x%x" % prci.reg[0][1] }}UL
 {% endfor %}
 
 #define METAL_SIFIVE_FE310_G000_PRCI
