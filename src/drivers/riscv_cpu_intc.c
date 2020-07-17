@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/drivers/riscv_cpu_intc.h>
+#include <metal/exception.h>
 #include <metal/init.h>
 #include <metal/interrupt.h>
 #include <stdbool.h>
@@ -10,26 +11,6 @@
 #define get_index(intc) ((intc).__interrupt_index)
 
 static bool init_done[__METAL_DT_NUM_HARTS] = {false};
-
-void __metal_exception_handler(void) __attribute__((interrupt, aligned(128)));
-void __metal_exception_handler(void) {
-    uint32_t hartid = metal_cpu_get_current_hartid();
-
-    uintptr_t mcause, mepc, mtval;
-    __asm__ volatile("csrr %0, mcause" : "=r"(mcause));
-    __asm__ volatile("csrr %0, mepc" : "=r"(mepc));
-    __asm__ volatile("csrr %0, mtval" : "=r"(mtval));
-
-    int id = RISCV_MCAUSE_ID(mcause);
-
-    if (RISCV_MCAUSE_IS_INTERRUPT(mcause)) {
-        __metal_local_interrupt_table[id]();
-    } else {
-        __metal_exception_table[id](metal_cpu_get(hartid), id);
-    }
-}
-
-extern void early_trap_vector(void);
 
 void riscv_cpu_intc_init(struct metal_interrupt intc) {
 
@@ -60,17 +41,14 @@ METAL_CONSTRUCTOR(init_riscv_cpu_intc) {
     }
 }
 
-extern void __metal_vector_table(void);
-
 int riscv_cpu_intc_set_vector_mode(struct metal_interrupt controller,
                                    metal_vector_mode mode) {
-
     switch (mode) {
     default:
     case METAL_DIRECT_MODE:
         /* Write the trap vector address with the vectored bit unset */
         __asm__ volatile(
-            "csrw mtvec, %0" ::"r"((uintptr_t)__metal_exception_handler));
+            "csrw mtvec, %0" ::"r"((uintptr_t)__metal_trap_vector));
         break;
     case METAL_VECTORED_MODE:
         /* Write the jump table address with the vectored bit set */
