@@ -4,17 +4,13 @@
 #ifndef METAL__LOCK_H
 #define METAL__LOCK_H
 
-#include <metal/compiler.h>
-#include <metal/machine.h>
-#include <metal/memory.h>
+#include <metal/generated/riscv_cpu.h>
+#include <metal/riscv.h>
 
 /*!
  * @file lock.h
  * @brief An API for creating and using a software lock/mutex
  */
-
-/* TODO: How can we make the exception code platform-independant? */
-#define _METAL_STORE_AMO_ACCESS_FAULT 7
 
 #define METAL_LOCK_BACKOFF_CYCLES 32
 #define METAL_LOCK_BACKOFF_EXPONENT 2
@@ -47,18 +43,6 @@ struct metal_lock {
  */
 __inline__ int metal_lock_init(struct metal_lock *lock) {
 #ifdef __riscv_atomic
-    /* Get a handle for the memory which holds the lock state */
-    struct metal_memory *lock_mem =
-        metal_get_memory_from_address((uintptr_t) & (lock->_state));
-    if (!lock_mem) {
-        return 1;
-    }
-
-    /* If the memory doesn't support atomics, report an error */
-    if (!metal_memory_supports_atomics(lock_mem)) {
-        return 2;
-    }
-
     lock->_state = 0;
 
     return 0;
@@ -81,7 +65,7 @@ __inline__ int metal_lock_take(struct metal_lock *lock) {
     int new = 1;
 
     int backoff = 1;
-    const int max_backoff = METAL_LOCK_BACKOFF_CYCLES * METAL_MAX_CORES;
+    const int max_backoff = METAL_LOCK_BACKOFF_CYCLES * __METAL_DT_NUM_HARTS;
 
     while (1) {
         __asm__ volatile("amoswap.w.aq %[old], %[new], (%[state])"
@@ -108,7 +92,7 @@ __inline__ int metal_lock_take(struct metal_lock *lock) {
     __asm__("csrw mtval, %[state]" ::[state] "r"(&(lock->_state)));
 
     /* Trigger a Store/AMO access fault */
-    _metal_trap(_METAL_STORE_AMO_ACCESS_FAULT);
+    _metal_trap(RISCV_MCAUSE_ID_STORE_AMO_ACCESS_FAULT);
 
     /* If execution returns, indicate failure */
     return 1;
@@ -135,7 +119,7 @@ __inline__ int metal_lock_give(struct metal_lock *lock) {
     __asm__("csrw mtval, %[state]" ::[state] "r"(&(lock->_state)));
 
     /* Trigger a Store/AMO access fault */
-    _metal_trap(_METAL_STORE_AMO_ACCESS_FAULT);
+    _metal_trap(RISCV_MCAUSE_ID_STORE_AMO_ACCESS_FAULT);
 
     /* If execution returns, indicate failure */
     return 1;
