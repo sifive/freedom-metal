@@ -38,7 +38,7 @@
 
 #define PLL_REGW(offset)                                                       \
     __METAL_ACCESS_ONCE(                                                       \
-        (__metal_io_u32 *)(METAL_SIFIVE_FE310_G000_PRCI_0_BASE_ADDR +          \
+        (__metal_io_u32 *)(METAL_SIFIVE_FE310_G000_PRCI_0_BASE_ADDRESS +       \
                            (offset)))
 
 struct pll_config_t {

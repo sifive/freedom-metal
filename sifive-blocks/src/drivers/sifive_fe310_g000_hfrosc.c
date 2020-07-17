@@ -18,7 +18,7 @@
 
 #define PRCI_REGW(offset)                                                      \
     __METAL_ACCESS_ONCE(                                                       \
-        (__metal_io_u32 *)(METAL_SIFIVE_FE310_G000_PRCI_0_BASE_ADDR +          \
+        (__metal_io_u32 *)(METAL_SIFIVE_FE310_G000_PRCI_0_BASE_ADDRESS +       \
                            (offset)))
 
 uint64_t sifive_fe310_g000_hfrosc_get_rate_hz(struct metal_clock clock) {

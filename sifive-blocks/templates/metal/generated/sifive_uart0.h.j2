@@ -29,7 +29,7 @@ static const struct dt_uart_data {
 } dt_uart_data[__METAL_DT_NUM_UARTS] = {
 	{% for uart in sifive_uart0s %}
 	{
-	    .base_addr = METAL_SIFIVE_UART0_{{ uart.id }}_BASE_ADDR,
+	    .base_addr = METAL_SIFIVE_UART0_{{ uart.id }}_BASE_ADDRESS,
 
 	{% if uart.clocks is defined %}
 	    /* {{ uart.clocks[0].compatible[0] }} */
