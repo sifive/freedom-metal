@@ -9,22 +9,29 @@
 #include <metal/generated/sifive_fe310_g000_hfxosc.h>
 #include <metal/io.h>
 
-#define CONFIG_ENABLE 0x40000000UL
-#define CONFIG_READY 0x80000000UL
+#ifndef METAL_SIFIVE_FE310_G000_PRCI
+#error No SiFive FE310-G000 PRCI available.
+#endif
 
-#define get_index(clk) ((clk).__clock_index)
+#define PRCI_HFXOSCCFG_ENABLE (1 << 30)
+#define PRCI_HFXOSCCFG_READY (1 << 31)
+
+#define PRCI_REGW(offset)                                                      \
+    __METAL_ACCESS_ONCE(                                                       \
+        (__metal_io_u32 *)(METAL_SIFIVE_FE310_G000_PRCI_0_BASE_ADDR +          \
+                           (offset)))
 
 uint64_t sifive_fe310_g000_hfxosc_get_rate_hz(struct metal_clock clock) {
 
-    uintptr_t base = dt_clock_data[get_index(clock)].base;
-    uint32_t cfg = __METAL_ACCESS_ONCE((__metal_io_u32 *)base);
-
-    if ((cfg & CONFIG_ENABLE) == 0)
+    if (!PRCI_REGW(METAL_SIFIVE_FE310_G000_PRCI_HFXOSCCFG) &
+        PRCI_HFXOSCCFG_ENABLE) {
         return 0;
-    if ((cfg & CONFIG_READY) == 0)
-        return 0;
+    }
+    while (!PRCI_REGW(METAL_SIFIVE_FE310_G000_PRCI_HFXOSCCFG) &
+           PRCI_HFXOSCCFG_READY)
+        ;
 
-    struct metal_clock ref = dt_clock_data[get_index(clock)].ref;
+    struct metal_clock ref = REF_CLOCK(clock);
     return metal_clock_get_rate_hz(ref);
 }
 

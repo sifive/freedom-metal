@@ -13,23 +13,20 @@
 
 #define __METAL_DT_NUM_SIFIVE_FE310_G000_LFROSCS {{ sifive_fe310_g000_lfroscs|length }}
 
+{% if sifive_fe310_g000_lfroscs|length > 1 %}
+
 static const struct dt_sifive_fe310_g000_lfrosc_clock_data {
-	uintptr_t config;
-	uintptr_t mux;
 	struct metal_clock lfrosc;
 	struct metal_clock psdlfaltclk;
 } dt_clock_data[__METAL_DT_NUM_SIFIVE_FE310_G000_LFROSCS] = {
 	{% for clk in sifive_fe310_g000_lfroscs %}
 	{
-		.config = {{ clk.regs_by_name["config"][0] }},
-
-		{% if "mux" in clk.regs_by_name %}
-		.mux = {{ clk.regs_by_name["mux"][0] }},
-		{% endif %}
-
 		{% if "clock_names" in clk %}
 		.lfrosc = (struct metal_clock) { {{ clk.clocks_by_name["lfrosc"].id }} },
 		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks_by_name["psdlfaltclk"].id }} },
+		{% elif clk.clocks|length > 1 %}
+		.lfrosc = (struct metal_clock) { {{ clk.clocks[0].id }} },
+		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks[1].id }} },
 		{% else %}
 		.lfrosc = (struct metal_clock) { {{ clk.clocks[0].id }} },
 		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks[0].id }} },
@@ -37,6 +34,27 @@ static const struct dt_sifive_fe310_g000_lfrosc_clock_data {
 	},
 	{% endfor %}
 };
+
+#define get_index(clock) ((clock).__clock_index)
+#define REF_LFROSC(clock) (dt_clock_data[get_index(clock)].lfrosc)
+#define REF_PSDLFALTCLK(clock) (dt_clock_data[get_index(clock)].psdlfaltclk)
+
+{% else %}
+
+#define get_index(clock) 0
+
+{% if "clock_names" in sifive_fe310_g000_lfroscs[0] %}
+#define REF_LFROSC(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks_by_name["lfrosc"].id }} })
+#define REF_PSDLFALTCLK(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks_by_name["psdlfaltclk"].id }} })
+{% elif sifive_fe310_g000_lfroscs[0].clocks|length > 1 %}
+#define REF_LFROSC(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[0].id }} })
+#define REF_PSDLFALTCLK(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[1].id }} })
+{% else %}
+#define REF_LFROSC(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[0].id }} })
+#define REF_PSDLFALTCLK(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[1].id }} })
+{% endif %}
+
+{% endif %}
 
 {% set driver_string = to_snakecase(sifive_fe310_g000_lfroscs[0].clocks[0].compatible[0]) %}
 {% include 'clock_dispatch.h.j2' %}

@@ -9,10 +9,11 @@
 #include <metal/generated/sifive_fe310_g000_lfrosc.h>
 #include <metal/io.h>
 
+#ifndef METAL_SIFIVE_AON0
+#error No AON block detected.
+#endif
+
 /* LFROSCCFG */
-#define METAL_LFROSCCFG_DIV_MASK 0x3F
-#define METAL_LFROSCCFG_TRIM_SHIFT 16
-#define METAL_LFROSCCFG_TRIM_MASK (0x1F << METAL_LFROSCCFG_TRIM_SHIFT)
 #define METAL_LFROSCCFG_EN (1 << 30)
 #define METAL_LFROSCCFG_RDY (1 << 31)
 
@@ -20,25 +21,24 @@
 #define METAL_LFCLKMUX_SEL 1
 #define METAL_LFCLKMUX_EXT_MUX_STATUS (1 << 31)
 
-#define LFROSC_REGW(addr) (__METAL_ACCESS_ONCE((__metal_io_u32 *)addr))
-
-#define get_index(clk) ((clk).__clock_index)
+#define LFROSC_REGW(offset)                                                    \
+    __METAL_ACCESS_ONCE(                                                       \
+        (__metal_io_u32 *)(METAL_SIFIVE_AON0_0_BASE_ADDR + (offset)))
 
 uint64_t sifive_fe310_g000_lfrosc_get_rate_hz(struct metal_clock clock) {
 
-    uintptr_t cfg_reg = dt_clock_data[get_index(clock)].config;
-    uintptr_t mux_reg = dt_clock_data[get_index(clock)].mux;
+    if (LFROSC_REGW(METAL_SIFIVE_AON0_LFCLKMUX) &
+        METAL_LFCLKMUX_EXT_MUX_STATUS) {
+        if (!LFROSC_REGW(METAL_SIFIVE_AON0_LFROSCCFG) & METAL_LFROSCCFG_EN) {
+            return 0;
+        }
+        while (!LFROSC_REGW(METAL_SIFIVE_AON0_LFROSCCFG) & METAL_LFROSCCFG_RDY)
+            ;
 
-    if (LFROSC_REGW(mux_reg) & METAL_LFCLKMUX_EXT_MUX_STATUS) {
-        struct metal_clock lfrosc = dt_clock_data[get_index(clock)].lfrosc;
-        return metal_clock_get_rate_hz(lfrosc);
+        return metal_clock_get_rate_hz(REF_LFROSC(clock));
     }
 
-    uint64_t div = (LFROSC_REGW(cfg_reg) & METAL_LFROSCCFG_DIV_MASK) + 1;
-
-    struct metal_clock psdlfaltclk =
-        dt_clock_data[get_index(clock)].psdlfaltclk;
-    return metal_clock_get_rate_hz(psdlfaltclk) / div;
+    return metal_clock_get_rate_hz(REF_PSDLFALTCLK(clock));
 }
 
 uint64_t sifive_fe310_g000_lfrosc_set_rate_hz(struct metal_clock clock,

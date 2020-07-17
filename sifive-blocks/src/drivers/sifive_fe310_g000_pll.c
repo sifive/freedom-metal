@@ -14,6 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef METAL_SIFIVE_FE310_G000_PRCI
+#error No SiFive FE310-G000 PRCI available.
+#endif
+
 #define PLL_R 0x00000007UL
 #define PLL_F 0x000003F0UL
 #define PLL_Q 0x00000C00UL
@@ -32,7 +36,10 @@
 
 #define PLL_CONFIG_NOT_VALID -1
 
-#define get_index(clk) ((clk).__clock_index)
+#define PLL_REGW(offset)                                                       \
+    __METAL_ACCESS_ONCE(                                                       \
+        (__metal_io_u32 *)(METAL_SIFIVE_FE310_G000_PRCI_0_BASE_ADDR +          \
+                           (offset)))
 
 struct pll_config_t {
     uint64_t multiplier;
@@ -174,48 +181,43 @@ static int find_closest_config(uint64_t ref_hz, uint64_t rate) {
 }
 
 static void sifive_fe310_g000_pll_init(struct metal_clock pll) {
-    uintptr_t pllcfg = dt_clock_data[get_index(pll)].config;
-
     /* If we're running off of the PLL, switch off before we start configuring
-     * it*/
-    if ((__METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) & PLL_SEL) != 0)
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_SEL);
+     * it. */
+    if ((PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) & PLL_SEL) != 0) {
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) &= ~PLL_SEL;
+    }
 
     /* Make sure we're running off of the external oscillator for stability */
-    if (dt_clock_data[get_index(pll)].has_hfxosc)
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_REFSEL;
+    if (PLL_HAS_HFXOSC(pll)) {
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) |= PLL_SEL;
+    }
 
     /* Configure the PLL to run at the requested init frequency. */
-    uint64_t init_rate = dt_clock_data[get_index(pll)].init_rate;
-    sifive_fe310_g000_pll_set_rate_hz(pll, init_rate);
+    sifive_fe310_g000_pll_set_rate_hz(pll, PLL_INIT_RATE(pll));
 }
 
 METAL_CONSTRUCTOR(init_sifive_fe310_g000_pll) {
     for (int i = 0; i < __METAL_DT_NUM_SIFIVE_FE310_G000_PLLS; i++) {
         struct metal_clock pll = (struct metal_clock){i};
-        uint64_t init_rate = dt_clock_data[get_index(pll)].init_rate;
+
         /* If the PLL init_rate is zero, don't initialize the PLL */
-        if (init_rate != 0)
+        if (PLL_INIT_RATE(pll) != 0) {
             sifive_fe310_g000_pll_init(pll);
+        }
     }
 }
 
 uint64_t sifive_fe310_g000_pll_get_rate_hz(struct metal_clock clock) {
-    uintptr_t config = dt_clock_data[get_index(clock)].config;
-    uintptr_t divider = dt_clock_data[get_index(clock)].divider;
-
-    uint32_t cfg = __METAL_ACCESS_ONCE((__metal_io_u32 *)config);
-    uint32_t div = __METAL_ACCESS_ONCE((__metal_io_u32 *)divider);
+    uint32_t cfg = PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG);
+    uint32_t div = PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV);
 
     /* There's a clock mux before the PLL that selects between the HFROSC and
      * the HFXOSC as the PLL's input clock. */
     uint64_t ref_hz;
     if (__METAL_GET_FIELD(cfg, PLL_SEL) == 0) {
-        struct metal_clock hfrosc = dt_clock_data[get_index(clock)].hfrosc;
-        ref_hz = sifive_fe310_g000_hfrosc_get_rate_hz(hfrosc);
+        ref_hz = sifive_fe310_g000_hfrosc_get_rate_hz(PLL_HFROSC(pll));
     } else {
-        struct metal_clock hfxosc = dt_clock_data[get_index(clock)].hfxosc;
-        ref_hz = sifive_fe310_g000_hfxosc_get_rate_hz(hfxosc);
+        ref_hz = sifive_fe310_g000_hfxosc_get_rate_hz(PLL_HFXOSC(pll));
     }
 
     /* It's possible to bypass the PLL, which is an internal bypass. */
@@ -255,33 +257,31 @@ uint64_t sifive_fe310_g000_pll_get_rate_hz(struct metal_clock clock) {
 /* Configure the PLL and wait for it to lock */
 static void configure_pll(struct metal_clock clock,
                           const struct pll_config_t *config) {
-    uintptr_t pllcfg = dt_clock_data[get_index(clock)].config;
-    uintptr_t plldiv = dt_clock_data[get_index(clock)].divider;
 
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_R);
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_R_SHIFT(config->r);
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) &= ~PLL_R;
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) |= PLL_R_SHIFT(config->r);
 
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_F);
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_F_SHIFT(config->f);
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) &= ~PLL_F;
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) |= PLL_F_SHIFT(config->f);
 
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_Q);
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_Q_SHIFT(config->q);
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) &= ~PLL_Q;
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) |= PLL_Q_SHIFT(config->q);
 
     if (config->d < 0) {
         /* disable final divider */
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) |= DIV_1;
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV) |= DIV_1;
 
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) &= ~(DIV_DIV);
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) |= PLL_DIV_SHIFT(1);
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV) &= ~DIV_DIV;
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV) |= PLL_DIV_SHIFT(1);
     } else {
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) &= ~(DIV_1);
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV) &= ~DIV_1;
 
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) &= ~(DIV_DIV);
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)plldiv) |=
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV) &= ~DIV_DIV;
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV) |=
             PLL_DIV_SHIFT(config->d);
     }
 
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_BYPASS);
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) &= ~PLL_BYPASS;
 
     /* Wait for the PLL to stabilize before testing it for lock */
     struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
@@ -292,7 +292,7 @@ static void configure_pll(struct metal_clock clock,
     }
 
     /* Wait for PLL to lock */
-    while ((__METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) & PLL_LOCK) == 0)
+    while ((PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) & PLL_LOCK) == 0)
         ;
 }
 
@@ -300,41 +300,37 @@ uint64_t sifive_fe310_g000_pll_set_rate_hz(struct metal_clock clock,
                                            uint64_t rate) {
     pre_rate_change_callbacks();
 
-    uintptr_t pllcfg = dt_clock_data[get_index(clock)].config;
-    uintptr_t plldiv = dt_clock_data[get_index(clock)].divider;
-
     /* We can't modify the PLL if coreclk is driven by it, so switch it off */
-    if (__METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) & PLL_SEL)
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) &= ~(PLL_SEL);
+    if ((PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) & PLL_SEL) != 0) {
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) &= ~PLL_SEL;
+    }
 
     /* There's a clock mux before the PLL that selects between the HFROSC and
      * the HFXOSC as the PLL's input clock. */
     uint64_t ref_hz;
-    if ((__METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) & PLL_REFSEL) == 0) {
-        struct metal_clock hfrosc = dt_clock_data[get_index(clock)].hfrosc;
-        ref_hz = sifive_fe310_g000_hfrosc_get_rate_hz(hfrosc);
+    if ((PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) & PLL_REFSEL) == 0) {
+        ref_hz = sifive_fe310_g000_hfrosc_get_rate_hz(PLL_HFROSC(pll));
     } else {
-        struct metal_clock hfxosc = dt_clock_data[get_index(clock)].hfxosc;
-        ref_hz = sifive_fe310_g000_hfxosc_get_rate_hz(hfxosc);
+        ref_hz = sifive_fe310_g000_hfrosc_get_rate_hz(PLL_HFXOSC(pll));
     }
 
     if ((ref_hz * 3 / 4) <= rate && (ref_hz * 5 / 4) >= rate) {
         /* if the desired rate is within 75%-125% of the input clock, bypass the
          * PLL
          */
-        __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_BYPASS;
+        PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) |= PLL_BYPASS;
     } else {
         int config_index = find_closest_config(ref_hz, rate);
         if (config_index != -1) {
             configure_pll(clock, &(pll_configs[config_index]));
         } else {
             /* unable to find a valid configuration */
-            __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_BYPASS;
+            PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) |= PLL_BYPASS;
         }
     }
 
     /* Enable the PLL */
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)pllcfg) |= PLL_SEL;
+    PLL_REGW(METAL_SIFIVE_FE310_G000_PRCI_PLLCFG) |= PLL_SEL;
 
     post_rate_change_callbacks();
 

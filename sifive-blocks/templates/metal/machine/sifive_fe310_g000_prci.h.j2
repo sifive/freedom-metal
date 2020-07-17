@@ -1,0 +1,22 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__PLATFORM__SIFIVE_FE310_G000_PRCI_H
+#define METAL__PLATFORM__SIFIVE_FE310_G000_PRCI_H
+
+{% if 'sifive,fe310-g000,prci' in devices %}
+
+{% for prci in devices['sifive,fe310-g000,prci'] %}
+#define METAL_SIFIVE_FE310_G000_PRCI_{{ loop.index0 }}_BASE_ADDR {{ "0x%x" % prci.reg[0][0] }}UL
+{% endfor %}
+
+#define METAL_SIFIVE_FE310_G000_PRCI
+#define METAL_SIFIVE_FE310_G000_PRCI_HFROSCCFG  0x00UL
+#define METAL_SIFIVE_FE310_G000_PRCI_HFXOSCCFG  0x04UL
+#define METAL_SIFIVE_FE310_G000_PRCI_PLLCFG     0x08UL
+#define METAL_SIFIVE_FE310_G000_PRCI_PLLOUTDIV  0x0CUL
+#define METAL_SIFIVE_FE310_G000_PRCI_PROCMONCFG 0xF0UL
+
+{% endif %}
+
+#endif

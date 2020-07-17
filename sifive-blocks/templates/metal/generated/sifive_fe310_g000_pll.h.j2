@@ -17,10 +17,10 @@
 
 #define __METAL_DT_NUM_SIFIVE_FE310_G000_PLLS {{ sifive_fe310_g000_plls|length }}
 
+{% if sifive_fe310_g000_plls|length > 1 %}
+
 static const struct dt_sifive_fe310_g000_pll_clock_data {
 	uint64_t init_rate;
-	uintptr_t config;
-	uintptr_t divider;
 	bool has_hfxosc;
 	struct metal_clock hfrosc;
 	struct metal_clock hfxosc;
@@ -28,8 +28,6 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 	{% for clk in sifive_fe310_g000_plls %}
 	{
 		.init_rate = {{ clk.clock_frequency[0] }},
-		.config = {{ clk.regs_by_name["config"][0] }},
-		.divider = {{ clk.regs_by_name["divider"][0] }},
 
 	{% if "pllref" in clk.clock_names %}
 		.has_hfxosc = true,
@@ -43,6 +41,27 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 	},
 	{% endfor %}
 };
+
+#define get_index(pll) ((pll).__clock_index)
+#define PLL_INIT_RATE(pll) dt_clock_data[get_index(pll)].init_rate
+#define PLL_HAS_HFXOSC(pll) dt_clock_data[get_index(pll)].has_hfxosc
+#define PLL_HFXOSC(pll) dt_clock_data[get_index(pll)].hfrosc
+#define PLL_HFROSC(pll) dt_clock_data[get_index(pll)].hfxosc
+
+{% else %}
+
+#define get_index(pll) 0
+#define PLL_INIT_RATE(pll) {{ sifive_fe310_g000_plls[0].clock_frequency[0] }}
+{% if 'pllref' in sifive_fe310_g000_plls[0].clock_names %}
+#define PLL_HAS_HFXOSC(pll) true
+#define PLL_HFXOSC(pll) ((struct metal_clock) { {{ sifive_fe310_g000_plls[0].clocks_by_name["pllref"].id }} })
+{% else %}
+#define PLL_HAS_HFXOSC(pll) false
+#define PLL_HFXOSC(pll) ((struct metal_clock) { 0 })
+{% endif %}
+#define PLL_HFROSC(pll) ((struct metal_clock) { {{ sifive_fe310_g000_plls[0].clocks_by_name["pllsel0"].id }} })
+
+{% endif %}
 
 {% if 'uart' in default_drivers and default_drivers['uart'] in devices %}
 {% set uarts = devices[default_drivers['uart']] %}
