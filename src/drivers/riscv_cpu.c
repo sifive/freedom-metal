@@ -75,6 +75,18 @@ int metal_cpu_clear_ipi(struct metal_cpu cpu) { return -1; }
 int metal_cpu_get_ipi(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_get_ipi(struct metal_cpu cpu) { return 0; }
 
+int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu)
+    __attribute__((weak));
+int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu) {
+    __asm__ volatile("csrs mie, %0" ::"r"(1 << METAL_LOCAL_INTERRUPT_TMR));
+}
+
+int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu)
+    __attribute__((weak));
+int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu) {
+    __asm__ volatile("csrc mie, %0" ::"r"(1 << METAL_LOCAL_INTERRUPT_TMR));
+}
+
 struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu) {
     return (struct metal_interrupt){cpu.__hartid};
 }

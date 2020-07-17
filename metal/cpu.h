@@ -47,6 +47,10 @@ int metal_cpu_enable_ipi(struct metal_cpu cpu);
 
 int metal_cpu_disable_ipi(struct metal_cpu cpu);
 
+int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu);
+
+int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu);
+
 /*! @brief Get the CPU cycle count timer value
  *
  * Get the value of the cycle count timer for a given CPU
