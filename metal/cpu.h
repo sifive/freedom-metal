@@ -19,6 +19,12 @@ struct metal_cpu {
     uint32_t __hartid;
 };
 
+typedef enum {
+    METAL_MACHINE_PRIVILEGE_MODE,
+    METAL_SUPERVISOR_PRIVILEGE_MODE,
+    METAL_USER_PRIVILEGE_MODE,
+} metal_privilege_mode_e;
+
 /*! @brief Get a reference to a CPU hart
  *
  * @param hartid The ID of the desired CPU hart
@@ -39,13 +45,47 @@ int metal_cpu_get_current_hartid(void);
  * @return The number of CPU harts */
 int metal_cpu_get_num_harts(void);
 
+/*!
+ * @brief Enables the global interrupt enable for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
 int metal_cpu_enable_interrupts(struct metal_cpu cpu);
 
+/*!
+ * @brief Disables the global interrupt enable for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
 int metal_cpu_disable_interrupts(struct metal_cpu cpu);
 
+/*!
+ * @brief Enables the inter-process interrupt for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
 int metal_cpu_enable_ipi(struct metal_cpu cpu);
 
+/*!
+ * @brief Disables the inter-process interrupt for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
 int metal_cpu_disable_ipi(struct metal_cpu cpu);
+
+/*!
+ * @brief Enables the timer interrupt for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
+int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu);
+
+/*!
+ * @brief Disables the timer interrupt for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
+int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu);
 
 /*! @brief Get the CPU cycle count timer value
  *

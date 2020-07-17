@@ -20,9 +20,9 @@ void __metal_trap_vector(void) {
 #endif
 
     if (RISCV_MCAUSE_IS_INTERRUPT(mcause)) {
-        __metal_exception_handler(mcause);
-    } else {
         __metal_interrupt_handler(mcause);
+    } else {
+        __metal_exception_handler(mcause);
     }
 }
 

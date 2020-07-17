@@ -51,7 +51,7 @@ static const struct dt_sifive_fe310_g000_lfrosc_clock_data {
 #define REF_PSDLFALTCLK(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[1].id }} })
 {% else %}
 #define REF_LFROSC(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[0].id }} })
-#define REF_PSDLFALTCLK(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[1].id }} })
+#define REF_PSDLFALTCLK(clock) ((struct metal_clock) { {{ sifive_fe310_g000_lfroscs[0].clocks[0].id }} })
 {% endif %}
 
 {% endif %}

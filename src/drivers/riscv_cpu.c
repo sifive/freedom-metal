@@ -3,11 +3,11 @@
 
 #include <assert.h>
 #include <metal/cpu.h>
-#include <metal/drivers/riscv_cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/generated/riscv_cpu.h>
 #include <metal/io.h>
 #include <metal/machine/platform.h>
+#include <metal/riscv.h>
 #include <metal/shutdown.h>
 #include <stdint.h>
 
@@ -48,22 +48,22 @@ int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time) { return -1; }
 
 int metal_cpu_enable_interrupts(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_enable_interrupts(struct metal_cpu cpu) {
-    __asm__ volatile("csrs mstatus, %0" ::"r"(METAL_MSTATUS_MIE));
+    __asm__ volatile("csrs mstatus, %0" ::"r"(RISCV_MSTATUS_MIE));
 }
 
 int metal_cpu_disable_interrupts(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_disable_interrupts(struct metal_cpu cpu) {
-    __asm__ volatile("csrc mstatus, %0" ::"r"(METAL_MSTATUS_MIE));
+    __asm__ volatile("csrc mstatus, %0" ::"r"(RISCV_MSTATUS_MIE));
 }
 
 int metal_cpu_enable_ipi(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_enable_ipi(struct metal_cpu cpu) {
-    __asm__ volatile("csrs mie, %0" ::"r"(1 << METAL_LOCAL_INTERRUPT_SW));
+    __asm__ volatile("csrs mie, %0" ::"r"(RISCV_MIE_MSIE));
 }
 
 int metal_cpu_disable_ipi(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_disable_ipi(struct metal_cpu cpu) {
-    __asm__ volatile("csrc mie, %0" ::"r"(1 << METAL_LOCAL_INTERRUPT_SW));
+    __asm__ volatile("csrc mie, %0" ::"r"(RISCV_MIE_MSIE));
 }
 
 int metal_cpu_set_ipi(struct metal_cpu cpu) __attribute__((weak));
@@ -75,6 +75,18 @@ int metal_cpu_clear_ipi(struct metal_cpu cpu) { return -1; }
 int metal_cpu_get_ipi(struct metal_cpu cpu) __attribute__((weak));
 int metal_cpu_get_ipi(struct metal_cpu cpu) { return 0; }
 
+int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu)
+    __attribute__((weak));
+int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu) {
+    __asm__ volatile("csrs mie, %0" ::"r"(RISCV_MIE_MTIE));
+}
+
+int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu)
+    __attribute__((weak));
+int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu) {
+    __asm__ volatile("csrc mie, %0" ::"r"(RISCV_MIE_MTIE));
+}
+
 struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu) {
     return (struct metal_interrupt){cpu.__hartid};
 }
@@ -85,8 +97,8 @@ int metal_cpu_get_instruction_length(struct metal_cpu cpu, uintptr_t epc) {
      * The encoding '00' '01' '10' are used for compressed instruction.
      * Only enconding '11' isn't regarded as compressed instruction (>16b).
      */
-    return ((*(unsigned short *)epc & METAL_INSN_LENGTH_MASK) ==
-            METAL_INSN_NOT_COMPRESSED)
+    return ((*(unsigned short *)epc & RISCV_INSTRUCTION_LENGTH_MASK) ==
+            RISCV_INSTRUCTION_NOT_COMPRESSED)
                ? 4
                : 2;
 }

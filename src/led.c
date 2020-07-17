@@ -8,13 +8,11 @@
 struct metal_led metal_led_get_rgb(char *label, char *color)
     __attribute__((weak));
 struct metal_led metal_led_get_rgb(char *label, char *color) {
-    assert(false);
     return (struct metal_led){0};
 }
 
 struct metal_led metal_led_get(char *label) __attribute__((weak));
 struct metal_led metal_led_get(char *label) {
-    assert(false);
     return (struct metal_led){0};
 }
 
