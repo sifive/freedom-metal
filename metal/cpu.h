@@ -19,6 +19,12 @@ struct metal_cpu {
     uint32_t __hartid;
 };
 
+typedef enum {
+    METAL_MACHINE_PRIVILEGE_MODE,
+    METAL_SUPERVISOR_PRIVILEGE_MODE,
+    METAL_USER_PRIVILEGE_MODE,
+} metal_privilege_mode_e;
+
 /*! @brief Get a reference to a CPU hart
  *
  * @param hartid The ID of the desired CPU hart
