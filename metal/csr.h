@@ -4,7 +4,6 @@
 #ifndef METAL__CSR_H
 #define METAL__CSR_H
 
-#include <metal/compiler.h>
 #include <stddef.h>
 #include <stdint.h>
 
