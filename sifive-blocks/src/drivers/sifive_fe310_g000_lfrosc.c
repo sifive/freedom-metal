@@ -23,7 +23,7 @@
 
 #define LFROSC_REGW(offset)                                                    \
     __METAL_ACCESS_ONCE(                                                       \
-        (__metal_io_u32 *)(METAL_SIFIVE_AON0_0_BASE_ADDR + (offset)))
+        (__metal_io_u32 *)(METAL_SIFIVE_AON0_0_BASE_ADDRESS + (offset)))
 
 uint64_t sifive_fe310_g000_lfrosc_get_rate_hz(struct metal_clock clock) {
 

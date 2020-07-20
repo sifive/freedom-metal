@@ -10,7 +10,7 @@
 
 void metal_shutdown(int code) __attribute__((noreturn));
 void metal_shutdown(int code) {
-    uintptr_t base = METAL_SIFIVE_TEST0_0_BASE_ADDR;
+    uintptr_t base = METAL_SIFIVE_TEST0_0_BASE_ADDRESS;
     uint32_t out = (code << 16) + (code == 0 ? 0x5555 : 0x3333);
     while (1) {
         __METAL_ACCESS_ONCE((

@@ -9,9 +9,11 @@
 
 {% for uart in sifive_uart0s %}
     {% if uart.reg_names is defined %}
-#define METAL_SIFIVE_UART0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % uart.regs_by_name["control"][0] }}
+#define METAL_SIFIVE_UART0_{{ loop.index0 }}_BASE_ADDRESS {{ '0x%x' % uart.regs_by_name["control"][0] }}
+#define METAL_SIFIVE_UART0_{{ loop.index0 }}_SIZE {{ '0x%x' % uart.regs_by_name["control"][1] }}
     {% else %}
-#define METAL_SIFIVE_UART0_{{ loop.index0 }}_BASE_ADDR {{ '0x%x' % uart.reg[0][0] }}
+#define METAL_SIFIVE_UART0_{{ loop.index0 }}_BASE_ADDRESS {{ '0x%x' % uart.reg[0][0] }}
+#define METAL_SIFIVE_UART0_{{ loop.index0 }}_SIZE {{ '0x%x' % uart.reg[0][1] }}
     {% endif %}
 {% endfor %}
 

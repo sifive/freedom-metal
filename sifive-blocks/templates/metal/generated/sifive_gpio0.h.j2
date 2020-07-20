@@ -19,7 +19,7 @@
 
 /* Only one sifive,gpio0 exists so all devicetree data is constant */
 #define get_index(gpio) 0
-#define BASE_ADDR(gpio) METAL_SIFIVE_GPIO0_0_BASE_ADDR
+#define BASE_ADDR(gpio) METAL_SIFIVE_GPIO0_0_BASE_ADDRESS
 #define INTERRUPT_PARENT(gpio) ((struct metal_interrupt) { {{ sifive_gpio0s[0].interrupt_parent[0].id }} })
 #define INTERRUPT_ID_BASE(gpio) {{ sifive_gpio0s[0].interrupts[0] }}
 
@@ -32,7 +32,7 @@ static const struct dt_gpio_data {
 } dt_gpio_data[__METAL_DT_NUM_GPIOS] = {
 	{% for gpio in sifive_gpio0s %}
 	{
-		.base_addr = METAL_SIFIVE_GPIO0_{{ gpio.id }}_BASE_ADDR,
+		.base_addr = METAL_SIFIVE_GPIO0_{{ gpio.id }}_BASE_ADDRESS,
 
 	{% if gpio.interrupt_parent is defined %}
 	    /* {{ gpio.interrupt_parent[0].compatible[0] }} */
