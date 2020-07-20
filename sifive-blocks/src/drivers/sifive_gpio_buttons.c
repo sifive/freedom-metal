@@ -10,18 +10,24 @@
 #include <metal/gpio.h>
 
 bool sifive_gpio_buttons_is_pressed(struct metal_button button) {
+    if (metal_button_is_none(button))
+        return false;
     metal_gpio_enable_input(BUTTON_GPIO(button), BUTTON_GPIO_PIN(button));
     return metal_gpio_get_input_pin(BUTTON_GPIO(button),
                                     BUTTON_GPIO_PIN(button));
 }
 
 int sifive_gpio_buttons_enable_interrupt(struct metal_button button) {
+    if (metal_button_is_none(button))
+        return 0;
     metal_gpio_enable_input(BUTTON_GPIO(button), BUTTON_GPIO_PIN(button));
     return metal_gpio_config_interrupt(
         BUTTON_GPIO(button), BUTTON_GPIO_PIN(button), METAL_GPIO_INT_RISING);
 }
 
 int sifive_gpio_buttons_disable_interrupt(struct metal_button button) {
+    if (metal_button_is_none(button))
+        return 0;
     metal_gpio_enable_input(BUTTON_GPIO(button), BUTTON_GPIO_PIN(button));
     return metal_gpio_config_interrupt(
         BUTTON_GPIO(button), BUTTON_GPIO_PIN(button), METAL_GPIO_INT_DISABLE);

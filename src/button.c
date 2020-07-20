@@ -5,11 +5,6 @@
 #include <metal/button.h>
 #include <metal/generated/button.h>
 
-struct metal_button metal_button_get(uint32_t index) {
-    assert(index < __METAL_DT_NUM_BUTTONS);
-    return (struct metal_button){index};
-}
-
 bool metal_button_is_pressed(struct metal_button button) __attribute__((weak));
 bool metal_button_is_pressed(struct metal_button button) { return false; }
 

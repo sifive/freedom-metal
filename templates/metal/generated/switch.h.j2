@@ -4,9 +4,10 @@
 {% include 'template_comment.h.j2' %}
 
 {% if 'switch' in default_drivers and default_drivers['switch'] in devices %}
+{% set switches = devices[default_drivers['switch']] %}
 #define __METAL_DT_NUM_SWITCHES {{ devices[switch_compatible]|length }}
 
-{% for switch in devices[default_drivers['switch']] %}
+{% for switch in switches %}
     {% if 'gpios' in switch %}
 #define metal_{{ to_snakecase(switch.compatible[0]) }}_{{ switch.id }}_interrupt_handler metal_{{ to_snakecase(switch.gpios[0].compatible[0]) }}_source_{{ switch.gpios[1] }}_handler
     {% elif 'interrupts_extended' in switch %}
@@ -18,6 +19,10 @@
 #define metal_switch_is_on {{ driver_string }}_is_on
 #define metal_switch_enable_interrupt {{ driver_string }}_enable_interrupt
 #define metal_switch_disable_interrupt {{ driver_string }}_disable_interrupt
+
+{% for switch in switches %}
+#define metal_switch_{{ to_snakecase(switch.label[0]) }} ((struct metal_switch) { {{ switch.id }} })
+{% endfor %}
 
 {% else %}
 #define __METAL_DT_NUM_SWITCHES 0

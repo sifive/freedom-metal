@@ -20,6 +20,14 @@ struct metal_switch {
     uint32_t __switch_index;
 };
 
+#define METAL_SWITCH_NONE UINT32_MAX
+
+#define metal_switch_none ((struct metal_switch){METAL_SWITCH_NONE})
+
+static inline bool metal_switch_is_none(struct metal_switch sw) {
+    return sw.__switch_index == METAL_SWITCH_NONE;
+}
+
 /*!
  * @brief Get a handle for a switch
  * @param index The index of the switch

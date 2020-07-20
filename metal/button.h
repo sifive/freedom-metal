@@ -23,13 +23,23 @@ struct metal_button {
     uint32_t __button_index;
 };
 
+#define METAL_BUTTON_NONE UINT32_MAX
+
+#define metal_button_none ((struct metal_button){METAL_BUTTON_NONE})
+
+static inline bool metal_button_is_none(struct metal_button button) {
+    return button.__button_index == METAL_BUTTON_NONE;
+}
+
 /*!
  * @brief Get a reference to a button
  *
  * @param index The button index
  * @return A handle for the button
  */
-struct metal_button metal_button_get(uint32_t index);
+static inline struct metal_button metal_button_get(uint32_t index) {
+    return ((struct metal_button){index});
+}
 
 /*!
  * @brief Returns if the button is currently pressed
