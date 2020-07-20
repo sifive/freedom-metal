@@ -39,52 +39,51 @@ unsigned long long metal_cpu_get_timebase(struct metal_cpu cpu) {
     return dt_cpu_data[get_hartid(cpu)].timebase;
 }
 
-uint64_t metal_cpu_get_mtime(struct metal_cpu cpu) __attribute__((weak));
-uint64_t metal_cpu_get_mtime(struct metal_cpu cpu) { return 0; }
+__attribute__((weak)) uint64_t metal_cpu_get_mtime(struct metal_cpu cpu) {
+    return 0;
+}
 
-int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time)
-    __attribute__((weak));
-int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time) { return -1; }
+__attribute__((weak)) int metal_cpu_set_mtimecmp(struct metal_cpu cpu,
+                                                 uint64_t time) {
+    return -1;
+}
 
-int metal_cpu_enable_interrupts(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_enable_interrupts(struct metal_cpu cpu) {
+__attribute__((weak)) void metal_cpu_enable_interrupts(void) {
     __asm__ volatile("csrs mstatus, %0" ::"r"(RISCV_MSTATUS_MIE));
 }
 
-int metal_cpu_disable_interrupts(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_disable_interrupts(struct metal_cpu cpu) {
+__attribute__((weak)) void metal_cpu_disable_interrupts(void) {
     __asm__ volatile("csrc mstatus, %0" ::"r"(RISCV_MSTATUS_MIE));
 }
 
-int metal_cpu_enable_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_enable_ipi(struct metal_cpu cpu) {
+__attribute__((weak)) void metal_cpu_enable_ipi(void) {
     __asm__ volatile("csrs mie, %0" ::"r"(RISCV_MIE_MSIE));
 }
 
-int metal_cpu_disable_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_disable_ipi(struct metal_cpu cpu) {
+__attribute__((weak)) void metal_cpu_disable_ipi(void) {
     __asm__ volatile("csrc mie, %0" ::"r"(RISCV_MIE_MSIE));
 }
 
-int metal_cpu_set_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_set_ipi(struct metal_cpu cpu) { return -1; }
+__attribute__((weak)) void metal_cpu_set_ipi(struct metal_cpu cpu) {}
 
-int metal_cpu_clear_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_clear_ipi(struct metal_cpu cpu) { return -1; }
+__attribute__((weak)) void metal_cpu_clear_ipi(struct metal_cpu cpu) {}
 
-int metal_cpu_get_ipi(struct metal_cpu cpu) __attribute__((weak));
-int metal_cpu_get_ipi(struct metal_cpu cpu) { return 0; }
+__attribute__((weak)) int metal_cpu_get_ipi(struct metal_cpu cpu) { return 0; }
 
-int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu)
-    __attribute__((weak));
-int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu) {
+__attribute__((weak)) void metal_cpu_enable_timer_interrupt(void) {
     __asm__ volatile("csrs mie, %0" ::"r"(RISCV_MIE_MTIE));
 }
 
-int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu)
-    __attribute__((weak));
-int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu) {
+__attribute__((weak)) void metal_cpu_disable_timer_interrupt(void) {
     __asm__ volatile("csrc mie, %0" ::"r"(RISCV_MIE_MTIE));
+}
+
+__attribute__((weak)) void metal_cpu_enable_external_interrupt(void) {
+    __asm__ volatile("csrs mie, %0" ::"r"(RISCV_MIE_MEIE));
+}
+
+__attribute__((weak)) void metal_cpu_disable_external_interrupt(void) {
+    __asm__ volatile("csrc mie, %0" ::"r"(RISCV_MIE_MEIE));
 }
 
 struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu) {

@@ -47,45 +47,43 @@ int metal_cpu_get_num_harts(void);
 
 /*!
  * @brief Enables the global interrupt enable for the hart
- * @param cpu The handle for the current hart
- * @return 0 upon success
  */
-int metal_cpu_enable_interrupts(struct metal_cpu cpu);
+void metal_cpu_enable_interrupts(void);
 
 /*!
  * @brief Disables the global interrupt enable for the hart
- * @param cpu The handle for the current hart
- * @return 0 upon success
  */
-int metal_cpu_disable_interrupts(struct metal_cpu cpu);
+void metal_cpu_disable_interrupts(void);
 
 /*!
  * @brief Enables the inter-process interrupt for the hart
- * @param cpu The handle for the current hart
- * @return 0 upon success
  */
-int metal_cpu_enable_ipi(struct metal_cpu cpu);
+void metal_cpu_enable_ipi(void);
 
 /*!
  * @brief Disables the inter-process interrupt for the hart
- * @param cpu The handle for the current hart
- * @return 0 upon success
  */
-int metal_cpu_disable_ipi(struct metal_cpu cpu);
+void metal_cpu_disable_ipi(void);
 
 /*!
  * @brief Enables the timer interrupt for the hart
- * @param cpu The handle for the current hart
- * @return 0 upon success
  */
-int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu);
+void metal_cpu_enable_timer_interrupt(void);
 
 /*!
  * @brief Disables the timer interrupt for the hart
- * @param cpu The handle for the current hart
- * @return 0 upon success
  */
-int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu);
+void metal_cpu_disable_timer_interrupt(void);
+
+/*!
+ * @brief Enables the external interrupt for the hart
+ */
+void metal_cpu_enable_external_interrupt(void);
+
+/*!
+ * @brief Diasble sthe external interrupt for the hart
+ */
+void metal_cpu_disable_external_interrupt(void);
 
 /*! @brief Get the CPU cycle count timer value
  *
@@ -138,7 +136,7 @@ int metal_cpu_set_mtimecmp(struct metal_cpu cpu, uint64_t time);
  * @param cpu The CPU device handle for the hart to be interrupted
  * @return 0 upon success
  */
-int metal_cpu_set_ipi(struct metal_cpu cpu);
+void metal_cpu_set_ipi(struct metal_cpu cpu);
 
 /*!
  * @brief Clear the inter-process interrupt for a hart
@@ -150,7 +148,7 @@ int metal_cpu_set_ipi(struct metal_cpu cpu);
  * @param cpu The CPU device handle for the hart to clear
  * @return 0 upon success
  */
-int metal_cpu_clear_ipi(struct metal_cpu cpu);
+void metal_cpu_clear_ipi(struct metal_cpu cpu);
 
 /*!
  * @brief Get the value of MSIP for the given hart

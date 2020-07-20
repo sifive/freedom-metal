@@ -5,6 +5,7 @@
 
 #ifdef METAL_RISCV_PLIC0
 
+#include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/drivers/riscv_plic0.h>
 #include <metal/generated/riscv_plic0.h>
@@ -51,6 +52,8 @@ static __inline__ int __metal_plic0_enable(int hartid, int id) {
               (id >> METAL_PLIC_SOURCE_SHIFT) * 4) |=
         (1 << (id & METAL_PLIC_SOURCE_MASK));
 
+    metal_cpu_enable_external_interrupt();
+
     return 0;
 }
 
@@ -63,6 +66,18 @@ static __inline__ int __metal_plic0_disable(int hartid, int id) {
               (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) +
               (id >> METAL_PLIC_SOURCE_SHIFT) * 4) &=
         ~(1 << (id & METAL_PLIC_SOURCE_MASK));
+
+    /* Check if any PLIC interrupts remain enabled and simply exit
+     * if they are. */
+    for (int i = 0; i < (METAL_RISCV_PLIC0_0_RISCV_NDEV / 32); i++) {
+        if (PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
+                      (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) + i) != 0)
+            return 0;
+    }
+
+    /* No more PLIC interrupts are enabled, so disable the external interrupt.
+     */
+    metal_cpu_disable_external_interrupt();
 
     return 0;
 }

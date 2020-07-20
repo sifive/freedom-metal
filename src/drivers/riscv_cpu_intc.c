@@ -132,8 +132,7 @@ int riscv_cpu_intc_enable(struct metal_interrupt controller, int id) {
     return 0;
 }
 
-int riscv_cpu_intc_interrupt_disable(struct metal_interrupt controller,
-                                     int id) {
+int riscv_cpu_intc_disable(struct metal_interrupt controller, int id) {
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
         return -1;
