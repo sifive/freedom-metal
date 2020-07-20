@@ -1,0 +1,34 @@
+#ifndef __METAL_DT_PMP__H
+#define __METAL_DT_PMP__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if harts|length > 1 %}
+
+#include <metal/generated/cpu.h>
+
+static const uint8_t dt_pmp_regions[__METAL_DT_NUM_HARTS] = {
+{% for hart in harts %}
+        {% if hart.riscv_pmpregions is defined %}
+        {{ hart.riscv_pmpregions[0] }}U,
+        {% else %}
+        0U,
+        {% endif %}
+{% endfor %}
+};
+
+#define PMP_REGIONS(hartid) (dt_pmp_regions[(hartid)])
+
+{% else %}
+
+{% if harts[0].riscv_pmpregions is defined %}
+#define PMP_REGIONS(hartid) {{ harts[0].riscv_pmpregions[0] }}U
+{% else %}
+#define PMP_REGIONS(hartid) 0U
+{% endif %}
+
+{% endif %}
+
+
+#endif /* ! __METAL_DT_PMP__H */
+
