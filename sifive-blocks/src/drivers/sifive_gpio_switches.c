@@ -9,6 +9,8 @@
 #include <metal/switch.h>
 
 bool sifive_gpio_switches_is_pressed(struct metal_switch sw) {
+    if (metal_switch_is_none(sw))
+        return false;
     if (SWITCH_HAS_GPIO(sw)) {
         metal_gpio_enable_input(SWITCH_GPIO(sw), SWITCH_GPIO_PIN(sw));
         return metal_gpio_get_input_pin(SWITCH_GPIO(sw), SWITCH_GPIO_PIN(sw));
@@ -17,6 +19,8 @@ bool sifive_gpio_switches_is_pressed(struct metal_switch sw) {
 }
 
 int sifive_gpio_switches_enable_interrupt(struct metal_switch sw) {
+    if (metal_switch_is_none(sw))
+        return -1;
     if (SWITCH_HAS_GPIO(sw)) {
         metal_gpio_enable_input(SWITCH_GPIO(sw), SWITCH_GPIO_PIN(sw));
         return metal_gpio_config_interrupt(SWITCH_GPIO(sw), SWITCH_GPIO_PIN(sw),
@@ -26,6 +30,8 @@ int sifive_gpio_switches_enable_interrupt(struct metal_switch sw) {
 }
 
 int sifive_gpio_switches_disable_interrupt(struct metal_switch sw) {
+    if (metal_switch_is_none(sw))
+        return -1;
     if (SWITCH_HAS_GPIO(sw)) {
         metal_gpio_enable_input(SWITCH_GPIO(sw), SWITCH_GPIO_PIN(sw));
         return metal_gpio_config_interrupt(SWITCH_GPIO(sw), SWITCH_GPIO_PIN(sw),
