@@ -12,7 +12,7 @@
 #define METAL_RISCV_CLINT0_{{ loop.index0 }}_SIZE {{ "0x%x" % clint.regs_by_name["control"][1] }}
     {% else %}
 #define METAL_RISCV_CLINT0_{{ loop.index0 }}_BASE_ADDRESS {{ "0x%x" % clint.reg[0][0] }}
-#define METAL_RISCV_CLINT0_{{ loop.index0 }}_SIZE {{ "0x%x" % clint.regs_by_name[0][1] }}
+#define METAL_RISCV_CLINT0_{{ loop.index0 }}_SIZE {{ "0x%x" % clint.reg[0][1] }}
     {% endif %}
 {% endfor %}
 
