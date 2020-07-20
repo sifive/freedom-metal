@@ -37,7 +37,7 @@ struct metal_i2c {
 /*! @brief Get a handle for a I2C device.
  * @param device_num The index of the desired I2C device.
  * @return A handle to the I2C device, or NULL if the device does not exist.*/
-struct metal_i2c *metal_i2c_get_device(int device_num);
+struct metal_i2c *metal_i2c_get_device(unsigned int device_num);
 
 /*! @brief Initialize a I2C device with a certain baud rate.
  * @param i2c The handle for the I2C device to initialize.

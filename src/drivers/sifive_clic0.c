@@ -83,25 +83,27 @@ int __metal_clic0_interrupt_set_mode(struct __metal_driver_sifive_clic0 *clic,
 
 int __metal_clic0_interrupt_set_level(struct __metal_driver_sifive_clic0 *clic,
                                       int id, unsigned int level) {
+
     uint8_t mask, nmmask, nlmask, val;
     struct __metal_clic_cfg cfg = __metal_clic0_configuration(clic, NULL);
     unsigned long control_base = __metal_driver_sifive_clic0_control_base(
         (struct metal_interrupt *)clic);
 
     /* Drop the LSBs that don't fit in nlbits */
-    level = level >> (METAL_CLIC_MAX_NLBITS - cfg.nlbits);
-
-    nmmask = ~(((uint8_t)(-1)) >> (cfg.nmbits));
-    nlmask = ((uint8_t)(-1)) >> (cfg.nmbits + cfg.nlbits);
+    nlmask = (uint8_t)(-1) >> (cfg.nmbits + cfg.nlbits);
+    nmmask = ~((uint8_t)(-1) >> (cfg.nmbits));
     mask = ~(nlmask | nmmask);
 
+    level &= mask;
     val = __METAL_ACCESS_ONCE(
         (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                           METAL_SIFIVE_CLIC0_CLICINTCTL_BASE + id));
+    val &= ~mask;
     __METAL_ACCESS_ONCE(
         (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                           METAL_SIFIVE_CLIC0_CLICINTCTL_BASE + id)) =
-        __METAL_SET_FIELD(val, mask, level);
+        (val | level);
+
     return 0;
 }
 
@@ -117,12 +119,13 @@ __metal_clic0_interrupt_get_level(struct __metal_driver_sifive_clic0 *clic,
         __metal_driver_sifive_clic0_num_intbits((struct metal_interrupt *)clic);
 
     if ((cfg.nmbits + cfg.nlbits) >= num_intbits) {
-        nlbits = num_intbits - cfg.nmbits;
+        nlbits = (num_intbits >= cfg.nmbits) ? (num_intbits - cfg.nmbits) : 0;
     } else {
-        nlbits = cfg.nlbits;
+        nlbits = __METAL_MIN((num_intbits - cfg.nmbits), cfg.nlbits);
     }
 
-    mask = ((1 << nlbits) - 1) << (8 - (cfg.nmbits + nlbits));
+    mask = ((1 << nlbits) - 1)
+           << (METAL_CLIC_MAX_NLBITS - (cfg.nmbits + nlbits));
     freebits = ((1 << METAL_CLIC_MAX_NLBITS) - 1) >> nlbits;
 
     if (mask == 0) {
@@ -140,28 +143,30 @@ __metal_clic0_interrupt_get_level(struct __metal_driver_sifive_clic0 *clic,
 
 int __metal_clic0_interrupt_set_priority(
     struct __metal_driver_sifive_clic0 *clic, int id, int priority) {
-    uint8_t mask, npmask, val, npbits;
+
+    uint8_t mask, nlmask, val, npbits;
     struct __metal_clic_cfg cfg = __metal_clic0_configuration(clic, NULL);
     unsigned long control_base = __metal_driver_sifive_clic0_control_base(
         (struct metal_interrupt *)clic);
     int num_intbits =
         __metal_driver_sifive_clic0_num_intbits((struct metal_interrupt *)clic);
 
-    if ((cfg.nmbits + cfg.nlbits) < num_intbits) {
+    if ((cfg.nmbits + cfg.nlbits) <= num_intbits) {
         npbits = num_intbits - (cfg.nmbits + cfg.nlbits);
-        priority = priority >> (8 - npbits);
 
-        mask = ((uint8_t)(-1)) >> (cfg.nmbits + cfg.nlbits + npbits);
-        npmask = ~(((uint8_t)(-1)) >> (cfg.nmbits + cfg.nlbits));
-        mask = ~(mask | npmask);
+        mask = (uint8_t)(-1) >> (cfg.nmbits + cfg.nlbits + npbits);
+        nlmask = ~((uint8_t)(-1) >> (cfg.nmbits + cfg.nlbits));
+        mask = ~(mask | nlmask);
 
+        priority &= mask;
         val = __METAL_ACCESS_ONCE(
             (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                               METAL_SIFIVE_CLIC0_CLICINTCTL_BASE + id));
+        val &= ~mask;
         __METAL_ACCESS_ONCE(
             (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                               METAL_SIFIVE_CLIC0_CLICINTCTL_BASE + id)) =
-            __METAL_SET_FIELD(val, mask, priority);
+            (val | priority);
     }
     return 0;
 }
@@ -208,12 +213,14 @@ int __metal_clic0_interrupt_set_vector_mode(
     val = __METAL_ACCESS_ONCE(
         (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
                           METAL_SIFIVE_CLIC0_CLICINTCTL_BASE + id));
-    /* Ensure its value is 1 bit wide */
-    enable &= 0x1;
+    if (enable) {
+        val |= mask;
+    } else {
+        val &= ~mask;
+    }
     __METAL_ACCESS_ONCE(
         (__metal_io_u8 *)(control_base + METAL_SIFIVE_CLIC0_MMODE_APERTURE +
-                          METAL_SIFIVE_CLIC0_CLICINTCTL_BASE + id)) =
-        __METAL_SET_FIELD(val, mask, enable);
+                          METAL_SIFIVE_CLIC0_CLICINTCTL_BASE + id)) = val;
     return 0;
 }
 
@@ -687,6 +694,21 @@ int __metal_driver_sifive_clic0_set_priority(struct metal_interrupt *controller,
     return __metal_clic0_interrupt_set_priority(clic, id, priority);
 }
 
+unsigned int __metal_driver_sifive_clic0_get_preemptive_level(
+    struct metal_interrupt *controller, int id) {
+    struct __metal_driver_sifive_clic0 *clic =
+        (struct __metal_driver_sifive_clic0 *)(controller);
+    return __metal_clic0_interrupt_get_level(clic, id);
+}
+
+int __metal_driver_sifive_clic0_set_preemptive_level(
+    struct metal_interrupt *controller, int id, unsigned int level) {
+    struct __metal_driver_sifive_clic0 *clic =
+        (struct __metal_driver_sifive_clic0 *)(controller);
+    __metal_clic0_interrupt_set_level(clic, id, level);
+    return (__metal_clic0_interrupt_set_priority(clic, id, level));
+}
+
 int __metal_driver_sifive_clic0_clear_interrupt(
     struct metal_interrupt *controller, int id) {
     struct __metal_driver_sifive_clic0 *clic =
@@ -784,6 +806,10 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_clic0) = {
         __metal_driver_sifive_clic0_get_priority,
     .clic_vtable.interrupt_set_priority =
         __metal_driver_sifive_clic0_set_priority,
+    .clic_vtable.interrupt_get_preemptive_level =
+        __metal_driver_sifive_clic0_get_preemptive_level,
+    .clic_vtable.interrupt_set_preemptive_level =
+        __metal_driver_sifive_clic0_set_preemptive_level,
     .clic_vtable.interrupt_clear = __metal_driver_sifive_clic0_clear_interrupt,
     .clic_vtable.interrupt_set = __metal_driver_sifive_clic0_set_interrupt,
     .clic_vtable.command_request = __metal_driver_sifive_clic0_command_request,

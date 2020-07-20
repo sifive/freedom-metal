@@ -40,12 +40,32 @@ _enter:
     csrw mtvec, t0
 
     /* There may be pre-initialization routines inside the MBI code that run in
-     * C, so here we set up a C environment.  First we set up a stack pointer,
+     * C, so here we set up a C environment. First we set up a stack pointer,
      * which is left as a weak reference in order to allow initialization
      * routines that do not need a stack to be set up to transparently be
      * called. */
     .weak __metal_stack_pointer
     la sp, __metal_stack_pointer
+
+   /* The METAL is designed for a bare-metal environment and therefore is expected
+    * to define its own stack pointer. We also align the stack pointer here
+    * because the only RISC-V ABI that's currently defined, mandates 16-byte
+    * stack alignment. */
+
+    bne sp, zero, 1f
+    la sp, _sp
+1:
+    /* Increment by hartid number of stack sizes */
+    csrr a0, mhartid
+    li t0, 0
+    la t1, __stack_size
+1:
+    andi sp, sp, -16
+    beq t0, a0, 1f
+    add sp, sp, t1
+    addi t0, t0, 1
+    j 1b
+1:
 
     /* Check for an initialization routine and call it if one exists, otherwise
      * just skip over the call entirely.   Note that __metal_initialize isn't
@@ -53,7 +73,6 @@ _enter:
      * segments having been initialized.  This is done to avoid putting a
      * burden on systems that can be initialized without having a C environment
      * set up. */
-    .weak __metal_before_start
     la ra, __metal_before_start
     beqz ra, 1f
     jalr ra
