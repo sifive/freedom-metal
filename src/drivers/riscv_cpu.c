@@ -87,6 +87,18 @@ int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu) {
     __asm__ volatile("csrc mie, %0" ::"r"(RISCV_MIE_MTIE));
 }
 
+void metal_cpu_enable_external_interrupt()
+    __attribute__((weak));
+void metal_cpu_enable_external_interrupt() {
+    __asm__ volatile("csrs mie, %0" ::"r"(RISCV_MIE_MEIE));
+}
+
+void metal_cpu_disable_external_interrupt()
+    __attribute__((weak));
+void metal_cpu_disable_external_interrupt() {
+    __asm__ volatile("csrc mie, %0" ::"r"(RISCV_MIE_MEIE));
+}
+
 struct metal_interrupt metal_cpu_interrupt_controller(struct metal_cpu cpu) {
     return (struct metal_interrupt){cpu.__hartid};
 }

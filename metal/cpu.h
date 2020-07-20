@@ -87,6 +87,20 @@ int metal_cpu_enable_timer_interrupt(struct metal_cpu cpu);
  */
 int metal_cpu_disable_timer_interrupt(struct metal_cpu cpu);
 
+/*!
+ * @brief Enables the external interrupt for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
+void metal_cpu_enable_external_interrupt();
+
+/*!
+ * @brief Diasble sthe external interrupt for the hart
+ * @param cpu The handle for the current hart
+ * @return 0 upon success
+ */
+void metal_cpu_disable_external_interrupt()
+
 /*! @brief Get the CPU cycle count timer value
  *
  * Get the value of the cycle count timer for a given CPU

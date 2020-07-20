@@ -25,9 +25,11 @@ typedef uint64_t riscv_xlen_t;
 
 #define RISCV_MIE_MSIE (1 << 3)
 #define RISCV_MIE_MTIE (1 << 7)
+#define RISCV_MIE_MEIE (1 << 11)
 
-#define RISCV_MIP_MSIE (1 << 3)
-#define RISCV_MIP_MTIE (1 << 7)
+#define RISCV_MIP_MSIP (1 << 3)
+#define RISCV_MIP_MTIP (1 << 7)
+#define RISCV_MIP_MEIP (1 << 11)
 
 #define RISCV_MISA_A_EXTENSIONS 0x0001
 #define RISCV_MISA_C_EXTENSIONS 0x0004
