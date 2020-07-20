@@ -30,7 +30,7 @@ typedef enum {
  * @param hartid The ID of the desired CPU hart
  * @return A pointer to the CPU device handle
  */
-inline struct metal_cpu metal_cpu_get(unsigned int hartid) {
+static __inline__ struct metal_cpu metal_cpu_get(unsigned int hartid) {
     assert(hartid < __METAL_DT_NUM_HARTS);
     return (struct metal_cpu){hartid};
 }
@@ -38,12 +38,20 @@ inline struct metal_cpu metal_cpu_get(unsigned int hartid) {
 /*! @brief Get the hartid of the CPU hart executing this function
  *
  * @return The hartid of the current CPU hart */
-int metal_cpu_get_current_hartid(void);
+static __inline__ int metal_cpu_get_current_hartid(void) {
+    int mhartid;
+    __asm__ volatile("csrr %0, mhartid" : "=r"(mhartid));
+    return mhartid;
+}
+
+static __inline__ struct metal_cpu metal_cpu_get_current_hart(void) {
+    return metal_cpu_get(metal_cpu_get_current_hartid());
+}
 
 /*! @brief Get the number of CPU harts
  *
  * @return The number of CPU harts */
-int metal_cpu_get_num_harts(void);
+static __inline__ int metal_cpu_get_num_harts() { return __METAL_DT_NUM_HARTS; }
 
 /*!
  * @brief Enables the global interrupt enable for the hart
