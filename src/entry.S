@@ -67,6 +67,14 @@ _enter:
     j 1b
 1:
 
+    /* Enable the prefetcher. */
+    li ra, 0xa000  // Load 0xa000_0000 as the SPF base config register
+    slli ra,ra,16
+    la t0, 0x08116811
+    sw t0,0(ra)
+    la t0, 0x0000005b
+    sw t0, 4(ra)
+
     /* Check for an initialization routine and call it if one exists, otherwise
      * just skip over the call entirely.   Note that __metal_initialize isn't
      * actually a full C function, as it doesn't end up with the .bss or .data
