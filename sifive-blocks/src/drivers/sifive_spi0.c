@@ -396,3 +396,5 @@ void sifive_spi0_init(struct metal_spi spi, int baud_rate) {
 }
 
 #endif /* METAL_SIFIVE_SPI0 */
+
+typedef int no_empty_translation_units;

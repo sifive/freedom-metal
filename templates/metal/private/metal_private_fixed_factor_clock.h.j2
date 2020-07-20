@@ -20,9 +20,10 @@ static const struct dt_fixed_factor_clock_data {
 } dt_clock_data[__METAL_DT_NUM_FIXED_FACTOR_CLOCKS] = {
 	{% for clk in fixed_factor_clocks %}
 	{
+		/* {{ clk.clocks[0].compatible[0] }} */
 		.mul = {{ clk.clock_mult[0] }},
 		.div = {{ clk.clock_div[0] }},
-		.ref = (struct metal_clock) { {{ clk.clocks[0].id }} }
+		.ref = { {{ clk.clocks[0].id }} }
 	},
 	{% endfor %}
 };

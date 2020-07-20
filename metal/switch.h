@@ -13,6 +13,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define METAL_SWITCH_INVALID_INDEX UINT32_MAX
+
 /*!
  * @brief A handle for a switch
  */

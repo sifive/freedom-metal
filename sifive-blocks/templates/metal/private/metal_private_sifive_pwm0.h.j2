@@ -36,12 +36,13 @@ static const struct dt_pwm_data {
 
 	{% if pwm.clocks is defined %}
 	    /* {{ pwm.clocks[0].compatible[0] }} */
-	    .clock = (struct metal_clock) { {{ pwm.clocks[0].id }} },
+	    .clock = { {{ pwm.clocks[0].id }} },
 	{% endif %}
 
 	{% if pwm.pinmux is defined %}
+	    /* {{ pwm.pinmux[0].compatible[0] }} */
 		.has_pinmux = 1,
-		.pinmux = (struct metal_gpio) { {{ pwm.pinmux[0].id }} },
+		.pinmux = { {{ pwm.pinmux[0].id }} },
 		.pinmux_output_selector = {{ pwm.pinmux[1] }},
 		.pinmux_source_selector = {{ pwm.pinmux[2] }},
 	{% else %}
@@ -50,7 +51,7 @@ static const struct dt_pwm_data {
 
 	{% if pwm.interrupt_parent is defined %}
 	    /* {{ pwm.interrupt_parent[0].compatible[0] }} */
-		.interrupt_parent = (struct metal_interrupt) { {{ pwm.interrupt_parent[0].id }} },
+		.interrupt_parent = { {{ pwm.interrupt_parent[0].id }} },
 		.interrupt_id = {{ pwm.interrupts[0] }},
 	{% endif %}
 	{% if pwm.ncomparators is defined %}

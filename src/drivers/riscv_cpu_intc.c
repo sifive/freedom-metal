@@ -183,6 +183,7 @@ int riscv_cpu_intc_disable(struct metal_interrupt controller, int id) {
     case METAL_INTERRUPT_ID_LC14:
     case METAL_INTERRUPT_ID_LC15:
         __asm__ volatile("csrc mie, %0" ::"r"(1 << id));
+        break;
     default:
         return -1;
     }

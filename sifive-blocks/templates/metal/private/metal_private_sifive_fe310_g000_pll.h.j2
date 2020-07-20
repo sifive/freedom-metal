@@ -32,12 +32,12 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 	{% if "pllref" in clk.clock_names %}
 		.has_hfxosc = true,
 		/* {{ clk.clocks_by_name["pllref"].compatible[0] }} */
-		.hfxosc = (struct metal_clock) { {{ clk.clocks_by_name["pllref"].id }} },
+		.hfxosc = { {{ clk.clocks_by_name["pllref"].id }} },
 	{% else %}
 		.has_hfxosc = false,
 	{% endif %}
 		/* {{ clk.clocks_by_name["pllsel0"].compatible[0] }} */
-		.hfrosc = (struct metal_clock) { {{ clk.clocks_by_name["pllsel0"].id }} },
+		.hfrosc = { {{ clk.clocks_by_name["pllsel0"].id }} },
 	},
 	{% endfor %}
 };
@@ -57,7 +57,7 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 #define PLL_HFXOSC(pll) ((struct metal_clock) { {{ sifive_fe310_g000_plls[0].clocks_by_name["pllref"].id }} })
 {% else %}
 #define PLL_HAS_HFXOSC(pll) false
-#define PLL_HFXOSC(pll) ((struct metal_clock) { 0 })
+#define PLL_HFXOSC(pll) ({ 0 })
 {% endif %}
 #define PLL_HFROSC(pll) ((struct metal_clock) { {{ sifive_fe310_g000_plls[0].clocks_by_name["pllsel0"].id }} })
 

@@ -113,11 +113,11 @@ int sifive_aon0_rtc_run(struct metal_rtc rtc,
 }
 
 int sifive_aon0_enable_rtc_interrupt(struct metal_rtc rtc) {
-    metal_interrupt_enable(AON_INTERRUPT_PARENT, AON_RTC_INTERRUPT_ID);
+    return metal_interrupt_enable(AON_INTERRUPT_PARENT, AON_RTC_INTERRUPT_ID);
 }
 
 int sifive_aon0_disable_rtc_interrupt(struct metal_rtc rtc) {
-    metal_interrupt_disable(AON_INTERRUPT_PARENT, AON_RTC_INTERRUPT_ID);
+    return metal_interrupt_disable(AON_INTERRUPT_PARENT, AON_RTC_INTERRUPT_ID);
 }
 
 /* Watchdog API */
@@ -154,14 +154,17 @@ uint64_t sifive_aon0_set_wdog_rate(struct metal_watchdog wdog,
     }
 
     /* Look for the closest scale value */
-    long min_diff = LONG_MAX;
+    uint64_t min_diff = UINT64_MAX;
     unsigned int min_scale = 0;
     for (int i = 0; i < METAL_WDOGCFG_SCALE_MASK; i++) {
         const uint64_t new_rate = clock_rate / (1 << i);
 
-        uint64_t diff = rate - new_rate;
-        if (diff < 0)
-            diff *= -1;
+        uint64_t diff;
+        if (rate > new_rate) {
+            diff = rate - new_rate;
+        } else {
+            diff = new_rate - rate;
+        }
 
         if (diff < min_diff) {
             min_diff = diff;
@@ -250,11 +253,11 @@ int sifive_aon0_wdog_run(struct metal_watchdog wdog,
 }
 
 int sifive_aon0_enable_wdog_interrupt(struct metal_watchdog wdog) {
-    metal_interrupt_enable(AON_INTERRUPT_PARENT, AON_WDOG_INTERRUPT_ID);
+    return metal_interrupt_enable(AON_INTERRUPT_PARENT, AON_WDOG_INTERRUPT_ID);
 }
 
 int sifive_aon0_disable_wdog_interrupt(struct metal_watchdog wdog) {
-    metal_interrupt_disable(AON_INTERRUPT_PARENT, AON_WDOG_INTERRUPT_ID);
+    return metal_interrupt_disable(AON_INTERRUPT_PARENT, AON_WDOG_INTERRUPT_ID);
 }
 
 int sifive_aon0_clear_wdog_interrupt(struct metal_watchdog wdog) {

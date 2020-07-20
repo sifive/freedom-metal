@@ -23,12 +23,12 @@
 
 uint64_t sifive_fe310_g000_hfxosc_get_rate_hz(struct metal_clock clock) {
 
-    if (!PRCI_REGW(METAL_SIFIVE_FE310_G000_PRCI_HFXOSCCFG) &
-        PRCI_HFXOSCCFG_ENABLE) {
+    if (!(PRCI_REGW(METAL_SIFIVE_FE310_G000_PRCI_HFXOSCCFG) &
+          PRCI_HFXOSCCFG_ENABLE)) {
         return 0;
     }
-    while (!PRCI_REGW(METAL_SIFIVE_FE310_G000_PRCI_HFXOSCCFG) &
-           PRCI_HFXOSCCFG_READY)
+    while (!(PRCI_REGW(METAL_SIFIVE_FE310_G000_PRCI_HFXOSCCFG) &
+             PRCI_HFXOSCCFG_READY))
         ;
 
     struct metal_clock ref = REF_CLOCK(clock);

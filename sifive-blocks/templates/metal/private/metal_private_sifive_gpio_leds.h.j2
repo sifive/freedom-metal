@@ -31,7 +31,8 @@ static const struct dt_led_data {
 } dt_led_data[__METAL_DT_NUM_SIFIVE_GPIO_LEDS] = {
 	{% for led in leds %}
 	{
-		.gpio = {{ led.gpios[0].id }},
+		/* {{ led.gpios[0].compatible[0] }} */
+		.gpio = { {{ led.gpios[0].id }} },
 		.pin = {{ led.gpios[1] }},
 	},
 	{% endfor %}
