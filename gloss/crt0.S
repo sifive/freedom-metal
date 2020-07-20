@@ -177,14 +177,24 @@ _skip_init:
 1:
 
   /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
-  li   a4, 0x10028
+  li   a4, 0x10028 /* F, D, Q */
   and  a5, a5, a4
   beqz a5, 1f
   csrr a5, mstatus
-  lui  a4, 0x2
+  lui  a4, 0x2     /* set METAL_MSTATUS_FS_INIT */
   or   a5, a5, a4
   csrw mstatus, a5
   csrwi fcsr, 0
+1:
+
+  /* Check RISC-V isa and enable VF bits if Vector extension architecture. */
+  csrr a5, misa
+  li   a4, 0x200000 /* V */
+  and  a5, a5, a4
+  beqz a5, 1f
+  csrr a5, mstatus
+  ori  a5, a5, 0x200/* set METAL_MSTATUS_VS_INIT */
+  csrw mstatus, a5
 1:
 
   /* This is a C runtime, so main() is defined to have some arguments.  Since
