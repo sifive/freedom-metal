@@ -154,4 +154,14 @@ int metal_gpio_config_interrupt(struct metal_gpio gpio, int pin,
 int metal_gpio_clear_interrupt(struct metal_gpio gpio, int pin,
                                enum metal_gpio_int_type int_type);
 
+/*!
+ * @brief Clear gpio interrupt status
+ * @param gpio The handle for the GPIO interface
+ * @param pin The bitmask for the pin to clear gpio interrupt
+ * @param priority The priority to set the interrupt to
+ * @return 0 if the interrupt is cleared
+ */
+int metal_gpio_set_interrupt_priority(struct metal_gpio gpio, int pin,
+                                      unsigned int priority);
+
 #endif

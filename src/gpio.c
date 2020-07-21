@@ -70,3 +70,9 @@ int metal_gpio_clear_interrupt(struct metal_gpio gpio, int pin,
                                enum metal_gpio_int_type int_type) {
     return -1;
 }
+
+__attribute__((weak)) int
+metal_gpio_set_interrupt_priority(struct metal_gpio gpio, int pin,
+                                  unsigned int priority) {
+    return -1;
+}
