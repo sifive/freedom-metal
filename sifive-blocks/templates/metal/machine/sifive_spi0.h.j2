@@ -1,0 +1,40 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__PLATFORM__SIFIVE_SPI0_H
+#define METAL__PLATFORM__SIFIVE_SPI0_H
+
+{% if 'sifive,spi0' in devices %}
+{% set sifive_spi0s = devices['sifive,spi0'] %}
+
+{% for spi in sifive_spi0s %}
+    {% if spi.reg_names is defined %}
+#define METAL_SIFIVE_SPI0_{{ loop.index0 }}_BASE_ADDRESS {{ '0x%x' % spi.regs_by_name["control"][0] }}
+#define METAL_SIFIVE_SPI0_{{ loop.index0 }}_SIZE {{ '0x%x' % spi.regs_by_name["control"][1] }}
+    {% else %}
+#define METAL_SIFIVE_SPI0_{{ loop.index0 }}_BASE_ADDRESS {{ '0x%x' % spi.reg[0][0] }}
+#define METAL_SIFIVE_SPI0_{{ loop.index0 }}_SIZE {{ '0x%x' % spi.reg[0][1] }}
+    {% endif %}
+{% endfor %}
+
+#define METAL_SIFIVE_SPI0
+#define METAL_SIFIVE_SPI0_SCKDIV        0x0
+#define METAL_SIFIVE_SPI0_SCKMODE       0x4
+#define METAL_SIFIVE_SPI0_CSID          0x10
+#define METAL_SIFIVE_SPI0_CSDEF         0x14
+#define METAL_SIFIVE_SPI0_CSMODE        0x18
+#define METAL_SIFIVE_SPI0_DELAY0        0x28
+#define METAL_SIFIVE_SPI0_DELAY1        0x2C
+#define METAL_SIFIVE_SPI0_FMT           0x40
+#define METAL_SIFIVE_SPI0_TXDATA        0x48
+#define METAL_SIFIVE_SPI0_RXDATA        0x4C
+#define METAL_SIFIVE_SPI0_TXMARK        0x50
+#define METAL_SIFIVE_SPI0_RXMARK        0x54
+#define METAL_SIFIVE_SPI0_FCTRL         0x60
+#define METAL_SIFIVE_SPI0_FFMT          0x64
+#define METAL_SIFIVE_SPI0_IE            0x70
+#define METAL_SIFIVE_SPI0_IP            0x74
+
+{% endif %}
+
+#endif

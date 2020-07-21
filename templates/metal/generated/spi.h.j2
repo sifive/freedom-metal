@@ -1,0 +1,25 @@
+#ifndef __METAL_DT_SPI__H
+#define __METAL_DT_SPI__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'spi' in default_drivers and default_drivers['spi'] in devices %}
+{% set spis = devices[default_drivers['spi']] %}
+#define __METAL_DT_NUM_SPIS {{ spis|length }}
+
+{% set driver_string = to_snakecase(default_drivers['spi']) %}
+#define metal_spi_init {{ driver_string }}_init
+#define metal_spi_transfer {{ driver_string }}_transfer
+#define metal_spi_get_baud_rate {{ driver_string }}_get_baud_rate
+#define metal_spi_set_baud_rate {{ driver_string }}_set_baud_rate
+
+{% for spi in spis %}
+#define metal_spi_{{ spi.id }} ((struct metal_spi) { {{ spi.id }} })
+{% endfor %}
+
+{% else %}
+#define __METAL_DT_NUM_SPIS 0
+{% endif %}
+
+#endif /* ! __METAL_DT_SPI__H */
+
