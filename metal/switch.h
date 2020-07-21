@@ -57,4 +57,11 @@ int metal_switch_enable_interrupt(struct metal_switch sw);
  */
 int metal_switch_disable_interrupt(struct metal_switch sw);
 
+/*!
+ * @brief Clear the interrupt for a switch
+ * @param sw The switch handle
+ * @return 0 upon success
+ */
+int metal_switch_clear_interrupt(struct metal_switch sw);
+
 #endif

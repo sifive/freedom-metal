@@ -40,6 +40,16 @@ int sifive_gpio_switches_disable_interrupt(struct metal_switch sw) {
     return metal_interrupt_disable(SWITCH_INTC(sw), SWITCH_INTERRUPT_ID(sw));
 }
 
+int sifive_gpio_switches_clear_interrupt(struct metal_switch sw) {
+    if (metal_switch_is_none(sw))
+        return -1;
+    if (SWITCH_HAS_GPIO(sw)) {
+        return metal_gpio_clear_interrupt(SWITCH_GPIO(sw), SWITCH_GPIO_PIN(sw),
+                                          METAL_GPIO_INT_RISING);
+    }
+    return 0;
+}
+
 #endif
 
 typedef int no_empty_translation_units;

@@ -33,6 +33,13 @@ int sifive_gpio_buttons_disable_interrupt(struct metal_button button) {
         BUTTON_GPIO(button), BUTTON_GPIO_PIN(button), METAL_GPIO_INT_DISABLE);
 }
 
+int sifive_gpio_buttons_clear_interrupt(struct metal_button button) {
+    if (metal_button_is_none(button))
+        return 0;
+    return metal_gpio_clear_interrupt(
+        BUTTON_GPIO(button), BUTTON_GPIO_PIN(button), METAL_GPIO_INT_RISING);
+}
+
 #endif
 
 typedef int no_empty_translation_units;

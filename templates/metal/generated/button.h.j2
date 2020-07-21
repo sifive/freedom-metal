@@ -18,6 +18,7 @@
 #define metal_button_is_pressed {{ driver_string}}_is_pressed
 #define metal_button_enable_interrupt {{ driver_string }}_enable_interrupt
 #define metal_button_disable_interrupt {{ driver_string }}_disable_interrupt
+#define metal_button_clear_interrupt {{ driver_string }}_clear_interrupt
 
 {% for button in buttons %}
 #define metal_button_{{ to_snakecase(button.label[0]) }} ((struct metal_button) { {{ button.id }} })

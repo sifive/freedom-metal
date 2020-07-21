@@ -14,3 +14,7 @@ int metal_switch_enable_interrupt(struct metal_switch sw) { return -1; }
 int metal_switch_disable_interrupt(struct metal_switch sw)
     __attribute__((weak));
 int metal_switch_disable_interrupt(struct metal_switch sw) { return -1; }
+
+__attribute__((weak)) int metal_switch_clear_interrupt(struct metal_switch sw) {
+    return -1;
+}
