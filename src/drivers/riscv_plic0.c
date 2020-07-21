@@ -182,6 +182,14 @@ unsigned int riscv_plic0_get_priority(struct metal_interrupt plic, int id) {
                      (id << METAL_PLIC_SOURCE_PRIORITY_SHIFT));
 }
 
+int riscv_plic0_set_threshold(struct metal_interrupt plic,
+                              unsigned int priority) {
+    for (int hartid = 0; hartid < __METAL_DT_NUM_HARTS; hartid++) {
+        __metal_riscv_plic0_set_threshold(hartid, priority);
+    }
+    return 0;
+}
+
 int riscv_plic0_set_preemptive_level(struct metal_interrupt controller, int id,
                                      unsigned int level) {
     return -1;
