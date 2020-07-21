@@ -9,6 +9,12 @@ typedef uint32_t riscv_xlen_t;
 typedef uint64_t riscv_xlen_t;
 #endif
 
+#if __riscv_flen == 32
+typedef uint32_t riscv_flen_t;
+#elif __riscv_flen == 64
+typedef uint64_t riscv_flen_t;
+#endif
+
 #if __riscv_xlen == 32
 #define RISCV_MCAUSE_INTERRUPT 0x80000000UL
 #define RISCV_MCAUSE_CODE_MASK 0x000003FFUL

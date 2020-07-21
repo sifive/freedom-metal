@@ -14,6 +14,7 @@
  */
 
 #include <stdint.h>
+#include <metal/riscv.h>
 
 enum metal_privilege_mode {
     METAL_PRIVILEGE_USER = 0,
@@ -21,95 +22,83 @@ enum metal_privilege_mode {
     METAL_PRIVILEGE_MACHINE = 3,
 };
 
-#if __riscv_xlen == 32
-typedef uint32_t metal_xreg_t;
-#elif __riscv_xlen == 64
-typedef uint64_t metal_xreg_t;
-#endif
-
-#if __riscv_flen == 32
-typedef uint32_t metal_freg_t;
-#elif __riscv_flen == 64
-typedef uint64_t metal_freg_t;
-#endif
-
 struct metal_register_file {
-    metal_xreg_t ra;
-    metal_xreg_t sp;
-    metal_xreg_t gp;
-    metal_xreg_t tp;
+    riscv_xlen_t ra;
+    riscv_xlen_t sp;
+    riscv_xlen_t gp;
+    riscv_xlen_t tp;
 
-    metal_xreg_t t0;
-    metal_xreg_t t1;
-    metal_xreg_t t2;
+    riscv_xlen_t t0;
+    riscv_xlen_t t1;
+    riscv_xlen_t t2;
 
-    metal_xreg_t s0;
-    metal_xreg_t s1;
+    riscv_xlen_t s0;
+    riscv_xlen_t s1;
 
-    metal_xreg_t a0;
-    metal_xreg_t a1;
-    metal_xreg_t a2;
-    metal_xreg_t a3;
-    metal_xreg_t a4;
-    metal_xreg_t a5;
+    riscv_xlen_t a0;
+    riscv_xlen_t a1;
+    riscv_xlen_t a2;
+    riscv_xlen_t a3;
+    riscv_xlen_t a4;
+    riscv_xlen_t a5;
 #ifndef __riscv_32e
-    metal_xreg_t a6;
-    metal_xreg_t a7;
+    riscv_xlen_t a6;
+    riscv_xlen_t a7;
 
-    metal_xreg_t s2;
-    metal_xreg_t s3;
-    metal_xreg_t s4;
-    metal_xreg_t s5;
-    metal_xreg_t s6;
-    metal_xreg_t s7;
-    metal_xreg_t s8;
-    metal_xreg_t s9;
-    metal_xreg_t s10;
-    metal_xreg_t s11;
+    riscv_xlen_t s2;
+    riscv_xlen_t s3;
+    riscv_xlen_t s4;
+    riscv_xlen_t s5;
+    riscv_xlen_t s6;
+    riscv_xlen_t s7;
+    riscv_xlen_t s8;
+    riscv_xlen_t s9;
+    riscv_xlen_t s10;
+    riscv_xlen_t s11;
 
-    metal_xreg_t t3;
-    metal_xreg_t t4;
-    metal_xreg_t t5;
-    metal_xreg_t t6;
+    riscv_xlen_t t3;
+    riscv_xlen_t t4;
+    riscv_xlen_t t5;
+    riscv_xlen_t t6;
 #endif /* __riscv_32e */
 
 #ifdef __riscv_flen
-    metal_freg_t ft0;
-    metal_freg_t ft1;
-    metal_freg_t ft2;
-    metal_freg_t ft3;
-    metal_freg_t ft4;
-    metal_freg_t ft5;
-    metal_freg_t ft6;
-    metal_freg_t ft7;
+    riscv_flen_t ft0;
+    riscv_flen_t ft1;
+    riscv_flen_t ft2;
+    riscv_flen_t ft3;
+    riscv_flen_t ft4;
+    riscv_flen_t ft5;
+    riscv_flen_t ft6;
+    riscv_flen_t ft7;
 
-    metal_freg_t fs0;
-    metal_freg_t fs1;
+    riscv_flen_t fs0;
+    riscv_flen_t fs1;
 
-    metal_freg_t fa0;
-    metal_freg_t fa1;
-    metal_freg_t fa2;
-    metal_freg_t fa3;
-    metal_freg_t fa4;
-    metal_freg_t fa5;
-    metal_freg_t fa6;
-    metal_freg_t fa7;
+    riscv_flen_t fa0;
+    riscv_flen_t fa1;
+    riscv_flen_t fa2;
+    riscv_flen_t fa3;
+    riscv_flen_t fa4;
+    riscv_flen_t fa5;
+    riscv_flen_t fa6;
+    riscv_flen_t fa7;
 
-    metal_freg_t fs2;
-    metal_freg_t fs3;
-    metal_freg_t fs4;
-    metal_freg_t fs5;
-    metal_freg_t fs6;
-    metal_freg_t fs7;
-    metal_freg_t fs8;
-    metal_freg_t fs9;
-    metal_freg_t fs10;
-    metal_freg_t fs11;
+    riscv_flen_t fs2;
+    riscv_flen_t fs3;
+    riscv_flen_t fs4;
+    riscv_flen_t fs5;
+    riscv_flen_t fs6;
+    riscv_flen_t fs7;
+    riscv_flen_t fs8;
+    riscv_flen_t fs9;
+    riscv_flen_t fs10;
+    riscv_flen_t fs11;
 
-    metal_freg_t ft8;
-    metal_freg_t ft9;
-    metal_freg_t ft10;
-    metal_freg_t ft11;
+    riscv_flen_t ft8;
+    riscv_flen_t ft9;
+    riscv_flen_t ft10;
+    riscv_flen_t ft11;
 #endif /* __riscv_flen */
 };
 
