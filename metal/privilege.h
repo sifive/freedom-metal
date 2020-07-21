@@ -13,8 +13,8 @@
  * by reading the RISC-V Privileged Architecture Specification v1.10.
  */
 
-#include <stdint.h>
 #include <metal/riscv.h>
+#include <stdint.h>
 
 enum metal_privilege_mode {
     METAL_PRIVILEGE_USER = 0,
