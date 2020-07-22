@@ -1,0 +1,27 @@
+#ifndef __METAL_DT_I2C__H
+#define __METAL_DT_I2C__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'i2c' in default_drivers and default_drivers['i2c'] in devices %}
+{% set i2cs = devices[default_drivers['i2c']] %}
+#define __METAL_DT_NUM_I2CS {{ i2cs|length }}
+
+{% set driver_string = to_snakecase(default_drivers['i2c']) %}
+#define metal_i2c_init {{ driver_string }}_init
+#define metal_i2c_write {{ driver_string }}_write
+#define metal_i2c_read {{ driver_string }}_read
+#define metal_i2c_transfer {{ driver_string }}_transfer
+#define metal_i2c_get_baud_rate {{ driver_string }}_get_baud_rate
+#define metal_i2c_set_baud_rate {{ driver_string }}_set_baud_rate
+
+{% for i2c in i2cs %}
+#define metal_i2c_{{ i2c.id }} ((struct metal_i2c) { {{ i2c.id }} })
+{% endfor %}
+
+{% else %}
+#define __METAL_DT_NUM_I2CS 0
+{% endif %}
+
+#endif /* ! __METAL_DT_I2C__H */
+
