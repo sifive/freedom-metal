@@ -21,7 +21,7 @@
 {% endif %}
 
 {% if global_interrupts is defined %}
-#define __METAL_NUM_GLOBAL_INTERRUPTS {{ global_interrupts.irqs|length + 1 }}
+#define __METAL_NUM_GLOBAL_INTERRUPTS {{ global_interrupts.irqs|length }}
 {% else %}
 #define __METAL_NUM_GLOBAL_INTERRUPTS 0
 {% endif %}

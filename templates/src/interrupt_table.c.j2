@@ -57,7 +57,11 @@ const metal_interrupt_handler_t __metal_local_interrupt_table[__METAL_NUM_LOCAL_
 };
 
 {% if global_interrupts is defined %}
-const metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBAL_INTERRUPTS] = {
+/* The global interrupt table holds function pointers for interrupt handlers called by the PLIC.
+ * It has one more entry than __METAL_NUM_GLOBAL_INTERRUPTS because the PLIC interrupt line 0
+ * is always unused.
+ */
+const metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBAL_INTERRUPTS + 1] = {
     metal_riscv_cpu_intc_default_handler, /* The PLIC has no source at id 0 */
 {% for irq in global_interrupts.irqs %}
     {% if irq.source.compatible != None %}
