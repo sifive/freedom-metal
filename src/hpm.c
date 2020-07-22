@@ -72,10 +72,6 @@
 /* Macro to check for instruction trap */
 #define MCAUSE_ILLEGAL_INST 0x02
 
-/* Return codes */
-#define METAL_HPM_RET_OK 0
-#define METAL_HPM_RET_NOK 1
-
 static uint64_t hpm_count[__METAL_DT_NUM_HARTS] = {0};
 
 int metal_hpm_init(void) {
@@ -91,9 +87,9 @@ int metal_hpm_init(void) {
         /* mcycle, mtime and minstret counters are always available, so start at
          * counter 3 */
         for (n = METAL_HPM_COUNTER_3; n < METAL_HPM_COUNTER_31; n++) {
-            metal_hpm_set_event(n, 0xFFFFFFFF);
+            metal_hpm_set_event_mask(n, 0xFFFFFFFF);
 
-            if (metal_hpm_get_event(n) == 0) {
+            if (metal_hpm_get_event_mask(n) == 0) {
                 break;
             }
         }
@@ -108,7 +104,7 @@ int metal_hpm_init(void) {
 
         /* Clear all counters */
         for (uint32_t i = 0; i < hpm_count[hartid]; i++) {
-            metal_hpm_clr_event(i, 0xFFFFFFFF);
+            metal_hpm_clear_event(i, 0xFFFFFFFF);
             metal_hpm_clear_counter(i);
         }
     } else {
@@ -122,7 +118,7 @@ int metal_hpm_disable(void) {
     uint32_t hartid = metal_cpu_get_current_hartid();
 
     /* Disable counter access */
-    uintptr_t temp = 0, val = 0;
+    riscv_xlen_t temp = 0, val = 0;
     __asm__ __volatile__("la %0, 1f \n\t"
                          "csrr %1, mtvec \n\t"
                          "csrw mtvec, %0 \n\t"
@@ -140,9 +136,14 @@ int metal_hpm_disable(void) {
     return METAL_HPM_RET_OK;
 }
 
-int metal_hpm_set_event(metal_hpm_counter counter, uint32_t bitmask) {
+uint32_t metal_hpm_get_num_counters(void) {
     uint32_t hartid = metal_cpu_get_current_hartid();
-    uint32_t val;
+    return hpm_count[hartid];
+}
+
+int metal_hpm_set_event_mask(metal_hpm_counter counter, riscv_xlen_t bitmask) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
+    riscv_xlen_t val;
 
     /* Return error if counter is out of range */
     if (counter >= hpm_count[hartid])
@@ -159,9 +160,9 @@ int metal_hpm_set_event(metal_hpm_counter counter, uint32_t bitmask) {
     return METAL_HPM_RET_OK;
 }
 
-uint32_t metal_hpm_get_event(metal_hpm_counter counter) {
+riscv_xlen_t metal_hpm_get_event_mask(metal_hpm_counter counter) {
     uint32_t hartid = metal_cpu_get_current_hartid();
-    uint32_t val = 0;
+    riscv_xlen_t val = 0;
 
     /* Return error if counter is out of range */
     if (counter >= hpm_count[hartid])
@@ -178,9 +179,9 @@ uint32_t metal_hpm_get_event(metal_hpm_counter counter) {
     return val;
 }
 
-int metal_hpm_clr_event(metal_hpm_counter counter, uint32_t bitmask) {
+int metal_hpm_clear_event(metal_hpm_counter counter, riscv_xlen_t bitmask) {
     uint32_t hartid = metal_cpu_get_current_hartid();
-    uint32_t val;
+    riscv_xlen_t val;
 
     /* Return error if counter is out of range */
     if (counter >= hpm_count[hartid])
@@ -199,7 +200,7 @@ int metal_hpm_clr_event(metal_hpm_counter counter, uint32_t bitmask) {
 
 int metal_hpm_enable_access(metal_hpm_counter counter) {
     uint32_t hartid = metal_cpu_get_current_hartid();
-    uintptr_t temp = 0, val = 0;
+    riscv_xlen_t temp = 0, val = 0;
 
     /* Return error if counter is out of range */
     if (counter >= hpm_count[hartid])
@@ -223,7 +224,7 @@ int metal_hpm_enable_access(metal_hpm_counter counter) {
 
 int metal_hpm_disable_access(metal_hpm_counter counter) {
     uint32_t hartid = metal_cpu_get_current_hartid();
-    uintptr_t temp = 0, val = 0;
+    riscv_xlen_t temp = 0, val = 0;
 
     /* Return error if counter is out of range */
     if (counter >= hpm_count[hartid])
