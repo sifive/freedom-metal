@@ -360,6 +360,9 @@ int sifive_spi0_set_baud_rate(struct metal_spi spi, int baud_rate) {
 }
 
 void _sifive_spi0_pre_rate_change_callback(uint32_t id) {
+    if (!spi_state[id].baud_rate)
+        return;
+
     struct metal_spi spi = (struct metal_spi){id};
     uintptr_t control_base = dt_spi_data[get_index(spi)].base_addr;
 
@@ -374,6 +377,9 @@ void _sifive_spi0_pre_rate_change_callback(uint32_t id) {
 }
 
 void _sifive_spi0_post_rate_change_callback(uint32_t id) {
+    if (!spi_state[id].baud_rate)
+        return;
+
     struct metal_spi spi = (struct metal_spi){id};
     uint32_t baud_rate = spi_state[get_index(spi)].baud_rate;
     sifive_spi0_set_baud_rate(spi, baud_rate);
