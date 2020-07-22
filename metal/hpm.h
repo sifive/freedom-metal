@@ -80,67 +80,54 @@ typedef enum {
 } metal_hpm_counter;
 
 /*! @brief Initialize hardware performance monitor counters.
- * @param cpu The CPU device handle.
  * @return 0 If no error.*/
-int metal_hpm_init(struct metal_cpu *cpu);
+int metal_hpm_init(void);
 
 /*! @brief Disables hardware performance monitor counters.
  *         Note - Disabled HPM counters may reduce power consumption.
- * @param cpu The CPU device handle.
  * @return 0 If no error.*/
-int metal_hpm_disable(struct metal_cpu *cpu);
+int metal_hpm_disable(void);
 
 /*! @brief Set events which will cause the specified counter to increment.
  *         Counter will start incrementing from the moment events are set.
- * @param cpu The CPU device handle.
  * @param counter Hardware counter to be incremented by selected events.
  * @param bitmask Bit-mask to select events for a particular counter,
  *                refer core reference manual for selection of events.
  *                Event bit mask is partitioned as follows:
  *                [XLEN-1:8] - Event selection mask [7:0] - Event class
  * @return 0 If no error.*/
-int metal_hpm_set_event(struct metal_cpu *cpu, metal_hpm_counter counter,
-                        unsigned int bitmask);
+int metal_hpm_set_event(metal_hpm_counter counter, uint32_t bitmask);
 
 /*! @brief Get events selection mask set for specified counter.
- * @param cpu The CPU device handle.
  * @param counter Hardware counter.
  * @return Event selection bit mask. refer core reference manual for details.*/
-unsigned int metal_hpm_get_event(struct metal_cpu *cpu,
-                                 metal_hpm_counter counter);
+uint32_t metal_hpm_get_event(metal_hpm_counter counter);
 
 /*! @brief Clear event selector bits as per specified bit-mask.
- * @param cpu The CPU device handle.
  * @param counter Hardware counter.
  * @return 0 If no error.*/
-int metal_hpm_clr_event(struct metal_cpu *cpu, metal_hpm_counter counter,
-                        unsigned int bitmask);
+int metal_hpm_clr_event(metal_hpm_counter counter, uint32_t bitmask);
 
 /*! @brief Enable counter access to next lower privilege mode.
- * @param cpu The CPU device handle.
  * @param counter Hardware counter.
  * @return 0 If no error.*/
-int metal_hpm_enable_access(struct metal_cpu *cpu, metal_hpm_counter counter);
+int metal_hpm_enable_access(metal_hpm_counter counter);
 
 /*! @brief Disable counter access to next lower privilege mode.
- * @param cpu The CPU device handle.
  * @param counter Hardware counter.
  * @return 0 If no error.*/
-int metal_hpm_disable_access(struct metal_cpu *cpu, metal_hpm_counter counter);
+int metal_hpm_disable_access(metal_hpm_counter counter);
 
 /*! @brief Reads current value of specified hardware counter.
  *         Note: 'mtime' register is memory mapped into CLINT block.
  *                Use CLINT APIs to access this register.
- * @param cpu The CPU device handle.
  * @param counter Hardware counter.
  * @return Current value of hardware counter on success, 0 on failure.*/
-unsigned long long metal_hpm_read_counter(struct metal_cpu *cpu,
-                                          metal_hpm_counter counter);
+uint64_t metal_hpm_read_counter(metal_hpm_counter counter);
 
 /*! @brief Clears off specified counter.
- * @param cpu The CPU device handle.
  * @param counter Hardware counter.
  * @return 0 If no error.*/
-int metal_hpm_clear_counter(struct metal_cpu *cpu, metal_hpm_counter counter);
+int metal_hpm_clear_counter(metal_hpm_counter counter);
 
 #endif

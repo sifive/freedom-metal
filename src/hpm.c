@@ -1,9 +1,9 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/drivers/riscv_cpu.h>
+#include <metal/cpu.h>
+#include <metal/generated/cpu.h>
 #include <metal/hpm.h>
-#include <stdint.h>
 
 /* Macro to generate code within a switch case */
 #define METAL_HPM_HANDLE_SWITCH(m)                                             \
@@ -76,25 +76,28 @@
 #define METAL_HPM_RET_OK 0
 #define METAL_HPM_RET_NOK 1
 
-int metal_hpm_init(struct metal_cpu *gcpu) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
+static uint64_t hpm_count[__METAL_DT_NUM_HARTS] = {0};
+
+int metal_hpm_init(void) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
 
     /* Check if counters are initialized or pointer is NULL */
-    if ((gcpu) && (cpu->hpm_count == 0)) {
+    if (hpm_count[hartid] == 0) {
         metal_hpm_counter n;
 
         /* Count number of available hardware performance counters */
-        cpu->hpm_count = METAL_HPM_COUNT_MAX;
+        hpm_count[hartid] = METAL_HPM_COUNT_MAX;
 
-        /* mcycle, mtime and minstret counters are always available */
+        /* mcycle, mtime and minstret counters are always available, so start at
+         * counter 3 */
         for (n = METAL_HPM_COUNTER_3; n < METAL_HPM_COUNTER_31; n++) {
-            metal_hpm_set_event(gcpu, n, 0xFFFFFFFF);
+            metal_hpm_set_event(n, 0xFFFFFFFF);
 
-            if (metal_hpm_get_event(gcpu, n) == 0) {
+            if (metal_hpm_get_event(n) == 0) {
                 break;
             }
         }
-        cpu->hpm_count = n;
+        hpm_count[hartid] = n;
 
         /* TODO: mcountinhibit csr is not yet accessible.
          * As per latest RiscV privileged spec v1.11,
@@ -104,9 +107,9 @@ int metal_hpm_init(struct metal_cpu *gcpu) {
         /* __asm__ __volatile__("csrw mcountinhibit, zero"); */
 
         /* Clear all counters */
-        for (unsigned int i = 0; i < cpu->hpm_count; i++) {
-            metal_hpm_clr_event(gcpu, i, 0xFFFFFFFF);
-            metal_hpm_clear_counter(gcpu, i);
+        for (uint32_t i = 0; i < hpm_count[hartid]; i++) {
+            metal_hpm_clr_event(i, 0xFFFFFFFF);
+            metal_hpm_clear_counter(i);
         }
     } else {
         return METAL_HPM_RET_NOK;
@@ -115,40 +118,34 @@ int metal_hpm_init(struct metal_cpu *gcpu) {
     return METAL_HPM_RET_OK;
 }
 
-int metal_hpm_disable(struct metal_cpu *gcpu) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
+int metal_hpm_disable(void) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
+
+    /* Disable counter access */
     uintptr_t temp = 0, val = 0;
+    __asm__ __volatile__("la %0, 1f \n\t"
+                         "csrr %1, mtvec \n\t"
+                         "csrw mtvec, %0 \n\t"
+                         "csrw mcounteren, zero \n\t"
+                         ".align 4 \n\t"
+                         "1: \n\t"
+                         "csrw mtvec, %1 \n\t"
+                         : "+r"(val), "+r"(temp));
 
-    /* Check if pointer is NULL */
-    if (gcpu) {
-        /* Disable counter access */
-        __asm__ __volatile__("la %0, 1f \n\t"
-                             "csrr %1, mtvec \n\t"
-                             "csrw mtvec, %0 \n\t"
-                             "csrw mcounteren, zero \n\t"
-                             ".align 4 \n\t"
-                             "1: \n\t"
-                             "csrw mtvec, %1 \n\t"
-                             : "+r"(val), "+r"(temp));
+    /* TODO: Disable all counters */
+    /* __asm__ __volatile__("csrw mcountinhibit, zero"); */
 
-        /* TODO: Disable all counters */
-        /* __asm__ __volatile__("csrw mcountinhibit, zero"); */
-
-        cpu->hpm_count = 0;
-    } else {
-        return METAL_HPM_RET_NOK;
-    }
+    hpm_count[hartid] = 0;
 
     return METAL_HPM_RET_OK;
 }
 
-int metal_hpm_set_event(struct metal_cpu *gcpu, metal_hpm_counter counter,
-                        unsigned int bitmask) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
-    unsigned int val;
+int metal_hpm_set_event(metal_hpm_counter counter, uint32_t bitmask) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
+    uint32_t val;
 
-    /* Return error if counter is out of range or pointer is NULL */
-    if ((gcpu) && (counter >= cpu->hpm_count))
+    /* Return error if counter is out of range */
+    if (counter >= hpm_count[hartid])
         return METAL_HPM_RET_NOK;
 
     switch (counter) {
@@ -162,13 +159,12 @@ int metal_hpm_set_event(struct metal_cpu *gcpu, metal_hpm_counter counter,
     return METAL_HPM_RET_OK;
 }
 
-unsigned int metal_hpm_get_event(struct metal_cpu *gcpu,
-                                 metal_hpm_counter counter) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
-    unsigned int val = 0;
+uint32_t metal_hpm_get_event(metal_hpm_counter counter) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
+    uint32_t val = 0;
 
-    /* Return error if counter is out of range or pointer is NULL */
-    if ((gcpu) && (counter >= cpu->hpm_count))
+    /* Return error if counter is out of range */
+    if (counter >= hpm_count[hartid])
         return METAL_HPM_RET_NOK;
 
     switch (counter) {
@@ -182,13 +178,12 @@ unsigned int metal_hpm_get_event(struct metal_cpu *gcpu,
     return val;
 }
 
-int metal_hpm_clr_event(struct metal_cpu *gcpu, metal_hpm_counter counter,
-                        unsigned int bitmask) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
-    unsigned int val;
+int metal_hpm_clr_event(metal_hpm_counter counter, uint32_t bitmask) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
+    uint32_t val;
 
-    /* Return error if counter is out of range or pointer is NULL */
-    if ((gcpu) && (counter >= cpu->hpm_count))
+    /* Return error if counter is out of range */
+    if (counter >= hpm_count[hartid])
         return METAL_HPM_RET_NOK;
 
     switch (counter) {
@@ -202,12 +197,12 @@ int metal_hpm_clr_event(struct metal_cpu *gcpu, metal_hpm_counter counter,
     return METAL_HPM_RET_OK;
 }
 
-int metal_hpm_enable_access(struct metal_cpu *gcpu, metal_hpm_counter counter) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
+int metal_hpm_enable_access(metal_hpm_counter counter) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
     uintptr_t temp = 0, val = 0;
 
-    /* Return error if counter is out of range or pointer is NULL */
-    if ((gcpu) && (counter >= cpu->hpm_count))
+    /* Return error if counter is out of range */
+    if (counter >= hpm_count[hartid])
         return METAL_HPM_RET_NOK;
 
     /* Set trap exit, to handle illegal instruction trap. */
@@ -226,13 +221,12 @@ int metal_hpm_enable_access(struct metal_cpu *gcpu, metal_hpm_counter counter) {
     return METAL_HPM_RET_OK;
 }
 
-int metal_hpm_disable_access(struct metal_cpu *gcpu,
-                             metal_hpm_counter counter) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
+int metal_hpm_disable_access(metal_hpm_counter counter) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
     uintptr_t temp = 0, val = 0;
 
-    /* Return error if counter is out of range or pointer is NULL */
-    if ((gcpu) && (counter >= cpu->hpm_count))
+    /* Return error if counter is out of range */
+    if (counter >= hpm_count[hartid])
         return METAL_HPM_RET_NOK;
 
     /* Set trap exit, to handle illegal instruction trap. */
@@ -251,17 +245,16 @@ int metal_hpm_disable_access(struct metal_cpu *gcpu,
     return METAL_HPM_RET_OK;
 }
 
-unsigned long long metal_hpm_read_counter(struct metal_cpu *gcpu,
-                                          metal_hpm_counter counter) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
+uint64_t metal_hpm_read_counter(metal_hpm_counter counter) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
 #if __riscv_xlen == 32
-    unsigned int vh = 0, vh1 = 0, vl = 0;
+    uint32_t vh = 0, vh1 = 0, vl = 0;
 #else
-    unsigned long long vl = 0;
+    uint64_t vl = 0;
 #endif
 
-    /* Return error if counter is out of range or pointer is NULL */
-    if ((gcpu) && (counter >= cpu->hpm_count))
+    /* Return error if counter is out of range */
+    if (counter >= hpm_count[hartid])
         return METAL_HPM_RET_NOK;
 
     switch (counter) {
@@ -300,16 +293,16 @@ unsigned long long metal_hpm_read_counter(struct metal_cpu *gcpu,
     }
 
 #if __riscv_xlen == 32
-    return ((((unsigned long long)vh) << 32) | vl);
+    return ((((uint64_t)vh) << 32) | vl);
 #else
     return vl;
 #endif
 }
 
-int metal_hpm_clear_counter(struct metal_cpu *gcpu, metal_hpm_counter counter) {
-    struct __metal_driver_cpu *cpu = (void *)gcpu;
-    /* Return error if counter is out of range or pointer is NULL */
-    if ((gcpu) && (counter >= cpu->hpm_count))
+int metal_hpm_clear_counter(metal_hpm_counter counter) {
+    uint32_t hartid = metal_cpu_get_current_hartid();
+    /* Return error if counter is out of range */
+    if (counter >= hpm_count[hartid])
         return METAL_HPM_RET_NOK;
 
     switch (counter) {
