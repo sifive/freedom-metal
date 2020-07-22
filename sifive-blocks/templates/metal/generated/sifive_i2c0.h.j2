@@ -1,0 +1,70 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__DRIVERS__SIFIVE_I2C0_H
+#define METAL__DRIVERS__SIFIVE_I2C0_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/clock.h>
+#include <metal/generated/i2c.h>
+#include <metal/gpio.h>
+#include <metal/interrupt.h>
+#include <metal/i2c.h>
+#include <metal/machine/platform.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+{% if 'sifive,i2c0' in devices %}
+{% set sifive_i2c0s = devices['sifive,i2c0'] %}
+
+static const struct dt_i2c_data {
+	uintptr_t base_addr;
+	struct metal_clock clock;
+	bool has_pinmux;
+	struct metal_gpio pinmux;
+	uint32_t pinmux_output_selector;
+	uint32_t pinmux_source_selector;
+	struct metal_interrupt interrupt_parent;
+	uint32_t interrupt_id;
+} dt_i2c_data[__METAL_DT_NUM_I2CS] = {
+	{% for i2c in sifive_i2c0s %}
+	{
+	    .base_addr = METAL_SIFIVE_I2C0_{{ i2c.id }}_BASE_ADDRESS,
+
+	{% if i2c.clocks is defined %}
+	    /* {{ i2c.clocks[0].compatible[0] }} */
+	    .clock = (struct metal_clock) { {{ i2c.clocks[0].id }} },
+	{% endif %}
+
+	{% if i2c.pinmux is defined %}
+		.has_pinmux = 1,
+		.pinmux = (struct metal_gpio) { {{ i2c.pinmux[0].id }} },
+		.pinmux_output_selector = {{ i2c.pinmux[1] }},
+		.pinmux_source_selector = {{ i2c.pinmux[2] }},
+	{% else %}
+		.has_pinmux = 0,
+	{% endif %}
+
+	{% if i2c.interrupt_parent is defined %}
+	    /* {{ i2c.interrupt_parent[0].compatible[0] }} */
+		.interrupt_parent = (struct metal_interrupt) { {{ i2c.interrupt_parent[0].id }} },
+		.interrupt_id = {{ i2c.interrupts[0] }},
+	{% endif %}
+	},
+	{% endfor %}
+};
+
+{% if sifive_i2c0s[0].clocks is defined %}
+{% set driver_string = to_snakecase(sifive_i2c0s[0].clocks[0].compatible[0]) %}
+{% include 'clock_dispatch.h.j2' %}
+{% endif %}
+
+{% if sifive_i2c0s[0].interrupt_parent is defined %}
+{% set driver_string = to_snakecase(sifive_i2c0s[0].interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h.j2' %}
+{% endif %}
+
+{% endif %}
+
+#endif
