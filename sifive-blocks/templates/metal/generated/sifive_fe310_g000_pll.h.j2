@@ -63,29 +63,40 @@ static const struct dt_sifive_fe310_g000_pll_clock_data {
 
 {% endif %}
 
-{% if 'uart' in default_drivers and default_drivers['uart'] in devices %}
-{% set uarts = devices[default_drivers['uart']] %}
-void _{{ to_snakecase(uarts[0].compatible[0]) }}_pre_rate_change_callback(struct metal_uart uart);
-void _{{ to_snakecase(uarts[0].compatible[0]) }}_post_rate_change_callback(struct metal_uart uart);
-{% endif %}
+{% for compat in devices %}
+    {% if 'clocks' in devices[compat][0] %}
+	{% if devices[compat][0].clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
+void _{{ to_snakecase(devices[compat][0].compatible[0]) }}_pre_rate_change_callback(uint32_t id);
+void _{{ to_snakecase(devices[compat][0].compatible[0]) }}_post_rate_change_callback(uint32_t id);
+	{% endif %}
+    {% endif %}
+{% endfor %}
 
 static __inline__ void pre_rate_change_callbacks() {
 {% if sifive_fe310_g000_plls|length == 1 %}
-    {% if uarts is defined and uarts[0].clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
-        {% for uart in uarts %}
-	_{{ to_snakecase(uarts[0].compatible[0]) }}_pre_rate_change_callback((struct metal_uart) { {{ uart.id }} });
+    {% for compat in devices %}
+	{% for device in devices[compat] %}
+	    {% if 'clocks' in device %}
+		{% if device.clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
+	    _{{ to_snakecase(device.compatible[0]) }}_pre_rate_change_callback({{ device.id }});
+		{% endif %}
+	    {% endif %}
 	{% endfor %}
-    {% endif %}
+    {% endfor %}
 {% endif %}
 }
 
 static __inline__ void post_rate_change_callbacks() {
 {% if sifive_fe310_g000_plls|length == 1 %}
-    {% if uarts is defined and uarts[0].clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
-        {% for uart in uarts %}
-	_{{ to_snakecase(uarts[0].compatible[0]) }}_post_rate_change_callback((struct metal_uart) { {{ uart.id }} });
-		{% endfor %}
-	{% endif %}
+    {% for compat in devices %}
+	{% for device in devices[compat] %}
+	    {% if 'clocks' in device %}
+		{% if device.clocks[0].compatible[0] == "sifive,fe310-g000,pll" %}
+	    _{{ to_snakecase(device.compatible[0]) }}_post_rate_change_callback({{ device.id }});
+		{% endif %}
+	    {% endif %}
+	{% endfor %}
+    {% endfor %}
 {% endif %}
 }
 

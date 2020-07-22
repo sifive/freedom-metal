@@ -178,7 +178,8 @@ int sifive_uart0_set_baud_rate(struct metal_uart uart, int baud_rate) {
     return 0;
 }
 
-void _sifive_uart0_pre_rate_change_callback(struct metal_uart uart) {
+void _sifive_uart0_pre_rate_change_callback(uint32_t id) {
+    struct metal_uart uart = (struct metal_uart){id};
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
     struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
@@ -212,7 +213,8 @@ void _sifive_uart0_pre_rate_change_callback(struct metal_uart uart) {
     }
 }
 
-void _sifive_uart0_post_rate_change_callback(struct metal_uart uart) {
+void _sifive_uart0_post_rate_change_callback(uint32_t id) {
+    struct metal_uart uart = (struct metal_uart){id};
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
     sifive_uart0_set_baud_rate(uart, baud_rate);
 }
