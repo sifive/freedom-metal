@@ -96,7 +96,6 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-
 ########################################################
 # libmetal-pico
 ########################################################
@@ -258,8 +257,8 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/sifive_uart0.$(OBJEXT) \
 	src/drivers/sifive_wdog0.$(OBJEXT) \
 	src/drivers/ucb_htif0.$(OBJEXT) \
-	src/drivers/sifive_flash.$(OBJEXT) \
 	src/drivers/sifive_nb2emmc.$(OBJEXT) \
+	src/drivers/sifive_flash.$(OBJEXT) \
 	src/drivers/sifive_nb2qspi0.$(OBJEXT) \
 	src/drivers/sifive_nb2uart0.$(OBJEXT) \
 	src/drivers/sifive_nb2wdt.$(OBJEXT) src/atomic.$(OBJEXT) \
@@ -273,8 +272,8 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/switch.$(OBJEXT) src/synchronize_harts.$(OBJEXT) \
 	src/timer.$(OBJEXT) src/time.$(OBJEXT) src/trap.$(OBJEXT) \
 	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
-	src/watchdog.$(OBJEXT) src/emmc.$(OBJEXT) src/flash.$(OBJEXT) \
-	src/qspi.$(OBJEXT)
+	src/emmc.$(OBJEXT) src/flash.$(OBJEXT) src/qspi.$(OBJEXT) \
+	src/watchdog.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -499,14 +498,13 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/memory.h metal/pmp.h metal/privilege.h metal/pwm.h \
 	metal/rtc.h metal/shutdown.h metal/spi.h metal/switch.h \
 	metal/timer.h metal/time.h metal/tty.h metal/uart.h \
-	metal/watchdog.h metal/emmc.h metal/flash.h metal/qspi.h
+	metal/emmc.h metal/flash.h metal/qspi.h metal/watchdog.h
 
 # This will generate these sources before the compilation step
 BUILT_SOURCES = \
 	metal/machine.h \
 	metal/machine/inline.h \
 	metal/machine/platform.h
-
 
 ########################################################
 # libmetal
@@ -543,8 +541,8 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_wdog0.c \
 	src/drivers/ucb_htif0.c \
-	src/drivers/sifive_flash.c \
 	src/drivers/sifive_nb2emmc.c \
+	src/drivers/sifive_flash.c \
 	src/drivers/sifive_nb2qspi0.c \
 	src/drivers/sifive_nb2uart0.c \
 	src/drivers/sifive_nb2wdt.c \
@@ -578,10 +576,10 @@ libmetal_a_SOURCES = \
 	src/tty.c \
 	src/uart.c \
 	src/vector.S \
-	src/watchdog.c \
 	src/emmc.c \
 	src/flash.c \
-	src/qspi.c 
+	src/qspi.c \
+	src/watchdog.c
 
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@libmetal_pico_a_SOURCES = \
 @WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/iob.c \
@@ -867,9 +865,9 @@ src/drivers/sifive_wdog0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/ucb_htif0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/sifive_flash.$(OBJEXT): src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_nb2emmc.$(OBJEXT): src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/sifive_flash.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_nb2qspi0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -921,11 +919,11 @@ src/tty.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/uart.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/vector.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
-src/watchdog.$(OBJEXT): src/$(am__dirstamp) \
-	src/$(DEPDIR)/$(am__dirstamp)
 src/emmc.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/flash.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/qspi.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/watchdog.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 
 libmetal.a: $(libmetal_a_OBJECTS) $(libmetal_a_DEPENDENCIES) $(EXTRA_libmetal_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libmetal.a

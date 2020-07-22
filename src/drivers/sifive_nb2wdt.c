@@ -23,7 +23,7 @@
 #define DW_RUN_MODE_INTR_AND_RESET 1
 #define DW_RESET_PLENGTH  10
 
-
+#define WDT_REGW(base,offset)   (__METAL_ACCESS_ONCE((uint32_t *)((unsigned long long)base + offset)))
 
 /*To enable the WDT*/
 #define DW_ENABLE_WDT(base)\
@@ -51,11 +51,11 @@
 #define DW_WDT_EOI()\
 	WDT_REGW(base,METAL_SIFIVE_NB2WDT_WDT_EOI)
 
-
+static unsigned long long base=0;
 
 int __metal_driver_sifive_nb2wdt_feed(const struct metal_watchdog *const wdog)
 {
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 
 	DW_RESTART_WDT(base);
 
@@ -71,7 +71,7 @@ int __metal_driver_sifive_nb2wdt_feed(const struct metal_watchdog *const wdog)
 
 long int __metal_driver_sifive_nb2wdt_get_rate(const struct metal_watchdog *const wdog)
 {
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 
 	const struct metal_clock *const clock = __metal_driver_sifive_nb2wdt_clock(wdog);
 
@@ -83,7 +83,7 @@ long int __metal_driver_sifive_nb2wdt_get_rate(const struct metal_watchdog *cons
 
 long int __metal_driver_sifive_nb2wdt_set_rate(const struct metal_watchdog *const wdog, const long int rate)
 {
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 
 	const struct metal_clock *const clock = __metal_driver_sifive_nb2wdt_clock(wdog);
 
@@ -109,7 +109,7 @@ long int __metal_driver_sifive_nb2wdt_set_rate(const struct metal_watchdog *cons
 
 long int __metal_driver_sifive_nb2wdt_get_timeout(const struct metal_watchdog *const wdog)
 {
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 	long int rd_dt = WDT_REGW(base, METAL_SIFIVE_NB2WDT_WDT_TORR);
 
 	rd_dt = pow(2, (16 + (double)rd_dt)) * pow(10,-7);
@@ -152,7 +152,7 @@ long int __metal_driver_sifive_nb2wdt_set_timeout(const struct metal_watchdog *c
 	double x = 0x00;
 	double temp_top = 0x00;
 	int top;
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 
 	long int temp_dt = timeout * pow(10,6);
 	temp_dt = temp_dt * 10 ;
@@ -176,7 +176,7 @@ long int __metal_driver_sifive_nb2wdt_set_timeout(const struct metal_watchdog *c
 int __metal_driver_sifive_nb2wdt_set_result(const struct metal_watchdog *const wdog,
 		const enum metal_watchdog_result result)
 {
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 
 	switch (result) {
 		default:
@@ -197,7 +197,7 @@ int __metal_driver_sifive_nb2wdt_set_result(const struct metal_watchdog *const w
 int __metal_driver_sifive_nb2wdt_run(const struct metal_watchdog *const wdog,
 		const enum metal_watchdog_run_option option)
 {
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 
 	switch (option) {
 		default:
@@ -229,7 +229,7 @@ int __metal_driver_sifive_nb2wdt_get_interrupt_id(const struct metal_watchdog *c
 
 int __metal_driver_sifive_nb2wdt_clear_interrupt(const struct metal_watchdog *const wdog)
 {
-	const uintptr_t base = (uintptr_t)__metal_driver_sifive_nb2wdt_control_base(wdog);
+	base = __metal_driver_sifive_nb2wdt_control_base(wdog);
 
 	uint32_t rd_dt;
 	rd_dt = WDT_REGW(base, METAL_SIFIVE_NB2WDT_WDT_EOI);
