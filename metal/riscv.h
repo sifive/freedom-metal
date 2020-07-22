@@ -9,6 +9,12 @@ typedef uint32_t riscv_xlen_t;
 typedef uint64_t riscv_xlen_t;
 #endif
 
+#if __riscv_flen == 32
+typedef uint32_t riscv_flen_t;
+#elif __riscv_flen == 64
+typedef uint64_t riscv_flen_t;
+#endif
+
 #if __riscv_xlen == 32
 #define RISCV_MCAUSE_INTERRUPT 0x80000000UL
 #define RISCV_MCAUSE_CODE_MASK 0x000003FFUL
@@ -22,7 +28,14 @@ typedef uint64_t riscv_xlen_t;
 #define RISCV_MCAUSE_IS_EXCEPTION(mcause) (!(RISCV_MCAUSE_IS_INTERRUPT(mcause))
 #define RISCV_MCAUSE_ID(mcause) ((mcause)&RISCV_MCAUSE_CODE_MASK)
 
+#define RISCV_MSTATUS_UIE (1 << 0)
+#define RISCV_MSTATUS_SIE (1 << 1)
 #define RISCV_MSTATUS_MIE (1 << 3)
+#define RISCV_MSTATUS_UPIE (1 << 4)
+#define RISCV_MSTATUS_SPIE (1 << 5)
+#define RISCV_MSTATUS_MPIE (1 << 7)
+#define RISCV_MSTATUS_MPP_OFFSET 11
+#define RISCV_MSTATUS_MPP_MASK (3 << RISCV_MSTATUS_MPP_OFFSET)
 
 #define RISCV_MIE_MSIE (1 << 3)
 #define RISCV_MIE_MTIE (1 << 7)
