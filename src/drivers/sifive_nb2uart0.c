@@ -12,6 +12,12 @@
 
 #define MAX_COUNT	10000
 
+#define UART_REG(offset)   (((unsigned long long)control_base + offset))
+#define UART_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)UART_REG(offset)))
+#define UART_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)UART_REG(offset)))
+
+static unsigned long long control_base=0;
+
 struct metal_interrupt *
 __metal_driver_sifive_nb2uart0_interrupt_controller(struct metal_uart *uart)
 {
@@ -20,7 +26,7 @@ __metal_driver_sifive_nb2uart0_interrupt_controller(struct metal_uart *uart)
 
 int __metal_driver_sifive_nb2uart0_get_interrupt_id(struct metal_uart *uart)
 {
-	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
  	//UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x81;//temp fix //we don't have Programmable THRE Interrupt Mode Enable in linux also
  	UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x0F;//temp fix
@@ -29,14 +35,14 @@ int __metal_driver_sifive_nb2uart0_get_interrupt_id(struct metal_uart *uart)
 
 int __metal_driver_sifive_nb2uart0_txready(struct metal_uart *uart)
 {
-	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
 	return (UART_REGW(METAL_SIFIVE_NB2UART0_USR) & UART_TFNF);
 }
 
 int __metal_driver_sifive_nb2uart0_putc(struct metal_uart *uart, int c)
 {
-	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 	uint32_t timeout=0;
 
 	while (!(UART_REGW(METAL_SIFIVE_NB2UART0_LSR) & UART_LSR_THRE))
@@ -57,7 +63,7 @@ int __metal_driver_sifive_nb2uart0_putc(struct metal_uart *uart, int c)
 int __metal_driver_sifive_nb2uart0_getc(struct metal_uart *uart, int *c)
 {
 	uint32_t ch = 0;
-	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
 
 	if (!(UART_REGW(METAL_SIFIVE_NB2UART0_LSR) & UART_LSR_DR))
@@ -88,7 +94,7 @@ int __metal_driver_sifive_nb2uart0_get_baud_rate(struct metal_uart *guart)
 int __metal_driver_sifive_nb2uart0_set_baud_rate(struct metal_uart *guart, int baud_rate)
 {
 	struct __metal_driver_sifive_nb2uart0 *uart = (void *)guart;
-	long control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
+	control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
 	struct metal_clock *clock = __metal_driver_sifive_nb2uart0_clock(guart);
 
 	uart->baud_rate = baud_rate;
@@ -127,7 +133,7 @@ void __metal_driver_sifive_nb2uart0_init(struct metal_uart *guart, int baud_rate
 {
 	uint32_t val = 0;
 	uint32_t timeout=0;
-	long control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
+	control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
 	struct __metal_driver_sifive_nb2uart0 *uart = (void *)(guart);
 	struct metal_clock *clock = __metal_driver_sifive_nb2uart0_clock(guart);
 //	struct __metal_driver_sifive_nb2gpio0 *pinmux = __metal_driver_sifive_nb2uart0_pinmux(guart);
@@ -199,7 +205,7 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 {
 	uint32_t val = 0;
 	uint32_t timeout=0;
-	long control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
+	control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
 	struct __metal_driver_sifive_nb2uart0 *uart = (void *)(guart);
 	struct metal_clock *clock = __metal_driver_sifive_nb2uart0_clock(guart);
 //	struct __metal_driver_sifive_nb2gpio0 *pinmux = __metal_driver_sifive_nb2uart0_pinmux(guart);

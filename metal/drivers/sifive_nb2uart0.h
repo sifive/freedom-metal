@@ -11,10 +11,6 @@
 #define SIFIVE_NB2UART_BUSY	-1
 #define SIFIVE_NB2UART_TXERR	-2
 
-#define UART_REG(offset)   (((unsigned long)control_base + offset))
-#define UART_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)UART_REG(offset)))
-#define UART_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)UART_REG(offset)))
-
 #define DIV_ROUND_CLOSEST(x, divisor)(			\
 {							\
 	typeof(x) __x = x;				\

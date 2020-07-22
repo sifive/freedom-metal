@@ -33,13 +33,13 @@
 #define BYPASS_PHASE_SHIFT		 24
 #define RX_DELAY_HALF_CLK		 31
 
-#define METAL_QSPI_REG(offset)   (((unsigned long)control_base + offset))
+#define METAL_QSPI_REG(offset)   (((unsigned long long)control_base + offset))
 #define METAL_QSPI_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_QSPI_REG(offset)))
 #define METAL_QSPI_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_QSPI_REG(offset)))
 
-#define METAL_QSPI_AXI_BASE_ADDR		 0x20000000UL
+//#define METAL_QSPI_AXI_BASE_ADDR		 0x20000000UL
 
-static unsigned long control_base=0;
+static unsigned long long control_base=0;
 
 static qspi_static_config_t qcfg;
 static qspi_command_config_t *cparams;
@@ -160,7 +160,7 @@ uint32_t __metal_driver_sifive_nb2qspi0_get_interrupt_status(struct metal_qspi *
 int __metal_driver_sifive_nb2qspi0_read(struct metal_qspi *gqspi,uint32_t addr_offset,size_t len,uint8_t *rx_buf)
 {
 	if(len != 0){
-		if(rx_buf) {
+		if(rx_buf){
 			if(qcfg.burstmode==QSPI_APB_ACCESS)
 			{
 				qspi_apb_read((uint32_t*)rx_buf);
@@ -169,7 +169,7 @@ int __metal_driver_sifive_nb2qspi0_read(struct metal_qspi *gqspi,uint32_t addr_o
 			{
 				/*Single burst read*/
 				uint32_t *axi_addr = (uint32_t*) (METAL_QSPI_AXI_BASE_ADDR+addr_offset);
-				uint32_t *dataptr=rx_buf;
+				uint32_t *dataptr= (uint32_t*)rx_buf;
 				/* Read length/4 locations */
 				for (int i = 0; i < len/4; i++)
 				{

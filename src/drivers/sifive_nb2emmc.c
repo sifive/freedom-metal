@@ -221,11 +221,11 @@ Slot Register Set
 #define DATSL1  20
 #define CMDSL1  24
 
-#define METAL_EMMC_REG(offset)   (((unsigned long)emmc_control_base + offset))
+#define METAL_EMMC_REG(offset)   (((unsigned long long)emmc_control_base + offset))
 #define METAL_EMMC_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_EMMC_REG(offset)))
 #define METAL_EMMC_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_EMMC_REG(offset)))
 
-static unsigned long emmc_control_base=0;
+static unsigned long long emmc_control_base=0;
 static eMMCRequest_t input_cmd;
 
 uint32_t g_data_buffer[128]; //512 bytes

@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <metal/qspi.h>
 
-#define AXI_FLASH_BASEADDR		 0x20000000UL
+//#define AXI_FLASH_BASEADDR		 0x20000000UL
 
 static qspi_static_config_t qcfg;
 static qspi_command_config_t cmd_cfg;
@@ -131,7 +131,7 @@ static int flash_write_page(long int dst_addr_offset,size_t length,char *tx_buff
 	/*start command*/
 	metal_qspi_execute_cmd(qspi);
 
-	uint32_t *axi_addr = (uint32_t*)(AXI_FLASH_BASEADDR + dst_addr_offset);
+	uint32_t *axi_addr = (uint32_t*)(METAL_QSPI_AXI_BASE_ADDR + dst_addr_offset);
 
 
 	uint32_t *dataptr=(uint32_t *)tx_buff;
@@ -223,7 +223,7 @@ int __metal_driver_sifive_flash_init(struct metal_flash *gflash,void *ptr)
 /* Implement flash read operation here */
 int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, const size_t size, char *rx_buf)
 {
-	uint32_t *axi_addr = addr;
+	//uint32_t *axi_addr = (uint32_t *)addr;
 	qspi_static_config_t *cfg=&qcfg;
 
 	cfg->addrlen   = QSPI_ADDR_32BIT;
@@ -712,7 +712,7 @@ static void flash_apb_dual_read(uint32_t dst_addr_offset,uint8_t *rxdata,uint32_
 void flash_axi_write(uint32_t dst_addr_offset,uint8_t *txdata,uint32_t length)
 {
 	uint32_t read_status, cnt;
-	uint32_t *axi_addr = (uint32_t*)(AXI_FLASH_BASEADDR+dst_addr_offset);
+	uint32_t *axi_addr = (uint32_t*)(METAL_QSPI_AXI_BASE_ADDR+dst_addr_offset);
 
 	qspi_config *cfg;
 	cfg = qspi_getconfig();
@@ -766,7 +766,7 @@ void flash_axi_write(uint32_t dst_addr_offset,uint8_t *txdata,uint32_t length)
  */
 void flash_axi_read(uint32_t dst_addr_offset,uint8_t *rxdata,uint32_t length)
 {
-	uint32_t *axi_addr = (uint32_t*) (AXI_FLASH_BASEADDR+dst_addr_offset);
+	uint32_t *axi_addr = (uint32_t*) (METAL_QSPI_AXI_BASE_ADDR+dst_addr_offset);
 	qspi_config *cfg;
 
 	cfg = qspi_getconfig();

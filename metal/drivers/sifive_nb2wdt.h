@@ -10,8 +10,6 @@
 #include <metal/clock.h>
 #include <metal/interrupt.h>
 
-#define WDT_REGW(base,offset)   (__METAL_ACCESS_ONCE((uint32_t *)(base + offset)))
-
 struct __metal_driver_vtable_sifive_nb2wdt {
     const struct metal_watchdog_vtable watchdog;
 };
