@@ -22,6 +22,7 @@
 #define metal_gpio_disable_pinmux {{ driver_string }}_disable_pinmux
 #define metal_gpio_config_interrupt {{ driver_string }}_config_interrupt
 #define metal_gpio_clear_interrupt {{ driver_string }}_clear_interrupt
+#define metal_gpio_set_interrupt_priority {{ driver_string }}_set_interrupt_priority
 
 {% else %}
 #define __METAL_DT_NUM_GPIOS 0

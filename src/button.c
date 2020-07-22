@@ -15,3 +15,8 @@ int metal_button_enable_interrupt(struct metal_button button) { return -1; }
 int metal_button_disable_interrupt(struct metal_button button)
     __attribute__((weak));
 int metal_button_disable_interrupt(struct metal_button button) { return -1; }
+
+__attribute__((weak)) int
+metal_button_clear_interrupt(struct metal_button button) {
+    return -1;
+}

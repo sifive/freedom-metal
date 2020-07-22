@@ -65,4 +65,12 @@ int metal_button_enable_interrupt(struct metal_button button);
  */
 int metal_button_disable_interrupt(struct metal_button button);
 
+/*!
+ * @brief Clear the button interrupt
+ *
+ * @param button The button handle
+ * @return 0 upon success
+ */
+int metal_button_clear_interrupt(struct metal_button button);
+
 #endif

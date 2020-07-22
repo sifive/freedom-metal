@@ -25,8 +25,8 @@
 #define SWITCH_HAS_GPIO(switch) {{ 'gpios' in switches[0] }}
 #define SWITCH_GPIO(switch) {{ switches[0].gpios[0].id }}
 #define SWITCH_GPIO_PIN(switch) {{ switches[0].gpios[1] }}
-#define SWITCH_INTC {{ switch.interrupts_extended[0].interrupt_parent[0].id }},
-#define SWITCH_INTERRUPT_ID = {{ switch.interrupts-extended[1] }},
+#define SWITCH_INTC(switch) {{ switch.interrupts_extended[0].interrupt_parent[0].id }},
+#define SWITCH_INTERRUPT_ID(switch) = {{ switch.interrupts-extended[1] }},
 
 {% else %}
 

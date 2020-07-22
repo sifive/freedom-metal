@@ -106,11 +106,15 @@ void riscv_plic0_init(struct metal_interrupt plic) {
             /* Initialize riscv,cpu-intc */
             metal_interrupt_init(intc);
 
+            /* Disable all interrupts, but set their priority to 1 so that
+             * the interrupt fires when enabled and pending. */
             for (int id = 0; id < METAL_RISCV_PLIC0_0_RISCV_NDEV; id++) {
                 __metal_plic0_disable(hartid, id);
-                riscv_plic0_set_priority(intc, id, 0);
+                riscv_plic0_set_priority(intc, id, 1);
             }
 
+            /* Set the default threshold to 0 so that any enabled interrupts
+             * are above the threshold. */
             __metal_riscv_plic0_set_threshold(hartid, 0);
 
             /* Enable plic (ext) interrupt with with hartid controller */
@@ -176,6 +180,14 @@ int riscv_plic0_set_priority(struct metal_interrupt plic, int id,
 unsigned int riscv_plic0_get_priority(struct metal_interrupt plic, int id) {
     return PLIC_REGW(METAL_RISCV_PLIC0_PRIORITY_BASE +
                      (id << METAL_PLIC_SOURCE_PRIORITY_SHIFT));
+}
+
+int riscv_plic0_set_threshold(struct metal_interrupt plic,
+                              unsigned int priority) {
+    for (int hartid = 0; hartid < __METAL_DT_NUM_HARTS; hartid++) {
+        __metal_riscv_plic0_set_threshold(hartid, priority);
+    }
+    return 0;
 }
 
 int riscv_plic0_set_preemptive_level(struct metal_interrupt controller, int id,

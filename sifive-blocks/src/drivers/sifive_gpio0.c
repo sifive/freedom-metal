@@ -183,6 +183,13 @@ int sifive_gpio0_clear_interrupt(struct metal_gpio gpio, int pin,
     return 0;
 }
 
+int sifive_gpio0_set_interrupt_priority(struct metal_gpio gpio, int pin,
+                                        unsigned int priority) {
+    struct metal_interrupt intc = INTERRUPT_PARENT(gpio);
+    int id = INTERRUPT_ID_BASE(gpio) + pin;
+    return metal_interrupt_set_priority(intc, id, priority);
+}
+
 #endif /* METAL_SIFIVE_GPIO0 */
 
 typedef int no_empty_translation_units;
