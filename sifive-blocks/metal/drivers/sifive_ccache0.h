@@ -4,19 +4,24 @@
 #ifndef METAL__DRIVERS__SIFIVE_CCACHE0_H
 #define METAL__DRIVERS__SIFIVE_CCACHE0_H
 
-#include <metal/cache.h>
-#include <metal/compiler.h>
+#include <stdint.h>
 
-struct __metal_driver_vtable_sifive_ccache0 {
-    struct __metal_cache_vtable cache;
-};
+/*!
+ * @brief Initialize the SiFive L2 Cache, enabling the requested number of ways
+ * @param ways The number of ways to enable
+ */
+void sifive_ccache0_init(uint32_t ways);
 
-struct __metal_driver_sifive_ccache0;
+/*!
+ * @brief Get the number of enabled ways of the SiFive L2 Cache
+ * @return The number of enabled ways
+ */
+uint32_t sifive_ccache0_get_enabled_ways(void);
 
-__METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_ccache0)
-
-struct __metal_driver_sifive_ccache0 {
-    struct metal_cache cache;
-};
+/*!
+ * @brief Enable the requested number of ways of the Sifive L2 Cache
+ * @param ways The number of ways to enable
+ */
+uint32_t sifive_ccache0_set_enabled_ways(uint32_t ways);
 
 #endif
