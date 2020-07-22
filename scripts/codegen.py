@@ -33,6 +33,10 @@ def parse_arguments(argv):
             default=DEFAULT_SOURCE_PATHS,
             help="The paths to look for template")
 
+    arg_parser.add_argument("--application-config",
+            required=False,
+            help="The path to the application's configuration file")
+
     args =  arg_parser.parse_args(argv)
 
     args.template_paths = [ d + "/templates" for d in args.source_paths ]
@@ -49,11 +53,14 @@ def get_template(template, args):
 
     return env.get_template(template)
 
+
 def to_snakecase(s):
     return s.lower().replace(',', '_').replace('-', '_').replace('.', '_')
 
+
 def rootname(path):
     return os.path.splitext(os.path.basename(path))[0]
+
 
 def unique_irqs(irqs):
     """
@@ -69,26 +76,96 @@ def unique_irqs(irqs):
             filtered_irqs.append(irq)
     return filtered_irqs
 
+
+# Each device with a given compatible string is assigned a 0-indexed ID
 driver_ids = dict()
 
 def assign_ids(dts, devices):
+    """
+    For every device of a given compatible string, assign a 0-indexed ID
+    """
     for api in devices:
         for device in devices[api]:
             for node_id, node in enumerate(dts.match(device)):
                 driver_ids[node] = node_id
 
-def local_interrupts(dts):
+
+def local_interrupt_is_hw_vectored(compatible, irq, config):
+    """
+    Given the compatible string, local interrupt id, and config, determines whether
+    hardware vectoring should be enabled.
+    """
+    if config is None:
+        return False
+
+    if 'interrupts.hwvector' in config:
+        if compatible in config['interrupts.hwvector']:
+            return irq in config['interrupts.hwvector'][compatible]
+    return False
+
+
+def local_interrupt_priority(compatible, irq, config):
+    """
+    Given the compatible string, local interrupt id, and config, determines the interrupt
+    priority setting.
+    """
+    if config is None:
+        return 0
+    if 'interrupts.priority' in config:
+        if compatible in config['interrupts.priority']:
+            for config_id, config_prio in config['interrupts.priority'][compatible]:
+                if config_id == irq:
+                    return config_prio
+    return 0
+
+
+def local_interrupts(dts, config):
     irqs = []
+
+    for irq in range(16):
+        irqs.append({
+            'source': {
+                'compatible': 'riscv,cpu',
+                'id': irq,
+            },
+            'id': irq,
+            'hwvectored': local_interrupt_is_hw_vectored('riscv,cpu', irq, config),
+            'priority': local_interrupt_priority('riscv,cpu', irq, config),
+        })
     
-    for node in dts.match("sifive,local-external-interrupts0"):
-        for source_id, irq_id in enumerate(node.get_fields("interrupts")):
-            irqs.append({
-                'source': {
-                    'compatible': "sifive,local-external-interrupts0",
-                    'id': source_id,
-                },
-                'id': irq_id,
-            })
+    clics = dts.match("sifive,clic0")
+    if len(clics) > 0:
+        clic = clics[0]
+        def int_parent_is_clic(n):
+            parent = n.get_field("interrupt-parent")
+            if parent is None:
+                return False
+            parent = dts.get_by_reference(parent)
+            return parent == clic
+        clic_sources = dts.filter(int_parent_is_clic)
+        for node in clic_sources:
+            for source_id, irq_id in enumerate(node.get_fields("interrupts")):
+                irqs.append({
+                    'source': {
+                        'compatible': node.get_field("compatible"),
+                        'id': source_id,
+                    },
+                    'id': irq_id,
+                    'hwvectored': local_interrupt_is_hw_vectored(node.get_field("compatible"), irq_id, config),
+                    'priority': local_interrupt_priority(node.get_field("compatible"), irq_id, config),
+                })
+    else:
+        for node in dts.match("sifive,local-external-interrupts0"):
+            for source_id, irq_id in enumerate(node.get_fields("interrupts")):
+                irqs.append({
+                    'source': {
+                        'compatible': "sifive,local-external-interrupts0",
+                        'id': source_id,
+                    },
+                    'id': irq_id,
+                    'hwvectored': local_interrupt_is_hw_vectored("sifive,local-external-interrupts0", irq_id, config),
+                    'priority': local_interrupt_priority("sifive,local-external-interrupts0", irq_id, config),
+                })
 
     irqs.sort(key=lambda x: x['id'])
 
@@ -129,8 +206,6 @@ def global_interrupts(dts):
     return global_interrupts
 
 def resolve_phandles(dts):
-    import pdb
-
     for node in dts.all_nodes():
         for prop in node.properties:
             if prop.name == "interrupt-parent":
@@ -273,6 +348,34 @@ def get_devices_from_manifests(template_paths):
     return devices
 
 
+def get_application_config(args):
+    if args.application_config is None:
+        return None
+    try:
+        with open(args.application_config, 'r') as config_file:
+            config = configparser.ConfigParser()
+            config.read_file(config_file)
+
+            data = dict()
+            for section in config.sections():
+                data[section] = dict()
+                for key in config[section].keys():
+                    if section == 'interrupts.hwvector':
+                        data[section][key] = [int(x) for x in config[section][key].split(' ')]
+                    elif section == 'interrupts.priority':
+                        priorities = []
+                        for pair in config[section][key].split(' '):
+                            irq, prio = [int(x) for x in pair.split(':')]
+                            priorities.append((irq, prio))
+                        data[section][key] = priorities
+                    else:
+                        data[section][key] = config[section][key]
+
+            return data
+    except FileNotFoundError:
+        sys.stderr.write("ERROR: Unable to open application config file {}\n".format(args.application_config))
+
+
 def main():
     args = parse_arguments(sys.argv[1:])
 
@@ -287,12 +390,15 @@ def main():
     # Assign driver IDs to all device instances
     assign_ids(dts, devices)
 
+    # Get the application config
+    config = get_application_config(args)
+
     # Convert the Devicetree object tree into dictionary data
     # which can be rendered by the templates
     template_data = {
         'chosen' : node_to_dict(dts.get_by_path("/chosen"), dts),
         'harts' : [node_to_dict(hart, dts) for hart in dts.match("^riscv$")],
-        'local_interrupts' : local_interrupts(dts),
+        'local_interrupts' : local_interrupts(dts, config),
         'global_interrupts' : global_interrupts(dts),
         'devices' : dict(),
         'default_drivers' : dict(),
@@ -302,6 +408,7 @@ def main():
         'source_dirs' : get_source_dirs(args),
         'templates' : get_templates(args.source_paths, strip_dir=False),
         'source_paths' : args.source_paths,
+        'config' : config,
     }
 
     for api in devices:

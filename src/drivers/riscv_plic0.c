@@ -190,16 +190,6 @@ int riscv_plic0_set_threshold(struct metal_interrupt plic,
     return 0;
 }
 
-int riscv_plic0_set_preemptive_level(struct metal_interrupt controller, int id,
-                                     unsigned int level) {
-    return -1;
-}
-
-unsigned int riscv_plic0_get_preemptive_level(struct metal_interrupt controller,
-                                              int id) {
-    return 0;
-}
-
 int riscv_plic0_vector_enable(struct metal_interrupt controller, int id) {
     return -1;
 }

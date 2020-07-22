@@ -173,28 +173,6 @@ unsigned int metal_interrupt_get_priority(struct metal_interrupt controller,
                                           int id);
 
 /*!
- * @brief Set preemptive level and priority for a given interrupt ID
- *
- * Set the preemptive level and priority for a given interrupt ID.
- *
- * @param controller The handle for the interrupt controller
- * @param id The interrupt ID to enable
- * @param level The interrupt level and priority are encoded together
- * @return 0 upon success
- */
-int metal_interrupt_set_preemptive_level(struct metal_interrupt controller,
-                                         int id, unsigned int level);
-
-/*!
- * @brief Get an interrupt preemptive level
- * @param controller The handle for the interrupt controller
- * @param id The interrupt ID to enable
- * @return The interrupt level
- */
-unsigned int
-metal_interrupt_get_preemptive_level(struct metal_interrupt controller, int id);
-
-/*!
  * @brief Enable an interrupt vector
  * @param controller The handle for the interrupt controller
  * @param id The interrupt ID to enable
