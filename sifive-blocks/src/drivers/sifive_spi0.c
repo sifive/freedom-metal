@@ -9,9 +9,7 @@
 #include <metal/cpu.h>
 #include <metal/generated/sifive_spi0.h>
 #include <metal/io.h>
-#define _POSIX_MONOTONIC_CLOCK 200809L
-#define _POSIX_TIMERS
-#include <time.h>
+#include <metal/time.h>
 
 /* Register fields */
 #define METAL_SPI_SCKDIV_MASK 0xFFF
@@ -62,12 +60,6 @@ static struct {
 };
 
 #define get_index(spi) ((spi).__spi_index)
-
-static time_t metal_time(void) {
-    struct timespec tp;
-    clock_gettime(CLOCK_MONOTONIC, &tp);
-    return tp.tv_sec;
-}
 
 static int configure_spi(struct metal_spi spi,
                          struct metal_spi_config *config) {
