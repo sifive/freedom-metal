@@ -1,0 +1,50 @@
+#ifndef __METAL_DT_CACHE__H
+#define __METAL_DT_CACHE__H
+
+{% include 'template_comment.h.j2' %}
+
+#include <stdbool.h>
+
+{% if harts|length > 1 %}
+
+#include <metal/generated/cpu.h>
+
+static const bool dt_l1_icache[__METAL_DT_NUM_HARTS] = {
+    {% for hart in harts %}
+        {% if 'i_cache_size' in hart %}
+    true,
+        {% else %}
+    false,
+        {% endif %}
+    {% endfor %}
+};
+static const bool dt_l1_dcache[__METAL_DT_NUM_HARTS] = {
+    {% for hart in harts %}
+        {% if 'd_cache_size' in hart %}
+    true,
+        {% else %}
+    false,
+        {% endif %}
+    {% endfor %}
+};
+
+#define HART_HAS_L1_ICACHE(hartid) (dt_l1_icache[(hartid)])
+#define HART_HAS_L1_DCACHE(hartid) (dt_l1_dcache[(hartid)])
+
+{% else %}
+
+{% if 'i_cache_size' in harts[0] %}
+#define HART_HAS_L1_ICACHE(hartid) true
+{% else %}
+#define HART_HAS_L1_ICACHE(hartid) false
+{% endif %}
+{% if 'd_cache_size' in harts[0] %}
+#define HART_HAS_L1_DCACHE(hartid) true
+{% else %}
+#define HART_HAS_L1_DCACHE(hartid) false
+{% endif %}
+
+{% endif %}
+
+#endif /* ! __METAL_DT_CACHE__H */
+

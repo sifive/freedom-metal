@@ -1,0 +1,31 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__PLATFORM__SIFIVE_FU540_C000_L20_H
+#define METAL__PLATFORM__SIFIVE_FU540_C000_L20_H
+
+{% if 'sifive,fu540-c000,l2' in devices %}
+{% set l2_caches = devices['sifive,fu540-c000,l2'] %}
+
+{% for l2 in l2_caches %}
+    {% if 'reg_names' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_BASE_ADDRESS {{ "0x%x" % l2.regs_by_name['control'][0] }}UL
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIZE {{ "0x%x" % l2.regs_by_name['control'][1] }}UL
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_BASE_ADDRESS {{ "0x%x" % l2.regs_by_name['sideband'][0] }}UL
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_SIZE {{ "0x%x" % l2.regs_by_name['sideband'][1] }}UL
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_BASE_ADDRESS {{ "0x%x" % l2.reg[0][0] }}UL
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIZE {{ "0x%x" % l2.reg[0][1] }}UL
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_BASE_ADDRESS {{ "0x%x" % l2.reg[1][0] }}UL
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_SIZE {{ "0x%x" % l2.reg[1][1] }}UL
+    {% endif %}
+{% endfor %}
+
+#define METAL_SIFIVE_CCACHE0
+#define METAL_SIFIVE_CCACHE0_CONFIG    0x0
+#define METAL_SIFIVE_CCACHE0_WAYENABLE 0x8
+
+{% endif %}
+
+#endif
+
