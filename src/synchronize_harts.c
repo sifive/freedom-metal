@@ -13,8 +13,8 @@ __attribute__((section(".init"))) void __metal_synchronize_harts() {
     uint32_t hartid = metal_cpu_get_current_hartid();
 
     /* Disable machine interrupts as a precaution */
-    metal_cpu_disable_interrupts(metal_cpu_get(hartid));
-    metal_cpu_disable_ipi(metal_cpu_get(hartid));
+    metal_cpu_disable_interrupts();
+    metal_cpu_disable_ipi();
 
     if (hartid == 0) {
         /* Hart 0 waits for all harts to set their MSIP bit */
