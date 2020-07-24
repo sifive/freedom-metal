@@ -73,6 +73,9 @@ void metal_riscv_plic0_source_0_handler() __attribute__((interrupt));
 {% else %}
 void metal_riscv_cpu_intc_meip_handler() __attribute__((interrupt));
 {% endif %}
+{% if 'sifive,buserror0' in devices %}
+void metal_sifive_buserror0_source_0_handler() __attribute__((interrupt));
+{% endif %}
 {% if local_interrupts is defined %}
     {% for irq in local_interrupts.irqs|unique_irqs %}
         {% if irq.source.compatible != None %}
@@ -94,6 +97,9 @@ void metal_riscv_cpu_intc_seip_handler();
 void metal_riscv_plic0_source_0_handler();
 {% else %}
 void metal_riscv_cpu_intc_meip_handler();
+{% endif %}
+{% if 'sifive,buserror0' in devices %}
+void metal_sifive_buserror0_handler();
 {% endif %}
 {% if local_interrupts is defined %}
     {% for irq in local_interrupts.irqs|unique_irqs %}

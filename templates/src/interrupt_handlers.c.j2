@@ -57,6 +57,9 @@ void metal_riscv_plic0_source_0_handler() __attribute((interrupt, weak, alias("_
 {% else %}
 void metal_riscv_cpu_intc_meip_handler() __attribute__((interrupt, weak, alias("_metal_local_interrupt_handler_nop")));
 {% endif %}
+{% if 'sifive,buserror0' in devices %}
+void metal_sifive_buserror0_source_0_handler() __attribute__((interrupt, weak, alias("_metal_local_interrupt_handler_nop")));
+{% endif %}
 {% if local_interrupts is defined %}
     {% for irq in local_interrupts.irqs|unique_irqs %}
         {% if irq.source.compatible != None %}

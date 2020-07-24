@@ -215,18 +215,4 @@ uintptr_t metal_cpu_get_exception_pc(struct metal_cpu cpu);
  */
 int metal_cpu_set_exception_pc(struct metal_cpu cpu, uintptr_t epc);
 
-/* I ripped out the buserror driver but I'd rather not delete the code
- * unnecessarily */
-struct metal_buserror {
-    uint32_t __buserror_index;
-};
-
-/*!
- * @brief Get the handle for the hart's bus error unit
- *
- * @param cpu The CPU device handle
- * @return A pointer to the bus error unit handle
- */
-struct metal_buserror metal_cpu_get_buserror(struct metal_cpu cpu);
-
 #endif

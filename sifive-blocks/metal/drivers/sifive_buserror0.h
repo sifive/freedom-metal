@@ -10,7 +10,7 @@
  * @brief API for configuring the SiFive Bus Error Unit
  */
 
-#include <metal/compiler.h>
+#include <metal/cpu.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -46,14 +46,7 @@ typedef enum {
     /*! @brief A value which is impossible for the bus error unit to report.
      * Indicates an error has occurred if provided as a return value. */
     METAL_BUSERROR_EVENT_INVALID = (1 << 8),
-} metal_buserror_event_t;
-
-/*!
- * @brief The handle for a bus error unit
- */
-struct metal_buserror {
-    uint8_t __no_empty_structs;
-};
+} sifive_buserror_event_t;
 
 /*!
  * @brief Enable bus error events
@@ -61,47 +54,29 @@ struct metal_buserror {
  * Enabling bus error events causes them to be registered as accrued and,
  * if the corresponding interrupt is inabled, trigger interrupts.
  *
- * @param beu The bus error unit handle
+ * @param cpu The CPU handle corresponding to the hart to configure
  * @param events A mask of error events to enable
- * @param enabled True if the mask should be enabled, false if they should be
- * disabled
  * @return 0 upon success
  */
-int metal_buserror_set_event_enabled(struct metal_buserror *beu,
-                                     metal_buserror_event_t events,
-                                     bool enabled);
+int sifive_buserror_enable_events(struct metal_cpu cpu,
+                                  sifive_buserror_event_t events);
+
+/*!
+ * @brief Disable bus error events
+ *
+ * @param cpu The CPU handle corresponding to the hart to configure
+ * @param events A mask of error events to enable
+ * @return 0 upon success
+ */
+int sifive_buserror_disable_events(struct metal_cpu cpu,
+                                   sifive_buserror_event_t events);
 
 /*!
  * @brief Get enabled bus error events
- * @param beu The bus error unit handle
+ * @param cpu The CPU handle corresponding to the hart to query
  * @return A mask of all enabled events
  */
-metal_buserror_event_t
-metal_buserror_get_event_enabled(struct metal_buserror *beu);
-
-/*!
- * @brief Enable or disable the platform interrupt
- *
- * @param beu The bus error unit handle
- * @param event The error event which would trigger the interrupt
- * @param enabled True if the interrupt should be enabled
- * @return 0 upon success
- */
-int metal_buserror_set_platform_interrupt(struct metal_buserror *beu,
-                                          metal_buserror_event_t events,
-                                          bool enabled);
-
-/*!
- * @brief Enable or disable the hart-local interrupt
- *
- * @param beu The bus error unit handle
- * @param event The error event which would trigger the interrupt
- * @param enabled True if the interrupt should be enabled
- * @return 0 upon success
- */
-int metal_buserror_set_local_interrupt(struct metal_buserror *beu,
-                                       metal_buserror_event_t events,
-                                       bool enabled);
+sifive_buserror_event_t sifive_buserror_get_event_enabled(struct metal_cpu cpu);
 
 /*!
  * @brief Get the error event which caused the most recent interrupt
@@ -112,7 +87,7 @@ int metal_buserror_set_local_interrupt(struct metal_buserror *beu,
  * @param beu The bus error unit handle
  * @return The event which caused the interrupt
  */
-metal_buserror_event_t metal_buserror_get_cause(struct metal_buserror *beu);
+sifive_buserror_event_t sifive_buserror_get_cause(struct metal_cpu cpu);
 
 /*!
  * @brief Clear the cause register for the bus error unit
@@ -120,10 +95,10 @@ metal_buserror_event_t metal_buserror_get_cause(struct metal_buserror *beu);
  * This method should be called from within the interrupt handler for the bus
  * error unit to un-latch the cause register for the next event
  *
- * @param beu The bus error unit handle
+ * @param cpu The CPU handle corresponding to the hart to configure
  * @return 0 upon success
  */
-int metal_buserror_clear_cause(struct metal_buserror *beu);
+int sifive_buserror_clear_cause(struct metal_cpu cpu);
 
 /*!
  * @brief Get the physical address of the error event
@@ -134,51 +109,62 @@ int metal_buserror_clear_cause(struct metal_buserror *beu);
  * @param beu The bus error unit handle
  * @return The address of the error event
  */
-uintptr_t metal_buserror_get_event_address(struct metal_buserror *beu);
+uintptr_t sifive_buserror_get_event_address(struct metal_cpu cpu);
 
 /*!
  * @brief Returns true if the event is set in the accrued register
  *
- * @param beu The bus error unit handle
+ * @param cpu The CPU handle corresponding to the hart to configure
  * @param event The event to query
  * @return True if the event is set in the accrued register
  */
-bool metal_buserror_is_event_accrued(struct metal_buserror *beu,
-                                     metal_buserror_event_t events);
+bool sifive_buserror_is_event_accrued(struct metal_cpu cpu,
+                                      sifive_buserror_event_t events);
 
 /*!
  * @brief Clear the given event from the accrued register
  *
- * @param beu The bus error unit handle
+ * @param cpu The CPU handle corresponding to the hart to configure
  * @param event The event to clear
  * @return 0 upon success
  */
-int metal_buserror_clear_event_accrued(struct metal_buserror *beu,
-                                       metal_buserror_event_t events);
+int sifive_buserror_clear_event_accrued(struct metal_cpu cpu,
+                                        sifive_buserror_event_t events);
 
 /*!
- * @brief get the platform-level interrupt parent of the bus error unit
+ * @brief Enable the platform-level buserror unit interrupt
  *
- * @param beu The bus error unit handle
- * @return A pointer to the interrupt parent
+ * @param cpu The CPU handle corresponding to the hart to configure
+ * @return 0 upon success
  */
-struct metal_interrupt *
-metal_buserror_get_platform_interrupt_parent(struct metal_buserror *beu);
+int sifive_buserror_enable_platform_interrupt(struct metal_cpu cpu,
+                                              sifive_buserror_event_t events);
 
 /*!
- * @brief Get the platform-level interrupt id for the bus error unit interrupt
+ * @brief Disable the platform-level buserror unit interrupt
  *
- * @param beu The bus error unit handle
- * @return The interrupt id
+ * @param cpu The CPU handle corresponding to the hart to configure
+ * @return 0 upon success
  */
-int metal_buserror_get_platform_interrupt_id(struct metal_buserror *beu);
+int sifive_buserror_disable_platform_interrupt(struct metal_cpu cpu,
+                                               sifive_buserror_event_t events);
 
 /*!
- * @brief Get the hart-local interrupt id for the bus error unit interrupt
+ * @brief Enable the hart-local buserror unit interrupt
  *
- * @param beu The bus error unit handle
- * @return The interrupt id
+ * @param cpu The CPU handle corresponding to the hart to configure
+ * @return 0 upon success
  */
-int metal_buserror_get_local_interrupt_id(struct metal_buserror *beu);
+int sifive_buserror_enable_local_interrupt(struct metal_cpu cpu,
+                                           sifive_buserror_event_t events);
+
+/*!
+ * @brief Disable the hart-local buserror unit interrupt
+ *
+ * @param cpu The CPU handle corresponding to the hart to configure
+ * @return 0 upon success
+ */
+int sifive_buserror_disable_local_interrupt(struct metal_cpu cpu,
+                                            sifive_buserror_event_t events);
 
 #endif

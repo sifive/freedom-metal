@@ -50,11 +50,28 @@ IRQ_15:
         j metal_riscv_cpu_intc_default_handler
 {% if local_interrupts is defined %}
   {% for irq in local_interrupts.irqs %}
-IRQ_LOCAL_{{ irq.id }}:
+IRQ_{{ irq.id }}:
     {% if irq.source is defined %}
-      j metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler
+        j metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler
     {% else %}
-      j metal_{{ local_interrupts.controller }}_{{ irq.id }}_handler
+        j metal_{{ local_interrupts.controller }}_{{ irq.id }}_handler
     {% endif %}
   {% endfor %}
+{% endif %}
+{% if 'sifive,buserror0' in devices %}
+#ifdef METAL_HLIC_VECTORED
+/*
+ * The Bus Error Unit has a hard-coded local interrupt id of 128. Therefore,
+ * when hardware-vectored local interrupts are enabled, we need to pad out
+ * the jump table to put the BEU interrupt handler at the appropriate offset.
+ * This wastes a ton of space, so this should only happen when HLIC-vectored
+ * interrupts are requested at compile-time.
+ */
+{% for i in range(16 + local_interrupts.irqs|length, 128) %}
+IRQ_{{ i }}:
+        j metal_riscv_cpu_intc_default_handler
+{% endfor %}
+IRQ_128:
+        j metal_sifive_buserror0_handler
+#endif
 {% endif %}
