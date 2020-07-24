@@ -180,6 +180,11 @@ int sifive_uart0_set_baud_rate(struct metal_uart uart, int baud_rate) {
 
 void _sifive_uart0_pre_rate_change_callback(uint32_t id) {
     struct metal_uart uart = (struct metal_uart){id};
+    uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
+
+    if (baud_rate == 0)
+        return;
+
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
     struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
@@ -198,24 +203,23 @@ void _sifive_uart0_pre_rate_change_callback(uint32_t id) {
 
     long bits_per_symbol =
         (UART_REGW(METAL_SIFIVE_UART0_TXCTRL) & (1 << 1)) ? 9 : 10;
-    uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
+    uint64_t ticks_to_wait = bits_per_symbol * MTIME_RATE_HZ_DEF / baud_rate;
 
-    if (baud_rate != 0) {
-        uint64_t ticks_to_wait =
-            bits_per_symbol * MTIME_RATE_HZ_DEF / baud_rate;
-
-        struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
-        uint64_t mtime = metal_cpu_get_mtime(cpu);
-        uint64_t mtime_end = mtime + ticks_to_wait;
-        while (mtime <= mtime_end) {
-            mtime = metal_cpu_get_mtime(cpu);
-        }
+    struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
+    uint64_t mtime = metal_cpu_get_mtime(cpu);
+    uint64_t mtime_end = mtime + ticks_to_wait;
+    while (mtime <= mtime_end) {
+        mtime = metal_cpu_get_mtime(cpu);
     }
 }
 
 void _sifive_uart0_post_rate_change_callback(uint32_t id) {
     struct metal_uart uart = (struct metal_uart){id};
     uint32_t baud_rate = uart_state[get_index(uart)].baud_rate;
+
+    if (baud_rate == 0)
+        return;
+
     sifive_uart0_set_baud_rate(uart, baud_rate);
 }
 
