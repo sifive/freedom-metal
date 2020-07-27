@@ -53,11 +53,7 @@
 
 #define METAL_SPI_RXDATA_TIMEOUT 1
 
-static struct {
-    uint64_t baud_rate;
-} spi_state[__METAL_DT_NUM_SPIS] = {
-    {.baud_rate = 0},
-};
+static struct { uint64_t baud_rate; } spi_state[__METAL_DT_NUM_SPIS];
 
 #define get_index(spi) ((spi).__spi_index)
 

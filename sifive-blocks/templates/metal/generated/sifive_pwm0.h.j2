@@ -1,0 +1,78 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__DRIVERS__SIFIVE_PWM0_H
+#define METAL__DRIVERS__SIFIVE_PWM0_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/clock.h>
+#include <metal/generated/pwm.h>
+#include <metal/gpio.h>
+#include <metal/interrupt.h>
+#include <metal/pwm.h>
+#include <metal/machine/platform.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+{% if 'sifive,pwm0' in devices %}
+{% set sifive_pwm0s = devices['sifive,pwm0'] %}
+
+static const struct dt_pwm_data {
+	uintptr_t base_addr;
+	struct metal_clock clock;
+	bool has_pinmux;
+	struct metal_gpio pinmux;
+	uint32_t pinmux_output_selector;
+	uint32_t pinmux_source_selector;
+	struct metal_interrupt interrupt_parent;
+	uint32_t interrupt_id;
+	uint8_t comparator_count;
+	uint8_t	compare_width;
+} dt_pwm_data[__METAL_DT_NUM_PWMS] = {
+	{% for pwm in sifive_pwm0s %}
+	{
+	    .base_addr = METAL_SIFIVE_PWM0_{{ pwm.id }}_BASE_ADDRESS,
+
+	{% if pwm.clocks is defined %}
+	    /* {{ pwm.clocks[0].compatible[0] }} */
+	    .clock = (struct metal_clock) { {{ pwm.clocks[0].id }} },
+	{% endif %}
+
+	{% if pwm.pinmux is defined %}
+		.has_pinmux = 1,
+		.pinmux = (struct metal_gpio) { {{ pwm.pinmux[0].id }} },
+		.pinmux_output_selector = {{ pwm.pinmux[1] }},
+		.pinmux_source_selector = {{ pwm.pinmux[2] }},
+	{% else %}
+		.has_pinmux = 0,
+	{% endif %}
+
+	{% if pwm.interrupt_parent is defined %}
+	    /* {{ pwm.interrupt_parent[0].compatible[0] }} */
+		.interrupt_parent = (struct metal_interrupt) { {{ pwm.interrupt_parent[0].id }} },
+		.interrupt_id = {{ pwm.interrupts[0] }},
+	{% endif %}
+	{% if pwm.ncomparators is defined %}
+		.comparator_count = {{ pwm.ncomparators }},
+	{% endif %}
+	{% if pwm.comparator_widthbits is defined %}
+		.compare_width = {{ pwm.comparator_widthbits }},
+	{% endif %}
+	},
+	{% endfor %}
+};
+
+{% if sifive_pwm0s[0].clocks is defined %}
+{% set driver_string = to_snakecase(sifive_pwm0s[0].clocks[0].compatible[0]) %}
+{% include 'clock_dispatch.h.j2' %}
+{% endif %}
+
+{% if sifive_pwm0s[0].interrupt_parent is defined %}
+{% set driver_string = to_snakecase(sifive_pwm0s[0].interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h.j2' %}
+{% endif %}
+
+{% endif %}
+
+#endif

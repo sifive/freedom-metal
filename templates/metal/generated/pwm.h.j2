@@ -1,0 +1,32 @@
+#ifndef __METAL_DT_PWM__H
+#define __METAL_DT_PWM__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'pwm' in default_drivers and default_drivers['pwm'] in devices %}
+{% set pwm_compatible = default_drivers['pwm'] %}
+{% set pwms = devices[pwm_compatible] %}
+
+#define __METAL_DT_NUM_PWMS {{ devices[pwm_compatible]|length }}
+
+{% set driver_string = to_snakecase(pwm_compatible) %}
+#define metal_pwm_enable {{ driver_string }}_enable
+#define metal_pwm_disable {{ driver_string }}_disable
+#define metal_pwm_set_freq {{ driver_string }}_set_freq
+#define metal_pwm_set_duty {{ driver_string }}_set_duty
+#define metal_pwm_get_duty {{ driver_string }}_get_duty
+#define metal_pwm_get_freq {{ driver_string }}_get_freq
+#define metal_pwm_trigger {{ driver_string }}_trigger
+#define metal_pwm_stop {{ driver_string }}_stop
+#define metal_pwm_cfg_interrupt {{ driver_string }}_cfg_interrupt
+#define metal_pwm_clear_interrupt {{ driver_string }}_clear_interrupt
+
+{% for pwm in pwms %}
+#define metal_pwm_{{ pwm.id }} ((struct metal_pwm) { {{ pwm.id }} })
+{% endfor %}
+
+{% else %}
+#define __METAL_DT_NUM_PWMS 0
+{% endif %}
+
+#endif /* ! __METAL_DT_PWM__H */

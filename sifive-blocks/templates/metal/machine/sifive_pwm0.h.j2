@@ -1,0 +1,33 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__PLATFORM__SIFIVE_PWM0_H
+#define METAL__PLATFORM__SIFIVE_PWM0_H
+
+{% if 'sifive,pwm0' in devices %}
+{% set sifive_pwm0s = devices['sifive,pwm0'] %}
+
+{% for pwm in sifive_pwm0s %}
+    {% if pwm.reg_names is defined %}
+#define METAL_SIFIVE_PWM0_{{ loop.index0 }}_BASE_ADDRESS {{ '0x%x' % pwm.regs_by_name["control"][0] }}
+#define METAL_SIFIVE_PWM0_{{ loop.index0 }}_SIZE {{ '0x%x' % pwm.regs_by_name["control"][1] }}
+    {% else %}
+#define METAL_SIFIVE_PWM0_{{ loop.index0 }}_BASE_ADDRESS {{ '0x%x' % pwm.reg[0][0] }}
+#define METAL_SIFIVE_PWM0_{{ loop.index0 }}_SIZE {{ '0x%x' % pwm.reg[0][1] }}
+    {% endif %}
+{% endfor %}
+
+#define METAL_SIFIVE_PWM0
+#define METAL_SIFIVE_PWM0_PWMCFG	0x0
+#define METAL_SIFIVE_PWM0_PWMCOUNT	0x8
+#define METAL_SIFIVE_PWM0_PWMS		0x10
+#define METAL_SIFIVE_PWM0_PWMCMP0	0x20
+#define METAL_SIFIVE_PWM0_PWMCMP1	0x24
+#define METAL_SIFIVE_PWM0_PWMCMP2	0x28
+#define METAL_SIFIVE_PWM0_PWMCMP3	0x2C
+
+#define METAL_MAX_PWM_CHANNELS	16
+
+{% endif %}
+
+#endif
