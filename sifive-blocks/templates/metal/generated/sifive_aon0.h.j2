@@ -1,0 +1,30 @@
+/* Copyright 2020 SiFive Inc. */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef __METAL__GENERATED__SIFIVE_AON00__H
+#define __METAL__GENERATED__SIFIVE_AON00__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'sifive,aon0' in devices %}
+{% set aon = devices['sifive,aon0'][0] %}
+
+#define AON_INTERRUPT_PARENT ((struct metal_interrupt) { {{ aon['interrupt_parent'][0].id }} })
+#define AON_CLOCK ((struct metal_clock) { {{ aon['clocks'][0].id }} })
+#define AON_WDOG_INTERRUPT_ID {{ aon['interrupts'][0] }}
+#define AON_RTC_INTERRUPT_ID {{ aon['interrupts'][1] }}
+
+{% if aon.interrupt_parent is defined %}
+{% set driver_string = to_snakecase(aon.interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h.j2' %}
+{% endif %}
+
+{% if aon.clocks is defined %}
+{% set driver_string = to_snakecase(aon.clocks[0].compatible[0]) %}
+{% include 'clock_dispatch.h.j2' %}
+{% endif %}
+
+{% endif %}
+
+#endif
+
