@@ -1,0 +1,45 @@
+/* Copyright 2020 SiFive Inc. */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef __METAL__GENERATED__SIFIVE_BUSERROR0__H
+#define __METAL__GENERATED__SIFIVE_BUSERROR0__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'sifive,buserror0' in devices %}
+
+#include <metal/generated/cpu.h>
+#include <metal/machine/platform.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+{% if harts|length > 1 %}
+
+static const uintptr_t dt_beu_base_addrs[__METAL_DT_NUM_HARTS] = {
+    {% for hart in harts %}
+        {% if 'sifive_buserror' in hart %}
+    METAL_SIFIVE_BUSERROR0_{{ hart['sifive_buserror'].id }}_BASE_ADDRESS,
+        {% else %}
+    0UL,
+        {% endif %}
+    {% endfor %}
+};
+
+#define BEU_BASE_ADDR(hartid) (dt_beu_base_addrs[(hartid)])
+#define HART_HAS_BEU(hartid) (BEU_BASE_ADDR(hartid) != 0UL)
+
+{% else %}
+
+    {% if 'sifive_buserror' in hart %}
+#define BEU_BASE_ADDR(hartid) METAL_SIFIVE_BUSERROR0_0_BASE_ADDRESS
+#define HART_HAS_BEU(hartid) (BEU_BASE_ADDR(hartid) != 0UL)
+    {% else %}
+#define BEU_BASE_ADDR(hartid) 0UL
+#define HART_HAS_BEU(hartid) false
+    {% endif %}
+
+{% endif %}
+
+{% endif %}
+
+#endif

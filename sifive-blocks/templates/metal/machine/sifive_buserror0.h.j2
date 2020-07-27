@@ -1,0 +1,20 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__PLATFORM__SIFIVE_BUSERROR0_H
+#define METAL__PLATFORM__SIFIVE_BUSERROR0_H
+
+{% if 'sifive,buserror0' in devices %}
+
+{% for buserror in devices['sifive,buserror0'] %}
+#define METAL_SIFIVE_BUSERROR0_{{ loop.index0 }}_BASE_ADDRESS {{ "0x%x" % buserror.reg[0][0] }}UL
+#define METAL_SIFIVE_BUSERROR0_{{ loop.index0 }}_SIZE {{ "0x%x" % buserror.reg[0][1] }}UL
+{% endfor %}
+
+#define METAL_SIFIVE_BUSERROR0
+#define METAL_SIFIVE_BUSERROR0_LFROSCCFG 0x70UL
+#define METAL_SIFIVE_BUSERROR0_LFCLKMUX  0x7CUL
+
+{% endif %}
+
+#endif
