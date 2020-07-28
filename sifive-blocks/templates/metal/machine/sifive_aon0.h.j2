@@ -12,6 +12,13 @@
 {% endfor %}
 
 #define METAL_SIFIVE_AON0
+#define METAL_SIFIVE_AON0_WDOGCFG 0x00
+#define METAL_SIFIVE_AON0_WDOGCOUNT 0x08
+#define METAL_SIFIVE_AON0_WDOGS 0x10
+#define METAL_SIFIVE_AON0_WDOGFEED 0x18
+#define METAL_SIFIVE_AON0_WDOGKEY 0x1C
+#define METAL_SIFIVE_AON0_WDOGCMP0 0x20
+#define METAL_SIFIVE_AON0_MAGIC_KEY 0x51F15E
 #define METAL_SIFIVE_AON0_RTCCFG 0x40
 #define METAL_SIFIVE_AON0_RTCCOUNTLO 0x48
 #define METAL_SIFIVE_AON0_RTCCOUNTHI 0x4C
@@ -20,6 +27,9 @@
 #define METAL_SIFIVE_AON0_LFROSCCFG 0x70UL
 #define METAL_SIFIVE_AON0_LFCLKMUX  0x7CUL
 
+{% if default_drivers['watchdog'] == 'sifive,aon0' %}
+#define metal_watchdog_handler metal_sifive_aon0_source_0_handler
+{% endif %}
 {% if default_drivers['rtc'] == 'sifive,aon0' %}
 #define metal_rtc_handler metal_sifive_aon0_source_1_handler
 {% endif %}
