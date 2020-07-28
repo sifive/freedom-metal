@@ -5,6 +5,14 @@
  * Scrub memory with zero
  */
 
+#include "metal/machine/platform.h"
+
+#ifdef METAL_RISCV_CLINT0
+.equ MSIP_CTRL_ADDR, METAL_RISCV_CLINT0_0_BASE_ADDRESS
+#else /* METAL_SIFIVE_CLIC0 */
+.equ MSIP_CTRL_ADDR, METAL_SIFIVE_CLIC0_0_BASE_ADDRESS
+#endif
+
 /* Keep it in metal.init section with _enter */
 .section .text.metal.init.scrub
 /* Disable linker relaxation */
@@ -107,14 +115,14 @@ memory_scrub:
     jal     _metal_memory_scrub
 
 done_scrub:
-    lui     a4, 0x2000
+    li      a4, MSIP_CTRL_ADDR
     li      a5,1
     sw      a5,0(a4)
     fence   w,rw
     j skip_scrub
 
 wait_scrub:
-    lui     a4, 0x2000
+    li      a4, MSIP_CTRL_ADDR
     lw      a5, 0(a4)
     beqz    a5, wait_scrub
 
