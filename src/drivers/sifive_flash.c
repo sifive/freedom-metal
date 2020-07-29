@@ -226,27 +226,30 @@ int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, c
 	uint32_t *axi_addr = addr;
 	qspi_static_config_t *cfg=&qcfg;
 
-	cfg->addrlen   = QSPI_ADDR_32BIT;
-	cfg->rxlen     = QSPI_32BIT;
-	cfg->txlen     = QSPI_32BIT;
-	cfg->wrmode    = QSPI_READ;
-	cfg->opmode    = QSPI_SPI;
-	cfg->speedmode = QSPI_CMD_SERIAL;
-	cfg->burstmode = QSPI_SINGLE_BURST;
+	cfg->addrlen	= QSPI_ADDR_24BIT;
+	cfg->rxlen	= QSPI_32BIT;
+	cfg->txlen	= QSPI_32BIT;
+	cfg->wrmode	= QSPI_READ;
+	cfg->opmode	= (flash->mode & 0x0F);
+	cfg->speedmode	= ((flash->mode & 0xF0) >> 4);
+	cfg->burstmode	= QSPI_SINGLE_BURST;
 
 	metal_qspi_setconfig(qspi,cfg);
 
-	/*set command enable, address enable phase,dummy phase enable,mode phase enable,read enable phase*/
-
-	//cmd_cfg.custom_command = (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN 
-	//		| QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
-
-	cmd_cfg.custom_command = (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_RX_DATA_PH_EN);
-
-	//cmd_cfg.dummy_stg = QSPI_SET_DUMMY_DLP(0 , 3 , 0);
-	//cmd_cfg.mode_stg  = QSPI_SET_MODE_REG(0x1 , 0x0);
-	//cmd_cfg.opcode    = FLASH_CMD_QUAD_READ_CMD;
-	cmd_cfg.opcode    = FLASH_CMD_READ_CMD;
+	if (flash->opcode == FLASH_CMD_NORMAL_READ)
+	{
+		/*set command enable, address phase enable, read phase enable*/
+		cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_RX_DATA_PH_EN);
+		cmd_cfg.opcode		= flash->opcode;
+	}
+	else
+	{
+		/*set command enable, address phase enable, dummy phase enable, mode phase enable, read phase enable*/
+		cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
+		cmd_cfg.dummy_stg	= QSPI_SET_DUMMY_DLP(0, (flash->dummy_count - 1), 0);
+		cmd_cfg.mode_stg	= QSPI_SET_MODE_REG((flash->mode_count - 1), 0x0);
+		cmd_cfg.opcode		= flash->opcode;
+	}
 
 	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
 
@@ -386,13 +389,137 @@ int __metal_driver_sifive_flash_erase(struct metal_flash *flash, unsigned int ad
 	return 0;
 }
 
+int __metal_driver_sifive_flash_register_read(struct metal_flash *flash, reg_read_t reg, uint32_t addr_offset, const size_t size, char *data)
+{
+	qspi_static_config_t *cfg=&qcfg;
+
+	if (reg == FLASH_RDSFDP) {
+
+		cfg->addrlen	= QSPI_ADDR_24BIT;
+		cfg->rxlen	= QSPI_32BIT;
+		cfg->wrmode	= QSPI_READ;
+		cfg->opmode	= QSPI_SPI;
+		cfg->speedmode	= QSPI_CMD_SERIAL;
+		cfg->burstmode	= QSPI_SINGLE_BURST;
+
+		metal_qspi_setconfig(qspi,cfg);
+
+		/*set command enable, address phase enable, dummy phase enable, read phase enable*/
+		cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_RX_DATA_PH_EN);
+		cmd_cfg.dummy_stg	= QSPI_SET_DUMMY_DLP(0, 7, 0);
+		cmd_cfg.opcode		= reg;
+
+		metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+
+		metal_qspi_read(qspi,addr_offset,size,data);
+
+		/* Check SFDP signature */
+		if (data[0] == 'S' && data[1] == 'F' && data[2] == 'D' && data[3] == 'P')
+		{
+			printf("The device supports SFDP.\n");
+			return 0;
+		}
+		else {
+			printf("The device does not support SFDP.\n");
+			return -1;
+		}
+	}
+	else {
+		cfg->wrmode	= QSPI_READ;
+		cfg->rxlen	= QSPI_8BIT;
+		cfg->opmode	= QSPI_SPI;
+		cfg->speedmode	= QSPI_CMD_SERIAL;
+		cfg->burstmode	= QSPI_APB_ACCESS;
+
+		metal_qspi_setconfig(qspi,cfg);
+
+		/*set command enable, read phase enable*/
+		cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_RX_DATA_PH_EN);
+		cmd_cfg.opcode		= reg;
+
+		metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+
+		metal_qspi_execute_cmd(qspi);
+
+		metal_qspi_read(qspi,addr_offset,size,data);
+
+		return 0;
+	}
+}
+
+int __metal_driver_sifive_flash_register_write(struct metal_flash *flash, reg_write_t reg, uint32_t addr_offset, const size_t size, char *data)
+{
+	uint8_t read_status = 0;
+	qspi_static_config_t *cfg = &qcfg;
+
+	flash_send_write_en(flash);
+
+	cfg->txlen	= QSPI_8BIT;
+	cfg->wrmode	= QSPI_WRITE;
+	cfg->opmode	= QSPI_SPI;
+	cfg->speedmode	= QSPI_CMD_SERIAL;
+	cfg->burstmode	= QSPI_APB_ACCESS;
+
+	metal_qspi_setconfig(qspi,cfg);
+
+	/*set command enable, write phase enable*/
+	cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_TX_DATA_PH_EN);
+	cmd_cfg.opcode		= reg;
+
+	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+
+	metal_qspi_write(qspi,addr_offset,size,data);
+
+	metal_qspi_execute_cmd(qspi);
+
+	do {
+		read_status = flash_status_read();
+	} while ((read_status & 0x1) == 0x1);
+
+	return 0;
+}
+
+int __metal_driver_sifive_flash_soft_reset(struct metal_flash *flash)
+{
+	qspi_static_config_t *cfg=&qcfg;
+
+	cfg->addrlen	= QSPI_ADDR_32BIT;
+	cfg->rxlen	= QSPI_32BIT;
+	cfg->txlen	= QSPI_32BIT;
+	cfg->opmode	= QSPI_SPI;
+	cfg->speedmode	= QSPI_CMD_SERIAL;
+	cfg->burstmode	= QSPI_APB_ACCESS;
+
+	metal_qspi_setconfig(qspi,cfg);
+
+	/*set command enable*/
+
+	cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN);
+	cmd_cfg.opcode		= FLASH_CMD_RST_EN;
+
+	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+
+	metal_qspi_execute_cmd(qspi);
+
+	cmd_cfg.opcode		= FLASH_CMD_RST;
+
+	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+
+	metal_qspi_execute_cmd(qspi);
+
+	return 0;
+}
+
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_flash) = {
-	.flash.init 	 	  = __metal_driver_sifive_flash_init,
-	.flash.get_device_id      = __metal_driver_sifive_flash_get_device_id,
-	.flash.write_protect      = __metal_driver_sifive_flash_write_protect,
-	.flash.write	      	  = __metal_driver_sifive_flash_write,
-	.flash.read  		  = __metal_driver_sifive_flash_read,
-	.flash.erase  		  = __metal_driver_sifive_flash_erase,
+	.flash.init		= __metal_driver_sifive_flash_init,
+	.flash.get_device_id	= __metal_driver_sifive_flash_get_device_id,
+	.flash.write_protect	= __metal_driver_sifive_flash_write_protect,
+	.flash.write		= __metal_driver_sifive_flash_write,
+	.flash.read		= __metal_driver_sifive_flash_read,
+	.flash.erase		= __metal_driver_sifive_flash_erase,
+	.flash.register_read	= __metal_driver_sifive_flash_register_read,
+	.flash.register_write	= __metal_driver_sifive_flash_register_write,
+	.flash.soft_reset	= __metal_driver_sifive_flash_soft_reset,
 };
 
 #endif /*METAL_SIFIVE_FLASH*/
