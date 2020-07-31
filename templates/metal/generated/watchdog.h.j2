@@ -1,0 +1,28 @@
+#ifndef __METAL_DT_WATCHDOG__H
+#define __METAL_DT_WATCHDOG__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'watchdog' in default_drivers and default_drivers['watchdog'] in devices %}
+{% set watchdog_compatible = default_drivers['watchdog'] %}
+
+#define __METAL_DT_NUM_WDOGS {{ devices[watchdog_compatible]|length }}
+
+{% set driver_string = to_snakecase(watchdog_compatible) %}
+#define metal_watchdog_run {{ driver_string }}_wdog_run
+#define metal_watchdog_set_rate {{ driver_string }}_set_wdog_rate
+#define metal_watchdog_get_rate {{ driver_string }}_get_wdog_rate
+#define metal_watchdog_set_timeout {{ driver_string }}_set_timeout
+#define metal_watchdog_get_timeout {{ driver_string }}_get_timeout
+#define metal_watchdog_set_result {{ driver_string }}_set_result
+#define metal_watchdog_enable_interrupt {{ driver_string }}_enable_wdog_interrupt
+#define metal_watchdog_disable_interrupt {{ driver_string }}_disable_wdog_interrupt
+#define metal_watchdog_clear_interrupt {{ driver_string }}_clear_wdog_interrupt
+
+{% else %}
+#define __METAL_DT_NUM_WDOGS 0
+{% endif %}
+
+#endif /* ! __METAL_DT_WATCHDOG__H */
+
+
