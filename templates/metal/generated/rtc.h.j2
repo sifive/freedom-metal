@@ -1,0 +1,27 @@
+#ifndef __METAL_DT_RTC__H
+#define __METAL_DT_RTC__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'rtc' in default_drivers and default_drivers['rtc'] in devices %}
+{% set rtc_compatible = default_drivers['rtc'] %}
+
+#define __METAL_DT_NUM_RTCS {{ devices[rtc_compatible]|length }}
+
+{% set driver_string = to_snakecase(rtc_compatible) %}
+#define metal_rtc_run {{ driver_string }}_rtc_run
+#define metal_rtc_get_rate {{ driver_string }}_get_rtc_rate
+#define metal_rtc_set_rate {{ driver_string }}_set_rtc_rate
+#define metal_rtc_get_compare {{ driver_string }}_get_compare
+#define metal_rtc_set_compare {{ driver_string }}_set_compare
+#define metal_rtc_get_count {{ driver_string }}_get_count
+#define metal_rtc_set_count {{ driver_string }}_set_count
+#define metal_rtc_enable_interrupt {{ driver_string }}_enable_rtc_interrupt
+#define metal_rtc_disable_interrupt {{ driver_string }}_disable_rtc_interrupt
+
+{% else %}
+#define __METAL_DT_NUM_RTCS 0
+{% endif %}
+
+#endif /* ! __METAL_DT_RTC__H */
+

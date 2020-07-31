@@ -12,8 +12,17 @@
 {% endfor %}
 
 #define METAL_SIFIVE_AON0
+#define METAL_SIFIVE_AON0_RTCCFG 0x40
+#define METAL_SIFIVE_AON0_RTCCOUNTLO 0x48
+#define METAL_SIFIVE_AON0_RTCCOUNTHI 0x4C
+#define METAL_SIFIVE_AON0_RTCS 0x50
+#define METAL_SIFIVE_AON0_RTCCMP0 0x60
 #define METAL_SIFIVE_AON0_LFROSCCFG 0x70UL
 #define METAL_SIFIVE_AON0_LFCLKMUX  0x7CUL
+
+{% if default_drivers['rtc'] == 'sifive,aon0' %}
+#define metal_rtc_handler metal_sifive_aon0_source_1_handler
+{% endif %}
 
 {% endif %}
 
