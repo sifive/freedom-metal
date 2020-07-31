@@ -6,13 +6,29 @@
 
 {% include 'template_comment.h.j2' %}
 
+#include <metal/clock.h>
+#include <metal/interrupt.h>
+
 {% if 'sifive,aon0' in devices %}
 {% set aon = devices['sifive,aon0'][0] %}
 
+{% if 'interrupt_parent' in aon %}
 #define AON_INTERRUPT_PARENT ((struct metal_interrupt) { {{ aon['interrupt_parent'][0].id }} })
+{% else %}
+#define AON_INTERRUPT_PARENT ((struct metal_interrupt){0})
+{% endif %}
+{% if 'clocks' in aon %}
 #define AON_CLOCK ((struct metal_clock) { {{ aon['clocks'][0].id }} })
+{% else %}
+#define AON_CLOCK ((struct metal_clock){0})
+{% endif %}
+{% if 'interrupts' in aon %}
 #define AON_WDOG_INTERRUPT_ID {{ aon['interrupts'][0] }}
 #define AON_RTC_INTERRUPT_ID {{ aon['interrupts'][1] }}
+{% else %}
+#define AON_WDOG_INTERRUPT_ID 0
+#define AON_RTC_INTERRUPT_ID 0
+{% endif %}
 
 {% if aon.interrupt_parent is defined %}
 {% set driver_string = to_snakecase(aon.interrupt_parent[0].compatible[0]) %}
