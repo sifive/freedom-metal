@@ -19,12 +19,6 @@ int riscv_plic0_set_vector_mode(struct metal_interrupt controller,
 metal_vector_mode
 riscv_plic0_get_vector_mode(struct metal_interrupt controller);
 
-int riscv_plic0_set_privilege(struct metal_interrupt controller,
-                              metal_intr_priv_mode privilege);
-
-metal_intr_priv_mode
-riscv_plic0_get_privilege(struct metal_interrupt controller);
-
 int riscv_plic0_enable(struct metal_interrupt controller, int id);
 
 int riscv_plic0_disable(struct metal_interrupt controller, int id);

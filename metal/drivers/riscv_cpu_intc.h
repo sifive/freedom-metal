@@ -41,12 +41,6 @@ int riscv_cpu_intc_set_vector_mode(struct metal_interrupt controller,
 metal_vector_mode
 riscv_cpu_intc_get_vector_mode(struct metal_interrupt controller);
 
-int riscv_cpu_intc_set_privilege(struct metal_interrupt controller,
-                                 metal_intr_priv_mode privilege);
-
-metal_intr_priv_mode
-riscv_cpu_intc_get_privilege(struct metal_interrupt controller);
-
 int riscv_cpu_intc_clear(struct metal_interrupt controller, int id);
 
 int riscv_cpu_intc_set(struct metal_interrupt controller, int id);
@@ -76,21 +70,5 @@ int riscv_cpu_intc_vector_enable(struct metal_interrupt controller, int id,
                                  metal_vector_mode mode);
 
 int riscv_cpu_intc_vector_disable(struct metal_interrupt controller, int id);
-
-metal_affinity riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
-                                              metal_affinity bitmask, int id);
-
-metal_affinity
-riscv_cpu_intc_affinity_disable(struct metal_interrupt controller,
-                                metal_affinity bitmask, int id);
-
-metal_affinity
-riscv_cpu_intc_affinity_set_threshold(struct metal_interrupt controller,
-                                      metal_affinity bitmask,
-                                      unsigned int level);
-
-unsigned int
-riscv_cpu_intc_affinity_get_threshold(struct metal_interrupt controller,
-                                      int context_id);
 
 #endif

@@ -15,11 +15,6 @@ int sifive_clic0_set_vector_mode(struct metal_interrupt clic,
 
 metal_vector_mode sifive_clic0_get_vector_mode(struct metal_interrupt clic);
 
-int sifive_clic0_set_privilege(struct metal_interrupt clic,
-                               metal_intr_priv_mode privilege);
-
-metal_intr_priv_mode sifive_clic0_get_privilege(struct metal_interrupt clic);
-
 int sifive_clic0_clear(struct metal_interrupt clic, int id);
 
 int sifive_clic0_set(struct metal_interrupt clic, int id);
@@ -46,18 +41,5 @@ unsigned int sifive_clic0_get_preemptive_level(struct metal_interrupt clic,
 int sifive_clic0_vector_enable(struct metal_interrupt clic, int id);
 
 int sifive_clic0_vector_disable(struct metal_interrupt clic, int id);
-
-metal_affinity sifive_clic0_affinity_enable(struct metal_interrupt clic,
-                                            metal_affinity bitmask, int id);
-
-metal_affinity sifive_clic0_affinity_disable(struct metal_interrupt clic,
-                                             metal_affinity bitmask, int id);
-
-metal_affinity sifive_clic0_affinity_set_threshold(struct metal_interrupt clic,
-                                                   metal_affinity bitmask,
-                                                   unsigned int level);
-
-unsigned int sifive_clic0_affinity_get_threshold(struct metal_interrupt clic,
-                                                 int context_id);
 
 #endif

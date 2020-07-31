@@ -422,30 +422,6 @@ int sifive_clic0_vector_disable(struct metal_interrupt clic, int id) {
     return 0;
 }
 
-metal_affinity sifive_clic0_affinity_enable(struct metal_interrupt controller,
-                                            metal_affinity bitmask, int id) {
-    /* Return a 1 for each hart in the bitmask, representing failure. */
-    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
-}
-
-metal_affinity sifive_clic0_affinity_disable(struct metal_interrupt controller,
-                                             metal_affinity bitmask, int id) {
-    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
-}
-
-metal_affinity
-sifive_clic0_affinity_set_threshold(struct metal_interrupt controller,
-                                    metal_affinity bitmask,
-                                    unsigned int level) {
-    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
-}
-
-unsigned int
-sifive_clic0_affinity_get_threshold(struct metal_interrupt controller,
-                                    int context_id) {
-    return 0;
-}
-
 #endif /* METAL_SIFIVE_CLIC0 */
 
 typedef int no_empty_translation_units;

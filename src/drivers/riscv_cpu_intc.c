@@ -110,19 +110,6 @@ riscv_cpu_intc_get_vector_mode(struct metal_interrupt controller) {
     }
 }
 
-int riscv_cpu_intc_set_privilege(struct metal_interrupt controller,
-                                 metal_intr_priv_mode privilege) {
-    if (privilege == METAL_INTR_PRIV_M_MODE) {
-        return 0;
-    }
-    return -1;
-}
-
-metal_intr_priv_mode
-riscv_cpu_intc_get_privilege(struct metal_interrupt controller) {
-    return METAL_INTR_PRIV_M_MODE;
-}
-
 int riscv_cpu_intc_enable(struct metal_interrupt controller, int id) {
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
@@ -241,29 +228,4 @@ int riscv_cpu_intc_vector_disable(struct metal_interrupt controller, int id) {
     default:
         return 0;
     }
-}
-
-metal_affinity riscv_cpu_intc_affinity_enable(struct metal_interrupt controller,
-                                              metal_affinity bitmask, int id) {
-    /* Return a 1 for each hart in the bitmask, representing failure. */
-    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
-}
-
-metal_affinity
-riscv_cpu_intc_affinity_disable(struct metal_interrupt controller,
-                                metal_affinity bitmask, int id) {
-    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
-}
-
-metal_affinity
-riscv_cpu_intc_affinity_set_threshold(struct metal_interrupt controller,
-                                      metal_affinity bitmask,
-                                      unsigned int level) {
-    return (metal_affinity){(1 << __METAL_DT_NUM_HARTS) - 1};
-}
-
-unsigned int
-riscv_cpu_intc_affinity_get_threshold(struct metal_interrupt controller,
-                                      int context_id) {
-    return 0;
 }
