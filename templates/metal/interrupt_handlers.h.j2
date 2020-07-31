@@ -15,7 +15,7 @@
 {% endif %}
 
 {% if local_interrupts is defined %}
-#define __METAL_NUM_LOCAL_INTERRUPTS {{ 16 + local_interrupts.irqs|length }}
+#define __METAL_NUM_LOCAL_INTERRUPTS {{ local_interrupts.irqs|length }}
 {% else %}
 #define __METAL_NUM_LOCAL_INTERRUPTS 16
 {% endif %}
@@ -58,61 +58,46 @@ void metal_exception_instruction_page_fault_handler(struct metal_cpu cpu, int ec
 void metal_exception_load_page_fault_handler(struct metal_cpu cpu, int ecode);
 void metal_exception_store_amo_page_fault_handler(struct metal_cpu cpu, int ecode);
 
-#ifdef METAL_HLIC_VECTORED
+
 void metal_riscv_cpu_intc_default_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_usip_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_ssip_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_msip_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_utip_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_stip_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_mtip_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_ueip_handler() __attribute__((interrupt));
-void metal_riscv_cpu_intc_seip_handler() __attribute__((interrupt));
+
+void metal_riscv_cpu_intc_usip_handler(){% if local_interrupts['irqs'][0]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+void metal_riscv_cpu_intc_ssip_handler(){% if local_interrupts['irqs'][1]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+void metal_riscv_cpu_intc_msip_handler(){% if local_interrupts['irqs'][3]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+
+void metal_riscv_cpu_intc_utip_handler(){% if local_interrupts['irqs'][4]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+void metal_riscv_cpu_intc_stip_handler(){% if local_interrupts['irqs'][5]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+void metal_riscv_cpu_intc_mtip_handler(){% if local_interrupts['irqs'][7]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+
+void metal_riscv_cpu_intc_ueip_handler(){% if local_interrupts['irqs'][8]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+void metal_riscv_cpu_intc_seip_handler(){% if local_interrupts['irqs'][9]['hwvectored'] %} __attribute__((interrupt)){% endif %};
 {% if global_interrupts is defined %}
-void metal_riscv_plic0_source_0_handler() __attribute__((interrupt));
+void metal_riscv_plic0_source_0_handler(){% if local_interrupts['irqs'][11]['hwvectored'] %} __attribute__((interrupt)){% endif %};
 {% else %}
-void metal_riscv_cpu_intc_meip_handler() __attribute__((interrupt));
+void metal_riscv_cpu_intc_meip_handler(){% if local_interrupts['irqs'][11]['hwvectored'] %} __attribute__((interrupt)){% endif %};
 {% endif %}
+
+{% if 'sifive,clic0' in devices %}
+void metal_sifive_clic0_csip_handler(){% if local_interrupts['irqs'][12]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+{% endif %}
+
 {% if 'sifive,buserror0' in devices %}
-void metal_sifive_buserror0_source_0_handler() __attribute__((interrupt));
+  {% if local_interrupts['irqs']|length >= 128 %}
+void metal_sifive_buserror0_source_0_handler(){% if local_interrupts['irqs'][128]['hwvectored'] %} __attribute__((interrupt)){% endif %};
+  {% endif %}
 {% endif %}
+
 {% if local_interrupts is defined %}
     {% for irq in local_interrupts.irqs|unique_irqs %}
-        {% if irq.source.compatible != None %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((interrupt));
+       {% if irq.id >= 16 and irq.source.compatible != None %}
+void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler(){% if local_interrupts['irqs'][irq.id]['hwvectored'] %} __attribute__((interrupt)){% endif %};
         {% endif %}
     {% endfor %}
 {% endif %}
-#else
-void metal_riscv_cpu_intc_default_handler();
-void metal_riscv_cpu_intc_usip_handler();
-void metal_riscv_cpu_intc_ssip_handler();
-void metal_riscv_cpu_intc_msip_handler();
-void metal_riscv_cpu_intc_utip_handler();
-void metal_riscv_cpu_intc_stip_handler();
-void metal_riscv_cpu_intc_mtip_handler();
-void metal_riscv_cpu_intc_ueip_handler();
-void metal_riscv_cpu_intc_seip_handler();
-{% if global_interrupts is defined %}
-void metal_riscv_plic0_source_0_handler();
-{% else %}
-void metal_riscv_cpu_intc_meip_handler();
-{% endif %}
-{% if 'sifive,buserror0' in devices %}
-void metal_sifive_buserror0_handler();
-{% endif %}
-{% if local_interrupts is defined %}
-    {% for irq in local_interrupts.irqs|unique_irqs %}
-        {% if irq.source.compatible != None %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler();
-        {% endif %}
-    {% endfor %}
-{% endif %}
-#endif
 
 {% if global_interrupts is defined %}
     {% for irq in global_interrupts.irqs|unique_irqs %}
-        {% if irq.source.compatible != None %}
+       {% if irq.source.compatible != None %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler();
         {% endif %}
     {% endfor %}

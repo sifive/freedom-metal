@@ -50,16 +50,17 @@ IRQ_15:
         j metal_riscv_cpu_intc_default_handler
 {% if local_interrupts is defined %}
   {% for irq in local_interrupts.irqs %}
+    {% if irq.id >= 16 %}
 IRQ_{{ irq.id }}:
-    {% if irq.source is defined %}
+      {% if irq.source is defined %}
         j metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler
-    {% else %}
+      {% else %}
         j metal_{{ local_interrupts.controller }}_{{ irq.id }}_handler
+      {% endif %}
     {% endif %}
   {% endfor %}
 {% endif %}
-{% if 'sifive,buserror0' in devices %}
-#ifdef METAL_HLIC_VECTORED
+{% if 'sifive,buserror0' in devices and config_requests_hw_vectored(config) %}
 /*
  * The Bus Error Unit has a hard-coded local interrupt id of 128. Therefore,
  * when hardware-vectored local interrupts are enabled, we need to pad out
@@ -73,5 +74,4 @@ IRQ_{{ i }}:
 {% endfor %}
 IRQ_128:
         j metal_sifive_buserror0_handler
-#endif
 {% endif %}

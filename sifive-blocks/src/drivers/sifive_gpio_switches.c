@@ -50,17 +50,6 @@ int sifive_gpio_switches_clear_interrupt(struct metal_switch sw) {
     return 0;
 }
 
-int sifive_gpio_switches_set_interrupt_priority(struct metal_switch sw,
-                                                unsigned int priority) {
-    if (metal_switch_is_none(sw))
-        return -1;
-    if (SWITCH_HAS_GPIO(sw)) {
-        return metal_gpio_set_interrupt_priority(SWITCH_GPIO(sw),
-                                                 SWITCH_GPIO_PIN(sw), priority);
-    }
-    return 0;
-}
-
 #endif
 
 typedef int no_empty_translation_units;

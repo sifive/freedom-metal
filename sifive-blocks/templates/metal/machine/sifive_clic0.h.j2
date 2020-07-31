@@ -1,0 +1,26 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__PLATFORM__SIFIVE_CLIC0_H
+#define METAL__PLATFORM__SIFIVE_CLIC0_H
+
+{% if 'sifive,clic0' in devices %}
+
+{% for clic in devices['sifive,clic0'] %}
+#define METAL_SIFIVE_CLIC0_{{ loop.index0 }}_BASE_ADDRESS {{ "0x%x" % clic.reg[0][0] }}UL
+#define METAL_SIFIVE_CLIC0_{{ loop.index0 }}_SIZE {{ "0x%x" % clic.reg[0][1] }}UL
+{% endfor %}
+
+#define METAL_SIFIVE_CLIC0
+#define METAL_SIFIVE_CLIC0_MSIP_BASE 0x0000
+#define METAL_SIFIVE_CLIC0_MTIMECMP_BASE 0x4000
+#define METAL_SIFIVE_CLIC0_MTIME 0xBFF8
+#define METAL_SIFIVE_CLIC0_CLICINTIP_BASE 0x800000
+#define METAL_SIFIVE_CLIC0_CLICINTIE_BASE 0x800400
+#define METAL_SIFIVE_CLIC0_CLICINTCFG_BASE 0x800800
+#define METAL_SIFIVE_CLIC0_CLICCFG 0x800C00
+
+{% endif %}
+
+#endif
+

@@ -1,0 +1,42 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__GENERATED__SIFIVE_CLIC0_H
+#define METAL__GENERATED__SIFIVE_CLIC0_H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'sifive,clic0' in devices %}
+{% set clic = devices['sifive,clic0'][0] %}
+
+#define CLIC_NUMINTS {{ clic['sifive_numints'][0] }}UL
+#define CLIC_NUMINTBITS {{ clic['sifive_numintbits'][0] }}UL
+#define CLIC_NUMLEVELS {{ clic['sifive_numlevels'][0] }}UL
+
+{% if config is not none and 'sifive,clic0' in config and 'nlbits' in config['sifive,clic0'] %}
+    {% if config['sifive,clic0']['nlbits']|int > (clic['sifive_numintbits'][0] - 1) %}
+#error Requested number of CLIC Level Bits exceeds available number of configuration bits
+    {% endif %}
+#define CLIC_NLBITS {{ config['sifive,clic0']['nlbits'] }}
+{% else %}
+#define CLIC_NLBITS (CLIC_NUMINTBITS - 1)
+{% endif %}
+
+static void clic_configure_vectoring(void) {
+    /* Software-vectored interrupts are enabled. Configure any selectively-vectored
+     * interrupts now. */
+    struct metal_interrupt clic = (struct metal_interrupt){0};
+{% for irq in local_interrupts.irqs %}
+    {% if local_interrupts['irqs'][irq.id]['hwvectored'] %}
+    sifive_clic0_vector_enable(clic, {{ irq.id }});
+    {% endif %}
+    {% if local_interrupts['irqs'][irq.id]['priority'] != 0 %}
+    sifive_clic0_set_priority(clic, {{ irq.id }}, {{ local_interrupts['irqs'][irq.id]['priority'] }});
+    {% endif %}
+{% endfor %}
+}
+
+{% endif %}
+
+#endif
+

@@ -18,6 +18,15 @@
     (__METAL_ACCESS_ONCE(                                                      \
         (__metal_io_u32 *)(METAL_RISCV_PLIC0_0_BASE_ADDRESS + (offset))))
 
+#define for_each_metal_affinity(bit, metal_affinity)                           \
+    for (bit = 0; metal_affinity.bitmask; bit++, metal_affinity.bitmask >>= 1)
+
+#define metal_affinity_set_val(metal_affinity, val)                            \
+    metal_affinity.bitmask = val;
+
+#define metal_affinity_set_bit(metal_affinity, bit, val)                       \
+    metal_affinity.bitmask |= ((val & 0x1) << bit);
+
 extern metal_interrupt_handler_t __metal_global_interrupt_table[];
 
 static __inline__ unsigned int __metal_plic0_claim_interrupt(uint32_t hartid) {
@@ -142,19 +151,6 @@ riscv_plic0_get_vector_mode(struct metal_interrupt controller) {
     return METAL_DIRECT_MODE;
 }
 
-int riscv_plic0_set_privilege(struct metal_interrupt controller,
-                              metal_intr_priv_mode privilege) {
-    if (privilege = METAL_INTR_PRIV_M_MODE) {
-        return 0;
-    }
-    return -1;
-}
-
-metal_intr_priv_mode
-riscv_plic0_get_privilege(struct metal_interrupt controller) {
-    return METAL_INTR_PRIV_M_MODE;
-}
-
 int riscv_plic0_enable(struct metal_interrupt plic, int id) {
     return __metal_plic0_enable(metal_cpu_get_current_hartid(), id);
 }
@@ -187,16 +183,6 @@ int riscv_plic0_set_threshold(struct metal_interrupt plic,
     for (int hartid = 0; hartid < __METAL_DT_NUM_HARTS; hartid++) {
         __metal_riscv_plic0_set_threshold(hartid, priority);
     }
-    return 0;
-}
-
-int riscv_plic0_set_preemptive_level(struct metal_interrupt controller, int id,
-                                     unsigned int level) {
-    return -1;
-}
-
-unsigned int riscv_plic0_get_preemptive_level(struct metal_interrupt controller,
-                                              int id) {
     return 0;
 }
 
