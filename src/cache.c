@@ -1,13 +1,44 @@
-/* Copyright 2018 SiFive, Inc */
+/* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/cache.h>
 #include <metal/machine.h>
 
+/* Macros to generate driver prefix string */
+#ifdef METAL_CACHE_DRIVER_PREFIX
+#define METAL_FUNC_STR(a, b) a##_##b
+#define METAL_FUNC_STR_(a, b) METAL_FUNC_STR(a, b)
+#define METAL_FUNC(x) METAL_FUNC_STR_(METAL_CACHE_DRIVER_PREFIX, x)
+#endif
+
 extern __inline__ void metal_cache_init(struct metal_cache *cache, int ways);
 extern __inline__ int metal_cache_get_enabled_ways(struct metal_cache *cache);
 extern __inline__ int metal_cache_set_enabled_ways(struct metal_cache *cache,
                                                    int ways);
+
+int metal_l2cache_init(void) {
+#ifdef METAL_CACHE_DRIVER_PREFIX
+    return METAL_FUNC(init)();
+#else
+    return -1;
+#endif
+}
+
+int metal_l2cache_get_enabled_ways(void) {
+#ifdef METAL_CACHE_DRIVER_PREFIX
+    return METAL_FUNC(get_enabled_ways)();
+#else
+    return -1;
+#endif
+}
+
+int metal_l2cache_set_enabled_ways(int ways) {
+#ifdef METAL_CACHE_DRIVER_PREFIX
+    return METAL_FUNC(set_enabled_ways)(ways);
+#else
+    return -1;
+#endif
+}
 
 int metal_dcache_l1_available(int hartid) {
     switch (hartid) {
