@@ -10,7 +10,11 @@ extern __inline__ int metal_flash_read(struct metal_flash *flash, unsigned int a
 extern __inline__ int metal_flash_write(struct metal_flash *flash, unsigned int addr, const size_t size, char *tx_buff);
 extern __inline__ int metal_flash_erase(struct metal_flash *flash, unsigned int addr, const size_t size);
 extern __inline__ int metal_flash_write_protect(struct metal_flash *flash, char* write_protect);
-extern __inline__ int metal_flash_get_device_id(struct metal_flash *flash, unsigned int *pdevice_id);
+extern __inline__ int metal_flash_register_read(struct metal_flash *flash, reg_read_t reg, uint32_t addr_offset, const size_t size, char *data);
+extern __inline__ int metal_flash_register_write(struct metal_flash *flash, reg_write_t reg, uint32_t addr_offset, const size_t size, char *data);
+extern __inline__ int metal_flash_qpi_mode(struct metal_flash *flash);
+extern __inline__ int metal_flash_manufacturer(struct metal_flash *flash, uint32_t *mfr_id);
+extern __inline__ int metal_flash_soft_reset(struct metal_flash *flash);
 
 struct metal_flash *metal_flash_get_device(const int device_num)
 {
