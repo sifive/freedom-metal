@@ -23,7 +23,6 @@ global def getMachineExecutionEnvironmentName         = _.getMachineExecutionEnv
 global def getMachineExecutionEnvironmentHeader       = _.getMachineExecutionEnvironmentConfigOptions.getFreedomMetalConfigureOptionsMachineHeader
 global def getMachineExecutionEnvironmentLdScript     = _.getMachineExecutionEnvironmentConfigOptions.getFreedomMetalConfigureOptionsMachineLdScript
 
-def dir / subDir = "{dir.getPathName}/{subDir}"
 tuple FreedomMetalConfigureOptions =
   global Resources:           List String
   global RISCV_ARCH:          String
