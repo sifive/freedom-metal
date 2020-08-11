@@ -1,11 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-CLANG_FORMAT=clang-format-6.0
+set -euo pipefail
 
 TOP_LEVEL=$(git rev-parse --show-toplevel)
 
-# Run clang-format in-place on all *.c and *.h files in the repository
-cd $TOP_LEVEL && $CLANG_FORMAT -i $(git ls-tree -r HEAD --name-only | grep -E "^\S+\.[ch]*$")
+$TOP_LEVEL/scripts/format
+
+echo "Checking that the sources are properly formatted"
 
 DIFF=$(git diff)
 
@@ -15,5 +16,7 @@ if [ "${DIFF}" != "" ] ; then
     echo ""
     echo "${DIFF}"
     exit 1
+else
+    echo "Sources are properly formatted"
 fi
 
