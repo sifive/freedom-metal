@@ -31,5 +31,5 @@ install:
 script:
 # Check source code formatting
   - docker exec -t host bash -c "cd /travis && ./scripts/check-format"
-# Run dummy Wake program in order to run Wake type cehcker.
+# Run dummy Wake program in order to run Wake type checker.
   - wake --init . && wake -x Unit
