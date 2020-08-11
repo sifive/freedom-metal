@@ -1,7 +1,7 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_GPIO_LEDS
 

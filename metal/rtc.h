@@ -5,7 +5,7 @@
 #define METAL__RTC_H
 
 #include <metal/generated/rtc.h>
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 #include <stdint.h>
 
 /*!

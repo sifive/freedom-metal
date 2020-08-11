@@ -1,7 +1,7 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 #include <metal/shutdown.h>
 
 #if !defined(__METAL_HAS_SHUTDOWN)

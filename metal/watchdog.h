@@ -11,7 +11,7 @@
  */
 
 #include <metal/generated/watchdog.h>
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 #include <stdint.h>
 
 /*!

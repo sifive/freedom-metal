@@ -6,7 +6,7 @@
 #include <metal/init.h>
 #include <metal/interrupt.h>
 #include <metal/io.h>
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 #include <metal/riscv.h>
 #include <stdbool.h>
 #include <stdint.h>

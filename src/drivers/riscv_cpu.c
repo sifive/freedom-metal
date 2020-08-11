@@ -6,7 +6,7 @@
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/generated/riscv_cpu.h>
 #include <metal/io.h>
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 #include <metal/riscv.h>
 #include <metal/shutdown.h>
 #include <stdint.h>

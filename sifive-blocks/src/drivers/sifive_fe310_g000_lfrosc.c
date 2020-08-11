@@ -1,7 +1,7 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_FE310_G000_LFROSC
 

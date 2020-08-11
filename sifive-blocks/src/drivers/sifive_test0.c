@@ -1,7 +1,7 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_TEST0
 
