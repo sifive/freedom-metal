@@ -5,8 +5,8 @@
 #ifdef METAL_SIFIVE_AON0
 
 #include <limits.h>
-#include <metal/generated/sifive_aon0.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_aon0.h>
 #include <metal/rtc.h>
 #include <metal/watchdog.h>
 

@@ -8,9 +8,9 @@
 #include <limits.h>
 #include <metal/cpu.h>
 #include <metal/drivers/sifive_fe310_g000_pll.h>
-#include <metal/generated/sifive_fe310_g000_pll.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_fe310_g000_pll.h>
 #include <stdio.h>
 #include <stdlib.h>
 

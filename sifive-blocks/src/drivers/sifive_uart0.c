@@ -7,9 +7,9 @@
 
 #include <metal/clock.h>
 #include <metal/cpu.h>
-#include <metal/generated/sifive_uart0.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_uart0.h>
 #include <metal/tty.h>
 #include <metal/uart.h>
 

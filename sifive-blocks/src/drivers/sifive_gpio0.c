@@ -5,9 +5,9 @@
 
 #ifdef METAL_SIFIVE_GPIO0
 
-#include <metal/generated/sifive_gpio0.h>
 #include <metal/gpio.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_gpio0.h>
 
 #define GPIO_REG(offset) ((uintptr_t)((base) + (offset)))
 #define GPIO_REGW(offset)                                                      \

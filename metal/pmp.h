@@ -18,7 +18,7 @@
  * can be found by reading the RISC-V Privileged Architecture Specification.
  */
 
-#include <metal/generated/cpu.h>
+#include <metal/private/metal_private_cpu.h>
 #include <stddef.h>
 
 struct metal_pmp;

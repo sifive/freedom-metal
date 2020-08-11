@@ -8,9 +8,9 @@
 #include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/drivers/riscv_plic0.h>
-#include <metal/generated/riscv_plic0.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_riscv_plic0.h>
 #include <stdbool.h>
 #include <stdint.h>
 

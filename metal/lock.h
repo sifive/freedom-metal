@@ -5,7 +5,7 @@
 #define METAL__LOCK_H
 
 #include <metal/compiler.h>
-#include <metal/generated/riscv_cpu.h>
+#include <metal/private/metal_private_riscv_cpu.h>
 #include <metal/riscv.h>
 
 /*!

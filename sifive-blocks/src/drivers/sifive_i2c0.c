@@ -7,8 +7,8 @@
 
 #include <metal/clock.h>
 #include <metal/cpu.h>
-#include <metal/generated/sifive_i2c0.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_i2c0.h>
 #include <metal/time.h>
 
 /* Register fields */

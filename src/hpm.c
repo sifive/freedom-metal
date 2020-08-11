@@ -2,8 +2,8 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/cpu.h>
-#include <metal/generated/cpu.h>
 #include <metal/hpm.h>
+#include <metal/private/metal_private_cpu.h>
 
 /* Macro to generate code within a switch case */
 #define METAL_HPM_HANDLE_SWITCH(m)                                             \

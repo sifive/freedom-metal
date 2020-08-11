@@ -10,8 +10,8 @@
  * @brief API for configuring watchdog timers
  */
 
-#include <metal/generated/watchdog.h>
 #include <metal/platform.h>
+#include <metal/private/metal_private_watchdog.h>
 #include <stdint.h>
 
 /*!

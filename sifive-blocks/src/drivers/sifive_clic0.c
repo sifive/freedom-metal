@@ -8,9 +8,9 @@
 #include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/drivers/sifive_clic0.h>
-#include <metal/generated/sifive_clic0.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_clic0.h>
 #include <metal/riscv.h>
 #include <stdbool.h>
 

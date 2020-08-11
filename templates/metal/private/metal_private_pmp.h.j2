@@ -5,7 +5,7 @@
 
 {% if harts|length > 1 %}
 
-#include <metal/generated/cpu.h>
+#include <metal/private/metal_private_cpu.h>
 
 static const uint8_t dt_pmp_regions[__METAL_DT_NUM_HARTS] = {
 {% for hart in harts %}

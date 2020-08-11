@@ -6,8 +6,8 @@
 #ifdef METAL_SIFIVE_FE310_G000_HFXOSC
 
 #include <metal/drivers/sifive_fe310_g000_hfxosc.h>
-#include <metal/generated/sifive_fe310_g000_hfxosc.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_fe310_g000_hfxosc.h>
 
 #ifndef METAL_SIFIVE_FE310_G000_PRCI
 #error No SiFive FE310-G000 PRCI available.

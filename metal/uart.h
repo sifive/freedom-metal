@@ -10,8 +10,8 @@
  */
 
 #include <assert.h>
-#include <metal/generated/uart.h>
 #include <metal/interrupt.h>
+#include <metal/private/metal_private_uart.h>
 #include <stdint.h>
 
 /*!

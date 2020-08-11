@@ -6,7 +6,7 @@
 #ifdef METAL_FIXED_CLOCK
 
 #include <metal/drivers/fixed_clock.h>
-#include <metal/generated/fixed_clock.h>
+#include <metal/private/metal_private_fixed_clock.h>
 
 #define get_index(clk) ((clk).__clock_index)
 

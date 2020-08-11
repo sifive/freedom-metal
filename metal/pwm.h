@@ -4,7 +4,7 @@
 #ifndef METAL__PWM_H
 #define METAL__PWM_H
 
-#include <metal/generated/pwm.h>
+#include <metal/private/metal_private_pwm.h>
 #include <stdbool.h>
 #include <stdint.h>
 

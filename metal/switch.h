@@ -9,7 +9,7 @@
  * @brief API for reading toggle switches
  */
 
-#include <metal/generated/switch.h>
+#include <metal/private/metal_private_switch.h>
 #include <stdbool.h>
 #include <stdint.h>
 

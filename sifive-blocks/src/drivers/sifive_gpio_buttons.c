@@ -6,8 +6,8 @@
 #ifdef METAL_SIFIVE_GPIO_BUTTONS
 
 #include <metal/button.h>
-#include <metal/generated/sifive_gpio_buttons.h>
 #include <metal/gpio.h>
+#include <metal/private/metal_private_sifive_gpio_buttons.h>
 
 bool sifive_gpio_buttons_is_pressed(struct metal_button button) {
     if (metal_button_is_none(button))

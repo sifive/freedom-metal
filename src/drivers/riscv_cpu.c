@@ -4,9 +4,9 @@
 #include <assert.h>
 #include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
-#include <metal/generated/riscv_cpu.h>
 #include <metal/io.h>
 #include <metal/platform.h>
+#include <metal/private/metal_private_riscv_cpu.h>
 #include <metal/riscv.h>
 #include <metal/shutdown.h>
 #include <stdint.h>

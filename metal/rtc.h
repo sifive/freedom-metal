@@ -4,8 +4,8 @@
 #ifndef METAL__RTC_H
 #define METAL__RTC_H
 
-#include <metal/generated/rtc.h>
 #include <metal/platform.h>
+#include <metal/private/metal_private_rtc.h>
 #include <stdint.h>
 
 /*!
