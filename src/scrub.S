@@ -37,8 +37,8 @@ __metal_before_start:
     /* Save caller ra */
     mv      s0, ra
 
-    la      t0, __metal_eccscrub_bit
-    beqz    t0, skip_scrub
+//    la      t0, __metal_eccscrub_bit
+//    beqz    t0, skip_scrub
 
     la      t0, __metal_boot_hart
     csrr    a5, mhartid
