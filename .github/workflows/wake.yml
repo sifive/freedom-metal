@@ -1,0 +1,27 @@
+name: wake-api-test
+
+on:
+  push:
+    path-ignore:
+      - 'doc/*'
+      - 'LICENSE*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Init workspace
+        uses: sifive/wit/actions/init@v0.13.2
+        with:
+          additional_packages: git@github.com:sifive/environment-blockci-sifive.git::0.7.1
+
+      - name: Run Wake API Test
+        uses: sifive/environment-blockci-sifive/actions/shell@0.7.1
+        with:
+          command: freedom-metal/tests/test-wake-api.sh
+
+      - name: Run library install test
+        uses: sifive/environment-blockci-sifive/actions/shell@0.7.1
+        with:
+          command: freedom-metal/tests/test-wake-install.sh
