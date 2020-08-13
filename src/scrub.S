@@ -85,6 +85,7 @@ __metal_memory_scrub:
  * Initialize memories to zero
  * This must be called before setting up any stack(s)
  */
+.weak __metal_eccscrub_bit
 .weak __metal_before_start
 .global __metal_before_start
 .type __metal_before_start, @function
