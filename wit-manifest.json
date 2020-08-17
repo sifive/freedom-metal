@@ -1,7 +1,7 @@
 [
     {
-        "//": "v0.2.2",
-        "commit": "29770efe2cf4e72edfb05da1baa1a08c5638f839",
+        "//": "Commit on master with wake 0.18+ support",
+        "commit": "e135f6a013d830f34aeb1a9542f42c0aabc80813",
         "name": "api-languages-sifive",
         "source": "git@github.com:sifive/api-languages-sifive.git"
     }
