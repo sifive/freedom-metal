@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <assert.h>
-#include <metal/generated/switch.h>
+#include <metal/private/metal_private_switch.h>
 #include <metal/switch.h>
 
 bool metal_switch_is_on(struct metal_switch sw) __attribute__((weak));

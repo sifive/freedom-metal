@@ -4,7 +4,7 @@
 #ifndef METAL__SPI_H
 #define METAL__SPI_H
 
-#include <metal/generated/spi.h>
+#include <metal/private/metal_private_spi.h>
 #include <stdbool.h>
 #include <stdint.h>
 

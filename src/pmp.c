@@ -2,8 +2,8 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/cpu.h>
-#include <metal/generated/pmp.h>
 #include <metal/pmp.h>
+#include <metal/private/metal_private_pmp.h>
 
 #define CONFIG_TO_INT(_config) (*((char *)&(_config)))
 #define INT_TO_CONFIG(_int) (*((struct metal_pmp_config *)(char *)&(_int)))

@@ -9,7 +9,7 @@
  * API for interfacing with physical buttons
  */
 
-#include <metal/generated/button.h>
+#include <metal/private/metal_private_button.h>
 #include <stdbool.h>
 #include <stdint.h>
 

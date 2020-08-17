@@ -1,16 +1,16 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_RISCV_PLIC0
 
 #include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/drivers/riscv_plic0.h>
-#include <metal/generated/riscv_plic0.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_riscv_plic0.h>
 #include <stdbool.h>
 #include <stdint.h>
 

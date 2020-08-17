@@ -1,13 +1,13 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_FE310_G000_LFROSC
 
 #include <metal/drivers/sifive_fe310_g000_lfrosc.h>
-#include <metal/generated/sifive_fe310_g000_lfrosc.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_fe310_g000_lfrosc.h>
 
 #ifndef METAL_SIFIVE_AON0
 #error No AON block detected.

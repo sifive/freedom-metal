@@ -1,16 +1,16 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_CLIC0
 
 #include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/drivers/sifive_clic0.h>
-#include <metal/generated/sifive_clic0.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_clic0.h>
 #include <metal/riscv.h>
 #include <stdbool.h>
 

@@ -1,11 +1,11 @@
 /* Copyright (c) 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_GPIO_SWITCHES
 
-#include <metal/generated/sifive_gpio_switches.h>
+#include <metal/private/metal_private_sifive_gpio_switches.h>
 #include <metal/switch.h>
 
 bool sifive_gpio_switches_is_pressed(struct metal_switch sw) {

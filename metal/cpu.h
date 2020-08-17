@@ -10,7 +10,7 @@
 #define METAL__CPU_H
 
 #include <assert.h>
-#include <metal/generated/cpu.h>
+#include <metal/private/metal_private_cpu.h>
 #include <stdint.h>
 
 /*! @brief A device handle for a CPU hart

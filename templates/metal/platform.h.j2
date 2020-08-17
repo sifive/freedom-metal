@@ -4,7 +4,7 @@
 {% include 'template_comment.h.j2' %}
 
 {% for compat in devices %}
-#include <metal/machine/{{ to_snakecase(compat) }}.h>
+#include <metal/platform/metal_platform_{{ to_snakecase(compat) }}.h>
 {% endfor %}
 
 #endif /* ! __METAL_PLATFORM__H */

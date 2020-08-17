@@ -1,13 +1,13 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_PWM0
 #include <metal/clock.h>
 #include <metal/cpu.h>
-#include <metal/generated/sifive_pwm0.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_pwm0.h>
 #include <metal/time.h>
 
 /* Register fields */

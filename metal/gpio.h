@@ -5,8 +5,8 @@
 #define METAL__GPIO_H
 
 #include <assert.h>
-#include <metal/generated/gpio.h>
 #include <metal/interrupt.h>
+#include <metal/private/metal_private_gpio.h>
 #include <stdint.h>
 
 /*!

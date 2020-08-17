@@ -1,13 +1,13 @@
 /* Copyright (c) 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_GPIO_BUTTONS
 
 #include <metal/button.h>
-#include <metal/generated/sifive_gpio_buttons.h>
 #include <metal/gpio.h>
+#include <metal/private/metal_private_sifive_gpio_buttons.h>
 
 bool sifive_gpio_buttons_is_pressed(struct metal_button button) {
     if (metal_button_is_none(button))

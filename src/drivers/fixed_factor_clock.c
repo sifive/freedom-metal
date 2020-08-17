@@ -1,12 +1,12 @@
 /* Copyright 2018 SiFive, Inc. */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_FIXED_FACTOR_CLOCK
 
 #include <metal/drivers/fixed_factor_clock.h>
-#include <metal/generated/fixed_factor_clock.h>
+#include <metal/private/metal_private_fixed_factor_clock.h>
 
 #define get_index(clk) ((clk).__clock_index)
 

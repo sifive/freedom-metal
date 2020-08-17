@@ -3,7 +3,7 @@
 
 #include <metal/cache.h>
 #include <metal/cpu.h>
-#include <metal/generated/cache.h>
+#include <metal/private/metal_private_cache.h>
 
 bool metal_dcache_l1_available(void) {
     return HART_HAS_L1_DCACHE(metal_cpu_get_current_hartid());

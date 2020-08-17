@@ -9,7 +9,7 @@
  * @brief API for manipulating LEDs
  */
 
-#include <metal/generated/led.h>
+#include <metal/private/metal_private_led.h>
 #include <stdbool.h>
 #include <stdint.h>
 

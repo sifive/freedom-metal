@@ -3,7 +3,7 @@
 
 #include <assert.h>
 #include <metal/button.h>
-#include <metal/generated/button.h>
+#include <metal/private/metal_private_button.h>
 
 bool metal_button_is_pressed(struct metal_button button) __attribute__((weak));
 bool metal_button_is_pressed(struct metal_button button) { return false; }

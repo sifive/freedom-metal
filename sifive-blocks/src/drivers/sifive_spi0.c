@@ -1,14 +1,14 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_SPI0
 
 #include <metal/clock.h>
 #include <metal/cpu.h>
-#include <metal/generated/sifive_spi0.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_spi0.h>
 #include <metal/time.h>
 
 /* Register fields */

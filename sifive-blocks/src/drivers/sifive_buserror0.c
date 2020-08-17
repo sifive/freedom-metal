@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/drivers/sifive_buserror0.h>
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 #include <stddef.h>
 
 #ifdef METAL_SIFIVE_BUSERROR0

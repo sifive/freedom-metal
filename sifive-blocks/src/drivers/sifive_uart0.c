@@ -1,15 +1,15 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
+#include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_UART0
 
 #include <metal/clock.h>
 #include <metal/cpu.h>
-#include <metal/generated/sifive_uart0.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_uart0.h>
 #include <metal/tty.h>
 #include <metal/uart.h>
 
