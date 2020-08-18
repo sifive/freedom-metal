@@ -10,13 +10,6 @@
 /* This implementation serves as a small shim that interfaces with the first
  * UART on a system. */
 int metal_tty_putc(int c) {
-    if (c == '\n') {
-        metal_tty_putc_raw('\r');
-    }
-    return metal_tty_putc_raw(c);
-}
-
-int metal_tty_putc_raw(int c) {
     return metal_uart_putc(__METAL_DT_STDOUT_UART_HANDLE, c);
 }
 
