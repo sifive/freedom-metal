@@ -258,7 +258,6 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/sifive_fe310-g000_lfrosc.$(OBJEXT) \
 	src/drivers/sifive_fe310-g000_pll.$(OBJEXT) \
 	src/drivers/sifive_fe310-g000_prci.$(OBJEXT) \
-	src/drivers/sifive_fu540-c000_l2.$(OBJEXT) \
 	src/drivers/sifive_global-external-interrupts0.$(OBJEXT) \
 	src/drivers/sifive_gpio-buttons.$(OBJEXT) \
 	src/drivers/sifive_gpio-leds.$(OBJEXT) \
@@ -491,7 +490,6 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_fe310-g000_lfrosc.h \
 	metal/drivers/sifive_fe310-g000_pll.h \
 	metal/drivers/sifive_fe310-g000_prci.h \
-	metal/drivers/sifive_fu540-c000_l2.h \
 	metal/drivers/sifive_global-external-interrupts0.h \
 	metal/drivers/sifive_gpio-buttons.h \
 	metal/drivers/sifive_gpio-leds.h \
@@ -539,7 +537,6 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_fe310-g000_lfrosc.c \
 	src/drivers/sifive_fe310-g000_pll.c \
 	src/drivers/sifive_fe310-g000_prci.c \
-	src/drivers/sifive_fu540-c000_l2.c \
 	src/drivers/sifive_global-external-interrupts0.c \
 	src/drivers/sifive_gpio-buttons.c \
 	src/drivers/sifive_gpio-leds.c \
@@ -853,9 +850,6 @@ src/drivers/sifive_fe310-g000_pll.$(OBJEXT):  \
 src/drivers/sifive_fe310-g000_prci.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/sifive_fu540-c000_l2.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_global-external-interrupts0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -1037,7 +1031,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fe310-g000_lfrosc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fe310-g000_pll.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fe310-g000_prci.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fu540-c000_l2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_global-external-interrupts0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_gpio-buttons.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_gpio-leds.Po@am__quote@
