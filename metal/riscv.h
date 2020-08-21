@@ -1,6 +1,9 @@
 /* Copyright (c) 2020 SiFive Inc. */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#ifndef __METAL_RISCV__H
+#define __METAL_RISCV__H
+
 #include <stdint.h>
 
 #if __riscv_xlen == 32
@@ -74,3 +77,5 @@ typedef uint64_t riscv_flen_t;
 
 #define RISCV_INSTRUCTION_LENGTH_MASK 3
 #define RISCV_INSTRUCTION_NOT_COMPRESSED 3
+
+#endif /* __METAL_RISCV__H */

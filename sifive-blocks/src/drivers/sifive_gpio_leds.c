@@ -38,3 +38,5 @@ void sifive_gpio_leds_toggle(struct metal_led led) {
 }
 
 #endif
+
+typedef int no_empty_translation_units;

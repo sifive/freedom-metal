@@ -179,6 +179,8 @@ int sifive_gpio0_clear_interrupt(struct metal_gpio gpio, int pin,
         GPIO_REGW(METAL_SIFIVE_GPIO0_HIGH_IP) |= (1 << pin);
         GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IP) |= (1 << pin);
         break;
+    default:
+        return -1;
     }
     return 0;
 }

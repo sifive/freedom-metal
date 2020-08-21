@@ -38,9 +38,12 @@ struct metal_gpio {
 /*! @brief Get a handle for a GPIO device
  * @param device_num The index of the desired GPIO device
  * @return A handle to the GPIO device */
-inline const struct metal_gpio metal_gpio_get_device(uint32_t index) {
-    assert(index < __METAL_DT_NUM_GPIOS);
-    return (const struct metal_gpio){index};
+inline struct metal_gpio metal_gpio_get_device(uint32_t index) {
+#if __METAL_DT_NUM_GPIOS != 0
+    if (index < __METAL_DT_NUM_GPIOS)
+        return (struct metal_gpio){index};
+#endif
+    return (struct metal_gpio){METAL_GPIO_INVALID_INDEX};
 }
 
 /*!

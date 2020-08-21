@@ -29,10 +29,11 @@ uint64_t sifive_fe310_g000_lfrosc_get_rate_hz(struct metal_clock clock) {
 
     if (LFROSC_REGW(METAL_SIFIVE_AON0_LFCLKMUX) &
         METAL_LFCLKMUX_EXT_MUX_STATUS) {
-        if (!LFROSC_REGW(METAL_SIFIVE_AON0_LFROSCCFG) & METAL_LFROSCCFG_EN) {
+        if (!(LFROSC_REGW(METAL_SIFIVE_AON0_LFROSCCFG) & METAL_LFROSCCFG_EN)) {
             return 0;
         }
-        while (!LFROSC_REGW(METAL_SIFIVE_AON0_LFROSCCFG) & METAL_LFROSCCFG_RDY)
+        while (
+            !(LFROSC_REGW(METAL_SIFIVE_AON0_LFROSCCFG) & METAL_LFROSCCFG_RDY))
             ;
 
         return metal_clock_get_rate_hz(REF_LFROSC(clock));

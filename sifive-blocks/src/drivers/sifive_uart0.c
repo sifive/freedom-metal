@@ -101,6 +101,8 @@ int sifive_uart0_rx_interrupt_disable(struct metal_uart uart) {
          * when no UART interrupt sources are enabled */
         return disable_parent_interrupt(uart);
     }
+
+    return 0;
 }
 
 int sifive_uart0_txready(struct metal_uart uart) {
@@ -186,7 +188,6 @@ void _sifive_uart0_pre_rate_change_callback(uint32_t id) {
         return;
 
     uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
-    struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to one and waiting until an interrupt is pending */

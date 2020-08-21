@@ -22,14 +22,14 @@ static const struct dt_sifive_fe310_g000_lfrosc_clock_data {
 	{% for clk in sifive_fe310_g000_lfroscs %}
 	{
 		{% if "clock_names" in clk %}
-		.lfrosc = (struct metal_clock) { {{ clk.clocks_by_name["lfrosc"].id }} },
-		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks_by_name["psdlfaltclk"].id }} },
+		.lfrosc = { {{ clk.clocks_by_name["lfrosc"].id }} },
+		.psdlfaltclk = { {{ clk.clocks_by_name["psdlfaltclk"].id }} },
 		{% elif clk.clocks|length > 1 %}
-		.lfrosc = (struct metal_clock) { {{ clk.clocks[0].id }} },
-		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks[1].id }} },
+		.lfrosc = { {{ clk.clocks[0].id }} },
+		.psdlfaltclk = { {{ clk.clocks[1].id }} },
 		{% else %}
-		.lfrosc = (struct metal_clock) { {{ clk.clocks[0].id }} },
-		.psdlfaltclk = (struct metal_clock) { {{ clk.clocks[0].id }} },
+		.lfrosc = { {{ clk.clocks[0].id }} },
+		.psdlfaltclk = { {{ clk.clocks[0].id }} },
 		{% endif %}
 	},
 	{% endfor %}

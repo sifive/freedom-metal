@@ -34,12 +34,13 @@ static const struct dt_i2c_data {
 
 	{% if i2c.clocks is defined %}
 	    /* {{ i2c.clocks[0].compatible[0] }} */
-	    .clock = (struct metal_clock) { {{ i2c.clocks[0].id }} },
+	    .clock = { {{ i2c.clocks[0].id }} },
 	{% endif %}
 
 	{% if i2c.pinmux is defined %}
+	    /* {{ i2c.pinmux[0].compatible[0] }} */
 		.has_pinmux = 1,
-		.pinmux = (struct metal_gpio) { {{ i2c.pinmux[0].id }} },
+		.pinmux = { {{ i2c.pinmux[0].id }} },
 		.pinmux_output_selector = {{ i2c.pinmux[1] }},
 		.pinmux_source_selector = {{ i2c.pinmux[2] }},
 	{% else %}
@@ -48,7 +49,7 @@ static const struct dt_i2c_data {
 
 	{% if i2c.interrupt_parent is defined %}
 	    /* {{ i2c.interrupt_parent[0].compatible[0] }} */
-		.interrupt_parent = (struct metal_interrupt) { {{ i2c.interrupt_parent[0].id }} },
+		.interrupt_parent = { {{ i2c.interrupt_parent[0].id }} },
 		.interrupt_id = {{ i2c.interrupts[0] }},
 	{% endif %}
 	},

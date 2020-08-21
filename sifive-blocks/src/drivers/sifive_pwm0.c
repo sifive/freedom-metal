@@ -135,7 +135,6 @@ int sifive_pwm0_set_freq(struct metal_pwm pwm, uint32_t idx, uint32_t freq) {
     uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
     uint8_t cmp_count = dt_pwm_data[get_index(pwm)].comparator_count;
     struct metal_clock clock = dt_pwm_data[get_index(pwm)].clock;
-    long clock_rate;
     unsigned int count;
     unsigned int prescale = 0;
     int ret = METAL_PWM_RET_ERR;
@@ -281,3 +280,5 @@ int sifive_pwm0_clear_interrupt(struct metal_pwm pwm, uint32_t idx) {
 }
 
 #endif /* METAL_SIFIVE_PWM0 */
+
+typedef int no_empty_translation_units;

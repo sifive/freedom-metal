@@ -19,6 +19,8 @@ static const struct dt_cpu_data {
     {
     {% if hart.timebase_frequency is defined %}
         .timebase = {{ hart.timebase_frequency[0] }},
+    {% else %}
+        .timebase = 1000000, /* No timebase known, assume 1 MHz */
     {% endif %}
     },
     {% endfor %}

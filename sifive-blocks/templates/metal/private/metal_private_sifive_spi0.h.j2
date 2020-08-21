@@ -34,21 +34,22 @@ static const struct dt_spi_data {
 
 	{% if spi.clocks is defined %}
 	    /* {{ spi.clocks[0].compatible[0] }} */
-	    .clock = (struct metal_clock) { {{ spi.clocks[0].id }} },
+	    .clock = { {{ spi.clocks[0].id }} },
 	{% endif %}
 
 	{% if spi.pinmux is defined %}
+	    /* {{ spi.pinmux[0].compatible[0] }} */
 		.has_pinmux = 1,
-		.pinmux = (struct metal_gpio) { {{ spi.pinmux[0].id }} },
-		.pinmux_output_selector = {{ spi.pinmux[1] }},
-		.pinmux_source_selector = {{ spi.pinmux[2] }},
+		.pinmux = { {{ spi.pinmux[0].id }} },
+		.pinmux_output_selector = {{ "0x%x" % spi.pinmux[1] }},
+		.pinmux_source_selector = {{ "0x%x" % spi.pinmux[2] }},
 	{% else %}
 		.has_pinmux = 0,
 	{% endif %}
 
 	{% if spi.interrupt_parent is defined %}
 	    /* {{ spi.interrupt_parent[0].compatible[0] }} */
-		.interrupt_parent = (struct metal_interrupt) { {{ spi.interrupt_parent[0].id }} },
+		.interrupt_parent = { {{ spi.interrupt_parent[0].id }} },
 		.interrupt_id = {{ spi.interrupts[0] }},
 	{% endif %}
 	},

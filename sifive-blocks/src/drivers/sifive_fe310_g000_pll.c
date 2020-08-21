@@ -34,7 +34,7 @@
 #define PLL_Q_SHIFT(q) ((q << 10) & PLL_Q)
 #define PLL_DIV_SHIFT(d) ((d << 0) & DIV_DIV)
 
-#define PLL_CONFIG_NOT_VALID -1
+#define PLL_CONFIG_NOT_VALID UINT64_MAX
 
 #define PLL_REGW(offset)                                                       \
     __METAL_ACCESS_ONCE(                                                       \
@@ -169,7 +169,13 @@ static int find_closest_config(uint64_t ref_hz, uint64_t rate) {
          i--) {
         uint64_t config_freq = get_pll_config_freq(ref_hz, &(pll_configs[i]));
         if (config_freq != PLL_CONFIG_NOT_VALID) {
-            uint64_t freq_diff = abs(config_freq - rate);
+            uint64_t freq_diff;
+            if (config_freq > rate) {
+                freq_diff = config_freq - rate;
+            } else {
+                freq_diff = rate - config_freq;
+            }
+
             if (freq_diff < closest_diff) {
                 closest_index = i;
                 closest_diff = freq_diff;

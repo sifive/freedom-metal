@@ -13,6 +13,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define METAL_BUTTON_INVALID_INDEX UINT32_MAX
+
 /*!
  * @brief A button device handle
  *
