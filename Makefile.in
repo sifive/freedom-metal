@@ -250,6 +250,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/sifive_gpio0.$(OBJEXT) \
 	src/drivers/sifive_i2c0.$(OBJEXT) \
 	src/drivers/sifive_local-external-interrupts0.$(OBJEXT) \
+	src/drivers/riscv_dma0.$(OBJEXT) \
 	src/drivers/sifive_pwm0.$(OBJEXT) \
 	src/drivers/sifive_rtc0.$(OBJEXT) \
 	src/drivers/sifive_spi0.$(OBJEXT) \
@@ -264,12 +265,12 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/trap.$(OBJEXT) src/gpio.$(OBJEXT) src/hpm.$(OBJEXT) \
 	src/i2c.$(OBJEXT) src/init.$(OBJEXT) src/interrupt.$(OBJEXT) \
 	src/led.$(OBJEXT) src/lock.$(OBJEXT) src/memory.$(OBJEXT) \
-	src/pmp.$(OBJEXT) src/privilege.$(OBJEXT) src/pwm.$(OBJEXT) \
-	src/rtc.$(OBJEXT) src/shutdown.$(OBJEXT) src/spi.$(OBJEXT) \
-	src/switch.$(OBJEXT) src/synchronize_harts.$(OBJEXT) \
-	src/timer.$(OBJEXT) src/time.$(OBJEXT) src/trap.$(OBJEXT) \
-	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
-	src/watchdog.$(OBJEXT)
+	src/pmp.$(OBJEXT) src/privilege.$(OBJEXT) src/dma.$(OBJEXT) \
+	src/pwm.$(OBJEXT) src/rtc.$(OBJEXT) src/shutdown.$(OBJEXT) \
+	src/spi.$(OBJEXT) src/switch.$(OBJEXT) \
+	src/synchronize_harts.$(OBJEXT) src/timer.$(OBJEXT) \
+	src/time.$(OBJEXT) src/trap.$(OBJEXT) src/tty.$(OBJEXT) \
+	src/uart.$(OBJEXT) src/vector.$(OBJEXT) src/watchdog.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -449,7 +450,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -480,15 +480,16 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h metal/drivers/sifive_i2c0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
-	metal/drivers/sifive_pwm0.h metal/drivers/sifive_rtc0.h \
-	metal/drivers/sifive_spi0.h metal/drivers/sifive_test0.h \
-	metal/drivers/sifive_trace.h metal/drivers/sifive_uart0.h \
-	metal/drivers/sifive_simuart0.h metal/drivers/sifive_wdog0.h \
-	metal/drivers/ucb_htif0.h metal/atomic.h metal/button.h \
-	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
-	metal/csr.h metal/gpio.h metal/hpm.h metal/i2c.h metal/init.h \
-	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
-	metal/lock.h metal/memory.h metal/pmp.h metal/privilege.h \
+	metal/drivers/riscv_dma0.h metal/drivers/sifive_pwm0.h \
+	metal/drivers/sifive_rtc0.h metal/drivers/sifive_spi0.h \
+	metal/drivers/sifive_test0.h metal/drivers/sifive_trace.h \
+	metal/drivers/sifive_uart0.h metal/drivers/sifive_simuart0.h \
+	metal/drivers/sifive_wdog0.h metal/drivers/ucb_htif0.h \
+	metal/atomic.h metal/button.h metal/cache.h metal/clock.h \
+	metal/compiler.h metal/cpu.h metal/csr.h metal/gpio.h \
+	metal/hpm.h metal/i2c.h metal/init.h metal/interrupt.h \
+	metal/io.h metal/itim.h metal/led.h metal/lock.h \
+	metal/memory.h metal/pmp.h metal/privilege.h metal/dma.h \
 	metal/pwm.h metal/rtc.h metal/shutdown.h metal/spi.h \
 	metal/switch.h metal/timer.h metal/time.h metal/tty.h \
 	metal/uart.h metal/watchdog.h
@@ -527,6 +528,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
+	src/drivers/riscv_dma0.c \
 	src/drivers/sifive_pwm0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
@@ -554,6 +556,7 @@ libmetal_a_SOURCES = \
 	src/memory.c \
 	src/pmp.c \
 	src/privilege.c \
+	src/dma.c\
 	src/pwm.c\
 	src/rtc.c \
 	src/shutdown.c \
@@ -836,6 +839,8 @@ src/drivers/sifive_i2c0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 src/drivers/sifive_local-external-interrupts0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/riscv_dma0.$(OBJEXT): src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_pwm0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_rtc0.$(OBJEXT): src/drivers/$(am__dirstamp) \
@@ -883,6 +888,7 @@ src/memory.$(OBJEXT): src/$(am__dirstamp) \
 src/pmp.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/privilege.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/dma.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/pwm.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/rtc.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/shutdown.$(OBJEXT): src/$(am__dirstamp) \
@@ -956,6 +962,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/clock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cpu.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/dma.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/entry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/gpio.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/hpm.Po@am__quote@
@@ -986,6 +993,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/inline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_clint0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_cpu.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_dma0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_plic0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_buserror0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_ccache0.Po@am__quote@

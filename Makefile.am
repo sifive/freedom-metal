@@ -54,6 +54,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_gpio0.h \
 	metal/drivers/sifive_i2c0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
+	metal/drivers/riscv_dma0.h \
 	metal/drivers/sifive_pwm0.h \
 	metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h \
@@ -82,6 +83,7 @@ nobase_include_HEADERS += \
 	metal/memory.h \
 	metal/pmp.h \
 	metal/privilege.h \
+	metal/dma.h\
 	metal/pwm.h\
 	metal/rtc.h \
 	metal/shutdown.h \
@@ -122,6 +124,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
+	src/drivers/riscv_dma0.c \
 	src/drivers/sifive_pwm0.c \
 	src/drivers/sifive_rtc0.c \
 	src/drivers/sifive_spi0.c \
@@ -149,6 +152,7 @@ libmetal_a_SOURCES = \
 	src/memory.c \
 	src/pmp.c \
 	src/privilege.c \
+	src/dma.c\
 	src/pwm.c\
 	src/rtc.c \
 	src/shutdown.c \
