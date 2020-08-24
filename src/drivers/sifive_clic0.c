@@ -11,7 +11,7 @@
 #include <metal/shutdown.h>
 #include <stdint.h>
 
-#define CLIC0_MAX_INTERRUPTS 4096
+#define CLIC0_MAX_INTERRUPTS 1024
 
 typedef enum metal_clic_vector_ {
     METAL_CLIC_NONVECTOR = 0,
