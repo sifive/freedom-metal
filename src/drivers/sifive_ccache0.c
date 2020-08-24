@@ -259,6 +259,7 @@ int sifive_ccache0_set_way_mask(uint32_t master_id, uint64_t waymask) {
 
 void sifive_ccache0_set_pmevent_selector(uint32_t counter, uint64_t mask) {
 
+#if METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS > 0
     if (counter < METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS) {
         SIFIVE_CCACHE0_ACQUIRE_LOCK
 
@@ -267,11 +268,14 @@ void sifive_ccache0_set_pmevent_selector(uint32_t counter, uint64_t mask) {
 
         SIFIVE_CCACHE0_RELEASE_LOCK
     }
+#endif
+    return;
 }
 
 uint64_t sifive_ccache0_get_pmevent_selector(uint32_t counter) {
     uint64_t val = 0;
 
+#if METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS > 0
     if (counter < METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS) {
         SIFIVE_CCACHE0_ACQUIRE_LOCK
         /* Get event selector for specified L2 event counter */
@@ -279,11 +283,13 @@ uint64_t sifive_ccache0_get_pmevent_selector(uint32_t counter) {
 
         SIFIVE_CCACHE0_RELEASE_LOCK
     }
+#endif
     return val;
 }
 
 void sifive_ccache0_clr_pmevent_counter(uint32_t counter) {
 
+#if METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS > 0
     if (counter < METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS) {
         SIFIVE_CCACHE0_ACQUIRE_LOCK
         /* Clear specified L2 event counter */
@@ -291,6 +297,8 @@ void sifive_ccache0_clr_pmevent_counter(uint32_t counter) {
 
         SIFIVE_CCACHE0_RELEASE_LOCK
     }
+#endif
+    return;
 }
 
 uint64_t sifive_ccache0_get_pmevent_counter(uint32_t counter) {
@@ -299,6 +307,7 @@ uint64_t sifive_ccache0_get_pmevent_counter(uint32_t counter) {
 #else
     uint64_t val = 0;
 #endif
+#if METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS > 0
     if (counter < METAL_SIFIVE_CCACHE0_PERFMON_COUNTERS) {
         /* Set counter register offset */
         counter *= 8;
@@ -317,7 +326,7 @@ uint64_t sifive_ccache0_get_pmevent_counter(uint32_t counter) {
 
         SIFIVE_CCACHE0_RELEASE_LOCK
     }
-
+#endif
 #if __riscv_xlen == 32
     return ((((unsigned long long)vh) << 32) | vl);
 #else
