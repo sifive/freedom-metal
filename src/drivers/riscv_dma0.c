@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define RET_OK 0
-#define RET_NOK 1
+#define METAL_DMA_RET_OK 0
+#define METAL_DMA_RET_ERR -1
 
 int __metal_driver_riscv_dma0_enable_dma(struct metal_dma *gdma,
         									unsigned int chan,
@@ -193,9 +193,56 @@ __metal_driver_riscv_dma0_get_interrupt(const struct metal_dma *const dma) {
     return __metal_driver_riscv_dma0_interrupt_parent(dma);
 }
 
+static struct metal_interrupt *
+__metal_driver_riscv_dma0_interrupt_controller(struct metal_dma *gdma) {
+    return __metal_driver_riscv_dma0_interrupt_parent(gdma);
+}
+
 int __metal_driver_riscv_dma0_get_interrupt_id(
-    const struct metal_dma *const dma) {
-    return __metal_driver_riscv_dma0_interrupt_line(dma);
+    struct metal_dma *gdma, unsigned int idx) {
+    return __metal_driver_riscv_dma0_interrupt_lines(gdma, idx);
+}
+
+int __metal_driver_riscv_dma0_chan_cfg_interrupt(struct metal_dma *gdma, unsigned int chanid, metal_dma_interrupt_t flag) {
+    struct __metal_driver_riscv_dma0 *dma = (void *)gdma;
+    unsigned long control_base = __metal_driver_riscv_dma0_control_base((struct  metal_dma *)gdma);
+    int ret = METAL_DMA_RET_ERR;
+
+    if(control_base != 0) {
+        if (flag == METAL_DMA_INT_DONE_ENABLE) {
+            METAL_DMA_CHAN_CONTROL_REG(chanid) |= (1 << METAL_DMA_CHAN_INT_DONE_SHIFT);
+        }
+        if (flag == METAL_DMA_INT_ERR_ENABLE) {
+            METAL_DMA_CHAN_CONTROL_REG(chanid) |= (1 << METAL_DMA_CHAN_INT_ERR_SHIFT);
+        }
+        if (flag == METAL_DMA_INT_DONE_ENABLE | METAL_DMA_INT_ERR_ENABLE) {
+            METAL_DMA_CHAN_CONTROL_REG(chanid) |= (1 << METAL_DMA_CHAN_INT_DONE_SHIFT);
+            METAL_DMA_CHAN_CONTROL_REG(chanid) |= (1 << METAL_DMA_CHAN_INT_ERR_SHIFT);
+        }
+        ret = METAL_DMA_RET_OK;
+    }
+    return ret;
+}
+
+int __metal_driver_riscv_dma0_chan_clr_interrupt(struct metal_dma *gdma, unsigned int chanid, metal_dma_interrupt_t flag) {
+    struct __metal_driver_riscv_dma0 *dma = (void *)gdma;
+    unsigned long control_base = __metal_driver_riscv_dma0_control_base((struct  metal_dma *)gdma);
+    int ret = METAL_DMA_RET_ERR;
+
+    if(control_base != 0) {
+        if (flag == METAL_DMA_INT_DONE_ENABLE) {
+            METAL_DMA_CHAN_CONTROL_REG(chanid) &= ~(1 << METAL_DMA_CHAN_INT_DONE_SHIFT);
+        }
+        if (flag == METAL_DMA_INT_ERR_ENABLE) {
+            METAL_DMA_CHAN_CONTROL_REG(chanid) &= ~(1 << METAL_DMA_CHAN_INT_ERR_SHIFT);
+        }
+        if (flag == METAL_DMA_INT_DONE_ENABLE | METAL_DMA_INT_ERR_ENABLE) {
+            METAL_DMA_CHAN_CONTROL_REG(chanid) &= ~(1 << METAL_DMA_CHAN_INT_DONE_SHIFT);
+            METAL_DMA_CHAN_CONTROL_REG(chanid) &= ~(1 << METAL_DMA_CHAN_INT_ERR_SHIFT);
+        }
+        ret = METAL_DMA_RET_OK;
+    }
+    return ret;
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_dma0) = {
@@ -209,7 +256,9 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_dma0) = {
     .dma.chan_txfer_enable = __metal_driver_riscv_dma0_txfer_enable,
     .dma.chan_txfer_status = __metal_driver_riscv_dma0_txfer_status,
     .dma.chan_txfer_enableIT = __metal_driver_riscv_dma0_enableIT,
-
+    .dma.get_interrupt_controller = __metal_driver_riscv_dma0_interrupt_controller,
+    .dma.chan_cfg_interrupt = __metal_driver_riscv_dma0_chan_cfg_interrupt,
+    .dma.chan_clr_interrupt = __metal_driver_riscv_dma0_chan_clr_interrupt,
 };
 
 #endif /* METAL_RISCV_DMA0 */

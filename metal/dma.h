@@ -38,6 +38,11 @@ enum metal_dma_state {
     METAL_DMA_ENABLE = !METAL_DMA_DISABLE
 };
 
+typedef enum {
+    METAL_DMA_INT_DONE_ENABLE = 0x01,
+    METAL_DMA_INT_ERR_ENABLE = 0x02,
+} metal_dma_interrupt_t;
+
 struct metal_dma_vtable {    
     int (*dma_enable)(struct metal_dma *dma, unsigned int chan, struct metal_dma_chan_config *config);
     int (*dma_disable)(struct metal_dma *dma, unsigned int chan);
@@ -45,10 +50,13 @@ struct metal_dma_vtable {
     int (*chan_active)(struct metal_dma *dma, unsigned int chan);
     void (*setup_jobques)(struct metal_dma *dma, unsigned int chan, struct metal_dma_chan_config *config);
     struct metal_interrupt *(*get_interrupt)(const struct metal_dma *const dma);
-    int (*get_interrupt_id)(const struct metal_dma *const dma);
+    int (*get_interrupt_id)(struct metal_dma *dma, unsigned int idx);
     void (*chan_txfer_enable)(struct metal_dma *dma, unsigned int chanid, struct metal_dma_chan_config *config);
     int  (*chan_txfer_status)(struct metal_dma *dma, unsigned int chanid);
     void (*chan_txfer_enableIT)(struct metal_dma *dma, unsigned int chanid, struct metal_dma_chan_config *config);
+    struct metal_interrupt *(*get_interrupt_controller)(struct metal_dma *dma);
+    int (*chan_cfg_interrupt)(struct metal_dma *dma, unsigned int chanid, metal_dma_interrupt_t flag);
+    int (*chan_clr_interrupt)(struct metal_dma *dma, unsigned int chanid, metal_dma_interrupt_t flag);
 };
 
 
@@ -119,8 +127,8 @@ metal_dma_get_interrupt(const struct metal_dma *const dma) {
  * @brief Get the interrupt ID for the dma compare
  * @return The interrupt ID
  */
-inline int metal_dma_get_interrupt_id(const struct metal_dma *const dma) {
-    return dma->vtable->get_interrupt_id(dma);
+inline int metal_dma_get_interrupt_id(struct metal_dma *dma, unsigned int idx) {
+    return dma->vtable->get_interrupt_id(dma, idx);
 }
 
 inline void metal_dma_channel_txfer_enable(struct metal_dma *dma, unsigned int chanid, struct metal_dma_chan_config *config) {
@@ -136,4 +144,15 @@ inline void metal_dma_channel_txfer_enableIT(struct metal_dma *dma, unsigned int
 
 }
 
+inline struct metal_interrupt * metal_dma_interrupt_controller(struct metal_dma *dma) {
+    return dma->vtable->get_interrupt_controller(dma);
+}
+
+inline int metal_dma_chan_cfg_interrupt(struct metal_dma *dma, unsigned int chanid, metal_dma_interrupt_t flag) {
+return dma->vtable->chan_cfg_interrupt(dma, chanid, flag);
+}
+
+inline int metal_dma_chan_clr_interrupt(struct metal_dma *dma, unsigned int chanid, metal_dma_interrupt_t flag) {
+return dma->vtable->chan_clr_interrupt(dma, chanid, flag);
+}
 #endif
