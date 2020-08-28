@@ -38,8 +38,6 @@
 #define ERASE_VAL 0x00000000
 
 
-#define METAL_EMMC_BIT_WIDTH 4
-#define METAL_EMMC_BOOT_PARTITION_ENABLE 0
 
 #define MMC_EXCSD_CQ_SUPPORT              308U
 /// CMD Queuing Depth
@@ -387,6 +385,11 @@ static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 	if(input_cmd->data_present)
 	{
 		cmd |=((1 << DPS) | (input_cmd->data_direction << DTDS));
+
+		if(input_cmd->blockcnt>1)
+		{
+			cmd |= ((1<<MSBS)|(1<<BCE));
+		}
 		METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = input_cmd->blocklen|(input_cmd->blockcnt<<BCCT);
 	}
 
@@ -847,7 +850,7 @@ static int emmc_get_partition_access(eMMC_Parition_t *partition,eMMC_ParitionAcc
 	retval=emmc_card_ext_csd_read((uint8_t*)g_data_buffer);
 
 
-//	printf("########### BYTE 177 %d\n",GET_BYTE_FROM_BUFFER(g_data_buffer,177));
+	printf("########### BYTE 228 %d\n",GET_BYTE_FROM_BUFFER(g_data_buffer,228));
 	uint8_t bootcfg=GET_BYTE_FROM_BUFFER(g_data_buffer,MMC_EXCSD_BOOT_PART_CONFIG);//179
 
 	
@@ -893,6 +896,8 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,
 	input_cmd.data_present=0;
 	retval=emmc_host_send_cmd(&input_cmd);// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), GO_PRE_IDLE_STATE);	// pre-idle state
 
+	//add logic to wait for 74 clock cycles
+	for(volatile int i=0;i<0x100;i++);
 	if(retval==0)
 	{
 		input_cmd.cmd=EMMC_CMD0;
@@ -906,32 +911,16 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,
 		input_cmd.dataptr=rx_data;
 		input_cmd.dataptrpos=rx_data;
 
-		// (EMMC_CMD0 << CI) | (0 << CRCCE) | (0 << RTS), BOOT_INITIATION);	// initiate alternative boot operational
 		retval=emmc_host_send_cmd(&input_cmd);
 
-		// wait for BRE(buffer read enable)
-
-		while( ((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
-
-
-
-		for(int i=0;i<3;i++)
-		{
-		
-			while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BRR) & 0x01) == 0 );
-			process_databuffer_read(&input_cmd);
-		}
-/*
+		uint32_t *dptr=input_cmd.dataptr;
 		do
 		{
-		//	while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BRR) & 0x01) == 0 );
+			// wait for BRE(buffer read enable)
+			while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
 			process_databuffer_read(&input_cmd);
 			status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
-			printf("status %x\n",status);
 		} while ((status & (1 << TC)) == 0);
-*/
-
-
 	}
 
 
