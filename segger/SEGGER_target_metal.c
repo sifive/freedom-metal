@@ -67,7 +67,7 @@ int SEGGER_SEMIHOST_X_Request(int Op, SEGGER_SEMIHOST_PARA *pPara) {
 
     switch (Op) {
     case SYS_WRITEC:
-        r0 = metal_writeC(pPara);
+        r0 = metal_writeC((char *)pPara);
         break;
     case SYS_READC:
         r0 = 0;
@@ -107,6 +107,8 @@ int __SEGGER_RTL_stdout_putc(int c) {
 }
 
 clock_t clock(void) { return SEGGER_SEMIHOST_Clock(); }
+
+void _execute_at_exit_fns(void);
 
 void exit(int status) {
     _execute_at_exit_fns(); // defined in libc_segger.a
