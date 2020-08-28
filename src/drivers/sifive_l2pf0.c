@@ -32,9 +32,25 @@
 #define REG_BITSHIFT_21 21
 #define REG_BITSHIFT_28 28
 
+/* Macros to capture trap, if L2PF does not exist for a hart id. */
+#define SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec)                                 \
+    __asm__ __volatile__("la %0, 1f \n\t"                                      \
+                         "csrr %1, mtvec \n\t"                                 \
+                         "csrw mtvec, %0 \n\t"                                 \
+                         : "+r"(exit), "+r"(mtvec))
+
+#define SIFIVE_L2PF0_TRAP_RESTORE(mtvec)                                       \
+    __asm__ __volatile__(".align 2 \n\t"                                       \
+                         "1: \n\t"                                             \
+                         "csrw mtvec, %0 \n\t"                                 \
+                         : "+r"(mtvec))
+
 void sifive_l2pf0_enable(void) {
+    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
+
+    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
 
     uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
@@ -42,11 +58,16 @@ void sifive_l2pf0_enable(void) {
     val |= REG_MASK_BITWIDTH1;
 
     REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL) = val;
+
+    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
 }
 
 void sifive_l2pf0_disable(void) {
+    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
+
+    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
 
     uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
@@ -54,12 +75,17 @@ void sifive_l2pf0_disable(void) {
     val &= ~REG_MASK_BITWIDTH1;
 
     REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL) = val;
+
+    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
 }
 
 void sifive_l2pf0_get_config(sifive_l2pf0_config *config) {
+    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
     uint32_t val;
+
+    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
 
     if (config) /* Check for NULL */
     {
@@ -89,12 +115,16 @@ void sifive_l2pf0_get_config(sifive_l2pf0_config *config) {
             ((val >> REG_BITSHIFT_9) & REG_MASK_BITWIDTH4);
         config->Window = ((val >> REG_BITSHIFT_13) & REG_MASK_BITWIDTH6);
     }
+    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
 }
 
 void sifive_l2pf0_set_config(sifive_l2pf0_config *config) {
+    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
     uint32_t val;
+
+    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
 
     if (config) /* Check for NULL */
     {
@@ -126,6 +156,7 @@ void sifive_l2pf0_set_config(sifive_l2pf0_config *config) {
 
         REGW(METAL_SIFIVE_L2PF0_USER_CONTROL) = val;
     }
+    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
 }
 
 #endif
