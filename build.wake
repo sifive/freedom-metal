@@ -1,0 +1,93 @@
+# Copyright (c) 2020 SiFive Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+package freedom_metal
+
+from wake import _
+
+export tuple FreedomMetalCodeGenerationOptions =
+  export TopDTSFile: Path
+  export OtherDTSFiles: List Path
+  export OutputDirectory: String
+  export ApplicationConfig: Option Path
+
+# The freedomMetalSources topic allows users of Freedom Metal to
+# add out-of-tree drivers to Freedom Metal, including code
+# generation from Devicetree content.
+#
+# To add an out-of-tree source directory to Freedom Metal, simply:
+#
+#    publish freedomMetalSources = "path/to/out-of-tree/sources", Nil
+#
+export topic freedomMetalSources : String
+
+# Add the default in-tree sources and SiFive blocks sources to the
+# freedomMetalSources topic
+publish freedomMetalSources = here, "{here}/sifive-blocks", Nil
+
+#######################################################################
+# makeFreedomMetalCodeGenerationOptions takes the following parameters:
+#   - topDTSFile: The top-level Devicetree source file
+#   - otherDTSFiles: any other Devicetree source files included in the
+#                    hierarchy of Devicetree source files
+#   - outputDirectory: The path to output generated Freedom Metal code
+#   - applicationConfig: An .ini file used to customize Freedom Metal
+#                        for a given application
+#######################################################################
+export def makeFreedomMetalCodeGenerationOptions topDTSFile otherDTSFiles outputDirectory =
+  FreedomMetalCodeGenerationOptions topDTSFile otherDTSFiles outputDirectory None
+
+export def runFreedomMetalCodeGeneration sdkDir options =
+  def topDTSFile = options.getFreedomMetalCodeGenerationOptionsTopDTSFile
+  def otherDTSFiles = options.getFreedomMetalCodeGenerationOptionsOtherDTSFiles
+  def outputDirectory = options.getFreedomMetalCodeGenerationOptionsOutputDirectory
+  def appConfig = options.getFreedomMetalCodeGenerationOptionsApplicationConfig
+
+  def inputs =
+    def outDir = mkdir (simplify outputDirectory)
+    def generatorSource = source "{here}/scripts/codegen.py"
+    def dtsSources = topDTSFile, otherDTSFiles
+    def metalSources = installFreedomMetal sdkDir
+    outDir, generatorSource, dtsSources ++ metalSources
+
+  def expectedOutputs _ =
+    subscribe freedomMetalSources
+    | mapFlat (\d sources d `.*\.j2`)
+    | map getPathName
+    | map (\f replace `\.j2` "" f)
+    | map (\f replace `.*/templates` outputDirectory f)
+
+  def args =
+    def base =
+      "--dts", relative sdkDir topDTSFile.getPathName,
+      "--output-dir", relative sdkDir outputDirectory,
+      "--source-paths", subscribe freedomMetalSources
+    match appConfig
+      None = base
+      Some p = "--application-config", p.getPathName, base
+
+  makePlan (pythonCommand (relative sdkDir "{here}/scripts/codegen.py") args) inputs
+  | setPlanDirectory sdkDir
+  | addPlanRelativePath "PYTHONPATH" here
+  | addPythonRequirementsEnv here
+  | setPlanFnOutputs expectedOutputs
+  | runJob
+
+# Install the python virtualenv for the code generator as part of the preinstall topic.
+publish preinstall = (pythonRequirementsInstaller here), Nil
+
+#######################################################################
+# installFreedomMetal installs the Freedom Metal sources appropriate
+#   for a customer deliverable and excludes the testing and internal
+#   infrastructure like Wake sources, CI configuration, etc.
+# It takes the following parameter:
+#   - install Path: the path to install Freedom Metal in
+#######################################################################
+export target installFreedomMetal installPath =
+  def metalSources =
+    (subscribe freedomMetalSources | mapFlat (\d sources d `.*\.(c|h|S|j2|ini)`)) ++
+    sources here `.*\.make` ++
+    sources here `LICENSE.*`
+
+  mkdir installPath,
+  map (installIn installPath) metalSources

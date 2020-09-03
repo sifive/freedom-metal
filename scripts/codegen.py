@@ -340,9 +340,12 @@ def get_templates(template_paths, strip_dir=True):
 def get_c_sources(args):
     sources = []
     for d in args.source_paths:
-        sources += [g for g in glob.glob("{}/src/**/*.c".format(d), recursive=True)]
+        sources += [
+            "$(ROOT_DIR)/" + g
+            for g in glob.glob("{}/src/**/*.c".format(d), recursive=True)
+        ]
     sources += [
-        os.path.join(args.output_dir, t.replace(".j2", ""))
+        "$(ROOT_DIR)/" + args.output_dir + "/" + t.replace(".j2", "")
         for t in get_templates(args.template_paths)
         if ".c" in t
     ]
@@ -353,9 +356,12 @@ def get_c_sources(args):
 def get_asm_sources(args):
     sources = []
     for d in args.source_paths:
-        sources += [g for g in glob.glob("{}/src/**/*.S".format(d), recursive=True)]
+        sources += [
+            "$(ROOT_DIR)/" + g
+            for g in glob.glob("{}/src/**/*.S".format(d), recursive=True)
+        ]
     sources += [
-        os.path.join(args.output_dir, t.replace(".j2", ""))
+        "$(ROOT_DIR)/" + args.output_dir + "/" + t.replace(".j2", "")
         for t in get_templates(args.template_paths)
         if ".S" in t
     ]
@@ -474,6 +480,7 @@ def main():
         "devices": dict(),
         "default_drivers": dict(),
         "devicetree_path": args.dts,
+        "output_dir": args.output_dir,
         "c_sources": get_c_sources(args),
         "asm_sources": get_asm_sources(args),
         "source_dirs": get_source_dirs(args),

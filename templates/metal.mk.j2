@@ -1,14 +1,17 @@
 METAL_SRC = \
-        {{ c_sources|join(' \\\n        ') }} \
+	{{ c_sources|join(' \\\n        ') }} \
 	{{ asm_sources|join(' \\\n        ') }}
 
-METAL_CFLAGS = {% for path in source_paths %} -I{{ path }} {% endfor %}
-
+METAL_CFLAGS = \
+{% for path in source_paths %}
+	-I$(ROOT_DIR)/{{ path }} \
+{% endfor %}
 
 METAL_MK_DEPEND = \
-	{{ devicetree_path }} \
-	{{ templates|join(' \\\n        ') }}
-
+	$(ROOT_DIR)/{{ devicetree_path }} \
+{% for template in templates %}
+	$(ROOT_DIR)/{{ template }} \
+{% endfor %}
 
 METAL_SRC_PATH = {{ source_dirs|join(':') }}
 
