@@ -8,7 +8,7 @@
  * hart 0 to finish copying the datat section, zeroing the BSS, and running
  * the libc contstructors.
  */
-__attribute__((section(".init"))) void __metal_synchronize_harts() {
+__attribute__((section(".init"))) void __metal_synchronize_harts(void) {
 #if __METAL_DT_NUM_HARTS > 1
     uint32_t hartid = metal_cpu_get_current_hartid();
 

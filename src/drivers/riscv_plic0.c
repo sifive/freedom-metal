@@ -94,7 +94,7 @@ static __inline__ int __metal_plic0_disable(int hartid, int id) {
 /* This is the interrupt handler for the machine external interrupt, which is
  * automatically named metal_riscv_plic0_source_0_handler() when a PLIC exists.
  */
-void metal_riscv_plic0_source_0_handler() {
+void metal_riscv_plic0_source_0_handler(void) {
     uint32_t hartid = metal_cpu_get_current_hartid();
 
     unsigned int idx = __metal_plic0_claim_interrupt(hartid);

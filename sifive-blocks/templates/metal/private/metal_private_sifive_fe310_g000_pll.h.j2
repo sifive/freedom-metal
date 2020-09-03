@@ -72,7 +72,7 @@ void _{{ to_snakecase(devices[compat][0].compatible[0]) }}_post_rate_change_call
     {% endif %}
 {% endfor %}
 
-static __inline__ void pre_rate_change_callbacks() {
+static __inline__ void pre_rate_change_callbacks(void) {
 {% if sifive_fe310_g000_plls|length == 1 %}
     {% for compat in devices %}
 	{% for device in devices[compat] %}
@@ -86,7 +86,7 @@ static __inline__ void pre_rate_change_callbacks() {
 {% endif %}
 }
 
-static __inline__ void post_rate_change_callbacks() {
+static __inline__ void post_rate_change_callbacks(void) {
 {% if sifive_fe310_g000_plls|length == 1 %}
     {% for compat in devices %}
 	{% for device in devices[compat] %}

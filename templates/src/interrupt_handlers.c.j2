@@ -16,16 +16,16 @@ void _metal_exception_handler_nop(struct metal_cpu cpu, int ecode) {
     metal_shutdown(100);
 }
 
-void _metal_local_interrupt_handler_nop() __attribute((interrupt));
-void _metal_local_interrupt_handler_nop() {
+void _metal_local_interrupt_handler_nop(void) __attribute((interrupt));
+void _metal_local_interrupt_handler_nop(void) {
     metal_shutdown(200);
 }
 
-void _metal_global_interrupt_handler_nop() {
+void _metal_global_interrupt_handler_nop(void) {
     metal_shutdown(300);
 }
 
-/* Alias default exception handlers to _metal_exception_handler_nop() */
+/* Alias default exception handlers to _metal_exception_handler_nop(void) */
 void metal_exception_instruction_address_misaligned_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
 void metal_exception_instruction_address_fault_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
 void metal_exception_illegal_instruction_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
@@ -42,40 +42,40 @@ void metal_exception_instruction_page_fault_handler(struct metal_cpu cpu, int ec
 void metal_exception_load_page_fault_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
 void metal_exception_store_amo_page_fault_handler(struct metal_cpu cpu, int ecode) __attribute__((weak, alias("_metal_exception_handler_nop")));
 
-/* Alias default local interrupt handlers to _metal_local_interrupt_handler_nop() */
-void metal_riscv_cpu_intc_default_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop"))); 
-void metal_riscv_cpu_intc_usip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
-void metal_riscv_cpu_intc_ssip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
-void metal_riscv_cpu_intc_msip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
-void metal_riscv_cpu_intc_utip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
-void metal_riscv_cpu_intc_stip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
-void metal_riscv_cpu_intc_mtip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
-void metal_riscv_cpu_intc_ueip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
-void metal_riscv_cpu_intc_seip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+/* Alias default local interrupt handlers to _metal_local_interrupt_handler_nop(void) */
+void metal_riscv_cpu_intc_default_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop"))); 
+void metal_riscv_cpu_intc_usip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_ssip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_msip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_utip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_stip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_mtip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_ueip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_seip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
 {% if global_interrupts is defined %}
-void metal_riscv_plic0_source_0_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_plic0_source_0_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
 {% else %}
-void metal_riscv_cpu_intc_meip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_riscv_cpu_intc_meip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
 {% endif %}
 {% if 'sifive,clic0' in devices %}
-void metal_sifive_clic0_csip_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_sifive_clic0_csip_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
 {% endif %}
 {% if 'sifive,buserror0' in devices %}
-void metal_sifive_buserror0_source_0_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_sifive_buserror0_source_0_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
 {% endif %}
 {% if local_interrupts is defined %}
     {% for irq in local_interrupts.irqs|unique_irqs %}
         {% if irq.id >= 16 and irq.source.compatible != None %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
+void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler(void) __attribute__((weak, alias("_metal_local_interrupt_handler_nop")));
         {% endif %}
     {% endfor %}
 {% endif %}
 
-/* Alias default global interrupt handlers to _metal_global_interrupt_handler_nop() */
+/* Alias default global interrupt handlers to _metal_global_interrupt_handler_nop(void) */
 {% if global_interrupts is defined %}
     {% for irq in global_interrupts.irqs|unique_irqs %}
         {% if irq.source.compatible != None %}
-void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler() __attribute__((weak, alias ("_metal_global_interrupt_handler_nop")));
+void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler(void) __attribute__((weak, alias ("_metal_global_interrupt_handler_nop")));
         {% endif %}
     {% endfor %}
 {% endif %}

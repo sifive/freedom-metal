@@ -61,11 +61,11 @@ static uintptr_t _get_pmpaddr_granularity(uintptr_t address) {
 int metal_pmp_num_regions(int hartid) { return PMP_REGIONS(hartid); }
 
 /* Get the number of pmp regions for the current hart */
-static unsigned int _pmp_regions() {
+static unsigned int _pmp_regions(void) {
     return metal_pmp_num_regions(metal_cpu_get_current_hartid());
 }
 
-void metal_pmp_init() {
+void metal_pmp_init(void) {
     struct metal_pmp_config init_config = {
         .L = METAL_PMP_UNLOCKED,
         .A = METAL_PMP_OFF,
