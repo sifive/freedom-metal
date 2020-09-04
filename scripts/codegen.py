@@ -139,7 +139,10 @@ def local_interrupts(dts, config):
     for irq in range(16):
         irqs.append(
             {
-                "source": {"compatible": "riscv,cpu", "id": irq,},
+                "source": {
+                    "compatible": "riscv,cpu",
+                    "id": irq,
+                },
                 "id": irq,
                 "hwvectored": local_interrupt_is_hw_vectored("riscv,cpu", irq, config),
                 "priority": local_interrupt_priority("riscv,cpu", irq, config),
