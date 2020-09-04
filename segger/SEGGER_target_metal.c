@@ -7,6 +7,8 @@
 #include <metal/timer.h>
 #include <metal/tty.h>
 
+#define UNUSED(x) (void)(x)
+
 /* metal heap start address is provided in target linker script */
 extern char metal_segment_heap_target_start;
 extern char __heap_size;
@@ -91,6 +93,15 @@ int __SEGGER_RTL_X_get_time_of_day(struct timeval *tp) {
 }
 
 int __SEGGER_RTL_X_set_time_of_day(const struct timeval *tp) { return 0; }
+
+void __SEGGER_RTL_X_assert(const char *stmt, const char *file, int line) {
+    UNUSED(file);
+    UNUSED(line);
+    puts("Failed: ");
+    puts(stmt);
+    puts("\n");
+    exit(1);
+}
 
 int __SEGGER_RTL_stdin_getc(void) {
     int r;
