@@ -51,7 +51,9 @@ static __inline__ struct metal_cpu metal_cpu_get_current_hart(void) {
 /*! @brief Get the number of CPU harts
  *
  * @return The number of CPU harts */
-static __inline__ int metal_cpu_get_num_harts(void) { return __METAL_DT_NUM_HARTS; }
+static __inline__ int metal_cpu_get_num_harts(void) {
+    return __METAL_DT_NUM_HARTS;
+}
 
 /*!
  * @brief Enables the global interrupt enable for the hart

@@ -8,15 +8,19 @@ CLANG_FORMAT=clang-format-6.0
 
 TOP_LEVEL=$(git rev-parse --show-toplevel)
 
+pushd $TOP_LEVEL
+
 # Run clang-format in-place on all *.c and *.h files in the repository
 echo "Running clang-format..."
-cd $TOP_LEVEL && $CLANG_FORMAT -i $(git ls-tree -r HEAD --name-only | grep -E "^\S+\.[ch]$")
+$CLANG_FORMAT -i $(git ls-tree -r HEAD --name-only | grep -E "^\S+\.[ch]$")
 
 # Install the 'black' python code formatter
-python3 -m venv $TOP_LEVEL/venv
-python3 -m pip install --upgrade pip
-python3 -m pip install black
+python3 -m venv venv
+. venv/bin/activate && python3 -m pip install --upgrade pip
+. venv/bin/activate && python3 -m pip install black==20.08b1
 
 # Run black on all *.py files in the repository
 echo "Running black..."
-cd $TOP_LEVEL && . venv/bin/activate && black $(git ls-tree -r HEAD --name-only | grep -E "^\S+\.py$")
+. venv/bin/activate && black $(git ls-tree -r HEAD --name-only | grep -E "^\S+\.py$")
+
+popd # $TOP_LEVEL
