@@ -2,6 +2,8 @@
 #
 # Documentation Build
 
+export RELEASE_TAG ?= unreleased
+
 .PHONY: all
 all: html pdf
 
