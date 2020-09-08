@@ -9,29 +9,8 @@ application.
 Initializing the CPU
 --------------------
 
-When the user application enters the ``main()`` function, the Freedom Metal
-framework has not yet performed the initialization necessary to register
-exception handlers. If this initialization is not performed before an exception
-occurs, any exception will cause the CPU to spin in a tight loop until reset.
-
-To initialize the Freedom Metal exception handlers, initialize CPU interrupts:
-
-.. code-block:: C
-
-   struct metal_cpu *cpu0 = metal_cpu_get(0);
-   if(!cpu) {
-      /* There was an error acquiring the CPU hart 0 handle */
-   }
-
-   struct metal_interrupt *cpu_int = metal_cpu_interrupt_controller(cpu0);
-   if(!cpu_int) {
-      /* There was an error acquiring the CPU interrupt controller */
-   }
-
-   metal_interrupt_init(cpu_int);
-
-The Freedom Metal interrupt API is further documented in :doc:`/devguide/interrupts`
-and :doc:`/apiref/interrupt`.
+When the user application enters the ``main()`` function, the Freedom
+Metal framework has already set up the exception handlers.
 
 Defining an Exception Handler
 -----------------------------
@@ -42,36 +21,41 @@ Exception handlers must conform to the following function signature:
    :project: metal
    :no-link:
 
-Therefore, an example exception handler might look like:
+Therefore, an exception handler for the illegal instruction exception
+would look like:
 
 .. code-block:: C
 
-   void my_exception_handler(struct metal_cpu *cpu, int ecode) {
+   void metal_exception_illegal_instruction_handler(struct metal_cpu cpu, int ecode) {
       /* Contents of handler */
    }
 
 Registering an Exception Handler
 --------------------------------
 
-Exception handlers are registered with a given CPU hart for an individual exception
-code.
+Exception handlers are registered by name at link time. Define a
+function using the appropriate name and it will be called whenever
+that exception is raised. The names of the available exception
+handlers are:
 
 .. code-block:: C
 
-   /* CPU Hart 0's interrupt controller must be initialized
-    * if it is not already */
-   struct metal_cpu *cpu0 = metal_cpu_get(0);
+   void metal_exception_instruction_address_misaligned_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_instruction_address_fault_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_illegal_instruction_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_breakpoint_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_load_address_misaligned_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_load_access_fault_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_store_amo_address_misaligned_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_store_amo_access_fault_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_ecall_from_u_mode_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_ecall_from_s_mode_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_default_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_ecall_from_m_mode_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_instruction_page_fault_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_load_page_fault_handler(struct metal_cpu cpu, int ecode);
+   void metal_exception_store_amo_page_fault_handler(struct metal_cpu cpu, int ecode);
 
-   int rc = metal_cpu_exception_register(cpu0,
-               <my_ecode>, /* Set to your desired value */
-               my_exception_handler);
-   if(rc != 0) {
-      /* Failed to register exception handler */
-   }
-
-A single exception handler may be used for multiple exception codes. For this reason,
-exception handlers receive the exception code as the ``ecode`` parameter and may use
-this to determine how to handle the exception.
 
 Returing Execution after a Faulting Instruction
 -----------------------------------------------
@@ -82,7 +66,7 @@ the faulting instruction using the following method:
 
 .. code-block:: C
 
-   void return_after_fault(struct metal_cpu *cpu, int ecode)
+   void metal_exception_load_access_fault_handler(struct metal_cpu cpu, int ecode)
    {
       /* Get the faulting instruction address */
       uintptr_t epc = metal_cpu_get_exception_pc(cpu);
