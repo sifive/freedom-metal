@@ -1,0 +1,23 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__PRIVATE__UCB_HTIF0_H
+#define METAL__PRIVATE__UCB_HTIF0_H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'ucb,htif0' in devices %}
+
+{% if chosen.stdout_path is defined %}
+{% if chosen.stdout_path[0].compatible[0] == "ucb,htif0" %}
+
+/* ucb,htif0 has been selected by the Devicetree to provide
+ * standard out for the Freedom Metal program
+ */
+#define METAL_STDOUT_UCB_HTIF0
+{% endif %}
+{% endif %}
+
+{% endif %}
+
+#endif
