@@ -22,4 +22,7 @@ int nop_putc(int c) {
     return -1;
 }
 
+int nop_getc(int *c) { return -1; }
+
 int metal_tty_putc(int c) __attribute__((weak, alias("nop_putc")));
+int metal_tty_getc(int *c) __attribute__((weak, alias("nop_getc")));
