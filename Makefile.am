@@ -165,29 +165,6 @@ libmetal_a_SOURCES = \
 	src/watchdog.c
 
 ########################################################
-# libmetal-pico
-########################################################
-
-# Build support for picolibc if --with-builtin-libmetal-pico is passed to configure
-if WITH_BUILTIN_LIBMETAL_PICO
-
-lib_LIBRARIES += libmetal-pico.a
-
-libmetal_pico_a_SOURCES = \
-	pico/iob.c \
-	gloss/crt0.S \
-	gloss/sys_sbrk.c \
-	gloss/sys_exit.c \
-	gloss/sys_times.c \
-	gloss/sys_sysconf.c \
-	gloss/sys_gettimeofday.c \
-	gloss/sys_clock_gettime.c \
-	gloss/sys_write.c
-
-endif # WITH_BUILTIN_LIBMETAL_PICO
-
-
-########################################################
 # libsegger
 ########################################################
 
