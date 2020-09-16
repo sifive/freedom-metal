@@ -6,6 +6,7 @@
 #include <metal/time.h>
 #include <metal/timer.h>
 #include <metal/tty.h>
+#include <stdlib.h>
 
 #define UNUSED(x) (void)(x)
 
