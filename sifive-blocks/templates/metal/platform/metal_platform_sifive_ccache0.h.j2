@@ -19,6 +19,24 @@
 #define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_BASE_ADDRESS {{ "0x%x" % l2.reg[1][0] }}UL
 #define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_SIZE {{ "0x%x" % l2.reg[1][1] }}UL
     {% endif %}
+
+    {% if 'cache_block_size' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_BLOCK_SIZE {{ "0x%x" % l2.cache_block_size[0] }}
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_BLOCK_SIZE 0UL
+    {% endif %}
+
+    {% if 'cache_sets' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_SETS {{ l2.cache_sets[0] }}UL
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_SETS 0UL
+    {% endif %}
+
+    {% if 'sifive_bank_count' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_BANK_COUNT {{ l2.sifive_bank_count[0] }}UL
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_BANK_COUNT 0UL
+    {% endif %}
 {% endfor %}
 
 #define METAL_SIFIVE_CCACHE0
