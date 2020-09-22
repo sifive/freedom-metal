@@ -21,18 +21,15 @@
 #define REG_SHIFT_16 16
 #define REG_SHIFT_24 24
 
-/* Masks to get cache configuration data */
-#define SIFIVE_CCACHE0_CONFIG_BANKS_MASK 0x000000FFUL
-#define SIFIVE_CCACHE0_CONFIG_WAYS_MASK 0x0000FF00UL
-#define SIFIVE_CCACHE0_CONFIG_SETS_MASK 0x00FF0000UL
-#define SIFIVE_CCACHE0_CONFIG_BLOCKS_MASK 0xFF000000UL
-
-#define SIFIVE_CCACHE0_WAY_ENABLE_MASK 0x000000FFUL
+#define SIFIVE_CCACHE0_BYTE_MASK 0xFFUL
 
 static int sifive_ccache0_interrupts[] = METAL_SIFIVE_CCACHE0_INTERRUPTS;
 
 /* Initialize cache at start-up via metal constructors */
 METAL_CONSTRUCTOR(_sifive_ccache0_init) { sifive_ccache0_init(); }
+
+/* Linker symbols to calculate LIM allocated size */
+extern char metal_segment_lim_target_start, metal_segment_lim_target_end;
 
 int sifive_ccache0_init(void) {
     int ret;
@@ -41,6 +38,17 @@ int sifive_ccache0_init(void) {
 
     /* Get cache configuration data */
     sifive_ccache0_get_config(&config);
+
+    int lim_size =
+        &metal_segment_lim_target_end - &metal_segment_lim_target_start;
+
+    if (lim_size) { /* Do not enable cache ways, corresponding to LIM area in
+                       use. */
+        while (lim_size > 0) {
+            lim_size -= (config.block_size * config.num_sets * config.num_bank);
+            config.num_ways--;
+        }
+    }
 
     /* Enable ways */
     ret = sifive_ccache0_set_enabled_ways(config.num_ways);
@@ -56,13 +64,12 @@ void sifive_ccache0_get_config(sifive_ccache0_config *config) {
         val = REGW(METAL_SIFIVE_CCACHE0_CONFIG);
 
         /* Populate cache configuration data */
-        config->num_bank = (val & SIFIVE_CCACHE0_CONFIG_BANKS_MASK);
-        config->num_ways =
-            (val & SIFIVE_CCACHE0_CONFIG_WAYS_MASK) >> REG_SHIFT_8;
+        config->num_bank = (val & SIFIVE_CCACHE0_BYTE_MASK);
+        config->num_ways = ((val >> REG_SHIFT_8) & SIFIVE_CCACHE0_BYTE_MASK);
         config->num_sets =
-            2 ^ ((val & SIFIVE_CCACHE0_CONFIG_SETS_MASK) >> REG_SHIFT_16);
+            2 << (((val >> REG_SHIFT_16) & SIFIVE_CCACHE0_BYTE_MASK) - 1);
         config->block_size =
-            2 ^ ((val & SIFIVE_CCACHE0_CONFIG_BLOCKS_MASK) >> REG_SHIFT_24);
+            2 << (((val >> REG_SHIFT_24) & SIFIVE_CCACHE0_BYTE_MASK) - 1);
     }
 }
 
@@ -70,7 +77,7 @@ uint32_t sifive_ccache0_get_enabled_ways(void) {
 
     uint32_t val = 0;
 
-    val = SIFIVE_CCACHE0_WAY_ENABLE_MASK & REGW(METAL_SIFIVE_CCACHE0_WAYENABLE);
+    val = SIFIVE_CCACHE0_BYTE_MASK & REGW(METAL_SIFIVE_CCACHE0_WAYENABLE);
 
     /* The stored number is the way index, so increment by 1 */
     val++;

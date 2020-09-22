@@ -78,6 +78,7 @@ nobase_include_HEADERS += \
 	metal/io.h \
 	metal/itim.h \
 	metal/led.h \
+	metal/lim.h \
 	metal/lock.h \
 	metal/memory.h \
 	metal/pmp.h \
