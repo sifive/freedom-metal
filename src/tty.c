@@ -6,6 +6,8 @@
 #include <metal/tty.h>
 #include <metal/uart.h>
 
+#define __METAL_DT_STDOUT_UART_HANDLE (&__metal_dt_simSerial_4000000.uart)
+
 #if defined(__METAL_DT_STDOUT_UART_HANDLE)
 /* This implementation serves as a small shim that interfaces with the first
  * UART on a system. */
