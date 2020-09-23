@@ -108,6 +108,36 @@ _start:
      complete */
   fence.i
 
+2:
+
+  /* Copy the LIM section */
+  la t0, metal_segment_lim_source_start
+  la t1, metal_segment_lim_target_start
+  la t2, metal_segment_lim_target_end
+
+  beq t0, t1, 2f
+  bge t1, t2, 2f
+
+1:
+#if __riscv_xlen == 32
+  lw   a0, 0(t0)
+  addi t0, t0, 4
+  sw   a0, 0(t1)
+  addi t1, t1, 4
+  blt  t1, t2, 1b
+#else
+  ld   a0, 0(t0)
+  addi t0, t0, 8
+  sd   a0, 0(t1)
+  addi t1, t1, 8
+  blt  t1, t2, 1b
+#endif
+2:
+
+  /* Fence all subsequent instruction fetches until after the LIM writes
+     complete */
+  fence.i
+
   /* Zero the BSS segment. */
   la t1, metal_segment_bss_target_start
   la t2, metal_segment_bss_target_end

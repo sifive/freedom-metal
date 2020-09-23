@@ -29,6 +29,7 @@ typedef enum {
 
 /*! @brief Initialize cache controller, enables all available
  *         cache-ways.
+ *         Note: If LIM is in use, corresponding cache ways are not enabled.
  * @param None.
  * @return 0 If no error.*/
 int sifive_ccache0_init(void);
