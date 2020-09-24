@@ -1,0 +1,24 @@
+  digraph "Freedom Metal Driver Tree" {
+   rankdir=LR;
+   edge [arrowsize=0.5; decorate=true; style="setlinewidth(2)"];
+   node [shape=box; arrowsize=0.5; fontsize=12; height=0.2;];
+   "root" [label="Top of Driver Tree"];
+   "src_drivers" [label="drivers"];
+   "metal_drivers" [label="drivers"];
+   "templates_metal" [label="metal"];
+   "templates_metal_platform" [label="platform"];
+   "templates_metal_private" [label="private"];
+   "root" -> "src" [weight=1000];
+   "root" -> "metal";
+   "root" -> "templates";
+   "src" -> "src_drivers";
+   "src_drivers" -> "metal_<driver>.c";
+   "metal" -> "metal_drivers"
+   "metal_drivers" -> "metal_<driver>.h";
+   "templates" -> "MANIFEST.ini";
+   "templates" -> "templates_metal";
+   "templates_metal" -> "templates_metal_platform";
+   "templates_metal" -> "templates_metal_private";
+   "templates_metal_platform" -> "metal_platform_<driver>.h.j2";
+   "templates_metal_private" -> "metal_private_<driver>.h.j2";
+  }
