@@ -11,5 +11,6 @@ Freedom Metal Documentation Contents
     introduction
     devguide
     api
+    driver
     genindex
     search
