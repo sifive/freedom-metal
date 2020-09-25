@@ -21,13 +21,7 @@
 #define REG_SHIFT_16 16
 #define REG_SHIFT_24 24
 
-/* Masks to get cache configuration data */
-#define SIFIVE_CCACHE0_CONFIG_BANKS_MASK 0x000000FFUL
-#define SIFIVE_CCACHE0_CONFIG_WAYS_MASK 0x0000FF00UL
-#define SIFIVE_CCACHE0_CONFIG_SETS_MASK 0x00FF0000UL
-#define SIFIVE_CCACHE0_CONFIG_BLOCKS_MASK 0xFF000000UL
-
-#define SIFIVE_CCACHE0_WAY_ENABLE_MASK 0x000000FFUL
+#define SIFIVE_CCACHE0_BYTE_MASK 0xFFUL
 
 static int sifive_ccache0_interrupts[] = METAL_SIFIVE_CCACHE0_INTERRUPTS;
 
@@ -56,13 +50,14 @@ void sifive_ccache0_get_config(sifive_ccache0_config *config) {
         val = REGW(METAL_SIFIVE_CCACHE0_CONFIG);
 
         /* Populate cache configuration data */
-        config->num_bank = (val & SIFIVE_CCACHE0_CONFIG_BANKS_MASK);
-        config->num_ways =
-            (val & SIFIVE_CCACHE0_CONFIG_WAYS_MASK) >> REG_SHIFT_8;
+        config->num_bank = (val & SIFIVE_CCACHE0_BYTE_MASK);
+        config->num_ways = ((val >> REG_SHIFT_8) & SIFIVE_CCACHE0_BYTE_MASK);
+        /* no. of sets, block size is 2's power of register value
+        (2 << (value-1)) */
         config->num_sets =
-            2 ^ ((val & SIFIVE_CCACHE0_CONFIG_SETS_MASK) >> REG_SHIFT_16);
+            2 << (((val >> REG_SHIFT_16) & SIFIVE_CCACHE0_BYTE_MASK) - 1);
         config->block_size =
-            2 ^ ((val & SIFIVE_CCACHE0_CONFIG_BLOCKS_MASK) >> REG_SHIFT_24);
+            2 << (((val >> REG_SHIFT_24) & SIFIVE_CCACHE0_BYTE_MASK) - 1);
     }
 }
 
@@ -70,7 +65,7 @@ uint32_t sifive_ccache0_get_enabled_ways(void) {
 
     uint32_t val = 0;
 
-    val = SIFIVE_CCACHE0_WAY_ENABLE_MASK & REGW(METAL_SIFIVE_CCACHE0_WAYENABLE);
+    val = SIFIVE_CCACHE0_BYTE_MASK & REGW(METAL_SIFIVE_CCACHE0_WAYENABLE);
 
     /* The stored number is the way index, so increment by 1 */
     val++;
