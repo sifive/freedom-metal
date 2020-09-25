@@ -98,11 +98,12 @@ build_triplet = @build@
 host_triplet = @host@
 
 ########################################################
-# libmetal-pico
+# libsegger
 ########################################################
 
-# Build support for picolibc if --with-builtin-libmetal-pico is passed to configure
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@am__append_1 = libmetal-pico.a
+# Provide segger hook with Freedom Metal that is built when
+# --with-builtin-libmetal-segger is passed to configure
+@WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@am__append_1 = libmetal-segger.a
 
 ########################################################
 # libgloss
@@ -209,23 +210,14 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.$(OBJEXT)
 libmetal_gloss_a_OBJECTS = $(am_libmetal_gloss_a_OBJECTS)
-libmetal_pico_a_AR = $(AR) $(ARFLAGS)
-libmetal_pico_a_LIBADD =
-am__libmetal_pico_a_SOURCES_DIST = pico/iob.c gloss/crt0.S \
-	gloss/sys_sbrk.c gloss/sys_exit.c gloss/sys_times.c \
-	gloss/sys_sysconf.c gloss/sys_gettimeofday.c \
-	gloss/sys_clock_gettime.c gloss/sys_write.c
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@am_libmetal_pico_a_OBJECTS =  \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/iob.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/crt0.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sbrk.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_exit.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_times.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sysconf.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_gettimeofday.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_clock_gettime.$(OBJEXT) \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_write.$(OBJEXT)
-libmetal_pico_a_OBJECTS = $(am_libmetal_pico_a_OBJECTS)
+libmetal_segger_a_AR = $(AR) $(ARFLAGS)
+libmetal_segger_a_LIBADD =
+am__libmetal_segger_a_SOURCES_DIST = gloss/crt0.S \
+	segger/SEGGER_target_metal.c
+@WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@am_libmetal_segger_a_OBJECTS =  \
+@WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@	gloss/crt0.$(OBJEXT) \
+@WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@	segger/SEGGER_target_metal.$(OBJEXT)
+libmetal_segger_a_OBJECTS = $(am_libmetal_segger_a_OBJECTS)
 libmetal_a_AR = $(AR) $(ARFLAGS)
 libmetal_a_LIBADD =
 am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
@@ -242,13 +234,13 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/sifive_fe310-g000_lfrosc.$(OBJEXT) \
 	src/drivers/sifive_fe310-g000_pll.$(OBJEXT) \
 	src/drivers/sifive_fe310-g000_prci.$(OBJEXT) \
-	src/drivers/sifive_fu540-c000_l2.$(OBJEXT) \
 	src/drivers/sifive_global-external-interrupts0.$(OBJEXT) \
 	src/drivers/sifive_gpio-buttons.$(OBJEXT) \
 	src/drivers/sifive_gpio-leds.$(OBJEXT) \
 	src/drivers/sifive_gpio-switches.$(OBJEXT) \
 	src/drivers/sifive_gpio0.$(OBJEXT) \
 	src/drivers/sifive_i2c0.$(OBJEXT) \
+	src/drivers/sifive_l2pf0.$(OBJEXT) \
 	src/drivers/sifive_local-external-interrupts0.$(OBJEXT) \
 	src/drivers/sifive_pwm0.$(OBJEXT) \
 	src/drivers/sifive_rtc0.$(OBJEXT) \
@@ -305,10 +297,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_pico_a_SOURCES) \
+SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_segger_a_SOURCES) \
 	$(libmetal_a_SOURCES)
 DIST_SOURCES = $(am__libmetal_gloss_a_SOURCES_DIST) \
-	$(am__libmetal_pico_a_SOURCES_DIST) $(libmetal_a_SOURCES)
+	$(am__libmetal_segger_a_SOURCES_DIST) $(libmetal_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -473,12 +465,12 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_fe310-g000_lfrosc.h \
 	metal/drivers/sifive_fe310-g000_pll.h \
 	metal/drivers/sifive_fe310-g000_prci.h \
-	metal/drivers/sifive_fu540-c000_l2.h \
 	metal/drivers/sifive_global-external-interrupts0.h \
 	metal/drivers/sifive_gpio-buttons.h \
 	metal/drivers/sifive_gpio-leds.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h metal/drivers/sifive_i2c0.h \
+	metal/drivers/sifive_l2pf0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_pwm0.h metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h metal/drivers/sifive_test0.h \
@@ -488,10 +480,10 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
 	metal/csr.h metal/gpio.h metal/hpm.h metal/i2c.h metal/init.h \
 	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
-	metal/lock.h metal/memory.h metal/pmp.h metal/privilege.h \
-	metal/pwm.h metal/rtc.h metal/shutdown.h metal/spi.h \
-	metal/switch.h metal/timer.h metal/time.h metal/tty.h \
-	metal/uart.h metal/watchdog.h
+	metal/lim.h metal/lock.h metal/memory.h metal/pmp.h \
+	metal/privilege.h metal/pwm.h metal/rtc.h metal/shutdown.h \
+	metal/scrub.h metal/spi.h metal/switch.h metal/timer.h \
+	metal/time.h metal/tty.h metal/uart.h metal/watchdog.h
 
 # This will generate these sources before the compilation step
 BUILT_SOURCES = \
@@ -519,13 +511,13 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_fe310-g000_lfrosc.c \
 	src/drivers/sifive_fe310-g000_pll.c \
 	src/drivers/sifive_fe310-g000_prci.c \
-	src/drivers/sifive_fu540-c000_l2.c \
 	src/drivers/sifive_global-external-interrupts0.c \
 	src/drivers/sifive_gpio-buttons.c \
 	src/drivers/sifive_gpio-leds.c \
 	src/drivers/sifive_gpio-switches.c \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
+	src/drivers/sifive_l2pf0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_pwm0.c \
 	src/drivers/sifive_rtc0.c \
@@ -568,16 +560,9 @@ libmetal_a_SOURCES = \
 	src/vector.S \
 	src/watchdog.c
 
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@libmetal_pico_a_SOURCES = \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	pico/iob.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/crt0.S \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sbrk.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_exit.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_times.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_sysconf.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_gettimeofday.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_clock_gettime.c \
-@WITH_BUILTIN_LIBMETAL_PICO_TRUE@	gloss/sys_write.c
+@WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@libmetal_segger_a_SOURCES = \
+@WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@       gloss/crt0.S \
+@WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@       segger/SEGGER_target_metal.c
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libmetal_gloss_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
@@ -763,19 +748,19 @@ libmetal-gloss.a: $(libmetal_gloss_a_OBJECTS) $(libmetal_gloss_a_DEPENDENCIES) $
 	$(AM_V_at)-rm -f libmetal-gloss.a
 	$(AM_V_AR)$(libmetal_gloss_a_AR) libmetal-gloss.a $(libmetal_gloss_a_OBJECTS) $(libmetal_gloss_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libmetal-gloss.a
-pico/$(am__dirstamp):
-	@$(MKDIR_P) pico
-	@: > pico/$(am__dirstamp)
-pico/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) pico/$(DEPDIR)
-	@: > pico/$(DEPDIR)/$(am__dirstamp)
-pico/iob.$(OBJEXT): pico/$(am__dirstamp) \
-	pico/$(DEPDIR)/$(am__dirstamp)
+segger/$(am__dirstamp):
+	@$(MKDIR_P) segger
+	@: > segger/$(am__dirstamp)
+segger/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) segger/$(DEPDIR)
+	@: > segger/$(DEPDIR)/$(am__dirstamp)
+segger/SEGGER_target_metal.$(OBJEXT): segger/$(am__dirstamp) \
+	segger/$(DEPDIR)/$(am__dirstamp)
 
-libmetal-pico.a: $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_DEPENDENCIES) $(EXTRA_libmetal_pico_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libmetal-pico.a
-	$(AM_V_AR)$(libmetal_pico_a_AR) libmetal-pico.a $(libmetal_pico_a_OBJECTS) $(libmetal_pico_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libmetal-pico.a
+libmetal-segger.a: $(libmetal_segger_a_OBJECTS) $(libmetal_segger_a_DEPENDENCIES) $(EXTRA_libmetal_segger_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libmetal-segger.a
+	$(AM_V_AR)$(libmetal_segger_a_AR) libmetal-segger.a $(libmetal_segger_a_OBJECTS) $(libmetal_segger_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libmetal-segger.a
 src/drivers/$(am__dirstamp):
 	@$(MKDIR_P) src/drivers
 	@: > src/drivers/$(am__dirstamp)
@@ -815,9 +800,6 @@ src/drivers/sifive_fe310-g000_pll.$(OBJEXT):  \
 src/drivers/sifive_fe310-g000_prci.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
-src/drivers/sifive_fu540-c000_l2.$(OBJEXT):  \
-	src/drivers/$(am__dirstamp) \
-	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_global-external-interrupts0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -832,6 +814,8 @@ src/drivers/sifive_gpio-switches.$(OBJEXT):  \
 src/drivers/sifive_gpio0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_i2c0.$(OBJEXT): src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/sifive_l2pf0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_local-external-interrupts0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
@@ -909,7 +893,7 @@ libmetal.a: $(libmetal_a_OBJECTS) $(libmetal_a_DEPENDENCIES) $(EXTRA_libmetal_a_
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f gloss/*.$(OBJEXT)
-	-rm -f pico/*.$(OBJEXT)
+	-rm -f segger/*.$(OBJEXT)
 	-rm -f src/*.$(OBJEXT)
 	-rm -f src/drivers/*.$(OBJEXT)
 
@@ -950,7 +934,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_utime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@pico/$(DEPDIR)/iob.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@segger/$(DEPDIR)/SEGGER_target_metal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Po@am__quote@
@@ -995,13 +979,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fe310-g000_lfrosc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fe310-g000_pll.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fe310-g000_prci.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_fu540-c000_l2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_global-external-interrupts0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_gpio-buttons.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_gpio-leds.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_gpio-switches.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_gpio0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_i2c0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_l2pf0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_local-external-interrupts0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_pwm0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_rtc0.Po@am__quote@
@@ -1328,8 +1312,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f gloss/$(DEPDIR)/$(am__dirstamp)
 	-rm -f gloss/$(am__dirstamp)
-	-rm -f pico/$(DEPDIR)/$(am__dirstamp)
-	-rm -f pico/$(am__dirstamp)
+	-rm -f segger/$(DEPDIR)/$(am__dirstamp)
+	-rm -f segger/$(am__dirstamp)
 	-rm -f src/$(DEPDIR)/$(am__dirstamp)
 	-rm -f src/$(am__dirstamp)
 	-rm -f src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -1345,7 +1329,7 @@ clean-am: clean-generic clean-libLIBRARIES clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf gloss/$(DEPDIR) pico/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) segger/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1393,7 +1377,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf gloss/$(DEPDIR) pico/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
+	-rm -rf gloss/$(DEPDIR) segger/$(DEPDIR) src/$(DEPDIR) src/drivers/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

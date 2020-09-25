@@ -46,13 +46,13 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_fe310-g000_lfrosc.h \
 	metal/drivers/sifive_fe310-g000_pll.h \
 	metal/drivers/sifive_fe310-g000_prci.h \
-	metal/drivers/sifive_fu540-c000_l2.h \
 	metal/drivers/sifive_global-external-interrupts0.h \
 	metal/drivers/sifive_gpio-buttons.h \
 	metal/drivers/sifive_gpio-leds.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h \
 	metal/drivers/sifive_i2c0.h \
+	metal/drivers/sifive_l2pf0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_pwm0.h \
 	metal/drivers/sifive_rtc0.h \
@@ -78,6 +78,7 @@ nobase_include_HEADERS += \
 	metal/io.h \
 	metal/itim.h \
 	metal/led.h \
+	metal/lim.h \
 	metal/lock.h \
 	metal/memory.h \
 	metal/pmp.h \
@@ -85,6 +86,7 @@ nobase_include_HEADERS += \
 	metal/pwm.h\
 	metal/rtc.h \
 	metal/shutdown.h \
+	metal/scrub.h \
 	metal/spi.h \
 	metal/switch.h \
 	metal/timer.h \
@@ -114,13 +116,13 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_fe310-g000_lfrosc.c \
 	src/drivers/sifive_fe310-g000_pll.c \
 	src/drivers/sifive_fe310-g000_prci.c \
-	src/drivers/sifive_fu540-c000_l2.c \
 	src/drivers/sifive_global-external-interrupts0.c \
 	src/drivers/sifive_gpio-buttons.c \
 	src/drivers/sifive_gpio-leds.c \
 	src/drivers/sifive_gpio-switches.c \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
+	src/drivers/sifive_l2pf0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_pwm0.c \
 	src/drivers/sifive_rtc0.c \
@@ -164,26 +166,20 @@ libmetal_a_SOURCES = \
 	src/watchdog.c
 
 ########################################################
-# libmetal-pico
+# libsegger
 ########################################################
 
-# Build support for picolibc if --with-builtin-libmetal-pico is passed to configure
-if WITH_BUILTIN_LIBMETAL_PICO
+# Provide segger hook with Freedom Metal that is built when
+# --with-builtin-libmetal-segger is passed to configure
+if WITH_BUILTIN_LIBMETAL_SEGGER
 
-lib_LIBRARIES += libmetal-pico.a
+lib_LIBRARIES += libmetal-segger.a
 
-libmetal_pico_a_SOURCES = \
-	pico/iob.c \
-	gloss/crt0.S \
-	gloss/sys_sbrk.c \
-	gloss/sys_exit.c \
-	gloss/sys_times.c \
-	gloss/sys_sysconf.c \
-	gloss/sys_gettimeofday.c \
-	gloss/sys_clock_gettime.c \
-	gloss/sys_write.c
+libmetal_segger_a_SOURCES = \
+       gloss/crt0.S \
+       segger/SEGGER_target_metal.c
 
-endif # WITH_BUILTIN_LIBMETAL_PICO
+endif # WITH_BUILTIN_LIBMETAL_SEGGER
 
 ########################################################
 # libgloss

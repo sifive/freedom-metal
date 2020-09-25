@@ -4,6 +4,8 @@
 #include <metal/time.h>
 #include <metal/timer.h>
 
+#include <stddef.h>
+
 int metal_gettimeofday(struct timeval *tp, void *tzp) {
     int rv;
     unsigned long long mcc, timebase;
