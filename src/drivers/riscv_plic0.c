@@ -187,35 +187,42 @@ int __metal_driver_riscv_plic0_register(struct metal_interrupt *controller,
 int __metal_driver_riscv_plic0_enable(struct metal_interrupt *controller,
                                       int id) {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
-
+    int contextid =
+        __metal_driver_sifive_plic0_context_ids(__metal_myhart_id());
+ 
     if (id >= __metal_driver_sifive_plic0_num_interrupts(controller)) {
         return -1;
     }
 
-    __metal_plic0_enable(plic, __metal_myhart_id(), id, METAL_ENABLE);
+    __metal_plic0_enable(plic, contextid, id, METAL_ENABLE);
     return 0;
 }
 
 int __metal_driver_riscv_plic0_disable(struct metal_interrupt *controller,
                                        int id) {
     struct __metal_driver_riscv_plic0 *plic = (void *)(controller);
-
+    int contextid =
+        __metal_driver_sifive_plic0_context_ids(__metal_myhart_id());
+ 
     if (id >= __metal_driver_sifive_plic0_num_interrupts(controller)) {
         return -1;
     }
-    __metal_plic0_enable(plic, __metal_myhart_id(), id, METAL_DISABLE);
+    __metal_plic0_enable(plic, contextid, id, METAL_DISABLE);
     return 0;
 }
 
 int __metal_driver_riscv_plic0_set_threshold(struct metal_interrupt *controller,
                                              unsigned int threshold) {
-    return __metal_plic0_set_threshold(controller, __metal_myhart_id(),
-                                       threshold);
+    int contextid =
+        __metal_driver_sifive_plic0_context_ids(__metal_myhart_id());
+    return __metal_plic0_set_threshold(controller, contextid, threshold);
 }
 
 unsigned int
 __metal_driver_riscv_plic0_get_threshold(struct metal_interrupt *controller) {
-    return __metal_plic0_get_threshold(controller, __metal_myhart_id());
+     int contextid =
+        __metal_driver_sifive_plic0_context_ids(__metal_myhart_id());
+     return __metal_plic0_get_threshold(controller, contextid);
 }
 
 metal_affinity
