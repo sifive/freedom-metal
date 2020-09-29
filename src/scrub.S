@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 /*
- * Scrub memory with zero
+ * Scrub memory with zeroes
  */
 
 /* Keep it in metal.init section with _enter */
@@ -11,9 +11,64 @@
 .option push
 .option norelax
 
-.type _metal_memory_scrub, @function
-_metal_memory_scrub:
-    /* Zero out memory */
+/* Function to zero-scrub specified memory
+ * a0 : start address for zero-scrub
+ * a1 : size memory region size in bytes
+ */
+.global metal_mem_scrub
+.type metal_mem_scrub, @function
+metal_mem_scrub:
+
+    /* Disable machine interrupts,
+    restore previous mstatus value at exit */
+    li      a3, 8
+    csrrc   t1, mstatus, a3
+
+#if __riscv_xlen == 32
+    addi    t0, x0, 4
+1:
+    blt     a1, t0, 2f
+    andi    a2, a0, 3
+    beqz    a2, 3f
+2:
+    sb      x0, 0(a0)
+    addi    a0, a0, 1
+    addi    a1, a1, -1
+    bgtz    a1, 1b
+    csrw    mstatus, t1
+    ret
+3:
+    sw      x0, 0(a0)
+    addi    a0, a0, 4
+    addi    a1, a1, -4
+    bgtz    a1, 1b
+    csrw    mstatus, t1
+    ret
+#else
+    addi    t0, x0, 8
+1:
+    blt     a1, t0, 2f
+    andi    a2, a0, 7
+    beqz    a2, 3f
+2:
+    sb      x0, 0(a0)
+    addi    a0, a0, 1
+    addi    a1, a1, -1
+    bgtz    a1, 1b
+    csrw    mstatus, t1
+    ret
+3:
+    sd      x0, 0(a0)
+    addi    a0, a0, 8
+    addi    a1, a1, -8
+    bgtz    a1, 1b
+    csrw    mstatus, t1
+    ret
+#endif
+
+.type __metal_memory_scrub, @function
+__metal_memory_scrub:
+/* Zero out specified memory regions */
 1:
 #if __riscv_xlen == 32
     sw      x0, 0(t1)
@@ -27,9 +82,10 @@ _metal_memory_scrub:
     ret
 
 /*
- * Initialize all memories available to zero
- * This must be call before seting up any stack(s)
+ * Initialize memories to zero
+ * This must be called before setting up any stack(s)
  */
+.weak __metal_eccscrub_bit
 .weak __metal_before_start
 .global __metal_before_start
 .type __metal_before_start, @function
@@ -42,81 +98,31 @@ __metal_before_start:
 
     la      t0, __metal_boot_hart
     csrr    a5, mhartid
+
     /* Disable machine interrupts to be safe */
     li      a3, 8
     csrc    mstatus, a3
-    bne     a5, t0, wait_scrub
 
-    /* Zero out itim memory. */
-    .weak metal_itim_0_memory_start
-    .weak metal_itim_0_memory_end
-    la      t1, metal_itim_0_memory_start
-    la      t2, metal_itim_0_memory_end
-    beq     t1, t2, dtim_scrub
-    jal     _metal_memory_scrub
-    .weak metal_itim_1_memory_start
-    .weak metal_itim_1_memory_end
-    la      t1, metal_itim_1_memory_start
-    la      t2, metal_itim_1_memory_end
-    beq     t1, t2, dtim_scrub
-    jal     _metal_memory_scrub
+    /* Zero out per hart stack */
+    mv      t1, sp
+    la      t2, __stack_size
+    add     t2, t2, sp
+    beq     t1, t2, 1f
+    jal     __metal_memory_scrub
+1:
+    bne     a5, t0, skip_scrub
 
-dtim_scrub:
-    /* Zero out dtim memory. */
-    .weak metal_dtim_0_memory_start
-    .weak metal_dtim_0_memory_end
-    la      t1, metal_dtim_0_memory_start
-    la      t2, metal_dtim_0_memory_end
-    beq     t1, t2, ils_scrub
-    jal     _metal_memory_scrub
-
-ils_scrub:
-    /* Zero out ils memory. */
-    .weak metal_ils_0_memory_start
-    .weak metal_ils_0_memory_end
-    la      t1, metal_ils_0_memory_start
-    la      t2, metal_ils_0_memory_end
-    beq     t1, t2, dls_scrub
-    jal     _metal_memory_scrub
-
-dls_scrub:
-    /* Zero out dls memory. */
-    .weak metal_dls_0_memory_start
-    .weak metal_dls_0_memory_end
-    la      t1, metal_dls_0_memory_start
-    la      t2, metal_dls_0_memory_end
-    beq     t1, t2, sram_scrub
-    jal     _metal_memory_scrub
-
-sram_scrub:
-    /* Zero out sram memory. */
-    .weak metal_sys_sram_0_memory_start
-    .weak metal_sys_sram_0_memory_end
-    la      t1, metal_sys_sram_0_memory_start
-    la      t2, metal_sys_sram_0_memory_end
-    beq     t1, t2, memory_scrub
-    jal     _metal_memory_scrub
-
-memory_scrub:
-    /* Zero out main memory. */
-    .weak metal_memory_0_memory_start
-    .weak metal_memory_0_memory_end
-    la      t1, metal_memory_0_memory_start
-    la      t2, metal_memory_0_memory_end
-    beq     t1, t2, done_scrub
-    jal     _metal_memory_scrub
-
-done_scrub:
-    lui     a4, 0x2000
-    li      a5,1
-    sw      a5,0(a4)
-    fence   w,rw
-    j skip_scrub
-
-wait_scrub:
-    lui     a4, 0x2000
-    lw      a5, 0(a4)
-    beqz    a5, wait_scrub
+    /* Zero out data segment */
+    la      t1, metal_segment_data_target_start
+    la      t2, metal_segment_data_target_end
+    beq     t1, t2, 1f
+    jal     __metal_memory_scrub
+1:
+    /* Zero out itim memory */
+    la      t1, metal_segment_itim_target_start
+    la      t2, metal_segment_itim_target_end
+    beq     t1, t2, skip_scrub
+    jal     __metal_memory_scrub
 
 skip_scrub:
     /* Restore caller ra */
