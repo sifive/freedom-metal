@@ -1,5 +1,6 @@
+************************
 Driver Development Guide
-========================
+************************
 
 Freedom Metal is designed to enable the creation of new device
 drivers, both by adding them to the main Freedom Metal repository and
@@ -26,24 +27,11 @@ A Freedom Metal device driver includes at least four separate files:
     expected to be useful for applications, just for the driver
     itself.
 
-Template Files
---------------
-
-To incorporate Device Tree data into the compiled driver, Freedom
-Metal uses [Jinja](https://jinja.palletsprojects.com) templates. This
-takes a C source file with special template commands that are replaced
-with data computed out of the contents of the target Device Tree file.
-
-Freedom Metal uses
-[pydevicetree](https://github.com/sifive/pydevicetree/) to parse
-Device Tree files and make them available to templates. Everything in
-the Device Tree is available to templates.
-
 Directory Layout
 ----------------
 
-The Freedom Metal template engine expects to find files laid out in
-a standard fashion:
+Freedom-metal-generate expects to find files laid out in a standard
+fashion:
 
 .. graphviz::
 
@@ -75,19 +63,22 @@ a standard fashion:
   }
 
 
-Exposing Devices use Freedom Metal APIs.
-----------------------------------------
+Exposing Devices using Freedom Metal APIs
+-----------------------------------------
 
 Each device driver in Freedom Metal creates a unique driver-specific
 interface. This effectively provides separate name spaces for each
 driver and avoids symbol collisions. Applications may use these
-driver-specific interfaces if desired, but more general
-purpose code can target a broader range of hardware by using the
-generic Freedom Metal interfaces. For example, the SiFive UART driver
-exposes an interface which is prefixed with ``sifive_uart0_``. A set of
-those functions is also compatible with the generic
-Freedom Metal uart device, and so there is an entry in
-``sifive_blocks/templates/MANIFEST.ini``:
+driver-specific interfaces if desired, but more general purpose code
+can target a broader range of hardware by using the generic Freedom
+Metal interfaces. These are declared by entries in your source path
+under ``templates/MANIFEST.ini``. Any Metal Driver API described in
+the :ref:`api-reference-label` section can be used in this fashion.
+
+For example, the SiFive UART driver exposes an interface which is
+prefixed with ``sifive_uart0_``. A set of those functions is also
+compatible with the generic Freedom Metal uart device, and so there is
+an entry in ``sifive_blocks/templates/MANIFEST.ini``:
 
 .. code-block:: none
 
@@ -95,8 +86,32 @@ Freedom Metal uart device, and so there is an entry in
    Compatible = sifive,uart0
 
 With this declaration, freedom metal creates aliases which map the
-generic UART API to the SiFive UART driver, allowing applications to
-use those names.
+generic UART API to the SiFive UART driver like this:
+
+.. code-block:: c
+
+    #ifndef __METAL_DT_UART__H
+    #define __METAL_DT_UART__H
+
+    /* GENERATED FILE
+     * --------------
+     * This file is generated from a template based on the content of the target
+     * Devicetree.
+     */
+
+    #define __METAL_DT_NUM_UARTS 1
+
+    #define metal_uart_init sifive_uart0_init
+    #define metal_uart_putc sifive_uart0_putc
+    #define metal_uart_getc sifive_uart0_getc
+    #define metal_uart_get_baud_rate sifive_uart0_get_baud_rate
+    #define metal_uart_set_baud_rate sifive_uart0_set_baud_rate
+
+
+    #endif /* ! __METAL_DT_UART__H */
+
+Applications can now use ``metal_uart_`` names and have those get
+directed to the ``sifive,uart0`` driver.
 
 Templates
 ---------
@@ -104,13 +119,15 @@ Templates
 A key part of this system is the use of templates to build
 target-specific code using Device Tree and application definitions.  A
 more complete description of the Jinja template language can be
-found on the [Jinja website](https://jinja.palletsprojects.com).
+found on the Jinja_ web site.
+
+.. _Jinja: https://jinja.palletsprojects.com
 
 Let's look at the template which generates the Platform header file
 for the SiFive UART, which is found in
-``sifive-blocks/templates/metal/platform/metal_platform_sifive_uart0.h.j2``:
+``sifive-blocks/templates/metal/platform/metal_platform_sifive_uart0.h.j2``
 
-.. code-block:: c
+.. code-block:: none
 
     #ifndef METAL__PLATFORM__SIFIVE_UART0_H
     #define METAL__PLATFORM__SIFIVE_UART0_H
@@ -239,14 +256,14 @@ Platform Template File Contents
 -------------------------------
 
 The Platform Template file should be named
-``templates/metal/platform/metal_platform``*compatible*``.h.j2``. If the compatible string in
+``templates/metal/platform/metal_platform_`` *compatible* ``.h.j2``. If the compatible string in
 Device Tree is ``sifive,fe310-g000,hfxosc``, then the platform template
 file name would be
-``templates/metal/platform/metal_platform_fe310_g000_hfxosc.h.j2``.  This
+``templates/metal/platform/metal_platform_sifive_fe310_g000_hfxosc.h.j2``.  This
 header file is exposed to applications and so it should only define
 names which will not conflict with names selected by an
 application. The standard of practice here is to prefix all names with
-``METAL_``*COMPATIBLE* to ensure uniqueness.
+``METAL_`` *COMPATIBLE* to ensure uniqueness.
 
 This file should define the address and size of any register block for
 the device along with register offsets within that device. You can see
@@ -256,10 +273,10 @@ Private Template File Contents
 ------------------------------
 
 The Private Template file should be named
-``templates/metal/private/metal_private``*compatible*``.h.j2``. If the
+``templates/metal/private/metal_private_`` *compatible* ``.h.j2``. If the
 compatible string in Device Tree is ``sifive,fe310-g000,hfxosc``, then
 the private template file name would be
-``templates/metal/private/metal_private_fe310_g000_hfxosc.h.j2``.
+``templates/metal/private/metal_private_sifive_fe310_g000_hfxosc.h.j2``.
 This file contains data for use by the freedom-metal driver. It should
 contain definitions for static data needed by the driver which can be
 derived from the Device Tree file, including references to other
@@ -273,7 +290,7 @@ dispatch definitions are specified. These configure the referenced
 clock and interrupt controllers for our device. Let's walk through the
 ``sifive,uart0`` Private Template.
 
-.. code-block:: C
+.. code-block:: none
 
     #ifndef METAL__DRIVERS__SIFIVE_UART0_H
     #define METAL__DRIVERS__SIFIVE_UART0_H
@@ -292,14 +309,14 @@ This portion wraps the header file in a guard #ifdef to prevent the
 contents from being parsed more than once by the compiler, then
 includes all of the necessary header files
 
-.. code-block:: C
+.. code-block:: none
 
     {% if 'sifive,uart0' in devices %}
 
 This statement elides the rest of the contents of file if there are no
 ``sifive,uart0`` compatible devices in the target system.
 
-.. code-block:: C
+.. code-block:: none
 
     {% set sifive_uart0s = devices['sifive,uart0'] %}
 
@@ -355,7 +372,7 @@ system. Here's the template for that,
 Here's all of the Device Tree data relevant to the ``sifive,uart0``
 driver, including the referenced clocks, the pinmux configuration and
 the interrupt controller. This uses the
-``METAL_SIFIVE_UART0_``*id*``BASE_ADDRESS definition from the Platform
+``METAL_SIFIVE_UART0_`` *id* ``_BASE_ADDRESS`` definition from the Platform
 Template file along with the ``pinmux`` and ``interrupt-parent``
 referenced devices.
 
@@ -364,7 +381,7 @@ interrupts to the generic ``metal_clock`` and ``metal_interrupt`` APIs
 so that the ``sifive,uart0`` driver can be written using those
 interfaces and get compiled to directly call the relevant drivers:
 
-.. code-block:: c
+.. code-block:: none
 
     {% if sifive_uart0s[0].clocks is defined %}
     {% set driver_string = to_snakecase(sifive_uart0s[0].clocks[0].compatible[0]) %}
@@ -423,6 +440,7 @@ On the HiFive1 Revb board, this generates the
 following ``metal/private/metal_private_sifive_uart0.h`` file:
 
 .. code-block:: c
+
     #ifndef METAL__DRIVERS__SIFIVE_UART0_H
     #define METAL__DRIVERS__SIFIVE_UART0_H
 
@@ -508,10 +526,10 @@ Metal Driver Header
 -------------------
 
 This is an optional file where you can place fixed definitions for
-your driver and is named ``metal/drivers/``*compatible*``.h``. If the
+your driver and is named ``metal/drivers/`` *compatible* ``.h``. If the
 compatible string in Device Tree is ``sifive,fe310-g000,hfxosc``, then
 the metal driver header file name would be
-``metal/drivers/sifive_fe310_g000_hfxosc.h``.  It is a public header
+``metal/drivers/sifive_fe310_g000_hfxosc.h``.  This is a public header
 file for interfaces which are not part of the generic Freedom Metal
 API for your device. As the ``sifive,uart0`` driver does not declare
 any interfaces beyond the generic ``metal_uart`` interface, it does
@@ -520,11 +538,10 @@ not include this header file.
 Metal Driver Source
 -------------------
 
-The device driver source code file name is
-``metal/src/drivers/``*compatible*``.c. If the compatible string in
-Device Tree is ``sifive,fe310-g000,hfxosc``, then the metal driver
-source file name would be
-``metal/src/drivers/sifive_fe310_g000_hfxosc.c``.
+The device driver source code file name is ``src/drivers/``
+*compatible* ``.c``. If the compatible string in Device Tree is
+``sifive,fe310-g000,hfxosc``, then the metal driver source file name
+would be ``src/drivers/sifive_fe310_g000_hfxosc.c``.
 
 Handling Interrupts
 -------------------
@@ -633,7 +650,7 @@ it supplies should include a stanza which generates calls to these
 functions. For instance, in the ``sifive,fe310-g000,pll`` private
 header template, you'll find:
 
-.. code-block:: c
+.. code-block:: none
 
     {% for compat in devices %}
 	{% if 'clocks' in devices[compat][0] %}
