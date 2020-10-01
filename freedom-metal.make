@@ -91,7 +91,7 @@ clean::
 	rm -rf metal .deps
 
 metal/metal.mk: $(METAL_MK_DEPEND)
-	python3 $(FREEDOM_METAL)/scripts/codegen.py --dts $(DEVICETREE) --source-paths $(FREEDOM_METAL) $(FREEDOM_METAL)/sifive-blocks --output-dir=metal
+	python3 $(FREEDOM_METAL)/scripts/freedom-metal-generate --dts $(DEVICETREE) --source-paths $(FREEDOM_METAL) $(FREEDOM_METAL)/sifive-blocks --output-dir=metal
 
 ESDK_SETTINGS_GENERATOR ?= $(FREEDOM_METAL)/../scripts/esdk-settings-generator
 
