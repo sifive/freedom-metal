@@ -34,6 +34,22 @@ typedef enum {
 } uart_parity;
 
 
+typedef enum uart_event {
+    METAL_UART_EVENT_NONE = 0x1,              // No event/interrupt pending.
+    METAL_UART_EVENT_TXDONE = 0x2,           // Transmit holding register empty or TX
+    			             	     // FIFO at or below trigger threshold.
+    METAL_UART_EVENT_RXDATA = 0x4,      // Receive buffer register data
+    				     	     // available (non-FIFO mode) or RX FIFO
+                                     	     // trigger level reached.
+
+    METAL_UART_EVENT_LINE_ERR = 0x6,         // Overrun/parity/framing error or break
+                                             // interrupt occurred.
+    METAL_UART_EVENT_BUSY      = 0x7,      //Attempt to write to the LCR[7] while
+                                     // DW_apb_uart was busy (DLAB).
+    METAL_UART_EVENT_TIMEOUT   = 0xc    
+}uart_event;
+
+
 struct metal_uart_vtable {
     void (*init)(struct metal_uart *uart, int baud_rate);
     void (*reinit)(struct metal_uart *uart, int baud_rate, uart_dls data, uart_stop_bits stop, uart_parity parity);
@@ -52,6 +68,7 @@ struct metal_uart_vtable {
     size_t (*get_tx_watermark)(struct metal_uart *uart);
     int (*set_rx_watermark)(struct metal_uart *uart, size_t length);
     size_t (*get_rx_watermark)(struct metal_uart *uart);
+    uart_event (*get_event)(struct metal_uart *uart);
 };
 
 /*!
@@ -246,6 +263,13 @@ __inline__ int metal_uart_set_receive_watermark(struct metal_uart *uart,
  */
 __inline__ size_t metal_uart_get_receive_watermark(struct metal_uart *uart) {
     return uart->vtable->get_rx_watermark(uart);
+}
+
+/*!
+ *
+ * */
+__inline__ uart_event metal_uart_get_event(struct metal_uart *uart){
+    return uart->vtable->get_event(uart);
 }
 
 #endif

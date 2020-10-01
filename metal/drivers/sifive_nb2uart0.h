@@ -11,6 +11,9 @@
 #define SIFIVE_NB2UART_BUSY	-1
 #define SIFIVE_NB2UART_TXERR	-2
 
+#define SIFIVE_NB2UART_FIFO_SIZE 512
+
+
 #define DIV_ROUND_CLOSEST(x, divisor)(			\
 {							\
 	typeof(x) __x = x;				\
@@ -28,6 +31,7 @@ struct __metal_driver_vtable_sifive_nb2uart0 {
 
 struct __metal_driver_sifive_nb2uart0;
 
+//define UART_FIFO_ENABLED  
 
 /*
  * These are the definitions for the Modem Control Register
@@ -117,6 +121,31 @@ struct __metal_driver_sifive_nb2uart0;
 
 /* useful defaults for LCR */
 #define UART_LCR_8N1	0x03
+
+#define UART_IER_ERBFI  (1<<0)	/*Enable Received Data Available Interrupt*/
+#define UART_IER_ETBEI  (1<<1)	/*Enable Transmit Holding Register Empty Interrupt*/
+#define UART_IER_ELSI   (1<<2)  /*Enable Receiver Line Status Interrupt*/
+#define UART_IER_EDSSI  (1<<3)  /*Enable Modem Status Interrupt*/
+#define UART_IER_ELCOLR (1<<4)  
+
+
+
+/*0x0 (FIFO_CHAR_1)	  : 1 character in FIFO*/
+/*0x1 (FIFO_QUARTER_FULL) : FIFO 1/4 full*/
+/*0x2 (FIFO_HALF_FULL)	  : FIFO 1/2 full*/
+/*0x3 (FIFO_FULL_2)	  : FIFO 2 less than full*/
+
+#define UART_RX_TRIGGER(level) (level<<6)
+
+/*0x0 (FIFO_EMPTY)	  : FIFO Empty*/
+/*0x1 (FIFO_CHAR_2)	  : 2 characters in FIFO*/
+/*0x2 (FIFO_QUARTER_FULL) : FIFO 1/4 full*/
+/*0x3 (FIFO_HALF_FULL)    : FIFO 1/2 full*/
+#define UART_TX_TRIGGER(level) (level<<6)
+
+
+
+
 
 /*! @brief Enumeration type for UART line control settings. */
 typedef enum

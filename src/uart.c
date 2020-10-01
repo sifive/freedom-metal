@@ -32,6 +32,8 @@ extern __inline__ int metal_uart_set_receive_watermark(struct metal_uart *uart,
 extern __inline__ size_t
 metal_uart_get_receive_watermark(struct metal_uart *uart);
 
+extern __inline__  uart_event metal_uart_get_event(struct metal_uart *uart);
+
 struct metal_uart *metal_uart_get_device(unsigned int device_num) {
 #if __METAL_DT_MAX_UARTS > 0
     if (device_num < __METAL_DT_MAX_UARTS) {
