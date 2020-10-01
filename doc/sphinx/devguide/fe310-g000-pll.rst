@@ -9,7 +9,7 @@ rate can use Freedom Metal to request that the PLL take on a certain output rate
 In the DeviceTree for your target, there should be a node like the following
 (example taken from the SiFive HiFive1):
 
-.. code-block:: DeviceTree
+.. code-block:: none
 
 	hfclk: clock@4 {
 		compatible = "sifive,fe310-g000,pll";
