@@ -118,17 +118,17 @@ def local_interrupt_is_hw_vectored(compatible, irq, config):
     return False
 
 
-def local_interrupt_priority(compatible, irq, config):
+def local_interrupt_priority(compatible, source_id, config):
     """
-    Given the compatible string, local interrupt id, and config, determines the interrupt
-    priority setting.
+    Given the compatible string, index within that devices interrupt parameter,
+    and config, determines the interrupt priority setting.
     """
     if config is None:
         return 0
     if "interrupts.priority" in config:
         if compatible in config["interrupts.priority"]:
             for config_id, config_prio in config["interrupts.priority"][compatible]:
-                if config_id == irq:
+                if config_id == source_id:
                     return config_prio
     return 0
 
@@ -171,10 +171,10 @@ def local_interrupts(dts, config):
                         },
                         "id": irq_id,
                         "hwvectored": local_interrupt_is_hw_vectored(
-                            node.get_field("compatible"), irq_id, config
+                            node.get_field("compatible"), source_id, config
                         ),
                         "priority": local_interrupt_priority(
-                            node.get_field("compatible"), irq_id, config
+                            node.get_field("compatible"), source_id, config
                         ),
                     }
                 )
@@ -194,10 +194,10 @@ def local_interrupts(dts, config):
                         },
                         "id": irq_id,
                         "hwvectored": local_interrupt_is_hw_vectored(
-                            "sifive,local-external-interrupts0", irq_id, config
+                            "sifive,local-external-interrupts0", source_id, config
                         ),
                         "priority": local_interrupt_priority(
-                            "sifive,local-external-interrupts0", irq_id, config
+                            "sifive,local-external-interrupts0", source_id, config
                         ),
                     }
                 )
