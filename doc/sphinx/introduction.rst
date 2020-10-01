@@ -1,5 +1,6 @@
+*****************************
 Introduction to Freedom Metal
-=============================
+*****************************
 
 This is the documentation for the SiFive Freedom Metal library |version|.
 
