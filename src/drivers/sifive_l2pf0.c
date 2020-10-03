@@ -38,7 +38,7 @@ void sifive_l2pf0_enable(void) {
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
 
-    if (hartid < l2pf_base_len) {
+    if ((hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
         uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
         /* Enable L2 prefetch unit for current hart */
@@ -52,7 +52,7 @@ void sifive_l2pf0_disable(void) {
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
 
-    if (hartid < l2pf_base_len) {
+    if ((hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
         uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
         /* Disable L2 prefetch unit for current hart */
@@ -68,7 +68,7 @@ void sifive_l2pf0_get_config(sifive_l2pf0_config *config) {
     uint32_t val;
 
     /* Check for NULL, valid base address */
-    if ((config) && (hartid < l2pf_base_len)) {
+    if ((config) && (hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
         /* Get currently active L2 prefetch configuration values */
         val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
@@ -103,7 +103,7 @@ void sifive_l2pf0_set_config(sifive_l2pf0_config *config) {
     uint32_t val;
 
     /* Check for NULL, valid base address */
-    if ((config) && (hartid < l2pf_base_len)) {
+    if ((config) && (hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
         /* Get values from configuration to write into register */
         val = (uint32_t)(
             (config->HwPrefetchEnable & REG_MASK_BITWIDTH1) |
