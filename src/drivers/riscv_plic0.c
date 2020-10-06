@@ -30,25 +30,32 @@
 extern metal_interrupt_handler_t __metal_global_interrupt_table[];
 
 static __inline__ unsigned int __metal_plic0_claim_interrupt(uint32_t hartid) {
-    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) +
-                     METAL_RISCV_PLIC0_CONTEXT_CLAIM);
+    return PLIC_REGW(
+        METAL_RISCV_PLIC0_CONTEXT_BASE +
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
+        METAL_RISCV_PLIC0_CONTEXT_CLAIM);
 }
 
 static __inline__ void __metal_plic0_complete_interrupt(int hartid,
                                                         unsigned int id) {
-    PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_CLAIM) = id;
+    PLIC_REGW(METAL_RISCV_PLIC0_CONTEXT_BASE +
+              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
+              METAL_RISCV_PLIC0_CONTEXT_CLAIM) = id;
 }
 
 static __inline__ int
 __metal_riscv_plic0_set_threshold(int hartid, unsigned int threshold) {
-    PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_THRESHOLD) =
-        threshold;
+    PLIC_REGW(METAL_RISCV_PLIC0_CONTEXT_BASE +
+              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
+              METAL_RISCV_PLIC0_CONTEXT_CLAIM) = threshold;
     return 0;
 }
 
 static __inline__ unsigned int __metal_riscv_plic0_get_threshold(int hartid) {
-    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) +
-                     METAL_RISCV_PLIC0_CONTEXT_THRESHOLD);
+    return PLIC_REGW(
+        METAL_RISCV_PLIC0_CONTEXT_BASE +
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
+        METAL_RISCV_PLIC0_CONTEXT_CLAIM);
 }
 
 static __inline__ int __metal_plic0_enable(int hartid, int id) {
@@ -56,10 +63,12 @@ static __inline__ int __metal_plic0_enable(int hartid, int id) {
         return -1;
     }
 
+    const uintptr_t id_offset = (id / 32) * 4;
+    const uint32_t enable_mask = (1 << id % 32);
+
     PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-              (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) +
-              (id >> METAL_PLIC_SOURCE_SHIFT) * 4) |=
-        (1 << (id & METAL_PLIC_SOURCE_MASK));
+              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +
+              id_offset) |= enable_mask;
 
     metal_cpu_enable_external_interrupt();
 
@@ -71,17 +80,22 @@ static __inline__ int __metal_plic0_disable(int hartid, int id) {
         return -1;
     }
 
+    const uintptr_t id_offset = (id / 32) * 4;
+    const uint32_t disable_mask = (1 << id % 32);
+
     PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-              (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) +
-              (id >> METAL_PLIC_SOURCE_SHIFT) * 4) &=
-        ~(1 << (id & METAL_PLIC_SOURCE_MASK));
+              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +
+              id_offset) &= ~disable_mask;
 
     /* Check if any PLIC interrupts remain enabled and simply exit
      * if they are. */
     for (int i = 0; i < (METAL_RISCV_PLIC0_0_RISCV_NDEV / 32); i++) {
         if (PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-                      (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) + i) != 0)
+                      (PLIC_CONTEXT_ID(hartid) *
+                       METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +
+                      (i * 4)) != 0) {
             return 0;
+        }
     }
 
     /* No more PLIC interrupts are enabled, so disable the external interrupt.
