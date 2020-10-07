@@ -10,18 +10,19 @@
 #include <metal/cpu.h>
 #include <metal/init.h>
 #include <metal/io.h>
+#include <metal/private/metal_private_sifive_buserror0.h>
 
 #define HARTID(cpu) ((cpu).__hartid)
 #define CPU_HAS_BEU(cpu) HART_HAS_BEU(HARTID(cpu))
 #define BEU_REGB(cpu, offset)                                                  \
     __METAL_ACCESS_ONCE(                                                       \
-        (__metal_io_u8 *)(BEU_BASE_ADDR(HARTID(cpu)) + (offset)))
+        (__metal_io_u8 *)(BEU_BASE_ADDR(HARTID(cpu)) + ((uintptr_t)offset)))
 
 /* Enable all events on all hart bus error units */
 METAL_CONSTRUCTOR(metal_driver_sifive_buserror_init) {
     for (int hart = 0; hart < metal_cpu_get_num_harts(); hart++) {
         struct metal_cpu cpu = metal_cpu_get(hart);
-        sifive_buserror_enable_events(cpu, METAL_BUSERROR_EVENT_ALL)
+        sifive_buserror_enable_events(cpu, METAL_BUSERROR_EVENT_ALL);
     }
 }
 
@@ -61,7 +62,7 @@ sifive_buserror_event_t sifive_buserror_get_cause(struct metal_cpu cpu) {
         return METAL_BUSERROR_EVENT_INVALID;
     }
 
-    return (1 << BEU_REGB(cpu, METAL_SIFIVE_BUSERROR0_CAUSE))
+    return (1 << BEU_REGB(cpu, METAL_SIFIVE_BUSERROR0_CAUSE));
 }
 
 int sifive_buserror_clear_cause(struct metal_cpu cpu) {
@@ -103,7 +104,7 @@ int sifive_buserror_clear_event_accrued(struct metal_cpu cpu,
         return -2;
     }
 
-    BEU_REGB(cpu, METAL_SIFIVE_BUSERROR0_ACCRUED) = 0;
+    BEU_REGB(cpu, METAL_SIFIVE_BUSERROR0_ACCRUED) &= ~events;
 
     return 0;
 }

@@ -60,7 +60,7 @@ IRQ_{{ irq.id }}:
     {% endif %}
   {% endfor %}
 {% endif %}
-{% if 'sifive,buserror0' in devices and config_requests_hw_vectored(config) %}
+{% if 'sifive,buserror0' in devices and local_interrupts.irqs|length >= 128 and local_interrupts.irqs[127].hwvectored %}
 /*
  * The Bus Error Unit has a hard-coded local interrupt id of 128. Therefore,
  * when hardware-vectored local interrupts are enabled, we need to pad out
