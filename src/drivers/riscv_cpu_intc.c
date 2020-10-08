@@ -33,14 +33,14 @@ void riscv_cpu_intc_init(struct metal_interrupt intc) {
 #endif
         }
 
-        init_done[get_index(intc)] = 1;
-    }
-}
+#ifdef METAL_RISCV_PLIC0
+        /* When the PLIC exists, automatically enable the external interrupt
+         * line.
+         */
+        riscv_cpu_intc_enable(intc, METAL_INTERRUPT_ID_EXT);
+#endif
 
-METAL_CONSTRUCTOR(init_riscv_cpu_intc) {
-    for (int i = 0; i < __METAL_DT_NUM_HARTS; i++) {
-        struct metal_interrupt intc = (struct metal_interrupt){i};
-        riscv_cpu_intc_init(intc);
+        init_done[get_index(intc)] = 1;
     }
 }
 

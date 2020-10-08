@@ -135,7 +135,7 @@ void riscv_plic0_init(struct metal_interrupt plic) {
         for (int hartid = 0; hartid < __METAL_DT_NUM_HARTS; hartid++) {
             for (int id = 0; id < METAL_RISCV_PLIC0_0_RISCV_NDEV; id++) {
                 __metal_plic0_disable(hartid, id);
-                riscv_plic0_set_priority(intc, id, 1);
+                riscv_plic0_set_priority(plic, id, 1);
             }
 
             /* Set the default threshold to 0 so that any enabled interrupts
