@@ -6,7 +6,6 @@
 #ifdef METAL_RISCV_PLIC0
 
 #include <metal/cpu.h>
-#include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/drivers/riscv_plic0.h>
 #include <metal/init.h>
 #include <metal/io.h>
@@ -120,17 +119,20 @@ void metal_riscv_plic0_source_0_handler(void) {
     __metal_plic0_complete_interrupt(hartid, idx);
 }
 
+/* Initialize the PLIC by:
+ *
+ *  - Disabling all interrupts
+ *  - Setting all interrupt priorities to 1
+ *  - Setting the interrupt threshold to 0
+ *
+ * As a result, any enabled and pending interrupt will fire without any
+ * other configuration. The user can always change interrupt priority
+ * and threshold to their own desired configuration after init.
+ */
 void riscv_plic0_init(struct metal_interrupt plic) {
     static bool init_done = false;
     if (!init_done) {
         for (int hartid = 0; hartid < __METAL_DT_NUM_HARTS; hartid++) {
-            struct metal_interrupt intc = (struct metal_interrupt){hartid};
-
-            /* Initialize riscv,cpu-intc */
-            metal_interrupt_init(intc);
-
-            /* Disable all interrupts, but set their priority to 1 so that
-             * the interrupt fires when enabled and pending. */
             for (int id = 0; id < METAL_RISCV_PLIC0_0_RISCV_NDEV; id++) {
                 __metal_plic0_disable(hartid, id);
                 riscv_plic0_set_priority(intc, id, 1);
@@ -139,9 +141,6 @@ void riscv_plic0_init(struct metal_interrupt plic) {
             /* Set the default threshold to 0 so that any enabled interrupts
              * are above the threshold. */
             __metal_riscv_plic0_set_threshold(hartid, 0);
-
-            /* Enable plic (ext) interrupt with with hartid controller */
-            metal_interrupt_enable(intc, METAL_INTERRUPT_ID_EXT);
         }
         init_done = true;
     }
