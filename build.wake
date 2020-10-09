@@ -50,6 +50,8 @@ global tuple MakeElfOptions =
   global IncludeDirs:  List String
   global ElfFile:      String
 
+def freedomMetalRoot = here
+
 global def runFreedomMetalInstall options =
   def outputDir = options.getFreedomMetalConfigureOptionsOutputDir
   def metalHeader = options.getFreedomMetalConfigureOptionsMachineHeader
@@ -60,27 +62,25 @@ global def runFreedomMetalInstall options =
 
   def installedFreedomMetal =
     def inputs =
-      sources "freedom-metal" `.*`
-      | filter (!matches `freedom-metal/doc/.*` _.getPathName)
+      sources freedomMetalRoot `.*`
+      | filter (!matches (freedomMetalRoot.quote, `/doc/.*`, Nil).regExpCat _.getPathName)
     def cmdline =
       "rsync",
       "-r",
-      "--exclude", "freedom-metal/doc",
-      "--exclude", "freedom-metal/.git",
+      "--exclude", "{freedomMetalRoot}/doc",
+      "--exclude", "{freedomMetalRoot}/.git",
       "--exclude", "*.wake",
-      "freedom-metal",
+      freedomMetalRoot,
       outputDir,
       Nil
-    def fnOutputs _ =
-      files "freedom-metal" `.*`
-      | filter (!matches `freedom-metal/(\.git|doc)/.*` _)
+    def fnOutputs outputs =
+      outputs
+      | filter (!matches (freedomMetalRoot.quote, `/(\.git|doc)/.*`, Nil).regExpCat _)
       | filter (!matches `.*\.(in|am|m4|wake)` _) # exclude these because autoconf modfies them
       | filter (!matches `(.*/)?(configure)` _)
-      | map ("{metalInstallDir}/{_}")
 
     makePlan cmdline inputs
     | setPlanFnOutputs fnOutputs
-    | setPlanLocalOnly True
     | runJob
     | getJobOutputs
 
