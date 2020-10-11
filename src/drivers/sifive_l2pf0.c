@@ -9,9 +9,7 @@
 #include <metal/machine.h>
 
 /* Macros to access memory mapped registers */
-#define REGW(x)                                                                \
-    *(volatile uint32_t *)(METAL_SIFIVE_L2PF0_0_BASE_ADDRESS +                 \
-                           hartid * 0x2000 + x)
+#define REGW(x) *((volatile uint32_t *)(l2pf_base[hartid] + x))
 
 /* Macros for register bit masks */
 #define REG_MASK_BITWIDTH1 0x01
@@ -32,63 +30,45 @@
 #define REG_BITSHIFT_21 21
 #define REG_BITSHIFT_28 28
 
-/* Macros to capture trap, if L2PF does not exist for a hart id. */
-#define SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec)                                 \
-    __asm__ __volatile__("la %0, 1f \n\t"                                      \
-                         "csrr %1, mtvec \n\t"                                 \
-                         "csrw mtvec, %0 \n\t"                                 \
-                         : "+r"(exit), "+r"(mtvec))
-
-#define SIFIVE_L2PF0_TRAP_RESTORE(mtvec)                                       \
-    __asm__ __volatile__(".align 2 \n\t"                                       \
-                         "1: \n\t"                                             \
-                         "csrw mtvec, %0 \n\t"                                 \
-                         : "+r"(mtvec))
+/* Array of base addresses with HART IDs as the index */
+unsigned long l2pf_base[] = METAL_SIFIVE_L2PF0_BASE_ADDR;
+int l2pf_base_len = sizeof(l2pf_base) / sizeof(unsigned long);
 
 void sifive_l2pf0_enable(void) {
-    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
 
-    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
+    if ((hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
+        uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
-    uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
+        /* Enable L2 prefetch unit for current hart */
+        val |= REG_MASK_BITWIDTH1;
 
-    /* Enable L2 prefetch unit for current hart */
-    val |= REG_MASK_BITWIDTH1;
-
-    REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL) = val;
-
-    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
+        REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL) = val;
+    }
 }
 
 void sifive_l2pf0_disable(void) {
-    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
 
-    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
+    if ((hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
+        uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
-    uint32_t val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
+        /* Disable L2 prefetch unit for current hart */
+        val &= ~REG_MASK_BITWIDTH1;
 
-    /* Disable L2 prefetch unit for current hart */
-    val &= ~REG_MASK_BITWIDTH1;
-
-    REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL) = val;
-
-    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
+        REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL) = val;
+    }
 }
 
 void sifive_l2pf0_get_config(sifive_l2pf0_config *config) {
-    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
     uint32_t val;
 
-    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
-
-    if (config) /* Check for NULL */
-    {
+    /* Check for NULL, valid base address */
+    if ((config) && (hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
         /* Get currently active L2 prefetch configuration values */
         val = REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL);
 
@@ -115,19 +95,15 @@ void sifive_l2pf0_get_config(sifive_l2pf0_config *config) {
             ((val >> REG_BITSHIFT_9) & REG_MASK_BITWIDTH4);
         config->Window = ((val >> REG_BITSHIFT_13) & REG_MASK_BITWIDTH6);
     }
-    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
 }
 
 void sifive_l2pf0_set_config(sifive_l2pf0_config *config) {
-    volatile uintptr_t exit = 0, mtvec = 0;
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
     uint32_t val;
 
-    SIFIVE_L2PF0_TRAP_CAPTURE(exit, mtvec);
-
-    if (config) /* Check for NULL */
-    {
+    /* Check for NULL, valid base address */
+    if ((config) && (hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
         /* Get values from configuration to write into register */
         val = (uint32_t)(
             (config->HwPrefetchEnable & REG_MASK_BITWIDTH1) |
@@ -156,7 +132,6 @@ void sifive_l2pf0_set_config(sifive_l2pf0_config *config) {
 
         REGW(METAL_SIFIVE_L2PF0_USER_CONTROL) = val;
     }
-    SIFIVE_L2PF0_TRAP_RESTORE(mtvec);
 }
 
 #endif

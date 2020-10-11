@@ -66,6 +66,8 @@ void sifive_ccache0_get_config(sifive_ccache0_config *config) {
         /* Populate cache configuration data */
         config->num_bank = (val & SIFIVE_CCACHE0_BYTE_MASK);
         config->num_ways = ((val >> REG_SHIFT_8) & SIFIVE_CCACHE0_BYTE_MASK);
+        /* no. of sets, block size is 2's power of register value
+        (2 << (value-1)) */
         config->num_sets =
             2 << (((val >> REG_SHIFT_16) & SIFIVE_CCACHE0_BYTE_MASK) - 1);
         config->block_size =
