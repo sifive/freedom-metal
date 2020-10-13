@@ -18,7 +18,7 @@
 static const uintptr_t dt_beu_base_addrs[__METAL_DT_NUM_HARTS] = {
     {% for hart in harts %}
         {% if 'sifive_buserror' in hart %}
-    METAL_SIFIVE_BUSERROR0_{{ hart['sifive_buserror'].id }}_BASE_ADDRESS,
+    METAL_SIFIVE_BUSERROR0_{{ hart['sifive_buserror'][0].id }}_BASE_ADDRESS,
         {% else %}
     0UL,
         {% endif %}
@@ -30,7 +30,7 @@ static const uintptr_t dt_beu_base_addrs[__METAL_DT_NUM_HARTS] = {
 
 {% else %}
 
-    {% if 'sifive_buserror' in hart %}
+    {% if 'sifive_buserror' in harts[0] %}
 #define BEU_BASE_ADDR(hartid) METAL_SIFIVE_BUSERROR0_0_BASE_ADDRESS
 #define HART_HAS_BEU(hartid) (BEU_BASE_ADDR(hartid) != 0UL)
     {% else %}

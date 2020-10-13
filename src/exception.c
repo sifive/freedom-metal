@@ -3,6 +3,7 @@
 
 #include <metal/exception.h>
 #include <metal/interrupt.h>
+#include <metal/platform.h>
 #include <metal/riscv.h>
 #include <stdint.h>
 
@@ -30,17 +31,19 @@ void __metal_exception_handler(riscv_xlen_t mcause) {
     const int id = RISCV_MCAUSE_ID(mcause);
     const struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
 
-#ifdef METAL_SIFIVE_BUSERROR0
-    /* The SiFive Bus Error Unit has a hard-coded local interrupt id of 128 */
-    if (id == 128) {
-        metal_sifive_buserror0_source_0_handler();
-    }
-#endif
-
     __metal_exception_table[id](cpu, id);
 }
 
 void __metal_interrupt_handler(riscv_xlen_t mcause) {
     const int id = RISCV_MCAUSE_ID(mcause);
+
+#ifdef METAL_SIFIVE_BUSERROR0
+    /* The SiFive Bus Error Unit has a hard-coded local interrupt id of 128 */
+    if (id == 128) {
+        metal_sifive_buserror0_source_0_handler();
+        return;
+    }
+#endif
+
     __metal_local_interrupt_table[id]();
 }
