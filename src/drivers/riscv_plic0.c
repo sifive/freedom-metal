@@ -17,6 +17,28 @@
     (__METAL_ACCESS_ONCE(                                                      \
         (__metal_io_u32 *)(METAL_RISCV_PLIC0_0_BASE_ADDRESS + (offset))))
 
+/* These per-hart register access macros deduplicate the offset calculations for
+ * their associated registers. The main extra complication being the PLIC's
+ * concept of "contexts". These macros use the PLIC_CONTEXT_ID() macro,
+ * generated from the Devicetree in metal/private/metal_private_riscv_plic0.h,
+ * to map a given hartid to the PLIC context for that hart's M mode.
+ */
+#define PLIC_CLAIM_REGW(hartid)                                                \
+    PLIC_REGW(                                                                 \
+        METAL_RISCV_PLIC0_CONTEXT_BASE +                                       \
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +     \
+        METAL_RISCV_PLIC0_CONTEXT_CLAIM)
+#define PLIC_THRESHOLD_REGW(hartid)                                            \
+    PLIC_REGW(                                                                 \
+        METAL_RISCV_PLIC0_CONTEXT_BASE +                                       \
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +     \
+        METAL_RISCV_PLIC0_CONTEXT_THRESHOLD)
+#define PLIC_ENABLE_REGW(hartid, id)                                           \
+    PLIC_REGW(                                                                 \
+        METAL_RISCV_PLIC0_ENABLE_BASE +                                        \
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +     \
+        ((id / 32) * 4))
+
 #define for_each_metal_affinity(bit, metal_affinity)                           \
     for (bit = 0; metal_affinity.bitmask; bit++, metal_affinity.bitmask >>= 1)
 
@@ -29,32 +51,22 @@
 extern metal_interrupt_handler_t __metal_global_interrupt_table[];
 
 static __inline__ unsigned int __metal_plic0_claim_interrupt(uint32_t hartid) {
-    return PLIC_REGW(
-        METAL_RISCV_PLIC0_CONTEXT_BASE +
-        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
-        METAL_RISCV_PLIC0_CONTEXT_CLAIM);
+    return PLIC_CLAIM_REGW(hartid);
 }
 
 static __inline__ void __metal_plic0_complete_interrupt(int hartid,
                                                         unsigned int id) {
-    PLIC_REGW(METAL_RISCV_PLIC0_CONTEXT_BASE +
-              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
-              METAL_RISCV_PLIC0_CONTEXT_CLAIM) = id;
+    PLIC_CLAIM_REGW(hartid) = id;
 }
 
 static __inline__ int
 __metal_riscv_plic0_set_threshold(int hartid, unsigned int threshold) {
-    PLIC_REGW(METAL_RISCV_PLIC0_CONTEXT_BASE +
-              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
-              METAL_RISCV_PLIC0_CONTEXT_CLAIM) = threshold;
+    PLIC_THRESHOLD_REGW(hartid) = threshold;
     return 0;
 }
 
 static __inline__ unsigned int __metal_riscv_plic0_get_threshold(int hartid) {
-    return PLIC_REGW(
-        METAL_RISCV_PLIC0_CONTEXT_BASE +
-        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +
-        METAL_RISCV_PLIC0_CONTEXT_CLAIM);
+    return PLIC_THRESHOLD_REGW(hartid);
 }
 
 static __inline__ int __metal_plic0_enable(int hartid, int id) {
@@ -62,12 +74,9 @@ static __inline__ int __metal_plic0_enable(int hartid, int id) {
         return -1;
     }
 
-    const uintptr_t id_offset = (id / 32) * 4;
-    const uint32_t enable_mask = (1 << id % 32);
+    const uint32_t enable_mask = (1 << (id % 32));
 
-    PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +
-              id_offset) |= enable_mask;
+    PLIC_ENABLE_REGW(hartid, id) |= enable_mask;
 
     metal_cpu_enable_external_interrupt();
 
@@ -79,20 +88,14 @@ static __inline__ int __metal_plic0_disable(int hartid, int id) {
         return -1;
     }
 
-    const uintptr_t id_offset = (id / 32) * 4;
-    const uint32_t disable_mask = (1 << id % 32);
+    const uint32_t disable_mask = (1 << (id % 32));
 
-    PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-              (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +
-              id_offset) &= ~disable_mask;
+    PLIC_ENABLE_REGW(hartid, id) &= ~disable_mask;
 
     /* Check if any PLIC interrupts remain enabled and simply exit
      * if they are. */
     for (int i = 0; i < (METAL_RISCV_PLIC0_0_RISCV_NDEV / 32); i++) {
-        if (PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-                      (PLIC_CONTEXT_ID(hartid) *
-                       METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +
-                      (i * 4)) != 0) {
+        if (PLIC_ENABLE_REGW(hartid, i * 32) == 0) {
             return 0;
         }
     }
