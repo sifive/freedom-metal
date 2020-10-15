@@ -61,9 +61,10 @@ global def runFreedomMetalInstall options =
   def metalInstallDir = outputDir
 
   def installedFreedomMetal =
-    def inputs =
+    def sourceFiles =
       sources freedomMetalRoot `.*`
       | filter (!matches (freedomMetalRoot.quote, `/doc/.*`, Nil).regExpCat _.getPathName)
+    def inputs = mkdir outputDir, sourceFiles
     def cmdline =
       "rsync",
       "-r",
