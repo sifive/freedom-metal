@@ -19,40 +19,47 @@
 #define __METAL_DT_NUM_RISCV_PLIC0S {{ riscv_plic0s|length }}
 
 {#
-   The PLIC has a claim/complete context window for each external interrupt line
-   implemented for each hart. This means that for this design:
+   The PLIC has an interrupt context for each non-User privilege mode for each
+   hart. This means that for this design:
 
-     Hart 0 - only machine external interrupt
-     Hart 1 - machine and supervisor external interrupts
-     hart 2 - machine and supervisor extarnal interrupts
+     Hart 0 - Machine-mode only
+     Hart 1 - Machine, Supervisor, and User modes
+     Hart 2 - Machine, Supervisor, and User modes
 
-   the PLIC will have the following memory map:
+   the PLIC will have the following interrupt contexts:
 
-     BASE + 0x0000 - Hart 0 M mode context window
-     BASE + 0x1000 - Hart 1 M mode context window
-     BASE + 0x2000 - Hart 1 S mode context window
-     BASE + 0x3000 - Hart 2 M mode context window
-     BASE + 0x4000 - Hart 2 S mode context window
+     Context 0 - Hart 0 M Mode
+     Context 1 - Hart 1 M Mode
+     Context 2 - Hart 1 S Mode
+     Context 3 - Hart 2 M mode
+     Context 4 - Hart 2 S Mode
 
    and this will be represented in the Devicetree node for the PLIC as:
 
      interrupts-extended = <&hlic0 11 &hlic1 11 &hlic1 13 &hlic2 11 &hlic2 13>;
 
-   The following template extracts the M mode context window base addresses for
-   each hart.
+   Therefore, the claim/complete context windows will be at:
+
+     BASE + 0 * 0x1000 - Context 0/Hart 0 M mode context window
+     BASE + 1 * 0x1000 - Context 1/Hart 1 M mode context window
+     BASE + 2 * 0x2000 - Context 2/Hart 1 S mode context window
+     BASE + 3 * 0x3000 - Context 3/Hart 2 M mode context window
+     BASE + 4 * 0x4000 - Context 4/Hart 2 S mode context window
+
+   The following template extracts the M mode context ids for each hart.
 #}
 {% set num_contexts = (riscv_plic0.interrupts_extended|length) // 2 %}
 {% if num_contexts == 1 %}
-#define PLIC_CONTEXT_BASE(hartid) METAL_RISCV_PLIC0_CONTEXT_BASE
+#define PLIC_CONTEXT_ID(hartid) 0
 {% else %}
-static const uintptr_t plic_context_offset[__METAL_DT_NUM_HARTS] = {
+static const uintptr_t plic_context_id[__METAL_DT_NUM_HARTS] = {
     {% for context in range(num_contexts) %}
         {% if riscv_plic0.interrupts_extended[2 * context + 1] == 11 %}
-    {{ "0x%xUL" % (4092 * context) }},
+    {{ context }},
         {% endif %}
     {% endfor %}
 };
-#define PLIC_CONTEXT_BASE(hartid) (METAL_RISCV_PLIC0_CONTEXT_BASE + plic_context_offset[hartid])
+#define PLIC_CONTEXT_ID(hartid) (plic_context_id[hartid])
 {% endif %}
 
 {% set driver_string = to_snakecase(riscv_plic0.interrupts_extended[0].compatible[0]) %}

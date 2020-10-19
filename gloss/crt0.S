@@ -142,6 +142,10 @@ _start:
 
 _skip_init:
 
+  /* All harts initialize their local interrupt controller */
+  csrr a0, mhartid
+  call riscv_cpu_intc_init
+
   /* Synchronize harts so that secondary harts wait until hart 0 finishes
      initializing */
   call __metal_synchronize_harts

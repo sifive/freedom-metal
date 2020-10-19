@@ -6,7 +6,6 @@
 #ifdef METAL_RISCV_PLIC0
 
 #include <metal/cpu.h>
-#include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/drivers/riscv_plic0.h>
 #include <metal/init.h>
 #include <metal/io.h>
@@ -17,6 +16,28 @@
 #define PLIC_REGW(offset)                                                      \
     (__METAL_ACCESS_ONCE(                                                      \
         (__metal_io_u32 *)(METAL_RISCV_PLIC0_0_BASE_ADDRESS + (offset))))
+
+/* These per-hart register access macros deduplicate the offset calculations for
+ * their associated registers. The main extra complication being the PLIC's
+ * concept of "contexts". These macros use the PLIC_CONTEXT_ID() macro,
+ * generated from the Devicetree in metal/private/metal_private_riscv_plic0.h,
+ * to map a given hartid to the PLIC context for that hart's M mode.
+ */
+#define PLIC_CLAIM_REGW(hartid)                                                \
+    PLIC_REGW(                                                                 \
+        METAL_RISCV_PLIC0_CONTEXT_BASE +                                       \
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +     \
+        METAL_RISCV_PLIC0_CONTEXT_CLAIM)
+#define PLIC_THRESHOLD_REGW(hartid)                                            \
+    PLIC_REGW(                                                                 \
+        METAL_RISCV_PLIC0_CONTEXT_BASE +                                       \
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_PER_CONTEXT_OFFSET) +     \
+        METAL_RISCV_PLIC0_CONTEXT_THRESHOLD)
+#define PLIC_ENABLE_REGW(hartid, id)                                           \
+    PLIC_REGW(                                                                 \
+        METAL_RISCV_PLIC0_ENABLE_BASE +                                        \
+        (PLIC_CONTEXT_ID(hartid) * METAL_RISCV_PLIC0_ENABLE_PER_CONTEXT) +     \
+        ((id / 32) * 4))
 
 #define for_each_metal_affinity(bit, metal_affinity)                           \
     for (bit = 0; metal_affinity.bitmask; bit++, metal_affinity.bitmask >>= 1)
@@ -30,25 +51,22 @@
 extern metal_interrupt_handler_t __metal_global_interrupt_table[];
 
 static __inline__ unsigned int __metal_plic0_claim_interrupt(uint32_t hartid) {
-    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) +
-                     METAL_RISCV_PLIC0_CONTEXT_CLAIM);
+    return PLIC_CLAIM_REGW(hartid);
 }
 
 static __inline__ void __metal_plic0_complete_interrupt(int hartid,
                                                         unsigned int id) {
-    PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_CLAIM) = id;
+    PLIC_CLAIM_REGW(hartid) = id;
 }
 
 static __inline__ int
 __metal_riscv_plic0_set_threshold(int hartid, unsigned int threshold) {
-    PLIC_REGW(PLIC_CONTEXT_BASE(hartid) + METAL_RISCV_PLIC0_CONTEXT_THRESHOLD) =
-        threshold;
+    PLIC_THRESHOLD_REGW(hartid) = threshold;
     return 0;
 }
 
 static __inline__ unsigned int __metal_riscv_plic0_get_threshold(int hartid) {
-    return PLIC_REGW(PLIC_CONTEXT_BASE(hartid) +
-                     METAL_RISCV_PLIC0_CONTEXT_THRESHOLD);
+    return PLIC_THRESHOLD_REGW(hartid);
 }
 
 static __inline__ int __metal_plic0_enable(int hartid, int id) {
@@ -56,10 +74,9 @@ static __inline__ int __metal_plic0_enable(int hartid, int id) {
         return -1;
     }
 
-    PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-              (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) +
-              (id >> METAL_PLIC_SOURCE_SHIFT) * 4) |=
-        (1 << (id & METAL_PLIC_SOURCE_MASK));
+    const uint32_t enable_mask = (1 << (id % 32));
+
+    PLIC_ENABLE_REGW(hartid, id) |= enable_mask;
 
     metal_cpu_enable_external_interrupt();
 
@@ -71,17 +88,16 @@ static __inline__ int __metal_plic0_disable(int hartid, int id) {
         return -1;
     }
 
-    PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-              (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) +
-              (id >> METAL_PLIC_SOURCE_SHIFT) * 4) &=
-        ~(1 << (id & METAL_PLIC_SOURCE_MASK));
+    const uint32_t disable_mask = (1 << (id % 32));
+
+    PLIC_ENABLE_REGW(hartid, id) &= ~disable_mask;
 
     /* Check if any PLIC interrupts remain enabled and simply exit
      * if they are. */
     for (int i = 0; i < (METAL_RISCV_PLIC0_0_RISCV_NDEV / 32); i++) {
-        if (PLIC_REGW(METAL_RISCV_PLIC0_ENABLE_BASE +
-                      (hartid * METAL_RISCV_PLIC0_ENABLE_PER_HART) + i) != 0)
+        if (PLIC_ENABLE_REGW(hartid, i * 32) == 0) {
             return 0;
+        }
     }
 
     /* No more PLIC interrupts are enabled, so disable the external interrupt.
@@ -106,28 +122,28 @@ void metal_riscv_plic0_source_0_handler(void) {
     __metal_plic0_complete_interrupt(hartid, idx);
 }
 
+/* Initialize the PLIC by:
+ *
+ *  - Disabling all interrupts
+ *  - Setting all interrupt priorities to 1
+ *  - Setting the interrupt threshold to 0
+ *
+ * As a result, any enabled and pending interrupt will fire without any
+ * other configuration. The user can always change interrupt priority
+ * and threshold to their own desired configuration after init.
+ */
 void riscv_plic0_init(struct metal_interrupt plic) {
     static bool init_done = false;
     if (!init_done) {
         for (int hartid = 0; hartid < __METAL_DT_NUM_HARTS; hartid++) {
-            struct metal_interrupt intc = (struct metal_interrupt){hartid};
-
-            /* Initialize riscv,cpu-intc */
-            metal_interrupt_init(intc);
-
-            /* Disable all interrupts, but set their priority to 1 so that
-             * the interrupt fires when enabled and pending. */
             for (int id = 0; id < METAL_RISCV_PLIC0_0_RISCV_NDEV; id++) {
                 __metal_plic0_disable(hartid, id);
-                riscv_plic0_set_priority(intc, id, 1);
+                riscv_plic0_set_priority(plic, id, 1);
             }
 
             /* Set the default threshold to 0 so that any enabled interrupts
              * are above the threshold. */
             __metal_riscv_plic0_set_threshold(hartid, 0);
-
-            /* Enable plic (ext) interrupt with with hartid controller */
-            metal_interrupt_enable(intc, METAL_INTERRUPT_ID_EXT);
         }
         init_done = true;
     }

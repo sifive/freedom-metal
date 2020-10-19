@@ -1,6 +1,7 @@
 /* Copyright 2018 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/cpu.h>
 #include <metal/drivers/riscv_cpu_intc.h>
 #include <metal/exception.h>
 #include <metal/init.h>
@@ -16,6 +17,7 @@
 static bool init_done[__METAL_DT_NUM_HARTS] = {false};
 
 void riscv_cpu_intc_init(struct metal_interrupt intc) {
+    assert(get_index(intc) == metal_cpu_get_current_hartid());
 
     if (!init_done[get_index(intc)]) {
         /*
@@ -33,19 +35,20 @@ void riscv_cpu_intc_init(struct metal_interrupt intc) {
 #endif
         }
 
-        init_done[get_index(intc)] = 1;
-    }
-}
+#ifdef METAL_RISCV_PLIC0
+        /* When the PLIC exists, automatically enable the external interrupt
+         * line.
+         */
+        riscv_cpu_intc_enable(intc, METAL_INTERRUPT_ID_EXT);
+#endif
 
-METAL_CONSTRUCTOR(init_riscv_cpu_intc) {
-    for (int i = 0; i < __METAL_DT_NUM_HARTS; i++) {
-        struct metal_interrupt intc = (struct metal_interrupt){i};
-        riscv_cpu_intc_init(intc);
+        init_done[get_index(intc)] = 1;
     }
 }
 
 int riscv_cpu_intc_set_vector_mode(struct metal_interrupt controller,
                                    metal_vector_mode mode) {
+    assert(get_index(controller) == metal_cpu_get_current_hartid());
     switch (mode) {
 #ifndef METAL_SIFIVE_CLIC0
     default:
@@ -93,6 +96,7 @@ int riscv_cpu_intc_set_vector_mode(struct metal_interrupt controller,
 
 metal_vector_mode
 riscv_cpu_intc_get_vector_mode(struct metal_interrupt controller) {
+    assert(get_index(controller) == metal_cpu_get_current_hartid());
 
     uintptr_t mtvec;
     __asm__ volatile("csrr %0, mtvec" : "=r"(mtvec));
@@ -111,6 +115,7 @@ riscv_cpu_intc_get_vector_mode(struct metal_interrupt controller) {
 }
 
 int riscv_cpu_intc_enable(struct metal_interrupt controller, int id) {
+    assert(get_index(controller) == metal_cpu_get_current_hartid());
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
         return -1;
@@ -151,6 +156,7 @@ int riscv_cpu_intc_enable(struct metal_interrupt controller, int id) {
 }
 
 int riscv_cpu_intc_disable(struct metal_interrupt controller, int id) {
+    assert(get_index(controller) == metal_cpu_get_current_hartid());
 
     if (id >= __METAL_NUM_LOCAL_INTERRUPTS) {
         return -1;
