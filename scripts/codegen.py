@@ -179,7 +179,12 @@ def local_interrupts(dts, config):
                     }
                 )
     else:
-        for node in dts.match("sifive,local-external-interrupts0"):
+        # Freedom Metal currently vectors all local interrupts of a given IRQ ID
+        # to the same interrupt handler. Therefore, we only enumerate a single
+        # sifive,local-external-interrupts0.
+        nodes = dts.match("sifive,local-external-interrupts0")
+        if len(nodes) > 0:
+            node = nodes[0]
             for source_id, irq_id in enumerate(node.get_fields("interrupts")):
                 irqs.append(
                     {
