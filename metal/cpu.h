@@ -38,7 +38,7 @@ static __inline__ struct metal_cpu metal_cpu_get(unsigned int hartid) {
 /*! @brief Get the hartid of the CPU hart executing this function
  *
  * @return The hartid of the current CPU hart */
-static __inline__ int metal_cpu_get_current_hartid(void) {
+static __inline__ uint32_t metal_cpu_get_current_hartid(void) {
     int mhartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(mhartid));
     return mhartid;
