@@ -1,0 +1,116 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__DRIVERS__SIFIVE_HCA0_AES_H
+#define METAL__DRIVERS__SIFIVE_HCA0_AES_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/interrupt.h>
+#include <metal/platform.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+{% if 'sifive,hca0' in devices %}
+{% set sifive_hca0s = devices['sifive,hca0'] %}
+
+/**
+ * Structure type to access AES control (AES_CR)
+ */
+typedef union _HCA_AES_CR {
+    struct {
+        uint32_t MODE:3;           /**< bit:   0..2  AES mode: ECB, CBC, CFB, OFB, CTR, GCM, CCM */
+        uint32_t _reserved0:1;     /**< bit:      3  (reserved) */
+        uint32_t KEYSZ:2;          /**< bit:   4..5  AES key size */
+        uint32_t PROCESS:1;        /**< bit:      6  AES process type (encryption or decryption) */
+        uint32_t INIT:1;           /**< bit:      7  AES Chain Initialization */
+        uint32_t DTYPE:1;          /**< bit:      8  AES GCM/CCM data type */
+        uint32_t CCMT:3;           /**< bit:  9..11  Encoded tag length parameter for CCM */
+        uint32_t CCMQ:3;           /**< bit: 12..14  Encoded q parameter for CCM */
+        uint32_t _reserved1:1;     /**< bit:     15  (reserved) */
+        uint32_t BUSY:1;           /**< bit:     16  AES Busy bit */
+        uint32_t _reserved2:15;    /**< bit: 17..31  (reserved) */
+    } b;                           /**< Structure used for bit access */
+    uint32_t w;                    /**< Structure used for word access */
+} HCA_AES_CR_Type;
+
+/* HCA AES control */
+#define HCA_AES_CR_MODE_Pos               0U                                       /**< HCA AES_CR: Mode: ECB, CBC, CFB, OFB, CTR, GCM, CCM Position */
+#define HCA_AES_CR_MODE_Msk               (7U << HCA_AES_CR_MODE_Pos)              /**< HCA AES_CR: Mode: ECB, CBC, CFB, OFB, CTR, GCM, CCM Mask */
+
+#define HCA_AES_CR_KEYSZ_Pos              4U                                       /**< HCA AES_CR: Key size Position */
+#define HCA_AES_CR_KEYSZ_Msk              (3U << HCA_AES_CR_KEYSZ_Pos)             /**< HCA AES_CR: Key size Mask */
+
+#define HCA_AES_CR_PROCESS_Pos            6U                                       /**< HCA AES_CR: Process type (encryption or decryption) Position */
+#define HCA_AES_CR_PROCESS_Msk            (1U << HCA_AES_CR_PROCESS_Pos)           /**< HCA AES_CR: Process type (encryption or decryption) Mask */
+
+#define HCA_AES_CR_INIT_Pos               7U                                       /**< HCA AES_CR: Chain Initialization Position */
+#define HCA_AES_CR_INIT_Msk               (1U << HCA_AES_CR_INIT_Pos)              /**< HCA AES_CR: Chain Initialization Mask */
+
+#define HCA_AES_CR_DTYPE_Pos              8U                                       /**< HCA AES_CR: Abort GCM/CCM operation Position */
+#define HCA_AES_CR_DTYPE_Msk              (1U << HCA_AES_CR_DTYPE_Pos)             /**< HCA AES_CR: Abort GCM/CCM operation Mask */
+
+#define HCA_AES_CR_CCMT_Pos               9U                                       /**< HCA AES_CR: Encoded tag length parameter for CCM Position */
+#define HCA_AES_CR_CCMT_Msk               (7U << HCA_AES_CR_CCMT_Pos)              /**< HCA AES_CR: Encoded tag length parameter for CCM Mask */
+
+#define HCA_AES_CR_CCMQ_Pos               12U                                      /**< HCA AES_CR: Encoded q parameter for CCM Position */
+#define HCA_AES_CR_CCMQ_Msk               (7U << HCA_AES_CR_CCMQ_Pos)              /**< HCA AES_CR: Encoded q parameter for CCM Mask */
+
+#define HCA_AES_CR_BUSY_Pos               16U                                      /**< HCA AES_CR: Busy bit Position */
+#define HCA_AES_CR_BUSY_Msk               (1U << HCA_AES_CR_BUSY_Pos)              /**< HCA AES_CR: Busy bit Mask */
+
+/**
+ * Structure type to access AES GCM/CCM AAD Length (AES_ALEN)
+ */
+typedef union _HCA_AES_ALEN {
+    struct {
+        uint64_t ALEN:61;          /**< bit:  0..60  AAD Length */
+        uint64_t _reserved0:3;     /**< bit: 61..63  (reserved) */
+    } b;                           /**< Structure used for bit access */
+    uint64_t w;                    /**< Structure used for word access */
+} HCA_AES_ALEN_Type;
+
+/* HCA AES GCM/CCM AAD Length */
+#define HCA_AES_ALEN_ALEN_Pos             0U                                       /**< HCA AES_ALEN: AAD Length Position */
+#define HCA_AES_ALEN_ALEN_Msk             0x1FFFFFFFFFFFFFFFU                      /**< HCA AES_ALEN: AAD Length Mask */
+
+/**
+ * Structure type to access AES GCM/CCM Payload Length (AES_PLDLEN)
+ */
+typedef union _HCA_AES_PLDLEN {
+    struct {
+        uint64_t PLDLEN:61;        /**< bit:  0..60  Payload Length */
+        uint64_t _reserved0:3;     /**< bit: 61..63  (reserved) */
+    } b;                           /**< Structure used for bit access */
+    uint64_t w;                    /**< Structure used for word access */
+} HCA_AES_PLDLEN_Type;
+
+/* HCA AES GCM/CCM Payload Length */
+#define HCA_AES_PLDLEN_PLDLEN_Pos         0U                                       /**< HCA AES_PLDLEN: Payload Length Position */
+#define HCA_AES_PLDLEN_PLDLEN_Msk         0x1FFFFFFFFFFFFFFFU                      /**< HCA AES_PLDLEN: Payload Length Mask */
+
+/* HCA AES Key */
+#define HCA_AES_KEY_KEY_0_Pos             0U                                       /**< HCA AES_KEY: 256-bits key 0 Position */
+#define HCA_AES_KEY_KEY_0_Msk             0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_KEY: 256-bits key 0 Mask */
+
+#define HCA_AES_KEY_KEY_1_Pos             0U                                       /**< HCA AES_KEY: 256-bits key 1 Position */
+#define HCA_AES_KEY_KEY_1_Msk             0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_KEY: 256-bits key 1 Mask */
+
+#define HCA_AES_KEY_KEY_2_Pos             0U                                       /**< HCA AES_KEY: 256-bits key 2 Position */
+#define HCA_AES_KEY_KEY_2_Pos             0U                                       /**< HCA AES_KEY: 256-bits key 2 Position */
+#define HCA_AES_KEY_KEY_2_Msk             0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_KEY: 256-bits key 2 Mask */
+
+#define HCA_AES_KEY_KEY_3_Pos             0U                                       /**< HCA AES_KEY: 256-bits key 3 Position */
+#define HCA_AES_KEY_KEY_3_Msk             0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_KEY: 256-bits key 3 Mask */
+
+/* HCA AES Initialization Vector */
+#define HCA_AES_INITV_INITV_0_Pos         0U                                       /**< HCA AES_INITV: Initialization Vector 0 Position */
+#define HCA_AES_INITV_INITV_0_Msk         0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_INITV: Initialization Vector 0 Mask */
+
+#define HCA_AES_INITV_INITV_1_Pos         0U                                       /**< HCA AES_INITV: Initialization Vector 1 Position */
+#define HCA_AES_INITV_INITV_1_Msk         0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_INITV: Initialization Vector 1 Mask */
+
+
+{% endif %}
+
+#endif /* METAL__DRIVERS__SIFIVE_HCA0_AES_H */

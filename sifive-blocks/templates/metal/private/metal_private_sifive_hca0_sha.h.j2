@@ -1,0 +1,83 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__DRIVERS__SIFIVE_HCA0_SHA_H
+#define METAL__DRIVERS__SIFIVE_HCA0_SHA_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/interrupt.h>
+#include <metal/platform.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+{% if 'sifive,hca0' in devices %}
+{% set sifive_hca0s = devices['sifive,hca0'] %}
+
+/**
+ * Structure type to access SHA control (SHA_CR)
+ */
+typedef union _HCA_SHA_CR {
+    struct {
+        uint32_t MODE:2;           /**< bit:   0..1  SHA mode: 224, 256, 384, 512 */
+        uint32_t INIT:1;           /**< bit:      2  Initialize the SHA engine */
+        uint32_t _reserved0:13;    /**< bit:  3..15  (reserved) */
+        uint32_t BUSY:1;           /**< bit:     16  SHA Busy bit */
+        uint32_t _reserved1:15;    /**< bit: 17..31  (reserved) */
+    } b;                           /**< Structure used for bit access */
+    uint32_t w;                    /**< Structure used for word access */
+} HCA_SHA_CR_Type;
+
+/* HCA SHA control */
+#define HCA_SHA_CR_MODE_Pos               0U                                       /**< HCA SHA_CR: Mode: 224, 256, 384, 512 Position */
+#define HCA_SHA_CR_MODE_Msk               (3U << HCA_SHA_CR_MODE_Pos)              /**< HCA SHA_CR: Mode: 224, 256, 384, 512 Mask */
+
+#define HCA_SHA_CR_INIT_Pos               2U                                       /**< HCA SHA_CR: Initialize the SHA engine Position */
+#define HCA_SHA_CR_INIT_Msk               (1U << HCA_SHA_CR_INIT_Pos)              /**< HCA SHA_CR: Initialize the SHA engine Mask */
+
+#define HCA_SHA_CR_BUSY_Pos               16U                                      /**< HCA SHA_CR: Busy bit Position */
+#define HCA_SHA_CR_BUSY_Msk               (1U << HCA_SHA_CR_BUSY_Pos)              /**< HCA SHA_CR: Busy bit Mask */
+
+/* HCA AES/SHA FIFO Input */
+#define HCA_FIFO_IN_DATA_Pos              0U                                       /**< HCA FIFO_IN: Data Position */
+#define HCA_FIFO_IN_DATA_Msk              0xFFFFFFFFFFFFFFFFU                      /**< HCA FIFO_IN: Data Mask */
+
+/* HCA AES FIFO Output */
+#define HCA_AES_OUT_AES_OUT_Pos           0U                                       /**< HCA AES_OUT: FIFO Output Position */
+#define HCA_AES_OUT_AES_OUT_Msk           0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_OUT: FIFO Output Mask */
+
+/* HCA AES Authentication Tag */
+#define HCA_AES_AUTH_AUTH_0_Pos           0U                                       /**< HCA AES_AUTH: Authentication Tag 0 Position */
+#define HCA_AES_AUTH_AUTH_0_Msk           0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_AUTH: Authentication Tag 0 Mask */
+
+#define HCA_AES_AUTH_AUTH_1_Pos           0U                                       /**< HCA AES_AUTH: Authentication Tag 1 Position */
+#define HCA_AES_AUTH_AUTH_1_Msk           0xFFFFFFFFFFFFFFFFU                      /**< HCA AES_AUTH: Authentication Tag 1 Mask */
+
+/* HCA HASH result from SHA */
+#define HCA_HASH_HASH_0_Pos               0U                                       /**< HCA HASH: Result form SHA 0 Position */
+#define HCA_HASH_HASH_0_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 0 Mask */
+
+#define HCA_HASH_HASH_1_Pos               0U                                       /**< HCA HASH: Result form SHA 1 Position */
+#define HCA_HASH_HASH_1_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 1 Mask */
+
+#define HCA_HASH_HASH_2_Pos               0U                                       /**< HCA HASH: Result form SHA 2 Position */
+#define HCA_HASH_HASH_2_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 2 Mask */
+
+#define HCA_HASH_HASH_3_Pos               0U                                       /**< HCA HASH: Result form SHA 3 Position */
+#define HCA_HASH_HASH_3_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 3 Mask */
+
+#define HCA_HASH_HASH_4_Pos               0U                                       /**< HCA HASH: Result form SHA 4 Position */
+#define HCA_HASH_HASH_4_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 4 Mask */
+
+#define HCA_HASH_HASH_5_Pos               0U                                       /**< HCA HASH: Result form SHA 5 Position */
+#define HCA_HASH_HASH_5_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 5 Mask */
+
+#define HCA_HASH_HASH_6_Pos               0U                                       /**< HCA HASH: Result form SHA 6 Position */
+#define HCA_HASH_HASH_6_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 6 Mask */
+
+#define HCA_HASH_HASH_7_Pos               0U                                       /**< HCA HASH: Result form SHA 7 Position */
+#define HCA_HASH_HASH_7_Msk               0xFFFFFFFFFFFFFFFFU                      /**< HCA HASH: Result form SHA 7 Mask */
+
+{% endif %}
+
+#endif /* METAL__DRIVERS__SIFIVE_HCA0_SHA_H */

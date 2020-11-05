@@ -1,0 +1,16 @@
+#ifndef __METAL_DT_HCA0_TRNG__H
+#define __METAL_DT_HCA0_TRNG__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'hca' in default_drivers and default_drivers['hca'] in devices %}
+{% set hca_compatible = default_drivers['hca'] %}
+
+{% set driver_string = to_snakecase(hca_compatible) %}
+#define metal_hca_trng_getrev {{ driver_string }}_trng_getrev
+#define metal_hca_trng_init {{ driver_string }}_trng_init
+#define metal_hca_trng_getdata {{ driver_string }}_trng_getdata
+
+{% endif %}
+
+#endif /* ! __METAL_DT_HCA0_TRNG__H */

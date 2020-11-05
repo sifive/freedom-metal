@@ -1,0 +1,20 @@
+#ifndef __METAL_DT_HCA0_AES__H
+#define __METAL_DT_HCA0_AES__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'hca' in default_drivers and default_drivers['hca'] in devices %}
+{% set hca_compatible = default_drivers['hca'] %}
+
+{% set driver_string = to_snakecase(hca_compatible) %}
+#define metal_hca_aes_getrev {{ driver_string }}_aes_getrev
+#define metal_hca_aes_setkey {{ driver_string }}_aes_setkey
+#define metal_hca_aes_setiv {{ driver_string }}_aes_setiv
+#define metal_hca_aes_cipher {{ driver_string }}_aes_cipher
+#define metal_hca_aes_auth_init {{ driver_string }}_aes_auth_init
+#define metal_hca_aes_auth_core {{ driver_string }}_aes_auth_core
+#define metal_hca_aes_auth_finish {{ driver_string }}_aes_auth_finish
+
+{% endif %}
+
+#endif /* ! __METAL_DT_HCA0_AES__H */
