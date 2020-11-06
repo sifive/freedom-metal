@@ -5,8 +5,7 @@
 #define METAL__CRYPTO_H
 
 /*! @brief CRYPTO operation error codes */
-typedef enum
-{
+typedef enum {
     /*! @brief no error */
     METAL_CRYPTO_OK = 0,
     /*! @brief generic error code */
@@ -46,8 +45,7 @@ typedef enum
     METAL_CRYPTO_NOT_YET_SUPPORTED = -31,
 } metal_crypto_errors_t;
 
-typedef enum
-{
+typedef enum {
     /*! @brief little endian words */
     METAL_CRYPTO_LITTLE_ENDIAN_MODE = 0,
     /*! @brief big endian words */
@@ -55,15 +53,13 @@ typedef enum
 } metal_crypto_endianness_t;
 
 /*! @brief  symmetric-crypto encryption mode */
-typedef enum
-{
+typedef enum {
     METAL_CRYPTO_ENCRYPT = 0,
     METAL_CRYPTO_DECRYPT = 1
 } metal_crypto_process_t;
 
 /*! @brief AES key bit lenght definition */
-typedef enum
-{
+typedef enum {
     /*! @brief Define for char lenght of 128 bits key */
     METAL_CRYPTO_KEY128 = 16,
     /*! @brief Define for char lenght of 192 bits key */
@@ -73,8 +69,7 @@ typedef enum
 } metal_crypto_key_size_t;
 
 /*! @brief AES key lenght supported */
-typedef enum
-{
+typedef enum {
     /*! @brief Define for 128 bits key lenght */
     METAL_CRYPTO_AES_KEY128 = 0,
     /*! @brief Define for 192 bits key lenght */
@@ -84,8 +79,7 @@ typedef enum
 } metal_crypto_aes_key_type_t;
 
 /*! @brief AES mode supported */
-typedef enum
-{
+typedef enum {
     /*! @brief Define ECB mode */
     METAL_CRYPTO_AES_ECB = 0,
     /*! @brief Define CBC mode */
@@ -103,8 +97,7 @@ typedef enum
 } metal_crypto_aes_mode_t;
 
 /*! @brief Hash mode supported */
-typedef enum
-{
+typedef enum {
     /*! @brief Define SHA224 mode */
     METAL_CRYPTO_HASH_SHA224 = 0,
     /*! @brief Define SHA256 mode */
@@ -116,8 +109,7 @@ typedef enum
 } metal_crypto_hash_mode_t;
 
 /*! @brief Hash size of SHA operation in bytes */
-typedef enum
-{
+typedef enum {
     /*! @brief Define size of SHA224 in bytes */
     METAL_CRYPTO_HASH_SHA224_BYTE_SIZE = 28,
     /*! @brief Define size of SHA256 in bytes */

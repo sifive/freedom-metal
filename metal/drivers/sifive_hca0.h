@@ -6,16 +6,16 @@
 
 /*!
  * @file sifive_hca0.h
- * @brief 
+ * @brief
  */
 
 #include <assert.h>
+#include <metal/crypto.h>
 #include <metal/interrupt.h>
 #include <metal/io.h>
-#include <metal/crypto.h>
 #include <metal/private/metal_private_hca0.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 /**
  * @addtogroup HCA0
  *  @{
@@ -57,27 +57,27 @@ struct sifive_hca0 {
     ((((uint64_t)GET_32BITS((const uint8_t *)data, (k + 4))) << 32) +          \
      (uint64_t)GET_32BITS((const uint8_t *)data, k))
 
-
 #ifndef IS_ALIGNED_4_BYTES
 /**
  * @brief Test is a pointer is aliged on a 4-byte address
  */
-#define IS_ALIGNED_4_BYTES(p)   (!(((uintptr_t)(p)) & 0x3u))
+#define IS_ALIGNED_4_BYTES(p) (!(((uintptr_t)(p)) & 0x3u))
 #endif
 
 #ifndef IS_ALIGNED_8_BYTES
 /**
  * @brief Test is a pointer is aliged on a 8-byte address
  */
-#define IS_ALIGNED_8_BYTES(p)   (!(((uintptr_t)(p)) & 0x7u))
+#define IS_ALIGNED_8_BYTES(p) (!(((uintptr_t)(p)) & 0x7u))
 #endif
 
-/*! 
+/*!
  * @brief Get a handle for a HCA device
  * @param device_num The index of the desired HCA device
  * @return A handle to the HCA device, or NULL if the device does not exist
  */
-__attribute__((always_inline)) inline struct sifive_hca0 sifive_hca0_get_device(uint32_t index) {
+__attribute__((always_inline)) inline struct sifive_hca0
+sifive_hca0_get_device(uint32_t index) {
 #if __METAL_DT_NUM_HCA0S > 0
     if (index < __METAL_DT_NUM_HCA0S)
         return (struct sifive_hca0){index};

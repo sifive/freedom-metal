@@ -10,9 +10,9 @@
  */
 
 #include <assert.h>
-#include <metal/interrupt.h>
 #include <metal/crypto.h>
 #include <metal/drivers/sifive_hca0.h>
+#include <metal/interrupt.h>
 #include <stdint.h>
 
 /*! @brief SHA256 block size */
@@ -41,8 +41,7 @@
 #define SHA512_BYTE_SIZE_BLOCKSIZE 16
 
 /*! @brief SHA 256 context */
-typedef struct
-{
+typedef struct {
     /*! @brief intermediate state and then final hash */
     uint32_t h[SHA256_SIZE_WORDS];
     /*! @brief total bits length computed */
@@ -58,8 +57,7 @@ typedef struct
 typedef hca_sha256_ctx_t hca_sha224_ctx_t;
 
 /*! @brief SHA 512 context */
-typedef struct
-{
+typedef struct {
     /*! @brief Initial, intermediate and then final hash. */
     uint64_t h[SHA512_SIZE_WORDS];
     /*! @brief bit len */
@@ -76,7 +74,7 @@ typedef struct
 typedef hca_sha512_ctx_t hca_sha384_ctx_t;
 
 /*! @brief Unified SHA context */
-typedef struct { 
+typedef struct {
     /*! @brief supported SHA contexts union */
     union {
         hca_sha224_ctx_t sha224;
@@ -105,10 +103,10 @@ typedef struct {
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref scl_errors_t
  */
-int32_t sifive_hca0_sha_init(struct sifive_hca0 hca,
-                            hca0_sha_ctx_t *const ctx,
-                            metal_crypto_hash_mode_t hash_mode,
-                            metal_crypto_endianness_t data_endianness) __attribute__((weak));
+int32_t sifive_hca0_sha_init(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
+                             metal_crypto_hash_mode_t hash_mode,
+                             metal_crypto_endianness_t data_endianness)
+    __attribute__((weak));
 
 /**
  * @brief Compute intermediate hash value of the chunk of data in parameter
@@ -120,10 +118,9 @@ int32_t sifive_hca0_sha_init(struct sifive_hca0 hca,
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref scl_errors_t
  */
-int32_t sifive_hca0_sha_core(struct sifive_hca0 hca,
-                            hca0_sha_ctx_t *const ctx,
-                            const uint8_t *const data,
-                            size_t data_byte_len) __attribute__((weak));
+int32_t sifive_hca0_sha_core(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
+                             const uint8_t *const data, size_t data_byte_len)
+    __attribute__((weak));
 
 /**
  * @brief Compute final hash value of the concatenated block pass to
@@ -137,9 +134,8 @@ int32_t sifive_hca0_sha_core(struct sifive_hca0 hca,
  * @return != 0                 otherwise @ref scl_errors_t
  */
 int32_t sifive_hca0_sha_finish(struct sifive_hca0 hca,
-                                hca0_sha_ctx_t *const ctx,
-                                uint8_t *const hash,
-                                size_t *const hash_len) __attribute__((weak));
+                               hca0_sha_ctx_t *const ctx, uint8_t *const hash,
+                               size_t *const hash_len) __attribute__((weak));
 
 /** @}*/
 #endif /* METAL__HCA_SHA_H */
