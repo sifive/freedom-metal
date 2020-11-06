@@ -12,8 +12,7 @@
 #include <assert.h>
 #include <metal/interrupt.h>
 #include <metal/crypto.h>
-#include <metal/hca.h>
-#include <metal/private/metal_private_hca0.h>
+#include <metal/drivers/sifive_hca0.h>
 #include <stdint.h>
 
 #define BLOCK128_NB_BYTE        16
@@ -31,7 +30,7 @@ typedef struct {
     uint64_t buf[BLOCK128_NB_UINT64]    __attribute__ ((aligned (8)));
     /*! buffer storage for incomplet data */
     metal_crypto_endianness_t data_endianness;
-} hca_aes_auth_ctx_t;
+} hca0_aes_auth_ctx_t;
 
 /**
  * @addtogroup HCA
@@ -50,10 +49,10 @@ typedef struct {
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref metal_crypto_errors_t
  */
-int32_t metal_hca_aes_setkey(struct metal_hca hca,
+int32_t sifive_hca0_aes_setkey(struct sifive_hca0 hca,
                                        metal_crypto_aes_key_type_t type,
                                        const uint64_t *const key,
-                                       metal_crypto_process_t aes_process);
+                                       metal_crypto_process_t aes_process) __attribute__((weak));
 
 /**
  * @brief set IV (Initial Value)
@@ -63,8 +62,8 @@ int32_t metal_hca_aes_setkey(struct metal_hca hca,
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref metal_crypto_errors_t
  */
-int32_t metal_hca_aes_setiv(struct metal_hca hca,
-                                      const uint64_t *const iv);
+int32_t sifive_hca0_aes_setiv(struct sifive_hca0 hca,
+                                      const uint64_t *const iv) __attribute__((weak));
 
 /**
  * @brief perform AES cipher operation
@@ -79,10 +78,10 @@ int32_t metal_hca_aes_setiv(struct metal_hca hca,
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref metal_crypto_errors_t
  */
-int32_t metal_hca_aes_cipher(
-    struct metal_hca hca, metal_crypto_aes_mode_t aes_mode,
+int32_t sifive_hca0_aes_cipher(
+    struct sifive_hca0 hca, metal_crypto_aes_mode_t aes_mode,
     metal_crypto_process_t aes_process, metal_crypto_endianness_t data_endianness,
-    const uint8_t *const data_in, size_t data_len, uint8_t *const data_out);
+    const uint8_t *const data_in, size_t data_len, uint8_t *const data_out) __attribute__((weak));
 
 /**
  * @brief initiliaze AES cipher with authentication operation
@@ -99,11 +98,11 @@ int32_t metal_hca_aes_cipher(
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref metal_crypto_errors_t
  */
-int32_t metal_hca_aes_auth_init(
-    struct metal_hca hca, hca_aes_auth_ctx_t *const ctx, 
+int32_t sifive_hca0_aes_auth_init(
+    struct sifive_hca0 hca, hca0_aes_auth_ctx_t *const ctx, 
     metal_crypto_aes_mode_t aes_mode, metal_crypto_process_t aes_process,
     metal_crypto_endianness_t data_endianness, uint32_t auth_option,
-    const uint8_t *const aad, size_t aad_byte_len, uint64_t payload_len);
+    const uint8_t *const aad, size_t aad_byte_len, size_t payload_len) __attribute__((weak));
 
 /**
  * @brief perform AES cipher with authentication operation
@@ -117,12 +116,11 @@ int32_t metal_hca_aes_auth_init(
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref metal_crypto_errors_t
  */
-int32_t metal_hca_aes_auth_core(struct metal_hca hca, 
-                                          hca_aes_auth_ctx_t *const ctx,
-                                          const uint8_t *const payload, 
-                                          uint64_t payload_len, 
-                                          uint8_t *const data_out, 
-                                          size_t *const out_len);
+int32_t sifive_hca0_aes_auth_core(struct sifive_hca0 hca, 
+                                hca0_aes_auth_ctx_t *const ctx,
+                                const uint8_t *const payload, 
+                                size_t payload_len, uint8_t *const data_out, 
+                                size_t *const out_len) __attribute__((weak));
 
 /**
  * @brief finish AES cipher with authentication operation
@@ -134,10 +132,10 @@ int32_t metal_hca_aes_auth_core(struct metal_hca hca,
  * @return 0                    SUCCESS
  * @return != 0                 otherwise @ref metal_crypto_errors_t
  */
-int32_t metal_hca_aes_auth_finish(struct metal_hca hca, 
-                                            hca_aes_auth_ctx_t *const ctx, 
+int32_t sifive_hca0_aes_auth_finish(struct sifive_hca0 hca, 
+                                            hca0_aes_auth_ctx_t *const ctx, 
                                             uint8_t *const data_out, 
-                                            uint64_t *const tag);
+                                            uint64_t *const tag) __attribute__((weak));
 
 /** @}*/
 #endif /* METAL__HCA_AES_H */

@@ -19,6 +19,12 @@
 
 #define METAL_SIFIVE_HCA0
 
+typedef enum
+{
+    HCA_AES_MODE = 0,
+    HCA_SHA_MODE = 1
+} hca0_mode_t;
+
 {% endif %}
 
 #endif /* METAL__PLATFORM__SIFIVE_HCA0_H */

@@ -2,15 +2,15 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/platform.h>
+#include <metal/crypto.h>
+#include <metal/drivers/sifive_hca0.h>
+#include <metal/drivers/sifive_hca0_sha.h>
 
 #ifdef METAL_SIFIVE_HCA0
 
 #include <metal/io.h>
 #include <metal/private/metal_private_sifive_hca0.h>
 #include <metal/private/metal_private_sifive_hca0_sha.h>
-#include <metal/crypto.h>
-#include <metal/hca.h>
-#include <metal/hca_sha.h>
 #include <string.h>
 #include <limits.h>
 
@@ -44,7 +44,7 @@ static void sifive_hca0_sha512_append_bit_len(uint8_t *const buffer, uint64_t *c
 /*
  * sha block function
  */
-static int32_t hca_sha_block(struct metal_hca hca, metal_crypto_hash_mode_t hash_mode,
+static int32_t hca_sha_block(struct sifive_hca0 hca, metal_crypto_hash_mode_t hash_mode,
                       size_t NbBlocks512, const uint8_t *const data_in)
 {
     volatile uint32_t reg32;
@@ -186,7 +186,7 @@ static int32_t hca_sha_block(struct metal_hca hca, metal_crypto_hash_mode_t hash
 /*
  * sha xxx core function
  */
-static int32_t sifive_hca0_sha256_core(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+static int32_t sifive_hca0_sha256_core(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                         const uint8_t *const data, size_t data_byte_len)
 {
     size_t block_buffer_index;
@@ -252,7 +252,7 @@ static int32_t sifive_hca0_sha256_core(struct metal_hca hca, hca_sha_ctx_t *cons
     return (METAL_CRYPTO_OK);
 }
 
-static int32_t sifive_hca0_sha512_core(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+static int32_t sifive_hca0_sha512_core(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                         const uint8_t *const data, size_t data_byte_len)
 {
     size_t block_buffer_index;
@@ -325,7 +325,7 @@ static int32_t sifive_hca0_sha512_core(struct metal_hca hca, hca_sha_ctx_t *cons
 /*
  * sha xxx finish function
  */
-static int32_t sifive_hca0_sha224_finish(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+static int32_t sifive_hca0_sha224_finish(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                           uint8_t *const hash, size_t *const hash_len)
 {
     volatile uint64_t val;
@@ -459,14 +459,14 @@ static int32_t sifive_hca0_sha224_finish(struct metal_hca hca, hca_sha_ctx_t *co
         val = hca_regs->HASH[3];
         out32[0] = bswap32((uint32_t)val);
         val = bswap64(hca_regs->HASH[2]);
-        out32[2] = (uint32_t)val;
-        out32[1] = (uint32_t)(val >> 32);
+        out32[1] = (uint32_t)val;
+        out32[2] = (uint32_t)(val >> 32);
         val = bswap64(hca_regs->HASH[1]);
-        out32[4] = (uint32_t)val;
-        out32[3] = (uint32_t)(val >> 32);
+        out32[3] = (uint32_t)val;
+        out32[4] = (uint32_t)(val >> 32);
         val = bswap64(hca_regs->HASH[0]);
-        out32[6] = (uint32_t)val;
-        out32[5] = (uint32_t)(val >> 32);
+        out32[5] = (uint32_t)val;
+        out32[6] = (uint32_t)(val >> 32);
     }
 
     *hash_len = METAL_CRYPTO_HASH_SHA224_BYTE_SIZE;
@@ -474,7 +474,7 @@ static int32_t sifive_hca0_sha224_finish(struct metal_hca hca, hca_sha_ctx_t *co
     return (METAL_CRYPTO_OK);
 }
 
-static int32_t sifive_hca0_sha256_finish(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+static int32_t sifive_hca0_sha256_finish(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                           uint8_t *const hash, size_t *hash_len)
 {
     size_t block_buffer_index;
@@ -619,7 +619,7 @@ static int32_t sifive_hca0_sha256_finish(struct metal_hca hca, hca_sha_ctx_t *co
     return (METAL_CRYPTO_OK);
 }
 
-static int32_t sifive_hca0_sha384_finish(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+static int32_t sifive_hca0_sha384_finish(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                           uint8_t *const hash, size_t *const hash_len)
 {
     size_t block_buffer_index;
@@ -784,7 +784,7 @@ static int32_t sifive_hca0_sha384_finish(struct metal_hca hca, hca_sha_ctx_t *co
     return (METAL_CRYPTO_OK);
 }
 
-static int32_t sifive_hca0_sha512_finish(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+static int32_t sifive_hca0_sha512_finish(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                           uint8_t *const hash, size_t *hash_len)
 {
     size_t block_buffer_index;
@@ -970,7 +970,7 @@ static int32_t sifive_hca0_sha512_finish(struct metal_hca hca, hca_sha_ctx_t *co
 }
 
 
-uint32_t sifive_hca0_sha_getrev(struct metal_hca hca)
+uint32_t sifive_hca0_sha_getrev(struct sifive_hca0 hca)
 {
     HCA_Type *hca_regs;
 
@@ -982,7 +982,7 @@ uint32_t sifive_hca0_sha_getrev(struct metal_hca hca)
     return (hca_regs->SHA_REV);
 }
 
-int32_t sifive_hca0_sha_init(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+int32_t sifive_hca0_sha_init(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                      metal_crypto_hash_mode_t hash_mode,
                      metal_crypto_endianness_t data_endianness)
 {
@@ -1049,7 +1049,7 @@ int32_t sifive_hca0_sha_init(struct metal_hca hca, hca_sha_ctx_t *const ctx,
     return (METAL_CRYPTO_OK);
 }
 
-int32_t sifive_hca0_sha_core(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+int32_t sifive_hca0_sha_core(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                      const uint8_t *const data, size_t data_byte_len)
 {
     if (NULL == ctx)
@@ -1076,7 +1076,7 @@ int32_t sifive_hca0_sha_core(struct metal_hca hca, hca_sha_ctx_t *const ctx,
     return (METAL_CRYPTO_ERROR);
 }
 
-int32_t sifive_hca0_sha_finish(struct metal_hca hca, hca_sha_ctx_t *const ctx,
+int32_t sifive_hca0_sha_finish(struct sifive_hca0 hca, hca0_sha_ctx_t *const ctx,
                        uint8_t *const hash, size_t *const hash_len)
 {
     if (NULL == ctx)
@@ -1100,6 +1100,28 @@ int32_t sifive_hca0_sha_finish(struct metal_hca hca, hca_sha_ctx_t *const ctx,
 
     return (METAL_CRYPTO_ERROR);
 }
-#endif /* METAL_SIFIVE_HCA0 */
 
-typedef int no_empty_translation_units;
+#else /* METAL_SIFIVE_HCA0 */
+
+/* Stubs for when no HCA SHA is present */
+uint32_t sifive_hca0_sha_getrev(struct sifive_hca0 hca)
+{ return 0;}
+int32_t sifive_hca0_sha_init(struct sifive_hca0 hca,
+    hca0_sha_ctx_t *const ctx,
+    metal_crypto_hash_mode_t hash_mode,
+    metal_crypto_endianness_t data_endianness)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t sifive_hca0_sha_core(struct sifive_hca0 hca,
+    hca0_sha_ctx_t *const ctx,
+    const uint8_t *const data,
+    size_t data_byte_len)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t sifive_hca0_sha_finish(struct sifive_hca0 hca,
+    hca0_sha_ctx_t *const ctx,
+    uint8_t *const hash,
+    size_t *const hash_len)
+{ return METAL_CRYPTO_ERROR; }
+
+#endif /* METAL_SIFIVE_HCA0 */

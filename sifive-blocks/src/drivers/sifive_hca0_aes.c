@@ -2,20 +2,20 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/platform.h>
+#include <metal/crypto.h>
+#include <metal/drivers/sifive_hca0.h>
+#include <metal/drivers/sifive_hca0_aes.h>
 
 #ifdef METAL_SIFIVE_HCA0
 
 #include <metal/io.h>
 #include <metal/private/metal_private_sifive_hca0.h>
 #include <metal/private/metal_private_sifive_hca0_aes.h>
-#include <metal/crypto.h>
-#include <metal/hca.h>
-#include <metal/hca_aes.h>
 #include <limits.h>
 
 #define get_index(hca) ((hca).__hca_index)
 
-uint32_t sifive_hca0_aes_getrev(struct metal_hca hca)
+uint32_t sifive_hca0_aes_getrev(struct sifive_hca0 hca)
 {
     HCA_Type *hca_regs;
 
@@ -27,7 +27,7 @@ uint32_t sifive_hca0_aes_getrev(struct metal_hca hca)
     return (hca_regs->AES_REV);
 }
 
-int32_t sifive_hca0_aes_setkey(struct metal_hca hca, metal_crypto_aes_key_type_t type,
+int32_t sifive_hca0_aes_setkey(struct sifive_hca0 hca, metal_crypto_aes_key_type_t type,
                        const uint64_t *const key, metal_crypto_process_t aes_process)
 {
     volatile uint32_t reg32;
@@ -67,7 +67,7 @@ int32_t sifive_hca0_aes_setkey(struct metal_hca hca, metal_crypto_aes_key_type_t
     return METAL_CRYPTO_OK;
 }
 
-int32_t sifive_hca0_aes_setiv(struct metal_hca hca, const uint64_t *const iv)
+int32_t sifive_hca0_aes_setiv(struct sifive_hca0 hca, const uint64_t *const iv)
 {
     volatile uint32_t reg32;
     HCA_Type *hca_regs;
@@ -92,7 +92,7 @@ int32_t sifive_hca0_aes_setiv(struct metal_hca hca, const uint64_t *const iv)
     return METAL_CRYPTO_OK;
 }
 
-int32_t sifive_hca0_aes_cipher(struct metal_hca hca, metal_crypto_aes_mode_t aes_mode,
+int32_t sifive_hca0_aes_cipher(struct sifive_hca0 hca, metal_crypto_aes_mode_t aes_mode,
                        metal_crypto_process_t aes_process,
                        metal_crypto_endianness_t data_endianness,
                        const uint8_t *const data_in, size_t data_len, uint8_t *const data_out)
@@ -294,7 +294,7 @@ int32_t sifive_hca0_aes_cipher(struct metal_hca hca, metal_crypto_aes_mode_t aes
     return METAL_CRYPTO_OK;
 }
 
-int32_t sifive_hca0_aes_auth_init(struct metal_hca hca, hca_aes_auth_ctx_t *const ctx,
+int32_t sifive_hca0_aes_auth_init(struct sifive_hca0 hca, hca0_aes_auth_ctx_t *const ctx,
                     metal_crypto_aes_mode_t aes_mode,
                     metal_crypto_process_t aes_process,
                     metal_crypto_endianness_t data_endianness, uint32_t auth_option,
@@ -558,8 +558,11 @@ int32_t sifive_hca0_aes_auth_init(struct metal_hca hca, hca_aes_auth_ctx_t *cons
 }
 
 
-int32_t sifive_hca0_aes_auth_core(struct metal_hca hca, hca_aes_auth_ctx_t *const ctx,
-                     const uint8_t *const data_in, size_t payload_len, uint8_t *const data_out, size_t *const len_out)
+int32_t sifive_hca0_aes_auth_core(struct sifive_hca0 hca, 
+                                  hca0_aes_auth_ctx_t *const ctx,
+                                  const uint8_t *const data_in, 
+                                  size_t payload_len, uint8_t *const data_out, 
+                                  size_t *const len_out)
 {
     volatile uint32_t reg32;
 #if __riscv_xlen == 64
@@ -912,8 +915,8 @@ int32_t sifive_hca0_aes_auth_core(struct metal_hca hca, hca_aes_auth_ctx_t *cons
     return METAL_CRYPTO_OK;
 }
 
-int32_t sifive_hca0_aes_auth_finish(struct metal_hca hca,
-                            hca_aes_auth_ctx_t *const ctx, uint8_t *const data_out,
+int32_t sifive_hca0_aes_auth_finish(struct sifive_hca0 hca,
+                            hca0_aes_auth_ctx_t *const ctx, uint8_t *const data_out,
                             uint64_t *const tag)
 {
     volatile uint32_t reg32;
@@ -1036,6 +1039,48 @@ int32_t sifive_hca0_aes_auth_finish(struct metal_hca hca,
 
     return METAL_CRYPTO_OK;
 }
-#endif /* METAL_SIFIVE_HCA0 */
 
-typedef int no_empty_translation_units;
+#else /* METAL_SIFIVE_HCA0 */
+
+/* Stubs for when no HCA AES driver is present */
+uint32_t sifive_hca0_aes_getrev(struct sifive_hca0 hca)
+{ return 0; }
+
+int32_t sifive_hca0_aes_setkey(struct sifive_hca0 hca,
+                                       metal_crypto_aes_key_type_t type,
+                                       const uint64_t *const key,
+                                       metal_crypto_process_t aes_process)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t sifive_hca0_aes_setiv(struct sifive_hca0 hca,
+                                      const uint64_t *const iv)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t sifive_hca0_aes_cipher(
+    struct sifive_hca0 hca, metal_crypto_aes_mode_t aes_mode,
+    metal_crypto_process_t aes_process, metal_crypto_endianness_t data_endianness,
+    const uint8_t *const data_in, size_t data_len, uint8_t *const data_out)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t sifive_hca0_aes_auth_init(
+    struct sifive_hca0 hca, hca0_aes_auth_ctx_t *const ctx, 
+    metal_crypto_aes_mode_t aes_mode, metal_crypto_process_t aes_process,
+    metal_crypto_endianness_t data_endianness, uint32_t auth_option,
+    const uint8_t *const aad, size_t aad_byte_len, size_t payload_len)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t sifive_hca0_aes_auth_core(struct sifive_hca0 hca, 
+                                          hca0_aes_auth_ctx_t *const ctx,
+                                          const uint8_t *const payload, 
+                                          size_t payload_len, 
+                                          uint8_t *const data_out, 
+                                          size_t *const out_len)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t hca_aes_auth_finish(struct sifive_hca0 hca, 
+                                            hca0_aes_auth_ctx_t *const ctx, 
+                                            uint8_t *const data_out, 
+                                            uint64_t *const tag)
+{ return METAL_CRYPTO_ERROR; }
+
+#endif /* METAL_SIFIVE_HCA0 */

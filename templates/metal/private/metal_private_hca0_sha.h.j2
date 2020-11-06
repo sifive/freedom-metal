@@ -7,10 +7,6 @@
 {% set hca_compatible = default_drivers['hca'] %}
 
 {% set driver_string = to_snakecase(hca_compatible) %}
-#define metal_hca_sha_getrev {{ driver_string }}_sha_getrev
-#define metal_hca_sha_init {{ driver_string }}_sha_init
-#define metal_hca_sha_core {{ driver_string }}_sha_core
-#define metal_hca_sha_finish {{ driver_string }}_sha_finish
 
 {% endif %}
 

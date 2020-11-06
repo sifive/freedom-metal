@@ -2,18 +2,18 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/platform.h>
+#include <metal/crypto.h>
+#include <metal/drivers/sifive_hca0.h>
 
 #ifdef METAL_SIFIVE_HCA0
 
 #include <metal/io.h>
 #include <metal/private/metal_private_sifive_hca0.h>
 #include <metal/private/metal_private_sifive_hca0_trng.h>
-#include <metal/crypto.h>
-#include <metal/hca.h>
 
 #define get_index(hca) ((hca).__hca_index)
 
-uint32_t sifive_hca0_trng_getrev(struct metal_hca hca)
+uint32_t sifive_hca0_trng_getrev(struct sifive_hca0 hca)
 {
     HCA_Type *hca_regs;
 
@@ -25,7 +25,7 @@ uint32_t sifive_hca0_trng_getrev(struct metal_hca hca)
     return (hca_regs->TRNG_REV);
 }
 
-int32_t sifive_hca0_trng_init(struct metal_hca hca)
+int32_t sifive_hca0_trng_init(struct sifive_hca0 hca)
 {
     volatile uint32_t reg32;
     int32_t ret = METAL_CRYPTO_OK;
@@ -81,7 +81,7 @@ int32_t sifive_hca0_trng_init(struct metal_hca hca)
     return ret;
 }
 
-int32_t sifive_hca0_trng_getdata(struct metal_hca hca, uint32_t *data_out)
+int32_t sifive_hca0_trng_getdata(struct sifive_hca0 hca, uint32_t *data_out)
 {
     volatile uint32_t reg32;
     int32_t ret = METAL_CRYPTO_OK;
@@ -110,6 +110,16 @@ int32_t sifive_hca0_trng_getdata(struct metal_hca hca, uint32_t *data_out)
     return METAL_CRYPTO_OK;
 }
 
-#endif /* METAL_SIFIVE_HCA0 */
+#else /* METAL_SIFIVE_HCA0 */
 
-typedef int no_empty_translation_units;
+/* Stubs for when no HCA TRNG is present */
+uint32_t sifive_hca0_trng_getrev(struct sifive_hca0 hca)
+{ return 0; }
+
+int32_t sifive_hca0_trng_init(struct sifive_hca0 hca)
+{ return METAL_CRYPTO_ERROR; }
+
+int32_t sifive_hca0_trng_getdata(struct sifive_hca0 hca, uint32_t *data_out)
+{ return METAL_CRYPTO_ERROR; }
+
+#endif /* METAL_SIFIVE_HCA0 */

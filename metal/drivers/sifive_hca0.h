@@ -5,7 +5,7 @@
 #define METAL__HCA_H
 
 /*!
- * @file hca.h
+ * @file sifive_hca0.h
  * @brief 
  */
 
@@ -17,20 +17,14 @@
 #include <stdio.h>
 #include <stdint.h>
 /**
- * @addtogroup HCA
+ * @addtogroup HCA0
  *  @{
  */
-
-typedef enum
-{
-    HCA_AES_MODE = 0,
-    HCA_SHA_MODE = 1
-} hca_mode_t;
 
 /*!
  * @brief Handle for a HCA device
  */
-struct metal_hca {
+struct sifive_hca0 {
     uint32_t __hca_index;
 };
 
@@ -83,15 +77,15 @@ struct metal_hca {
  * @param device_num The index of the desired HCA device
  * @return A handle to the HCA device, or NULL if the device does not exist
  */
-inline struct metal_hca metal_hca_get_device(uint32_t index) {
+__attribute__((always_inline)) inline struct sifive_hca0 sifive_hca0_get_device(uint32_t index) {
 #if __METAL_DT_NUM_HCA0S > 0
     if (index < __METAL_DT_NUM_HCA0S)
-        return (struct metal_hca){index};
+        return (struct sifive_hca0){index};
 #endif
-    return (struct metal_hca){METAL_HCA_INVALID_INDEX};
+    return (struct sifive_hca0){METAL_HCA_INVALID_INDEX};
 }
 
-uint32_t metal_hca_getrev(struct metal_hca hca);
+uint32_t sifive_hca0_getrev(struct sifive_hca0 hca) __attribute__((weak));
 
 /** @}*/
 #endif /* METAL__HCA_H */
