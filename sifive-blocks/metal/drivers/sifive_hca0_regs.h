@@ -166,8 +166,9 @@ typedef union _HCA_CR {
 #define HCA_CR_IFIFOCNT_Msk                                                    \
     (0x3FU << HCA_CR_IFIFOCNT_Pos) /**< HCA CR: Input FIFO count Mask */
 
-#define HCA_CR_AESFIFOCNT_Pos 24U /**< HCA CR: AES output FIFO count Position  \
-                                   */
+#define HCA_CR_AESFIFOCNT_Pos                                                  \
+    24U /**< HCA CR: AES output FIFO count Position                            \
+         */
 #define HCA_CR_AESFIFOCNT_Msk                                                  \
     (0x3FU << HCA_CR_AESFIFOCNT_Pos) /**< HCA CR: AES output FIFO count Mask   \
                                       */
@@ -212,8 +213,9 @@ typedef union _HCA_AES_CR {
     (1U << HCA_AES_CR_PROCESS_Pos) /**< HCA AES_CR: Process type (encryption   \
                                       or decryption) Mask */
 
-#define HCA_AES_CR_INIT_Pos 7U /**< HCA AES_CR: Chain Initialization Position  \
-                                */
+#define HCA_AES_CR_INIT_Pos                                                    \
+    7U /**< HCA AES_CR: Chain Initialization Position                          \
+        */
 #define HCA_AES_CR_INIT_Msk                                                    \
     (1U << HCA_AES_CR_INIT_Pos) /**< HCA AES_CR: Chain Initialization Mask */
 
@@ -334,8 +336,9 @@ typedef union _HCA_SHA_CR {
 
 /* HCA AES/SHA FIFO Input */
 #define HCA_FIFO_IN_DATA_Pos 0U /**< HCA FIFO_IN: Data Position */
-#define HCA_FIFO_IN_DATA_Msk 0xFFFFFFFFFFFFFFFFU /**< HCA FIFO_IN: Data Mask   \
-                                                  */
+#define HCA_FIFO_IN_DATA_Msk                                                   \
+    0xFFFFFFFFFFFFFFFFU /**< HCA FIFO_IN: Data Mask                            \
+                         */
 
 /* HCA AES FIFO Output */
 #define HCA_AES_OUT_AES_OUT_Pos 0U /**< HCA AES_OUT: FIFO Output Position */
@@ -510,8 +513,9 @@ typedef union _HCA_TRNG_SR {
                                          */
 
 /* HCA TRNG data */
-#define HCA_TRNG_DATA_DATA_Pos 0U /**< HCA TRNG_DATA: Data register Position   \
-                                   */
+#define HCA_TRNG_DATA_DATA_Pos                                                 \
+    0U /**< HCA TRNG_DATA: Data register Position                              \
+        */
 #define HCA_TRNG_DATA_DATA_Msk                                                 \
     0xFFFFFFFFU /**< HCA TRNG_DATA: Data register Mask */
 
@@ -631,8 +635,9 @@ typedef union _HCA_DMA_LEN {
 
 /* HCA DMA source address */
 #define HCA_DMA_SRC_SRC_Pos 0U /**< HCA DMA_SRC: Source Address Position */
-#define HCA_DMA_SRC_SRC_Msk 0xFFFFFFFFU /**< HCA DMA_SRC: Source Address Mask  \
-                                         */
+#define HCA_DMA_SRC_SRC_Msk                                                    \
+    0xFFFFFFFFU /**< HCA DMA_SRC: Source Address Mask                          \
+                 */
 
 /* HCA DMA destination address */
 #define HCA_DMA_DEST_DEST_Pos                                                  \
@@ -654,20 +659,23 @@ typedef union _HCA_HCA_REV {
 } HCA_HCA_REV_Type;
 
 /* HCA HCA Revision */
-#define HCA_HCA_REV_PATCHREV_Pos 0U /**< HCA HCA_REV: Patch Revision Position  \
-                                     */
+#define HCA_HCA_REV_PATCHREV_Pos                                               \
+    0U /**< HCA HCA_REV: Patch Revision Position                               \
+        */
 #define HCA_HCA_REV_PATCHREV_Msk                                               \
     (0xFU << HCA_HCA_REV_PATCHREV_Pos) /**< HCA HCA_REV: Patch Revision Mask   \
                                         */
 
-#define HCA_HCA_REV_MINORREV_Pos 4U /**< HCA HCA_REV: Minor Revision Position  \
-                                     */
+#define HCA_HCA_REV_MINORREV_Pos                                               \
+    4U /**< HCA HCA_REV: Minor Revision Position                               \
+        */
 #define HCA_HCA_REV_MINORREV_Msk                                               \
     (0xFU << HCA_HCA_REV_MINORREV_Pos) /**< HCA HCA_REV: Minor Revision Mask   \
                                         */
 
-#define HCA_HCA_REV_MAJORREV_Pos 8U /**< HCA HCA_REV: Major Revision Position  \
-                                     */
+#define HCA_HCA_REV_MAJORREV_Pos                                               \
+    8U /**< HCA HCA_REV: Major Revision Position                               \
+        */
 #define HCA_HCA_REV_MAJORREV_Msk                                               \
     (0xFU << HCA_HCA_REV_MAJORREV_Pos) /**< HCA HCA_REV: Major Revision Mask   \
                                         */
@@ -687,20 +695,23 @@ typedef union _HCA_AES_REV {
 } HCA_AES_REV_Type;
 
 /* HCA AES Revision */
-#define HCA_AES_REV_PATCHREV_Pos 0U /**< HCA AES_REV: Patch Revision Position  \
-                                     */
+#define HCA_AES_REV_PATCHREV_Pos                                               \
+    0U /**< HCA AES_REV: Patch Revision Position                               \
+        */
 #define HCA_AES_REV_PATCHREV_Msk                                               \
     (0xFU << HCA_AES_REV_PATCHREV_Pos) /**< HCA AES_REV: Patch Revision Mask   \
                                         */
 
-#define HCA_AES_REV_MINORREV_Pos 4U /**< HCA AES_REV: Minor Revision Position  \
-                                     */
+#define HCA_AES_REV_MINORREV_Pos                                               \
+    4U /**< HCA AES_REV: Minor Revision Position                               \
+        */
 #define HCA_AES_REV_MINORREV_Msk                                               \
     (0xFU << HCA_AES_REV_MINORREV_Pos) /**< HCA AES_REV: Minor Revision Mask   \
                                         */
 
-#define HCA_AES_REV_MAJORREV_Pos 8U /**< HCA AES_REV: Major Revision Position  \
-                                     */
+#define HCA_AES_REV_MAJORREV_Pos                                               \
+    8U /**< HCA AES_REV: Major Revision Position                               \
+        */
 #define HCA_AES_REV_MAJORREV_Msk                                               \
     (0xFU << HCA_AES_REV_MAJORREV_Pos) /**< HCA AES_REV: Major Revision Mask   \
                                         */
@@ -724,20 +735,23 @@ typedef union _HCA_SHA_REV {
 } HCA_SHA_REV_Type;
 
 /* HCA SHA Revision */
-#define HCA_SHA_REV_PATCHREV_Pos 0U /**< HCA SHA_REV: Patch Revision Position  \
-                                     */
+#define HCA_SHA_REV_PATCHREV_Pos                                               \
+    0U /**< HCA SHA_REV: Patch Revision Position                               \
+        */
 #define HCA_SHA_REV_PATCHREV_Msk                                               \
     (0xFU << HCA_SHA_REV_PATCHREV_Pos) /**< HCA SHA_REV: Patch Revision Mask   \
                                         */
 
-#define HCA_SHA_REV_MINORREV_Pos 4U /**< HCA SHA_REV: Minor Revision Position  \
-                                     */
+#define HCA_SHA_REV_MINORREV_Pos                                               \
+    4U /**< HCA SHA_REV: Minor Revision Position                               \
+        */
 #define HCA_SHA_REV_MINORREV_Msk                                               \
     (0xFU << HCA_SHA_REV_MINORREV_Pos) /**< HCA SHA_REV: Minor Revision Mask   \
                                         */
 
-#define HCA_SHA_REV_MAJORREV_Pos 8U /**< HCA SHA_REV: Major Revision Position  \
-                                     */
+#define HCA_SHA_REV_MAJORREV_Pos                                               \
+    8U /**< HCA SHA_REV: Major Revision Position                               \
+        */
 #define HCA_SHA_REV_MAJORREV_Msk                                               \
     (0xFU << HCA_SHA_REV_MAJORREV_Pos) /**< HCA SHA_REV: Major Revision Mask   \
                                         */
