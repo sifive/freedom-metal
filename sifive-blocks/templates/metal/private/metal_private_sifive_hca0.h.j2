@@ -1,12 +1,12 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef METAL__DRIVERS__SIFIVE_HCA0_H
-#define METAL__DRIVERS__SIFIVE_HCA0_H
+#ifndef METAL__GENERATED__SIFIVE_HCA0_H
+#define METAL__GENERATED__SIFIVE_HCA0_H
 
 {% include 'template_comment.h.j2' %}
 
-#include <metal/private/metal_private_hca0.h>
+#include <metal/drivers/sifive_hca0_regs.h>
 #include <metal/interrupt.h>
 #include <metal/platform.h>
 #include <stdbool.h>
@@ -14,206 +14,6 @@
 
 {% if 'sifive,hca0' in devices %}
 {% set sifive_hca0s = devices['sifive,hca0'] %}
-
-/* following defines should be used for structure members */
-#define __IM   volatile const   /**< Defines 'read only' structure member permissions */
-#define __OM   volatile         /**< Defines 'write only' structure member permissions */
-#define __IOM  volatile         /**< Defines 'read / write' structure member permissions */
-
-typedef struct _HCA {
-    __IOM   uint32_t   CR;                 /**< Offset: 0x000 (R/W) Control */
-            uint32_t   _reserved0[3U];
-    __IOM   uint32_t   AES_CR;             /**< Offset: 0x010 (R/W) AES control */
-            uint32_t   _reserved1[3U];
-    __IOM   uint64_t   AES_ALEN;           /**< Offset: 0x020 (R/W) AES GCM/CCM AAD Length */
-    __IOM   uint64_t   AES_PLDLEN;         /**< Offset: 0x028 (R/W) AES GCM/CCM Payload Length */
-    __OM    uint64_t   AES_KEY[4U];        /**< Offset: 0x030 ( /W) AES Key */
-    __IOM   uint64_t   AES_INITV[2U];      /**< Offset: 0x050 (R/W) AES Initialization Vector */
-    __IOM   uint32_t   SHA_CR;             /**< Offset: 0x060 (R/W) SHA control */
-            uint32_t   _reserved2[3U];
-#if __riscv_xlen == 64
-    __OM    uint64_t   FIFO_IN;            /**< Offset: 0x070 ( /W) AES/SHA FIFO Input */
-            uint32_t   _reserved3[2U];
-    __IM    uint64_t   AES_OUT;            /**< Offset: 0x080 (R/ ) AES FIFO Output */
-            uint32_t   _reserved4[2U];
-#endif
-#if __riscv_xlen == 32
-    __OM    uint32_t   FIFO_IN;            /**< Offset: 0x070 ( /W) AES/SHA FIFO Input */
-            uint32_t   _reserved3[3U];
-    __IM    uint32_t   AES_OUT;            /**< Offset: 0x080 (R/ ) AES FIFO Output */
-            uint32_t   _reserved4[3U];
-#endif
-    __IM    uint64_t   AES_AUTH[2U];       /**< Offset: 0x090 (R/ ) AES Authentication Tag */
-    __IM    uint64_t   HASH[8U];           /**< Offset: 0x0A0 (R/ ) HASH result from SHA */
-    __IOM   uint32_t   TRNG_CR;            /**< Offset: 0x0E0 (R/W) TRNG control */
-    __IOM   uint32_t   TRNG_SR;            /**< Offset: 0x0E4 (R/W) TRNG status */
-    __IM    uint32_t   TRNG_DATA;          /**< Offset: 0x0E8 (R/ ) TRNG data */
-    __IOM   uint32_t   TRNG_TRIM;          /**< Offset: 0x0EC (R/W) TRNG trim */
-            uint32_t   _reserved5[8U];
-    __IOM   uint32_t   DMA_CR;             /**< Offset: 0x110 (R/W) DMA control */
-    __IOM   uint32_t   DMA_LEN;            /**< Offset: 0x114 (R/W) DMA length */
-    __IOM   uint32_t   DMA_SRC;            /**< Offset: 0x118 (R/W) DMA source address */
-            uint32_t   _reserved6;
-    __IOM   uint32_t   DMA_DEST;           /**< Offset: 0x120 (R/W) DMA destination address */
-            uint32_t   _reserved7[0x37U];
-    __IM    uint32_t   HCA_REV;            /**< Offset: 0x200 (R/ ) HCA Revision */
-    __IM    uint32_t   AES_REV;            /**< Offset: 0x204 (R/ ) AES Revision */
-    __IM    uint32_t   SHA_REV;            /**< Offset: 0x208 (R/ ) SHA Revision */
-    __IM    uint32_t   TRNG_REV;           /**< Offset: 0x20C (R/ ) TRNG Revision */
-} HCA_Type;
-
-/**
- * Structure type to access HCA Revision (HCA_REV)
- */
-typedef union _HCA_HCA_REV {
-    struct {
-        uint32_t PATCHREV:4;       /**< bit:   0..3  HCA Patch Revision */
-        uint32_t MINORREV:4;       /**< bit:   4..7  HCA Minor Revision */
-        uint32_t MAJORREV:4;       /**< bit:  8..11  HCA Major Revision */
-        uint32_t _reserved0:20;    /**< bit: 12..31  (reserved) */
-    } b;                           /**< Structure used for bit access */
-    uint32_t w;                    /**< Structure used for word access */
-} HCA_HCA_REV_Type;
-
-/* HCA HCA Revision */
-#define HCA_HCA_REV_PATCHREV_Pos          0U                                       /**< HCA HCA_REV: Patch Revision Position */
-#define HCA_HCA_REV_PATCHREV_Msk          (0xFU << HCA_HCA_REV_PATCHREV_Pos)       /**< HCA HCA_REV: Patch Revision Mask */
-
-#define HCA_HCA_REV_MINORREV_Pos          4U                                       /**< HCA HCA_REV: Minor Revision Position */
-#define HCA_HCA_REV_MINORREV_Msk          (0xFU << HCA_HCA_REV_MINORREV_Pos)       /**< HCA HCA_REV: Minor Revision Mask */
-
-#define HCA_HCA_REV_MAJORREV_Pos          8U                                       /**< HCA HCA_REV: Major Revision Position */
-#define HCA_HCA_REV_MAJORREV_Msk          (0xFU << HCA_HCA_REV_MAJORREV_Pos)       /**< HCA HCA_REV: Major Revision Mask */
-
-/**
- * Structure type to access Control (CR)
- */
-typedef union _HCA_CR {
-    struct {
-        uint32_t IFIFOTGT:1;       /**< bit:      0  Input FIFO target, 0: AES, 1: SHA */
-        uint32_t IFIFOEMPTY:1;     /**< bit:      1  Input FIFO Empty */
-        uint32_t IFIFOFULL:1;      /**< bit:      2  Input FIFO Full */
-        uint32_t OFIFOEMPTY:1;     /**< bit:      3  Output FIFO Empty */
-        uint32_t OFIFOFULL:1;      /**< bit:      4  Output FIFO Full */
-        uint32_t ENDIANNESS:1;     /**< bit:      5  FIFOs endianness, 0: Little Endian, 1: Big Endian */
-        uint32_t _reserved0:2;     /**< bit:   6..7  (reserved) */
-        uint32_t CRYPTODIE:1;      /**< bit:      8  AES/SHA completion interrupt enable */
-        uint32_t OFIFOIE:1;        /**< bit:      9  Output FIFO not empty interrupt enable */
-        uint32_t DMADIE:1;         /**< bit:     10  DMA completion interrupt enable */
-        uint32_t _reserved1:1;     /**< bit:     11  (reserved) */
-        uint32_t CRYPTODIS:1;      /**< bit:     12  AES/SHA completion interrupt status */
-        uint32_t OFIFOIS:1;        /**< bit:     13  Output FIFO not empty interrupt status */
-        uint32_t DMADIS:1;         /**< bit:     14  DMA completion interrupt status */
-        uint32_t _reserved2:1;     /**< bit:     15  (reserved) */
-        uint32_t IFIFOCNT:6;       /**< bit: 16..21  Input FIFO count */
-        uint32_t _reserved3:2;     /**< bit: 22..23  (reserved) */
-        uint32_t AESFIFOCNT:6;     /**< bit: 24..29  AES output FIFO count */
-        uint32_t _reserved4:2;     /**< bit: 30..31  (reserved) */
-    } b;                           /**< Structure used for bit access */
-    uint32_t w;                    /**< Structure used for word access */
-} HCA_CR_Type;
-
-/* HCA Control */
-#define HCA_CR_IFIFOTGT_Pos               0U                                       /**< HCA CR: Input FIFO target, 0: AES, 1: SHA Position */
-#define HCA_CR_IFIFOTGT_Msk               (1U << HCA_CR_IFIFOTGT_Pos)              /**< HCA CR: Input FIFO target, 0: AES, 1: SHA Mask */
-
-#define HCA_CR_IFIFOEMPTY_Pos             1U                                       /**< HCA CR: Input FIFO Empty Position */
-#define HCA_CR_IFIFOEMPTY_Msk             (1U << HCA_CR_IFIFOEMPTY_Pos)            /**< HCA CR: Input FIFO Empty Mask */
-
-#define HCA_CR_IFIFOFULL_Pos              2U                                       /**< HCA CR: Input FIFO Full Position */
-#define HCA_CR_IFIFOFULL_Msk              (1U << HCA_CR_IFIFOFULL_Pos)             /**< HCA CR: Input FIFO Full Mask */
-
-#define HCA_CR_OFIFOEMPTY_Pos             3U                                       /**< HCA CR: Output FIFO Empty Position */
-#define HCA_CR_OFIFOEMPTY_Msk             (1U << HCA_CR_OFIFOEMPTY_Pos)            /**< HCA CR: Output FIFO Empty Mask */
-
-#define HCA_CR_OFIFOFULL_Pos              4U                                       /**< HCA CR: Output FIFO Full Position */
-#define HCA_CR_OFIFOFULL_Msk              (1U << HCA_CR_OFIFOFULL_Pos)             /**< HCA CR: Output FIFO Full Mask */
-
-#define HCA_CR_ENDIANNESS_Pos             5U                                       /**< HCA CR: FIFOs endianness, 0: Little Endian, 1: Big Endian Position */
-#define HCA_CR_ENDIANNESS_Msk             (1U << HCA_CR_ENDIANNESS_Pos)            /**< HCA CR: FIFOs endianness, 0: Little Endian, 1: Big Endian Mask */
-
-#define HCA_CR_CRYPTODIE_Pos              8U                                       /**< HCA CR: AES/SHA completion interrupt enable Position */
-#define HCA_CR_CRYPTODIE_Msk              (1U << HCA_CR_CRYPTODIE_Pos)             /**< HCA CR: AES/SHA completion interrupt enable Mask */
-
-#define HCA_CR_OFIFOIE_Pos                9U                                       /**< HCA CR: Output FIFO not empty interrupt enable Position */
-#define HCA_CR_OFIFOIE_Msk                (1U << HCA_CR_OFIFOIE_Pos)               /**< HCA CR: Output FIFO not empty interrupt enable Mask */
-
-#define HCA_CR_DMADIE_Pos                 10U                                      /**< HCA CR: DMA completion interrupt enable Position */
-#define HCA_CR_DMADIE_Msk                 (1U << HCA_CR_DMADIE_Pos)                /**< HCA CR: DMA completion interrupt enable Mask */
-
-#define HCA_CR_CRYPTODIS_Pos              12U                                      /**< HCA CR: AES/SHA completion interrupt status Position */
-#define HCA_CR_CRYPTODIS_Msk              (1U << HCA_CR_CRYPTODIS_Pos)             /**< HCA CR: AES/SHA completion interrupt status Mask */
-
-#define HCA_CR_OFIFOIS_Pos                13U                                      /**< HCA CR: Output FIFO not empty interrupt status Position */
-#define HCA_CR_OFIFOIS_Msk                (1U << HCA_CR_OFIFOIS_Pos)               /**< HCA CR: Output FIFO not empty interrupt status Mask */
-
-#define HCA_CR_DMADIS_Pos                 14U                                      /**< HCA CR: DMA completion interrupt status Position */
-#define HCA_CR_DMADIS_Msk                 (1U << HCA_CR_DMADIS_Pos)                /**< HCA CR: DMA completion interrupt status Mask */
-
-#define HCA_CR_IFIFOCNT_Pos               16U                                      /**< HCA CR: Input FIFO count Position */
-#define HCA_CR_IFIFOCNT_Msk               (0x3FU << HCA_CR_IFIFOCNT_Pos)           /**< HCA CR: Input FIFO count Mask */
-
-#define HCA_CR_AESFIFOCNT_Pos             24U                                      /**< HCA CR: AES output FIFO count Position */
-#define HCA_CR_AESFIFOCNT_Msk             (0x3FU << HCA_CR_AESFIFOCNT_Pos)         /**< HCA CR: AES output FIFO count Mask */
-
-/**
- * Structure type to access DMA control (DMA_CR)
- */
-typedef union _HCA_DMA_CR {
-    struct {
-        uint32_t START:1;          /**< bit:      0  DMA Start */
-        uint32_t _reserved0:7;     /**< bit:   1..7  (reserved) */
-        uint32_t BUSY:1;           /**< bit:      8  DMA Busy */
-        uint32_t RDALIGNERR:1;     /**< bit:      9  Read alignment error */
-        uint32_t WRALIGNERR:1;     /**< bit:     10  Write alignment error */
-        uint32_t RESPERR:1;        /**< bit:     11  DMA Response error */
-        uint32_t LEGALERR:1;       /**< bit:     12  DMA Legal error */
-        uint32_t _reserved1:19;    /**< bit: 13..31  (reserved) */
-    } b;                           /**< Structure used for bit access */
-    uint32_t w;                    /**< Structure used for word access */
-} HCA_DMA_CR_Type;
-
-/* HCA DMA control */
-#define HCA_DMA_CR_START_Pos              0U                                       /**< HCA DMA_CR: Start Position */
-#define HCA_DMA_CR_START_Msk              (1U << HCA_DMA_CR_START_Pos)             /**< HCA DMA_CR: Start Mask */
-
-#define HCA_DMA_CR_BUSY_Pos               8U                                       /**< HCA DMA_CR: Busy Position */
-#define HCA_DMA_CR_BUSY_Msk               (1U << HCA_DMA_CR_BUSY_Pos)              /**< HCA DMA_CR: Busy Mask */
-
-#define HCA_DMA_CR_RDALIGNERR_Pos         9U                                       /**< HCA DMA_CR: Read alignment error Position */
-#define HCA_DMA_CR_RDALIGNERR_Msk         (1U << HCA_DMA_CR_RDALIGNERR_Pos)        /**< HCA DMA_CR: Read alignment error Mask */
-
-#define HCA_DMA_CR_WRALIGNERR_Pos         10U                                      /**< HCA DMA_CR: Write alignment error Position */
-#define HCA_DMA_CR_WRALIGNERR_Msk         (1U << HCA_DMA_CR_WRALIGNERR_Pos)        /**< HCA DMA_CR: Write alignment error Mask */
-
-#define HCA_DMA_CR_RESPERR_Pos            11U                                      /**< HCA DMA_CR: Response error Position */
-#define HCA_DMA_CR_RESPERR_Msk            (1U << HCA_DMA_CR_RESPERR_Pos)           /**< HCA DMA_CR: Response error Mask */
-
-#define HCA_DMA_CR_LEGALERR_Pos           12U                                      /**< HCA DMA_CR: Legal error Position */
-#define HCA_DMA_CR_LEGALERR_Msk           (1U << HCA_DMA_CR_LEGALERR_Pos)          /**< HCA DMA_CR: Legal error Mask */
-
-/**
- * Structure type to access DMA length (DMA_LEN)
- */
-typedef union _HCA_DMA_LEN {
-    struct {
-        uint32_t LEN:28;           /**< bit:  0..27  DMA Length (number of 128-bits blocks) */
-        uint32_t _reserved0:4;     /**< bit: 28..31  (reserved) */
-    } b;                           /**< Structure used for bit access */
-    uint32_t w;                    /**< Structure used for word access */
-} HCA_DMA_LEN_Type;
-
-/* HCA DMA length */
-#define HCA_DMA_LEN_LEN_Pos               0U                                       /**< HCA DMA_LEN: Length (number of 128-bits blocks) Position */
-#define HCA_DMA_LEN_LEN_Msk               0xFFFFFFFU                               /**< HCA DMA_LEN: Length (number of 128-bits blocks) Mask */
-
-/* HCA DMA source address */
-#define HCA_DMA_SRC_SRC_Pos               0U                                       /**< HCA DMA_SRC: Source Address Position */
-#define HCA_DMA_SRC_SRC_Msk               0xFFFFFFFFU                              /**< HCA DMA_SRC: Source Address Mask */
-
-/* HCA DMA destination address */
-#define HCA_DMA_DEST_DEST_Pos             0U                                       /**< HCA DMA_DEST: Destination Address Position */
-#define HCA_DMA_DEST_DEST_Msk             0xFFFFFFFFU                              /**< HCA DMA_DEST: Destination Address Mask */
 
 static const struct dt_hca_data {
 	uintptr_t base_addr;
@@ -242,4 +42,4 @@ static const struct dt_hca_data {
 
 {% endif %}
 
-#endif /* METAL__DRIVERS__SIFIVE_HCA0_H */
+#endif /* METAL__GENERATED__SIFIVE_HCA0_H */

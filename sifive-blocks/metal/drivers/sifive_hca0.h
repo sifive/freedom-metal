@@ -1,8 +1,8 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef METAL__HCA_H
-#define METAL__HCA_H
+#ifndef METAL__DRIVERS__SIFIVE_HCA0_H
+#define METAL__DRIVERS__SIFIVE_HCA0_H
 
 /*!
  * @file sifive_hca0.h
@@ -20,6 +20,8 @@
  * @addtogroup HCA0
  *  @{
  */
+
+typedef enum { HCA_AES_MODE = 0, HCA_SHA_MODE = 1 } hca0_mode_t;
 
 /*!
  * @brief Handle for a HCA device
@@ -88,4 +90,4 @@ sifive_hca0_get_device(uint32_t index) {
 uint32_t sifive_hca0_getrev(struct sifive_hca0 hca) __attribute__((weak));
 
 /** @}*/
-#endif /* METAL__HCA_H */
+#endif /* METAL__DRIVERS__SIFIVE_HCA0_H */

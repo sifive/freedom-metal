@@ -1,11 +1,11 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef METAL__HCA_SHA_H
-#define METAL__HCA_SHA_H
+#ifndef METAL__DRIVERS__SIFIVE_HCA0_SHA_H
+#define METAL__DRIVERS__SIFIVE_HCA0_SHA_H
 
 /*!
- * @file hca_sha.h
+ * @file sifive_hca0_sha.h
  * @brief API for AES crypto operation through HCA
  */
 
@@ -138,4 +138,4 @@ int32_t sifive_hca0_sha_finish(struct sifive_hca0 hca,
                                size_t *const hash_len) __attribute__((weak));
 
 /** @}*/
-#endif /* METAL__HCA_SHA_H */
+#endif /* METAL__DRIVERS__SIFIVE_HCA0_SHA_H */

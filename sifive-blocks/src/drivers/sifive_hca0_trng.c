@@ -7,9 +7,9 @@
 
 #ifdef METAL_SIFIVE_HCA0
 
+#include <metal/drivers/sifive_hca0_regs.h>
 #include <metal/io.h>
 #include <metal/private/metal_private_sifive_hca0.h>
-#include <metal/private/metal_private_sifive_hca0_trng.h>
 
 #define get_index(hca) ((hca).__hca_index)
 

@@ -1,11 +1,11 @@
 /* Copyright 2020 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#ifndef METAL__HCA_TRNG_H
-#define METAL__HCA_TRNG_H
+#ifndef METAL__DRIVERS__SIFIVE_HCA0_TRNG_H
+#define METAL__DRIVERS__SIFIVE_HCA0_TRNG_H
 
 /*!
- * @file hca_trng.h
+ * @file sifive_hca0_trng.h
  * @brief API for TRNG crypto operation through HCA
  */
 
@@ -30,4 +30,4 @@ int32_t sifive_hca0_trng_getdata(struct sifive_hca0 hca, uint32_t *data_out)
     __attribute__((weak));
 
 /** @}*/
-#endif /* METAL__HCA_TRNG_H */
+#endif /* METAL__DRIVERS__SIFIVE_HCA0_TRNG_H */
