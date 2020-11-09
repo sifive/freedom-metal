@@ -1,0 +1,45 @@
+/* Copyright 2020 SiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__GENERATED__SIFIVE_HCA0_H
+#define METAL__GENERATED__SIFIVE_HCA0_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/drivers/sifive_hca0_regs.h>
+#include <metal/interrupt.h>
+#include <metal/platform.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+{% if 'sifive,hca0' in devices %}
+{% set sifive_hca0s = devices['sifive,hca0'] %}
+
+static const struct dt_hca_data {
+	uintptr_t base_addr;
+    HCA_Type *hca_regs;
+	struct metal_interrupt interrupt_parent;
+	uint32_t interrupt_id;
+} dt_hca_data[__METAL_DT_NUM_HCA0S] = {
+	{% for hca in sifive_hca0s %}
+	{
+	    .base_addr = METAL_SIFIVE_HCA0_{{ hca.id }}_BASE_ADDRESS,
+        .hca_regs = (HCA_Type *) METAL_SIFIVE_HCA0_{{ hca.id }}_BASE_ADDRESS,
+
+	{% if hca.interrupt_parent is defined %}
+	    /* {{ hca.interrupt_parent[0].compatible[0] }} */
+		.interrupt_parent = { {{ hca.interrupt_parent[0].id }} },
+		.interrupt_id = {{ hca.interrupts[0] }},
+	{% endif %}
+	},
+	{% endfor %}
+};
+
+{% if sifive_hca0s[0].interrupt_parent is defined %}
+{% set driver_string = to_snakecase(sifive_hca0s[0].interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h.j2' %}
+{% endif %}
+
+{% endif %}
+
+#endif /* METAL__GENERATED__SIFIVE_HCA0_H */

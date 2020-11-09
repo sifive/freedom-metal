@@ -1,0 +1,17 @@
+#ifndef __METAL_DT_HCA0__H
+#define __METAL_DT_HCA0__H
+
+{% include 'template_comment.h.j2' %}
+
+{% if 'hca' in default_drivers and default_drivers['hca'] in devices %}
+{% set hca_compatible = default_drivers['hca'] %}
+
+#define __METAL_DT_NUM_HCA0S {{ devices[hca_compatible]|length }}
+
+{% set driver_string = to_snakecase(hca_compatible) %}
+
+{% else %}
+#define __METAL_DT_NUM_HCA0S 0
+{% endif %}
+
+#endif /* ! __METAL_DT_HCA0__H */
