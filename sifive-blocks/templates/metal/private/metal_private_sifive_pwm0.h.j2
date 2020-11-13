@@ -54,11 +54,11 @@ static const struct dt_pwm_data {
 		.interrupt_parent = { {{ pwm.interrupt_parent[0].id }} },
 		.interrupt_id = {{ pwm.interrupts[0] }},
 	{% endif %}
-	{% if pwm.ncomparators is defined %}
-		.comparator_count = {{ pwm.ncomparators }},
+	{% if pwm.sifive_ncomparators is defined %}
+		.comparator_count = {{ pwm.sifive_ncomparators[0] }},
 	{% endif %}
-	{% if pwm.comparator_widthbits is defined %}
-		.compare_width = {{ pwm.comparator_widthbits }},
+	{% if pwm.sifive_comparator_widthbits is defined %}
+		.compare_width = {{ pwm.sifive_comparator_widthbits[0] }},
 	{% endif %}
 	},
 	{% endfor %}
