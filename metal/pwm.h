@@ -93,8 +93,10 @@ int metal_pwm_stop(struct metal_pwm pwm, uint32_t idx);
 /*! @brief Enable or Disable PWM interrupts.
  * @param pwm PWM device handle.
  * @param flag PWM interrupt enable flag.
+ * @param idx PWM channel id.
  * @return 0 If no error.*/
-int metal_pwm_cfg_interrupt(struct metal_pwm pwm, metal_pwm_interrupt_t flag);
+int metal_pwm_cfg_interrupt(struct metal_pwm pwm, metal_pwm_interrupt_t flag,
+                            uint32_t idx);
 
 /*! @brief Clears pending interrupt flags.
  * @param pwm PWM device handle.

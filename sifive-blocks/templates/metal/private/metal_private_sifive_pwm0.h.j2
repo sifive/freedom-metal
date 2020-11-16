@@ -26,7 +26,7 @@ static const struct dt_pwm_data {
 	uint32_t pinmux_output_selector;
 	uint32_t pinmux_source_selector;
 	struct metal_interrupt interrupt_parent;
-	uint32_t interrupt_id;
+	uint32_t interrupt_id[4];
 	uint8_t comparator_count;
 	uint8_t	compare_width;
 } dt_pwm_data[__METAL_DT_NUM_PWMS] = {
@@ -52,7 +52,9 @@ static const struct dt_pwm_data {
 	{% if pwm.interrupt_parent is defined %}
 	    /* {{ pwm.interrupt_parent[0].compatible[0] }} */
 		.interrupt_parent = { {{ pwm.interrupt_parent[0].id }} },
-		.interrupt_id = {{ pwm.interrupts[0] }},
+		.interrupt_id = {
+			{{ pwm.interrupts[0] }},{{ pwm.interrupts[1] }},{{ pwm.interrupts[2] }},{{ pwm.interrupts[3] }},
+		},
 	{% endif %}
 	{% if pwm.sifive_ncomparators is defined %}
 		.comparator_count = {{ pwm.sifive_ncomparators[0] }},
