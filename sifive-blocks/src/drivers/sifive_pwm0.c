@@ -4,26 +4,18 @@
 #include <metal/platform.h>
 
 #ifdef METAL_SIFIVE_PWM0
+
 #include <metal/clock.h>
 #include <metal/cpu.h>
+#include <metal/drivers/sifive_pwm0_regs.h>
 #include <metal/io.h>
 #include <metal/private/metal_private_sifive_pwm0.h>
 #include <metal/time.h>
 
-/* Register fields */
-#define METAL_PWMCFG_STICKY (1UL << 8)
-#define METAL_PWMCFG_ZEROCMP (1UL << 9)
-#define METAL_PWMCFG_DEGLITCH (1UL << 10)
-#define METAL_PWMCFG_ENALWAYS (1UL << 12)
-#define METAL_PWMCFG_ENONESHOT (1UL << 13)
-#define METAL_PWMCFG_CMPCENTER(x) (1UL << (16 + x))
-#define METAL_PWMCFG_CMPIP(x) (1UL << (28 + x))
-#define METAL_SIFIVE_PWM0_PWMCMP(x) (METAL_SIFIVE_PWM0_PWMCMP0 + (x * 4))
-
-/* Macros to access registers */
-#define METAL_PWM_REG(offset) ((base + offset))
-#define METAL_PWM_REGW(offset)                                                 \
-    (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_PWM_REG(offset)))
+#define METAL_PWMCFG_CMPCENTER(x) (1UL << (PWM_PWMCFG_PWMCMPNCENTER_Pos + x))
+#define METAL_PWMCFG_INVERT(x) (1UL << (PWM_PWMCFG_PWMINVERTN_Pos + x))
+#define METAL_PWMCFG_GANG(x) (1UL << (PWM_PWMCFG_PWMGANGN_Pos + x))
+#define METAL_PWMCFG_CMPIP(x) (1UL << (PWM_PWMCFG_PWMIPN_Pos + x))
 
 /* Macro to get PWM compare count */
 #define METAL_PWM_GETCMPVAL(duty)                                              \
@@ -63,7 +55,7 @@ void _sifive_pwm0_pre_rate_change_callback(uint32_t id) {
 
 void _sifive_pwm0_post_rate_change_callback(uint32_t id) {
     struct metal_pwm pwm = metal_pwm_get_device(id);
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
+    PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
     uint8_t cmp_count = dt_pwm_data[get_index(pwm)].comparator_count;
     uint8_t idx = 0;
     uint32_t duty;
@@ -77,8 +69,7 @@ void _sifive_pwm0_post_rate_change_callback(uint32_t id) {
         while (++idx < cmp_count) {
             duty = pwm_state[get_index(pwm)].duty[idx];
             if (duty != 0) {
-                METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCMP(idx)) =
-                    METAL_PWM_GETCMPVAL(duty);
+                PWM_regs->PWMCMP[idx] = METAL_PWM_GETCMPVAL(duty);
             }
         }
     }
@@ -86,11 +77,11 @@ void _sifive_pwm0_post_rate_change_callback(uint32_t id) {
 
 int sifive_pwm0_enable(struct metal_pwm pwm) {
     int ret = METAL_PWM_RET_ERR;
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
 
-    if (base != 0) {
-
+    if (dt_pwm_data[get_index(pwm)].base_addr != 0) {
+        PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
         int has_pinmux = dt_pwm_data[get_index(pwm)].has_pinmux;
+
         if (has_pinmux) {
             struct metal_gpio pinmux = dt_pwm_data[get_index(pwm)].pinmux;
             uint32_t output_sel =
@@ -105,7 +96,7 @@ int sifive_pwm0_enable(struct metal_pwm pwm) {
             (1UL << dt_pwm_data[get_index(pwm)].compare_width) - 1;
         pwm_state[get_index(pwm)].freq = 0;
         pwm_state[get_index(pwm)].count_val = 0;
-        METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) = 0;
+        PWM_regs->PWMCFG = 0;
         ret = METAL_PWM_RET_OK;
     }
     return ret;
@@ -113,11 +104,11 @@ int sifive_pwm0_enable(struct metal_pwm pwm) {
 
 int sifive_pwm0_disable(struct metal_pwm pwm) {
     int ret = METAL_PWM_RET_ERR;
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
 
-    if (base != 0) {
-
+    if (dt_pwm_data[get_index(pwm)].base_addr != 0) {
+        PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
         int has_pinmux = dt_pwm_data[get_index(pwm)].has_pinmux;
+
         if (has_pinmux) {
             /* Disable PWM I/O pins */
             struct metal_gpio pinmux = dt_pwm_data[get_index(pwm)].pinmux;
@@ -132,7 +123,7 @@ int sifive_pwm0_disable(struct metal_pwm pwm) {
 }
 
 int sifive_pwm0_set_freq(struct metal_pwm pwm, uint32_t idx, uint32_t freq) {
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
+    PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
     uint8_t cmp_count = dt_pwm_data[get_index(pwm)].comparator_count;
     struct metal_clock clock = dt_pwm_data[get_index(pwm)].clock;
     unsigned int count;
@@ -153,8 +144,8 @@ int sifive_pwm0_set_freq(struct metal_pwm pwm, uint32_t idx, uint32_t freq) {
         pwm_state[get_index(pwm)].count_val = --count;
 
         /* Update values into registers */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCMP0) = count;
-        METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) |= (prescale & 0x0FUL);
+        PWM_regs->PWMCMP[0] = count;
+        PWM_regs->PWMCFG |= (prescale & 0x0FUL);
         ret = METAL_PWM_RET_OK;
 
 #if defined(METAL_PWM_DEBUG)
@@ -169,7 +160,7 @@ int sifive_pwm0_set_freq(struct metal_pwm pwm, uint32_t idx, uint32_t freq) {
 
 int sifive_pwm0_set_duty(struct metal_pwm pwm, uint32_t idx, unsigned int duty,
                          metal_pwm_phase_correct_t phase_corr) {
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
+    PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
     uint8_t cmp_count = dt_pwm_data[get_index(pwm)].comparator_count;
     int ret = METAL_PWM_RET_ERR;
 
@@ -177,17 +168,14 @@ int sifive_pwm0_set_duty(struct metal_pwm pwm, uint32_t idx, unsigned int duty,
      * PWMCMP0 */
     if ((idx > 0) && (idx < cmp_count) && (duty <= METAL_PWM_MAXDUTY)) {
         /* Calculate PWM compare count value for given duty cycle */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCMP(idx)) =
-            METAL_PWM_GETCMPVAL(duty);
+        PWM_regs->PWMCMP[idx] = METAL_PWM_GETCMPVAL(duty);
         pwm_state[get_index(pwm)].duty[idx] = duty;
 
         /* Enable / Disable phase correct PWM mode */
         if (phase_corr == METAL_PWM_PHASE_CORRECT_ENABLE) {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) |=
-                METAL_PWMCFG_CMPCENTER(idx);
+            PWM_regs->PWMCFG |= METAL_PWMCFG_CMPCENTER(idx);
         } else {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) &=
-                ~METAL_PWMCFG_CMPCENTER(idx);
+            PWM_regs->PWMCFG &= ~METAL_PWMCFG_CMPCENTER(idx);
         }
         ret = METAL_PWM_RET_OK;
     }
@@ -214,21 +202,22 @@ uint32_t sifive_pwm0_get_freq(struct metal_pwm pwm, uint32_t idx) {
 
 int sifive_pwm0_trigger(struct metal_pwm pwm, uint32_t idx,
                         metal_pwm_run_mode_t mode) {
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
     int ret = METAL_PWM_RET_ERR;
 
     (void)idx; /* Unused parameter,for later use */
 
-    if (base != 0) {
+    if (dt_pwm_data[get_index(pwm)].base_addr != 0) {
+        PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
+
         /* Configure for requested PWM run mode */
         if (mode == METAL_PWM_CONTINUOUS) {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) |= METAL_PWMCFG_DEGLITCH |
-                                                        METAL_PWMCFG_ZEROCMP |
-                                                        METAL_PWMCFG_ENALWAYS;
+            PWM_regs->PWMCFG |= PWM_PWMCFG_PWMDEGLITCH_Msk |
+                                PWM_PWMCFG_PWMZEROCMP_Msk |
+                                PWM_PWMCFG_PWMENALWAYS_Msk;
         } else {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) |= METAL_PWMCFG_DEGLITCH |
-                                                        METAL_PWMCFG_ZEROCMP |
-                                                        METAL_PWMCFG_ENONESHOT;
+            PWM_regs->PWMCFG |= PWM_PWMCFG_PWMDEGLITCH_Msk |
+                                PWM_PWMCFG_PWMZEROCMP_Msk |
+                                PWM_PWMCFG_PWMONESHOT_Msk;
         }
         ret = METAL_PWM_RET_OK;
     }
@@ -236,14 +225,15 @@ int sifive_pwm0_trigger(struct metal_pwm pwm, uint32_t idx,
 }
 
 int sifive_pwm0_stop(struct metal_pwm pwm, uint32_t idx) {
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
     int ret = METAL_PWM_RET_ERR;
 
     (void)idx; /* Unused parameter,for later use */
 
-    if (base != 0) {
+    if (dt_pwm_data[get_index(pwm)].base_addr != 0) {
+        PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
+
         /* Disable always running mode */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) &= ~METAL_PWMCFG_ENALWAYS;
+        PWM_regs->PWMCFG &= ~PWM_PWMCFG_PWMENALWAYS_Msk;
         ret = METAL_PWM_RET_OK;
     }
     return ret;
@@ -251,15 +241,16 @@ int sifive_pwm0_stop(struct metal_pwm pwm, uint32_t idx) {
 
 int sifive_pwm0_cfg_interrupt(struct metal_pwm pwm,
                               metal_pwm_interrupt_t flag) {
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
     int ret = METAL_PWM_RET_ERR;
 
-    if (base != 0) {
+    if (dt_pwm_data[get_index(pwm)].base_addr != 0) {
+        PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
+
         if (flag == METAL_PWM_INTERRUPT_ENABLE) {
             /* Enable sticky bit, to make sure interrupts are not forgotten */
-            METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) |= METAL_PWMCFG_STICKY;
+            PWM_regs->PWMCFG |= PWM_PWMCFG_PWMSTICKY_Msk;
         } else {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) &= ~METAL_PWMCFG_STICKY;
+            PWM_regs->PWMCFG &= ~PWM_PWMCFG_PWMSTICKY_Msk;
         }
         ret = METAL_PWM_RET_OK;
     }
@@ -267,13 +258,13 @@ int sifive_pwm0_cfg_interrupt(struct metal_pwm pwm,
 }
 
 int sifive_pwm0_clear_interrupt(struct metal_pwm pwm, uint32_t idx) {
-    uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
     uint8_t cmp_count = dt_pwm_data[get_index(pwm)].comparator_count;
     int ret = METAL_PWM_RET_ERR;
 
-    if ((base != 0) && (idx < cmp_count)) {
+    if ((dt_pwm_data[get_index(pwm)].base_addr != 0) && (idx < cmp_count)) {
+        PWM_Type *PWM_regs = (PWM_Type *)dt_pwm_data[get_index(pwm)].base_addr;
         /* Clear interrupt pending bit for given PWM comparator */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) &= ~METAL_PWMCFG_CMPIP(idx);
+        PWM_regs->PWMCFG &= ~METAL_PWMCFG_CMPIP(idx);
         ret = METAL_PWM_RET_OK;
     }
     return ret;

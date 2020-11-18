@@ -7,77 +7,53 @@
 
 #include <metal/clock.h>
 #include <metal/cpu.h>
+#include <metal/drivers/sifive_spi0_regs.h>
 #include <metal/io.h>
 #include <metal/private/metal_private_sifive_spi0.h>
 #include <metal/time.h>
-
-/* Register fields */
-#define METAL_SPI_SCKDIV_MASK 0xFFF
-
-#define METAL_SPI_SCKMODE_PHA_SHIFT 0
-#define METAL_SPI_SCKMODE_POL_SHIFT 1
-
-#define METAL_SPI_CSMODE_MASK 3
-#define METAL_SPI_CSMODE_AUTO 0
-#define METAL_SPI_CSMODE_HOLD 2
-#define METAL_SPI_CSMODE_OFF 3
-
-#define METAL_SPI_PROTO_MASK 3
-#define METAL_SPI_PROTO_SINGLE 0
-#define METAL_SPI_PROTO_DUAL 1
-#define METAL_SPI_PROTO_QUAD 2
-
-#define METAL_SPI_ENDIAN_LSB 4
-
-#define METAL_SPI_DISABLE_RX 8
-
-#define METAL_SPI_FRAME_LEN_SHIFT 16
-#define METAL_SPI_FRAME_LEN_MASK (0xF << METAL_SPI_FRAME_LEN_SHIFT)
-
-#define METAL_SPI_TXDATA_FULL (1 << 31)
-#define METAL_SPI_RXDATA_EMPTY (1 << 31)
-#define METAL_SPI_TXMARK_MASK 7
-#define METAL_SPI_TXWM 1
-#define METAL_SPI_TXRXDATA_MASK (0xFF)
-
-#define METAL_SPI_INTERVAL_SHIFT 16
-
-#define METAL_SPI_CONTROL_IO 0
-#define METAL_SPI_CONTROL_MAPPED 1
-
-#define METAL_SPI_REG(offset) (((unsigned long)control_base + offset))
-#define METAL_SPI_REGB(offset)                                                 \
-    (__METAL_ACCESS_ONCE((__metal_io_u8 *)METAL_SPI_REG(offset)))
-#define METAL_SPI_REGW(offset)                                                 \
-    (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_SPI_REG(offset)))
-
-#define METAL_SPI_RXDATA_TIMEOUT 1
 
 static struct { uint64_t baud_rate; } spi_state[__METAL_DT_NUM_SPIS];
 
 #define get_index(spi) ((spi).__spi_index)
 
+#define SPI_FMT_PROTO_SINGLE 0
+#define SPI_FMT_PROTO_DUAL 1
+#define SPI_FMT_PROTO_QUAD 2
+
+#define SPI_CSMODE_AUTO 0
+#define SPI_CSMODE_HOLD 2
+#define SPI_CSMODE_OFF 3
+
+#define SPI_ENDIAN_LSB 1
+
+#define SPI_BITS_PER_FRAME 8
+
+#define SPI_CONTROL_IO 0
+#define SPI_CONTROL_MAPPED 1
+
+#define SPI_RXDATA_TIMEOUT 1
+
 static int configure_spi(struct metal_spi spi,
                          struct metal_spi_config *config) {
-    uintptr_t control_base = dt_spi_data[get_index(spi)].base_addr;
+    SPI_Type *SPI_regs = (SPI_Type *)dt_spi_data[get_index(spi)].base_addr;
 
     /* Set protocol */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
+    SPI_regs->FMT &= ~(SPI_FMT_PROTO_Msk);
     switch (config->protocol) {
     case METAL_SPI_SINGLE:
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
+        SPI_regs->FMT |= SPI_FMT_PROTO_SINGLE;
         break;
     case METAL_SPI_DUAL:
         if (config->multi_wire == MULTI_WIRE_ALL)
-            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
+            SPI_regs->FMT |= SPI_FMT_PROTO_DUAL;
         else
-            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
+            SPI_regs->FMT |= SPI_FMT_PROTO_SINGLE;
         break;
     case METAL_SPI_QUAD:
         if (config->multi_wire == MULTI_WIRE_ALL)
-            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
+            SPI_regs->FMT |= SPI_FMT_PROTO_QUAD;
         else
-            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_SINGLE;
+            SPI_regs->FMT |= SPI_FMT_PROTO_SINGLE;
         break;
     default:
         /* Unsupported value */
@@ -86,49 +62,44 @@ static int configure_spi(struct metal_spi spi,
 
     /* Set Polarity */
     if (config->polarity) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |=
-            (1 << METAL_SPI_SCKMODE_POL_SHIFT);
+        SPI_regs->SCKMODE |= SPI_SCKMODE_SCKMODE_POL_Msk;
     } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
-            ~(1 << METAL_SPI_SCKMODE_POL_SHIFT);
+        SPI_regs->SCKMODE &= ~(SPI_SCKMODE_SCKMODE_POL_Msk);
     }
 
     /* Set Phase */
     if (config->phase) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) |=
-            (1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+        SPI_regs->SCKMODE |= SPI_SCKMODE_SCKMODE_PHA_Msk;
     } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKMODE) &=
-            ~(1 << METAL_SPI_SCKMODE_PHA_SHIFT);
+        SPI_regs->SCKMODE &= ~(SPI_SCKMODE_SCKMODE_PHA_Msk);
     }
 
     /* Set Endianness */
     if (config->little_endian) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_ENDIAN_LSB;
+        SPI_regs->FMT |= SPI_FMT_ENDIAN_Msk;
     } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_ENDIAN_LSB);
+        SPI_regs->FMT &= ~(SPI_FMT_ENDIAN_Msk);
     }
 
     /* Always populate receive FIFO */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_DISABLE_RX);
+    SPI_regs->FMT &= ~(SPI_FMT_IODIR_Msk);
 
     /* Set CS Active */
     if (config->cs_active_high) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 0;
+        SPI_regs->CSDEF = 0;
     } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 1;
+        SPI_regs->CSDEF = 1;
     }
 
     /* Set frame length */
-    if ((METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) & METAL_SPI_FRAME_LEN_MASK) !=
-        (8 << METAL_SPI_FRAME_LEN_SHIFT)) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_FRAME_LEN_MASK);
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |=
-            (8 << METAL_SPI_FRAME_LEN_SHIFT);
+    if ((SPI_regs->FMT & SPI_FMT_LEN_Msk) !=
+        (SPI_BITS_PER_FRAME << SPI_FMT_LEN_Pos)) {
+        SPI_regs->FMT &= ~(SPI_FMT_LEN_Msk);
+        SPI_regs->FMT |= (SPI_BITS_PER_FRAME << SPI_FMT_LEN_Pos);
     }
 
     /* Set CS line */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSID) = config->csid;
+    SPI_regs->CSID = config->csid;
 
     /* Toggle off memory-mapped SPI flash mode, toggle on programmable IO mode
      * It seems that with this line uncommented, the debugger cannot have access
@@ -137,7 +108,7 @@ static int configure_spi(struct metal_spi spi,
      * reset cores, reset $pc, set *((int *) 0x20004060) = 0, (set the flash
      * interface control register to programmable I/O mode) and then continue
      * Alternative, comment out the "flash" line in openocd.cfg */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_FCTRL) = METAL_SPI_CONTROL_IO;
+    SPI_regs->FCTRL = SPI_CONTROL_IO;
 
     return 0;
 }
@@ -145,16 +116,16 @@ static int configure_spi(struct metal_spi spi,
 static void spi_mode_switch(struct metal_spi spi,
                             struct metal_spi_config *config,
                             unsigned int trans_stage) {
-    uintptr_t control_base = dt_spi_data[get_index(spi)].base_addr;
+    SPI_Type *SPI_regs = (SPI_Type *)dt_spi_data[get_index(spi)].base_addr;
 
     if (config->multi_wire == trans_stage) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) &= ~(METAL_SPI_PROTO_MASK);
+        SPI_regs->FMT &= ~(SPI_FMT_PROTO_Msk);
         switch (config->protocol) {
         case METAL_SPI_DUAL:
-            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_DUAL;
+            SPI_regs->FMT |= SPI_FMT_PROTO_DUAL;
             break;
         case METAL_SPI_QUAD:
-            METAL_SPI_REGW(METAL_SIFIVE_SPI0_FMT) |= METAL_SPI_PROTO_QUAD;
+            SPI_regs->FMT |= SPI_FMT_PROTO_QUAD;
             break;
         default:
             /* Unsupported value */
@@ -165,7 +136,7 @@ static void spi_mode_switch(struct metal_spi spi,
 
 int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
                          size_t len, char *tx_buf, char *rx_buf) {
-    uintptr_t control_base = dt_spi_data[get_index(spi)].base_addr;
+    SPI_Type *SPI_regs = (SPI_Type *)dt_spi_data[get_index(spi)].base_addr;
     int rc = 0;
     size_t i = 0;
 
@@ -175,8 +146,8 @@ int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
     }
 
     /* Hold the chip select line for all len transferred */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) |= METAL_SPI_CSMODE_HOLD;
+    SPI_regs->CSMODE &= ~(SPI_CSMODE_CSMODE_Msk);
+    SPI_regs->CSMODE |= SPI_CSMODE_HOLD;
 
     uint32_t rxdata;
 
@@ -185,29 +156,28 @@ int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
 
     for (i = 0; i < config->cmd_num; i++) {
 
-        while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
-            ;
-
-        if (tx_buf) {
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
-        } else {
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
+        while (SPI_regs->TXDATA & SPI_TXDATA_FULL_Msk) {
+            /* wait */
         }
 
-        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
+        if (tx_buf) {
+            SPI_regs->TXDATA = (tx_buf[i] & SPI_TXDATA_DATA_Msk);
+        } else {
+            SPI_regs->TXDATA = 0;
+        }
 
-        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
-               METAL_SPI_RXDATA_EMPTY) {
+        endwait = metal_time() + SPI_RXDATA_TIMEOUT;
+
+        while ((rxdata = SPI_regs->RXDATA) & SPI_RXDATA_EMPTY_Msk) {
             if (metal_time() > endwait) {
-                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &=
-                    ~(METAL_SPI_CSMODE_MASK);
+                SPI_regs->CSMODE &= ~(SPI_CSMODE_CSMODE_Msk);
 
                 return 1;
             }
         }
 
         if (rx_buf) {
-            rx_buf[i] = (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+            rx_buf[i] = (char)(rxdata & SPI_RXDATA_DATA_Msk);
         }
     }
 
@@ -217,56 +187,55 @@ int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
     /* Send Addr data */
     for (; i < (config->cmd_num + config->addr_num); i++) {
 
-        while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
-            ;
-
-        if (tx_buf) {
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
-        } else {
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
+        while (SPI_regs->TXDATA & SPI_TXDATA_FULL_Msk) {
+            /* wait */
         }
 
-        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
+        if (tx_buf) {
+            SPI_regs->TXDATA = (tx_buf[i] & SPI_TXDATA_DATA_Msk);
+        } else {
+            SPI_regs->TXDATA = 0;
+        }
 
-        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
-               METAL_SPI_RXDATA_EMPTY) {
+        endwait = metal_time() + SPI_RXDATA_TIMEOUT;
+
+        while ((rxdata = SPI_regs->RXDATA) & SPI_RXDATA_EMPTY_Msk) {
             if (metal_time() > endwait) {
-                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &=
-                    ~(METAL_SPI_CSMODE_MASK);
+                SPI_regs->CSMODE &= ~(SPI_CSMODE_CSMODE_Msk);
 
                 return 1;
             }
         }
 
         if (rx_buf) {
-            rx_buf[i] = (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+            rx_buf[i] = (char)(rxdata & SPI_RXDATA_DATA_Msk);
         }
     }
 
     /* Send Dummy data */
     for (; i < (config->cmd_num + config->addr_num + config->dummy_num); i++) {
 
-        while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
-            ;
-
-        if (tx_buf) {
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
-        } else {
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
+        while (SPI_regs->TXDATA & SPI_TXDATA_FULL_Msk) {
+            /* wait */
         }
 
-        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
+        if (tx_buf) {
+            SPI_regs->TXDATA = (tx_buf[i] & SPI_TXDATA_DATA_Msk);
+        } else {
+            SPI_regs->TXDATA = 0;
+        }
 
-        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
-               METAL_SPI_RXDATA_EMPTY) {
+        endwait = metal_time() + SPI_RXDATA_TIMEOUT;
+
+        while ((rxdata = SPI_regs->RXDATA) & SPI_RXDATA_EMPTY_Msk) {
             if (metal_time() > endwait) {
-                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &=
-                    ~(METAL_SPI_CSMODE_MASK);
+                SPI_regs->CSMODE &= ~(SPI_CSMODE_CSMODE_Msk);
+
                 return 1;
             }
         }
         if (rx_buf) {
-            rx_buf[i] = (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+            rx_buf[i] = (char)(rxdata & SPI_RXDATA_DATA_Msk);
         }
     }
 
@@ -277,16 +246,17 @@ int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
         /* Master send bytes to the slave */
 
         /* Wait for TXFIFO to not be full */
-        while (METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXDATA) & METAL_SPI_TXDATA_FULL)
-            ;
+        while (SPI_regs->TXDATA & SPI_TXDATA_FULL_Msk) {
+            /* wait */
+        }
 
         /* Transfer byte by modifying the least significant byte in the TXDATA
          * register */
         if (tx_buf) {
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = tx_buf[i];
+            SPI_regs->TXDATA = (tx_buf[i] & SPI_TXDATA_DATA_Msk);
         } else {
             /* Transfer a 0 byte if the sending buffer is NULL */
-            METAL_SPI_REGB(METAL_SIFIVE_SPI0_TXDATA) = 0;
+            SPI_regs->TXDATA = 0;
         }
 
         /* Master receives bytes from the RX FIFO */
@@ -294,14 +264,12 @@ int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
         /* Wait for RXFIFO to not be empty, but break the nested loops if
          * timeout this timeout method  needs refining, preferably taking into
          * account the device specs */
-        endwait = metal_time() + METAL_SPI_RXDATA_TIMEOUT;
+        endwait = metal_time() + SPI_RXDATA_TIMEOUT;
 
-        while ((rxdata = METAL_SPI_REGW(METAL_SIFIVE_SPI0_RXDATA)) &
-               METAL_SPI_RXDATA_EMPTY) {
+        while ((rxdata = SPI_regs->RXDATA) & SPI_RXDATA_EMPTY_Msk) {
             if (metal_time() > endwait) {
                 /* If timeout, deassert the CS */
-                METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &=
-                    ~(METAL_SPI_CSMODE_MASK);
+                SPI_regs->CSMODE &= ~(SPI_CSMODE_CSMODE_Msk);
 
                 /* If timeout, return error code 1 immediately */
                 return 1;
@@ -310,7 +278,7 @@ int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
 
         /* Only store the dequeued byte if the receive_buffer is not NULL */
         if (rx_buf) {
-            rx_buf[i] = (char)(rxdata & METAL_SPI_TXRXDATA_MASK);
+            rx_buf[i] = (char)(rxdata & SPI_RXDATA_DATA_Msk);
         }
     }
 
@@ -322,7 +290,7 @@ int sifive_spi0_transfer(struct metal_spi spi, struct metal_spi_config *config,
      * deasserts the CS pin immediately, the following bytes in the output FIFO
      * will not be sent consecutively.
      * There needs to be a better way to handle this. */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSMODE) &= ~(METAL_SPI_CSMODE_MASK);
+    SPI_regs->CSMODE &= ~(SPI_CSMODE_CSMODE_Msk);
 
     return 0;
 }
@@ -332,7 +300,7 @@ int sifive_spi0_get_baud_rate(struct metal_spi spi) {
 }
 
 int sifive_spi0_set_baud_rate(struct metal_spi spi, int baud_rate) {
-    uintptr_t control_base = dt_spi_data[get_index(spi)].base_addr;
+    SPI_Type *SPI_regs = (SPI_Type *)dt_spi_data[get_index(spi)].base_addr;
     struct metal_clock clock = dt_spi_data[get_index(spi)].clock;
 
     spi_state[get_index(spi)].baud_rate = baud_rate;
@@ -342,15 +310,19 @@ int sifive_spi0_set_baud_rate(struct metal_spi spi, int baud_rate) {
     /* Calculate divider */
     long div = (clock_rate / (2 * baud_rate)) - 1;
 
-    if (div > METAL_SPI_SCKDIV_MASK) {
+    if (div > SPI_SCKDIV_SCKDIV_Msk) {
         /* The requested baud rate is lower than we can support at
          * the current clock rate */
         return -1;
     }
 
     /* Set divider */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) &= ~METAL_SPI_SCKDIV_MASK;
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_SCKDIV) |= (div & METAL_SPI_SCKDIV_MASK);
+    SPI_regs->SCKDIV &= ~SPI_SCKDIV_SCKDIV_Pos;
+    /*
+     * no needed to make mask div with SPI_SCKDIV_SCKDIV_Msk because
+     * div <= SPI_SCKDIV_SCKDIV_Msk (we just test it above)
+     */
+    SPI_regs->SCKDIV |= div;
 
     return 0;
 }
@@ -360,16 +332,17 @@ void _sifive_spi0_pre_rate_change_callback(uint32_t id) {
         return;
 
     struct metal_spi spi = (struct metal_spi){id};
-    uintptr_t control_base = dt_spi_data[get_index(spi)].base_addr;
+    SPI_Type *SPI_regs = (SPI_Type *)dt_spi_data[get_index(spi)].base_addr;
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to one and waiting until an interrupt is pending (indicating an empty
      * TXFIFO) */
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXMARK) &= ~(METAL_SPI_TXMARK_MASK);
-    METAL_SPI_REGW(METAL_SIFIVE_SPI0_TXMARK) |= (METAL_SPI_TXMARK_MASK & 1);
+    SPI_regs->TXMARK &= ~(SPI_TXMARK_TXMARK_Msk);
+    SPI_regs->TXMARK |= ((1 << SPI_TXMARK_TXMARK_Pos) & SPI_TXMARK_TXMARK_Msk);
 
-    while ((METAL_SPI_REGW(METAL_SIFIVE_SPI0_IP) & METAL_SPI_TXWM) == 0)
-        ;
+    while ((SPI_regs->IP & SPI_IP_TXWM_IP_Msk) == 0) {
+        /* wait */
+    }
 }
 
 void _sifive_spi0_post_rate_change_callback(uint32_t id) {

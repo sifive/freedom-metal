@@ -7,36 +7,12 @@
 
 #include <metal/clock.h>
 #include <metal/cpu.h>
+#include <metal/drivers/sifive_uart0_regs.h>
 #include <metal/init.h>
 #include <metal/io.h>
 #include <metal/private/metal_private_sifive_uart0.h>
 #include <metal/tty.h>
 #include <metal/uart.h>
-
-/* TXDATA Fields */
-#define UART_TXEN (1 << 0)
-#define UART_TXFULL (1 << 31)
-
-/* RXDATA Fields */
-#define UART_RXEN (1 << 0)
-#define UART_RXEMPTY (1 << 31)
-
-/* TXCTRL Fields */
-#define UART_NSTOP (1 << 1)
-#define UART_TXCNT(count) ((0x7 & count) << 16)
-
-/* RXCTRL Fields */
-#define UART_RXCNT(count) ((0x7 & count) << 16)
-
-/* IP Fields */
-#define UART_TXWM (1 << 0)
-#define UART_RXWM (1 << 1)
-
-#define UART_REG(offset) (((uintptr_t)base + offset))
-#define UART_REGB(offset)                                                      \
-    (__METAL_ACCESS_ONCE((__metal_io_u8 *)UART_REG(offset)))
-#define UART_REGW(offset)                                                      \
-    (__METAL_ACCESS_ONCE((__metal_io_u32 *)UART_REG(offset)))
 
 #define get_index(uart) ((uart).__uart_index)
 
@@ -63,19 +39,19 @@ static __inline__ int disable_parent_interrupt(struct metal_uart uart) {
 }
 
 int sifive_uart0_tx_interrupt_enable(struct metal_uart uart) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_TXWM;
+    UART_regs->IE |= UART_IE_TXWM_IE_Msk;
 
     return enable_parent_interrupt(uart);
 }
 
 int sifive_uart0_tx_interrupt_disable(struct metal_uart uart) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_TXWM;
+    UART_regs->IE &= (~UART_IE_TXWM_IE_Msk);
 
-    if ((UART_REGW(METAL_SIFIVE_UART0_IE) & UART_RXWM) == 0) {
+    if ((UART_regs->IE & UART_IE_RXWM_IE_Msk) == 0) {
         /* Disable the UART interrupt line on the interrupt controller
          * when no UART interrupt sources are enabled */
         return disable_parent_interrupt(uart);
@@ -84,19 +60,19 @@ int sifive_uart0_tx_interrupt_disable(struct metal_uart uart) {
 }
 
 int sifive_uart0_rx_interrupt_enable(struct metal_uart uart) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    UART_REGW(METAL_SIFIVE_UART0_IE) |= UART_RXWM;
+    UART_regs->IE |= UART_IE_RXWM_IE_Msk;
 
     return enable_parent_interrupt(uart);
 }
 
 int sifive_uart0_rx_interrupt_disable(struct metal_uart uart) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    UART_REGW(METAL_SIFIVE_UART0_IE) &= ~UART_RXWM;
+    UART_regs->IE &= (~UART_IE_RXWM_IE_Msk);
 
-    if ((UART_REGW(METAL_SIFIVE_UART0_IE) & UART_TXWM) == 0) {
+    if ((UART_regs->IE & UART_IE_TXWM_IE_Msk) == 0) {
         /* Disable the UART interrupt line on the interrupt controller
          * when no UART interrupt sources are enabled */
         return disable_parent_interrupt(uart);
@@ -106,54 +82,58 @@ int sifive_uart0_rx_interrupt_disable(struct metal_uart uart) {
 }
 
 int sifive_uart0_txready(struct metal_uart uart) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    return !!((UART_REGW(METAL_SIFIVE_UART0_TXDATA) & UART_TXFULL));
+    return !!(UART_regs->TXDATA & UART_TXDATA_FULL_Msk);
 }
 
 int sifive_uart0_set_tx_watermark(struct metal_uart uart, size_t level) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXCNT(level);
+    UART_regs->TXCTRL |=
+        ((level << UART_TXCTRL_TXCNT_Pos) & UART_TXCTRL_TXCNT_Msk);
     return 0;
 }
 
 size_t sifive_uart0_get_tx_watermark(struct metal_uart uart) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    return ((UART_REGW(METAL_SIFIVE_UART0_TXCTRL) >> 16) & 0x7);
+    return ((UART_regs->TXCTRL & UART_TXCTRL_TXCNT_Msk) >>
+            UART_TXCTRL_TXCNT_Pos);
 }
 
 int sifive_uart0_set_rx_watermark(struct metal_uart uart, size_t level) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXCNT(level);
+    UART_regs->RXCTRL |=
+        ((level << UART_RXCTRL_RXCNT_Pos) & UART_RXCTRL_RXCNT_Msk);
     return 0;
 }
 
 size_t sifive_uart0_get_rx_watermark(struct metal_uart uart) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
-    return ((UART_REGW(METAL_SIFIVE_UART0_RXCTRL) >> 16) & 0x7);
+    return ((UART_regs->RXCTRL & UART_RXCTRL_RXCNT_Msk) >>
+            UART_RXCTRL_RXCNT_Pos);
 }
 
 int sifive_uart0_putc(struct metal_uart uart, int c) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
     while (sifive_uart0_txready(uart) != 0) {
         /* wait */
     }
-    UART_REGW(METAL_SIFIVE_UART0_TXDATA) = c;
+    UART_regs->TXDATA = c;
     return 0;
 }
 
 int sifive_uart0_getc(struct metal_uart uart, int *c) {
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
     /* No seperate status register, we get status and the byte at same time */
-    uint32_t ch = UART_REGW(METAL_SIFIVE_UART0_RXDATA);
+    uint32_t ch = UART_regs->RXDATA;
     ;
-    if (ch & UART_RXEMPTY) {
+    if (ch & UART_RXDATA_EMPTY_Msk) {
         *c = -1; /* aka: EOF in most of the world */
     } else {
         *c = ch & 0x0ff;
@@ -167,15 +147,15 @@ int sifive_uart0_get_baud_rate(struct metal_uart uart) {
 
 int sifive_uart0_set_baud_rate(struct metal_uart uart, int baud_rate) {
     uint32_t index = get_index(uart);
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
-    struct metal_clock clock = dt_uart_data[get_index(uart)].clock;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[index].base_addr;
+    struct metal_clock clock = dt_uart_data[index].clock;
 
     uart_state[index].baud_rate = baud_rate;
 
     long clock_rate = metal_clock_get_rate_hz(clock);
-    UART_REGW(METAL_SIFIVE_UART0_DIV) = clock_rate / baud_rate - 1;
-    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXEN;
-    UART_REGW(METAL_SIFIVE_UART0_RXCTRL) |= UART_RXEN;
+    UART_regs->DIV = clock_rate / baud_rate - 1;
+    UART_regs->TXCTRL |= UART_TXCTRL_TXEN_Msk;
+    UART_regs->RXCTRL |= UART_RXCTRL_RXEN_Msk;
 
     return 0;
 }
@@ -187,23 +167,23 @@ void _sifive_uart0_pre_rate_change_callback(uint32_t id) {
     if (baud_rate == 0)
         return;
 
-    uintptr_t base = dt_uart_data[get_index(uart)].base_addr;
+    UART_Type *UART_regs = (UART_Type *)dt_uart_data[get_index(uart)].base_addr;
 
     /* Detect when the TXDATA is empty by setting the transmit watermark count
      * to one and waiting until an interrupt is pending */
 
-    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) &= ~(UART_TXCNT(0x7));
-    UART_REGW(METAL_SIFIVE_UART0_TXCTRL) |= UART_TXCNT(1);
+    UART_regs->TXCTRL &= ~(UART_RXCTRL_RXCNT_Msk);
+    UART_regs->TXCTRL |= ((1 << UART_RXCTRL_RXCNT_Pos) & UART_RXCTRL_RXCNT_Msk);
 
-    while ((UART_REGW(METAL_SIFIVE_UART0_IP) & UART_TXWM) == 0)
-        ;
+    while ((UART_regs->IP & UART_IP_TXWM_IP_Msk) == 0) {
+        /* wait */
+    }
 
     /* When the TXDATA clears, the UART is still shifting out the last byte.
      * Calculate the time we must drain to finish transmitting and then wait
      * that long. */
 
-    long bits_per_symbol =
-        (UART_REGW(METAL_SIFIVE_UART0_TXCTRL) & (1 << 1)) ? 9 : 10;
+    long bits_per_symbol = (UART_regs->TXCTRL & UART_TXCTRL_NSTOP_Msk) ? 9 : 10;
     uint64_t ticks_to_wait = bits_per_symbol * MTIME_RATE_HZ_DEF / baud_rate;
 
     struct metal_cpu cpu = metal_cpu_get(metal_cpu_get_current_hartid());
