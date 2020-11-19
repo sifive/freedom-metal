@@ -19,11 +19,54 @@
 #define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_BASE_ADDRESS {{ "0x%x" % l2.reg[1][0] }}UL
 #define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_SIDEBAND_SIZE {{ "0x%x" % l2.reg[1][1] }}UL
     {% endif %}
+
+    {% if 'cache_block_size' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_BLOCK_SIZE {{ "0x%x" % l2.cache_block_size[0] }}
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_BLOCK_SIZE 0UL
+    {% endif %}
+
+    {% if 'cache_sets' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_SETS {{ l2.cache_sets[0] }}UL
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_CACHE_SETS 0UL
+    {% endif %}
+
+    {% if 'sifive_bank_count' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_BANK_COUNT {{ l2.sifive_bank_count[0] }}UL
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_BANK_COUNT 0UL
+    {% endif %}
+
+    {% if 'sifive_perfmon_counters' in l2 %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_PERFMON_COUNTERS {{ l2.sifive_perfmon_counters[0] }}UL
+    {% else %}
+#define METAL_SIFIVE_CCACHE0_{{ loop.index0 }}_PERFMON_COUNTERS 0UL
+    {% endif %}
 {% endfor %}
 
 #define METAL_SIFIVE_CCACHE0
-#define METAL_SIFIVE_CCACHE0_CONFIG    0x0
-#define METAL_SIFIVE_CCACHE0_WAYENABLE 0x8
+#define METAL_SIFIVE_CCACHE0_CONFIG          0x0000
+#define METAL_SIFIVE_CCACHE0_WAYENABLE       0x0008
+#define METAL_SIFIVE_CCACHE0_ECCINJECTERROR  0x0040
+#define METAL_SIFIVE_CCACHE0_DIRECCFIXLOW    0x0100
+#define METAL_SIFIVE_CCACHE0_DIRECCFIXHIGH   0x0104
+#define METAL_SIFIVE_CCACHE0_DIRECCFIXCOUNT  0x0108
+#define METAL_SIFIVE_CCACHE0_DIRECCFAILLOW   0x0120
+#define METAL_SIFIVE_CCACHE0_DIRECCFAILHIGH  0x0124
+#define METAL_SIFIVE_CCACHE0_DIRECCFAILCOUNT 0x0128
+#define METAL_SIFIVE_CCACHE0_DATECCFIXLOW    0x0140
+#define METAL_SIFIVE_CCACHE0_DATECCFIXHIGH   0x0144
+#define METAL_SIFIVE_CCACHE0_DATECCFIXCOUNT  0x0148
+#define METAL_SIFIVE_CCACHE0_DATECCFAILLOW   0x0160
+#define METAL_SIFIVE_CCACHE0_DATECCFAILHIGH  0x0164
+#define METAL_SIFIVE_CCACHE0_DATECCFAILCOUNT 0x0168
+#define METAL_SIFIVE_CCACHE0_FLUSH64         0x0200
+#define METAL_SIFIVE_CCACHE0_FLUSH32         0x0240
+#define METAL_SIFIVE_CCACHE0_WAYMASK0        0x0800
+#define METAL_SIFIVE_CCACHE0_PMEVENTSELECT0  0x2000
+#define METAL_SIFIVE_CCACHE0_PMCLIENTFILTER  0x2800
+#define METAL_SIFIVE_CCACHE0_PMEVENTCOUNTER0 0x3000
 
 {% endif %}
 
