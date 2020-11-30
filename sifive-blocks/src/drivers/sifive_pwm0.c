@@ -249,17 +249,21 @@ int sifive_pwm0_stop(struct metal_pwm pwm, uint32_t idx) {
     return ret;
 }
 
-int sifive_pwm0_cfg_interrupt(struct metal_pwm pwm,
-                              metal_pwm_interrupt_t flag) {
+int sifive_pwm0_cfg_interrupt(struct metal_pwm pwm, metal_pwm_interrupt_t flag,
+                              uint32_t idx) {
     uintptr_t base = dt_pwm_data[get_index(pwm)].base_addr;
+    struct metal_interrupt intc = dt_pwm_data[get_index(pwm)].interrupt_parent;
+    int id = dt_pwm_data[get_index(pwm)].interrupt_id[idx];
     int ret = METAL_PWM_RET_ERR;
 
     if (base != 0) {
         if (flag == METAL_PWM_INTERRUPT_ENABLE) {
             /* Enable sticky bit, to make sure interrupts are not forgotten */
             METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) |= METAL_PWMCFG_STICKY;
+            metal_interrupt_enable(intc, id);
         } else {
             METAL_PWM_REGW(METAL_SIFIVE_PWM0_PWMCFG) &= ~METAL_PWMCFG_STICKY;
+            metal_interrupt_disable(intc, id);
         }
         ret = METAL_PWM_RET_OK;
     }
