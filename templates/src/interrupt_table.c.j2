@@ -71,7 +71,12 @@ const metal_interrupt_handler_t __metal_global_interrupt_table[__METAL_NUM_GLOBA
     metal_riscv_cpu_intc_default_handler, /* The PLIC has no source at id 0 */
 {% for irq in global_interrupts.irqs %}
     {% if irq.source.compatible != None %}
+    {% set device = devices[irq.source.compatible] %}
+    {% if device|length > 1 %}
+    metal_{{ to_snakecase(irq.source.compatible) }}_{{ ((irq.id - device[0].interrupts[0]) / device[0].interrupts|length)|int }}_source_{{ irq.source.id }}_handler,
+    {% else %}
     metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler,
+    {% endif %}
     {% else %}
     metal_riscv_cpu_intc_default_handler, /* IRQ source has no compatible string */
     {% endif %}

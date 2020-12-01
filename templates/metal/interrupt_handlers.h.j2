@@ -97,10 +97,13 @@ void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_
 {% endif %}
 
 {% if global_interrupts is defined %}
-    {% for irq in global_interrupts.irqs|unique_irqs %}
-       {% if irq.source.compatible != None %}
+    {% for irq in global_interrupts.irqs %}
+    {% set device = devices[irq.source.compatible] %}
+    {% if device|length > 1 %}
+void metal_{{ to_snakecase(irq.source.compatible) }}_{{ ((irq.id - device[0].interrupts[0]) / device[0].interrupts|length)|int }}_source_{{ irq.source.id }}_handler(void);
+    {% else %}
 void metal_{{ to_snakecase(irq.source.compatible) }}_source_{{ irq.source.id }}_handler(void);
-        {% endif %}
+    {% endif %}
     {% endfor %}
 {% endif %}
 
