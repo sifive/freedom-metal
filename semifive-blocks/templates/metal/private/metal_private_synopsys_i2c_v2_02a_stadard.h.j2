@@ -1,0 +1,71 @@
+/* Copyright 2020 SemiFive, Inc */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+#ifndef METAL__DRIVERS__SYNOPSYS_I2C0_H
+#define METAL__DRIVERS__SYNOPSYS_I2C0_H
+
+{% include 'template_comment.h.j2' %}
+
+#include <metal/clock.h>
+#include <metal/private/metal_private_i2c.h>
+#include <metal/gpio.h>
+#include <metal/interrupt.h>
+#include <metal/i2c.h>
+#include <metal/platform.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+{% if 'synopsys_i2c_v2_02a_standard' in devices %}
+{% set synopsys_i2c0s = devices['synopsys_i2c_v2_02a_standard'] %}
+
+static const struct dt_i2c_data {
+	uintptr_t base_addr;
+	struct metal_clock clock;
+	bool has_pinmux;
+	struct metal_gpio pinmux;
+	uint32_t pinmux_output_selector;
+	uint32_t pinmux_source_selector;
+	struct metal_interrupt interrupt_parent;
+	uint32_t interrupt_id[{{synopsys_i2c0s[0].interrupts|length}}];
+} dt_i2c_data[__METAL_DT_NUM_I2CS] = {
+	{% for i2c in synopsys_i2c0s %}
+	{
+	    .base_addr = METAL_SYNOPSYS_I2C0_{{ i2c.id }}_BASE_ADDRESS,
+
+	{% if i2c.clocks is defined %}
+	    /* {{ i2c.clocks[0].compatible[0] }} */
+	    .clock = { {{ i2c.clocks[0].id }} },
+	{% endif %}
+
+	{% if i2c.pinmux is defined %}
+	    /* {{ i2c.pinmux[0].compatible[0] }} */
+		.has_pinmux = 1,
+		.pinmux = { {{ i2c.pinmux[0].id }} },
+		.pinmux_output_selector = {{ i2c.pinmux[1] }},
+		.pinmux_source_selector = {{ i2c.pinmux[2] }},
+	{% else %}
+		.has_pinmux = 0,
+	{% endif %}
+
+	{% if i2c.interrupt_parent is defined %}
+	    /* {{ i2c.interrupt_parent[0].compatible[0] }} */
+		.interrupt_parent = { {{ i2c.interrupt_parent[0].id }} },
+		.interrupt_id = { {% for interrupt in i2c.interrupts %} {{ interrupt }},{% endfor %} },
+	{% endif %}
+	},
+	{% endfor %}
+};
+
+{% if synopsys_i2c0s[0].clocks is defined %}
+{% set driver_string = to_snakecase(synopsys_i2c0s[0].clocks[0].compatible[0]) %}
+{% include 'clock_dispatch.h.j2' %}
+{% endif %}
+
+{% if synopsys_i2c0s[0].interrupt_parent is defined %}
+{% set driver_string = to_snakecase(synopsys_i2c0s[0].interrupt_parent[0].compatible[0]) %}
+{% include 'interrupt_dispatch.h.j2' %}
+{% endif %}
+
+{% endif %}
+
+#endif
