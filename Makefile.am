@@ -82,6 +82,7 @@ nobase_include_HEADERS += \
 	metal/lim.h \
 	metal/lock.h \
 	metal/memory.h \
+	metal/nmi.h \
 	metal/pmp.h \
 	metal/privilege.h \
 	metal/pwm.h\
