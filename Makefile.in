@@ -481,7 +481,7 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
 	metal/csr.h metal/gpio.h metal/hpm.h metal/i2c.h metal/init.h \
 	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
-	metal/lim.h metal/lock.h metal/memory.h metal/pmp.h \
+	metal/lim.h metal/lock.h metal/memory.h metal/nmi.h metal/pmp.h \
 	metal/privilege.h metal/pwm.h metal/rtc.h metal/shutdown.h \
 	metal/scrub.h metal/spi.h metal/switch.h metal/timer.h \
 	metal/time.h metal/tty.h metal/uart.h metal/watchdog.h
