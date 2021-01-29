@@ -476,7 +476,8 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_spi0.h metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_trace.h metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_simuart0.h metal/drivers/sifive_wdog0.h \
-	metal/drivers/ucb_htif0.h metal/atomic.h metal/button.h \
+	metal/drivers/ucb_htif0.h metal/drivers/sifive_hca1_regs.h\
+	metal/atomic.h metal/button.h \
 	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
 	metal/csr.h metal/gpio.h metal/hpm.h metal/i2c.h metal/init.h \
 	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
