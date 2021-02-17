@@ -111,7 +111,8 @@ host_triplet = @host@
 
 # Freedom Metal has its own libgloss implementation that is only built when
 # --with-builtin-libgloss is passed to configure.
-@WITH_BUILTIN_LIBGLOSS_TRUE@am__append_2 = libmetal-gloss.a
+@WITH_BUILTIN_LIBGLOSS_TRUE@am__append_2 = libmetal-gloss.a \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	libmetal-gloss-semihost.a
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -159,6 +160,38 @@ AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
+libmetal_gloss_semihost_a_AR = $(AR) $(ARFLAGS)
+libmetal_gloss_semihost_a_LIBADD =
+am__libmetal_gloss_semihost_a_SOURCES_DIST = gloss/crt0.S \
+	gloss/nanosleep.c gloss/semihost-sys_close.c \
+	gloss/semihost-sys_exit.c gloss/semihost-sys_fdtable.c \
+	gloss/semihost-sys_fstat.c gloss/semihost-sys_ftime.c \
+	gloss/semihost-sys_isatty.c gloss/semihost-sys_link.c \
+	gloss/semihost-sys_lseek.c gloss/semihost-sys_open.c \
+	gloss/semihost-sys_read.c gloss/semihost-sys_sbrk.c \
+	gloss/semihost-sys_stat.c gloss/semihost-sys_stat_common.c \
+	gloss/semihost-sys_unlink.c gloss/semihost-sys_write.c
+am__dirstamp = $(am__leading_dot)dirstamp
+@WITH_BUILTIN_LIBGLOSS_TRUE@am_libmetal_gloss_semihost_a_OBJECTS =  \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_close.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_exit.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_fdtable.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_fstat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_ftime.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_isatty.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_link.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_lseek.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_open.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_read.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_sbrk.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat_common.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_unlink.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_write.$(OBJEXT)
+libmetal_gloss_semihost_a_OBJECTS =  \
+	$(am_libmetal_gloss_semihost_a_OBJECTS)
 libmetal_gloss_a_AR = $(AR) $(ARFLAGS)
 libmetal_gloss_a_LIBADD =
 am__libmetal_gloss_a_SOURCES_DIST = gloss/crt0.S gloss/nanosleep.c \
@@ -173,7 +206,6 @@ am__libmetal_gloss_a_SOURCES_DIST = gloss/crt0.S gloss/nanosleep.c \
 	gloss/sys_sbrk.c gloss/sys_stat.c gloss/sys_sysconf.c \
 	gloss/sys_times.c gloss/sys_unlink.c gloss/sys_utime.c \
 	gloss/sys_wait.c gloss/sys_write.c
-am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@am_libmetal_gloss_a_OBJECTS =  \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.$(OBJEXT) \
@@ -297,9 +329,11 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libmetal_gloss_a_SOURCES) $(libmetal_segger_a_SOURCES) \
+SOURCES = $(libmetal_gloss_semihost_a_SOURCES) \
+	$(libmetal_gloss_a_SOURCES) $(libmetal_segger_a_SOURCES) \
 	$(libmetal_a_SOURCES)
-DIST_SOURCES = $(am__libmetal_gloss_a_SOURCES_DIST) \
+DIST_SOURCES = $(am__libmetal_gloss_semihost_a_SOURCES_DIST) \
+	$(am__libmetal_gloss_a_SOURCES_DIST) \
 	$(am__libmetal_segger_a_SOURCES_DIST) $(libmetal_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -476,8 +510,7 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_spi0.h metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_trace.h metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_simuart0.h metal/drivers/sifive_wdog0.h \
-	metal/drivers/ucb_htif0.h metal/drivers/sifive_hca1_regs.h\
-	metal/atomic.h metal/button.h \
+	metal/drivers/ucb_htif0.h metal/atomic.h metal/button.h \
 	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
 	metal/csr.h metal/gpio.h metal/hpm.h metal/i2c.h metal/init.h \
 	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
@@ -601,6 +634,25 @@ libmetal_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_wait.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_write.c
 
+@WITH_BUILTIN_LIBGLOSS_TRUE@libmetal_gloss_semihost_a_SOURCES = \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_close.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_exit.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_fdtable.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_fstat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_ftime.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_isatty.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_link.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_lseek.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_open.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_read.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_sbrk.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat_common.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_unlink.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_write.c
+
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -680,6 +732,41 @@ gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/nanosleep.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_close.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_exit.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_fdtable.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_fstat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_ftime.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_isatty.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_link.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_lseek.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_open.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_read.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_sbrk.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_stat.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_stat_common.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_unlink.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/semihost-sys_write.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+
+libmetal-gloss-semihost.a: $(libmetal_gloss_semihost_a_OBJECTS) $(libmetal_gloss_semihost_a_DEPENDENCIES) $(EXTRA_libmetal_gloss_semihost_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libmetal-gloss-semihost.a
+	$(AM_V_AR)$(libmetal_gloss_semihost_a_AR) libmetal-gloss-semihost.a $(libmetal_gloss_semihost_a_OBJECTS) $(libmetal_gloss_semihost_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libmetal-gloss-semihost.a
 gloss/sys_access.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/sys_chdir.$(OBJEXT): gloss/$(am__dirstamp) \
@@ -903,6 +990,21 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/crt0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/nanosleep.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_close.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_exit.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_fdtable.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_fstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_ftime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_isatty.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_link.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_lseek.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_open.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_read.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_stat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_stat_common.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_unlink.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_access.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_chdir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_chmod.Po@am__quote@

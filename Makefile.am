@@ -227,6 +227,27 @@ libmetal_gloss_a_SOURCES = \
 	gloss/sys_wait.c \
 	gloss/sys_write.c
 
+lib_LIBRARIES += libmetal-gloss-semihost.a
+
+libmetal_gloss_semihost_a_SOURCES = \
+	gloss/crt0.S \
+	gloss/nanosleep.c \
+	gloss/semihost-sys_close.c \
+	gloss/semihost-sys_exit.c \
+	gloss/semihost-sys_fdtable.c \
+	gloss/semihost-sys_fstat.c \
+	gloss/semihost-sys_ftime.c \
+	gloss/semihost-sys_isatty.c \
+	gloss/semihost-sys_link.c \
+	gloss/semihost-sys_lseek.c \
+	gloss/semihost-sys_open.c \
+	gloss/semihost-sys_read.c \
+	gloss/semihost-sys_sbrk.c \
+	gloss/semihost-sys_stat.c \
+	gloss/semihost-sys_stat_common.c \
+	gloss/semihost-sys_unlink.c \
+	gloss/semihost-sys_write.c
+
 endif
 
 ########################################################
