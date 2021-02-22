@@ -68,6 +68,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_nb2qspi0.h \
 	metal/drivers/sifive_nb2uart0.h \
 	metal/drivers/sifive_nb2wdt.h \
+	metal/drivers/sifive_nb2otp.h \
 	metal/atomic.h \
 	metal/button.h \
 	metal/cache.h \
@@ -101,7 +102,8 @@ nobase_include_HEADERS += \
 	metal/emmc.h \
 	metal/flash.h \
 	metal/qspi.h \
-	metal/watchdog.h
+	metal/watchdog.h \
+	metal/otp.h
 ########################################################
 # libmetal
 ########################################################
@@ -145,6 +147,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_nb2qspi0.c \
 	src/drivers/sifive_nb2uart0.c \
 	src/drivers/sifive_nb2wdt.c \
+	src/drivers/sifive_nb2otp.c \
 	src/atomic.c \
 	src/button.c \
 	src/cache.c \
@@ -178,7 +181,8 @@ libmetal_a_SOURCES = \
 	src/emmc.c \
 	src/flash.c \
 	src/qspi.c \
-	src/watchdog.c
+	src/watchdog.c \
+	src/otp.c
 ########################################################
 # libsegger
 ########################################################
