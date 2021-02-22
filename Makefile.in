@@ -254,7 +254,8 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/sifive_flash.$(OBJEXT) \
 	src/drivers/sifive_nb2qspi0.$(OBJEXT) \
 	src/drivers/sifive_nb2uart0.$(OBJEXT) \
-	src/drivers/sifive_nb2wdt.$(OBJEXT) src/atomic.$(OBJEXT) \
+	src/drivers/sifive_nb2wdt.$(OBJEXT) \
+	src/drivers/sifive_nb2otp.$(OBJEXT) src/atomic.$(OBJEXT) \
 	src/button.$(OBJEXT) src/cache.$(OBJEXT) src/clock.$(OBJEXT) \
 	src/cpu.$(OBJEXT) src/entry.$(OBJEXT) src/scrub.$(OBJEXT) \
 	src/trap.$(OBJEXT) src/gpio.$(OBJEXT) src/hpm.$(OBJEXT) \
@@ -266,7 +267,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/timer.$(OBJEXT) src/time.$(OBJEXT) src/trap.$(OBJEXT) \
 	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
 	src/emmc.$(OBJEXT) src/flash.$(OBJEXT) src/qspi.$(OBJEXT) \
-	src/watchdog.$(OBJEXT)
+	src/watchdog.$(OBJEXT) src/otp.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -484,15 +485,15 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/ucb_htif0.h metal/drivers/sifive_nb2emmc.h \
 	metal/drivers/sifive_flash.h metal/drivers/sifive_nb2qspi0.h \
 	metal/drivers/sifive_nb2uart0.h metal/drivers/sifive_nb2wdt.h \
-	metal/atomic.h metal/button.h metal/cache.h metal/clock.h \
-	metal/compiler.h metal/cpu.h metal/csr.h metal/gpio.h \
-	metal/hpm.h metal/i2c.h metal/init.h metal/interrupt.h \
-	metal/io.h metal/itim.h metal/led.h metal/lim.h metal/lock.h \
-	metal/memory.h metal/pmp.h metal/privilege.h metal/pwm.h \
-	metal/rtc.h metal/shutdown.h metal/scrub.h metal/spi.h \
-	metal/switch.h metal/timer.h metal/time.h metal/tty.h \
-	metal/uart.h metal/emmc.h metal/flash.h metal/qspi.h \
-	metal/watchdog.h
+	metal/drivers/sifive_nb2otp.h metal/atomic.h metal/button.h \
+	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
+	metal/csr.h metal/gpio.h metal/hpm.h metal/i2c.h metal/init.h \
+	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
+	metal/lim.h metal/lock.h metal/memory.h metal/pmp.h \
+	metal/privilege.h metal/pwm.h metal/rtc.h metal/shutdown.h \
+	metal/scrub.h metal/spi.h metal/switch.h metal/timer.h \
+	metal/time.h metal/tty.h metal/uart.h metal/emmc.h \
+	metal/flash.h metal/qspi.h metal/watchdog.h metal/otp.h
 
 # This will generate these sources before the compilation step
 BUILT_SOURCES = \
@@ -541,6 +542,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_nb2qspi0.c \
 	src/drivers/sifive_nb2uart0.c \
 	src/drivers/sifive_nb2wdt.c \
+	src/drivers/sifive_nb2otp.c \
 	src/atomic.c \
 	src/button.c \
 	src/cache.c \
@@ -574,7 +576,8 @@ libmetal_a_SOURCES = \
 	src/emmc.c \
 	src/flash.c \
 	src/qspi.c \
-	src/watchdog.c
+	src/watchdog.c \
+	src/otp.c
 
 @WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@libmetal_segger_a_SOURCES = \
 @WITH_BUILTIN_LIBMETAL_SEGGER_TRUE@       gloss/crt0.S \
@@ -864,6 +867,8 @@ src/drivers/sifive_nb2uart0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_nb2wdt.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/sifive_nb2otp.$(OBJEXT): src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/$(am__dirstamp):
 	@$(MKDIR_P) src
 	@: > src/$(am__dirstamp)
@@ -913,6 +918,7 @@ src/flash.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/qspi.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/watchdog.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/otp.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 
 libmetal.a: $(libmetal_a_OBJECTS) $(libmetal_a_DEPENDENCIES) $(EXTRA_libmetal_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libmetal.a
@@ -980,6 +986,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/led.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/lock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/memory.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/otp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pmp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/privilege.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/pwm.Po@am__quote@
@@ -1021,6 +1028,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_l2pf0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_local-external-interrupts0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_nb2emmc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_nb2otp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_nb2qspi0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_nb2uart0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_nb2wdt.Po@am__quote@
