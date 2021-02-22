@@ -278,7 +278,7 @@ static void emmc_host_set_clock(unsigned int freq)
 
 static void emmc_host_initialization()
 {
-	printf("\n Doing eMMC Reset");
+	printf("Doing eMMC Reset\n");
 	// Software reset
 	emmc_host_reset();
 
@@ -346,7 +346,30 @@ static void process_databuffer_read(eMMCRequest_t* request)
 	}
 }
 
+static void process_databuffer_write(eMMCRequest_t* request)
+{
+	uint32_t data_tocopy = calc_data_tocopy(request);
 
+	request->dataRemaining -= data_tocopy;
+
+	uint8_t *tempdataptr=request->dataptrpos;
+
+	while(data_tocopy > 0U)
+	{
+		uint32_t data = 0;
+		uint8_t byte_count = 0;
+
+		while(data_tocopy && byte_count<4) {
+			//data |= (uint32_t)*((uint8_t*)request->dataptrpos) << (8 * byte_count);
+			data |= (uint32_t)*((uint8_t*)tempdataptr) << (8 * byte_count);
+			byte_count++;
+			data_tocopy--;
+			//request->dataptrpos = (uint8_t*)request->dataptrpos + 1;
+			request->dataptrpos++;
+		}
+		METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS08) = data;
+	}
+}
 
 static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 {
@@ -914,15 +937,25 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,
 		retval=emmc_host_send_cmd(&input_cmd);
 
 		uint32_t *dptr=input_cmd.dataptr;
-		do
+		if(retval==0)
 		{
+			do
+			{
 			// wait for BRE(buffer read enable)
 			while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
 			process_databuffer_read(&input_cmd);
 			status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
-		} while ((status & (1 << TC)) == 0);
-	}
+			} while ((status & (1 << TC)) == 0);
+		}
+		else{
 
+		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+		}
+	}else
+	{
+
+		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+	}
 
 	return retval;
 }
@@ -982,121 +1015,125 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 	uint32_t timeout1=0;
 	uint32_t timeout2=0;
 
+	emmc_select_card(EMMC_RCA);
+
 	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = emmc->deviceblocklen;
+
 
 	emmc_set_block_size(emmc->deviceblocklen);
 
-	input_cmd.cmd=EMMC_CMD17;
+	input_cmd.cmd=EMMC_CMD18;
 	input_cmd.arg=addr;
 	input_cmd.response_type=EMMC_RESPONSE_R1;
 	input_cmd.data_present=1;
 	input_cmd.data_direction=EMMC_TRANSFER_READ;
 	input_cmd.dataptr=rx_buff;
+	input_cmd.dataptrpos=rx_buff;
 	input_cmd.dataRemaining=len;
 	input_cmd.blocklen=emmc->deviceblocklen;
 	input_cmd.blockcnt=len/emmc->deviceblocklen;
 
 	retval=emmc_host_send_cmd(&input_cmd);//((EMMC_CMD17 << CI) | (1 << DPS) | (2 << CRCCE) | (1 << DTDS) | (2 << RTS)), addr);
-
-	while( ((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 ) // wait for BRE(buffer read enable)
+	if(retval==0)
 	{
-		if(timeout1 > MAX_COUNT) {
-			printf("Exit from function \"__metal_driver_sifive_nb2emmc_read_block()\" due to timeout1");
-			exit(1);
-		}
-		else
-			timeout1++;
+		do
+		{
+		// wait for BRE(buffer read enable)
+		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
+		process_databuffer_read(&input_cmd);
+		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+		} while ((status & (1 << TC)) == 0);
+	}else{
+
+		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}
 
-	process_databuffer_read(&input_cmd);
-
-	do
-	{
-		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
-		if(timeout2 > MAX_COUNT) {
-			printf("Exit from function \"__metal_driver_sifive_nb2emmc_read_block()\" due to timeout2");
-			exit(1);
-		}
-		else
-			timeout2++;
-	} while ((status & (1 << TC)) == 0); //to check complition of transmission
+	emmc_select_card(0);
 
 	return retval;
 }
 
 int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int addr, const size_t len, char *tx_buff)
 {
+	int retval=0;
 	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
 	uint32_t timeout1=0;
 	uint32_t timeout2=0;
 	unsigned int status=0;
 
+	emmc_select_card(EMMC_RCA);
+
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS01) = emmc->deviceblocklen;
 
 	emmc_set_block_size(emmc->deviceblocklen);
 
-	//eMMCRequest_t input_cmd;
-	input_cmd.cmd=EMMC_CMD24;
-	input_cmd.cmd=addr;
+	input_cmd.cmd=EMMC_CMD25;
+	input_cmd.arg=addr;
 	input_cmd.response_type=EMMC_RESPONSE_R1;
 	input_cmd.data_direction=EMMC_TRANSFER_WRITE;
 	input_cmd.data_present=1;
+	input_cmd.dataptr=tx_buff;
+	input_cmd.dataptrpos=tx_buff;
+	input_cmd.dataRemaining=len;
 	input_cmd.blocklen=emmc->deviceblocklen;
 	input_cmd.blockcnt=len/emmc->deviceblocklen;
 
-	//emmc_host_send_cmd( )//((24 << CI) | (1 << DPS) | (2 << CRCCE) | (1 << DTDS) | (2 << RTS)), addr);
-
-	while( ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS09) >> BWE) & 0x01) == 0 ) // wait for BWE (buffer write enable)
+	emmc_host_send_cmd(&input_cmd);
+	if(retval==0)
 	{
-		if(timeout1 > MAX_COUNT) {
-			printf("Exit from function \"__metal_driver_sifive_nb2emmc_write_block()\" due to timeout1");
-			exit(1);
-		}
-		else
-			timeout1++;
-	}
-	for (int i = 0; i < emmc->deviceblocklen / 4; i=i+4){
-		METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS08) = (uint32_t)tx_buff[i];
+		do
+		{
+		/*wait for BWE(buffer write enable)*/
+		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BWE) & 0x01) == 0 );
+		process_databuffer_write(&input_cmd);
+		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+		} while ((status & (1 << TC)) == 0);
+	}else{
+
+		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}
 
-	do {
-		status = METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS12);
-		if(timeout2 > MAX_COUNT) {
-			printf("Exit from function \"__metal_driver_sifive_nb2emmc_write_block()\" due to timeout2");
-			exit(1);
-		}
-		else
-			timeout2++;
-	} while ((status & (1 << TC)) == 0);
+	emmc_select_card(0);
 
-	return 0;
+	return retval;
 }
 
 
 int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int start_addr, long int end_addr)
 {
-
-	//eMMCRequest_t input_cmd;
-
+	int retval=0;
 	input_cmd.cmd=EMMC_CMD35;
 	input_cmd.cmd=start_addr;
 	input_cmd.response_type=EMMC_RESPONSE_R1;
 
 	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD35 << CI) |  (2 << CRCCE) |  (2 << RTS), start_addr);
+	if(retval!=0)
+	{
+		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+	}else
+	{
+		input_cmd.cmd=EMMC_CMD36;
+		input_cmd.cmd=end_addr;
+		input_cmd.response_type=EMMC_RESPONSE_R1;
+		emmc_host_send_cmd(&input_cmd);//(EMMC_CMD36 << CI) |  (2 << CRCCE) |  (2 << RTS), end_addr);
+		if(retval!=0)
+		{
+			printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 
-	input_cmd.cmd=EMMC_CMD36;
-	input_cmd.cmd=end_addr;
-	input_cmd.response_type=EMMC_RESPONSE_R1;
+		}else
+		{
 
-	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD36 << CI) |  (2 << CRCCE) |  (2 << RTS), end_addr);
-
-	input_cmd.cmd=EMMC_CMD38;
-	input_cmd.cmd=start_addr;
-	input_cmd.response_type=EMMC_RESPONSE_R1B;
-
-	emmc_host_send_cmd(&input_cmd);//(38 << CI) |  (3 << CRCCE) |  (3 << RTS), ERASE_VAL);
-
-	return 0;
+			input_cmd.cmd=EMMC_CMD38;
+			input_cmd.cmd=start_addr;
+			input_cmd.response_type=EMMC_RESPONSE_R1B;
+			emmc_host_send_cmd(&input_cmd);//(38 << CI) |  (3 << CRCCE) |  (3 << RTS), ERASE_VAL)
+			if(retval!=0)
+			{
+				printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+			}
+		}
+	}
+	return retval;
 }
 
 
