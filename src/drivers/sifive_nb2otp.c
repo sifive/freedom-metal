@@ -18,7 +18,7 @@
 static unsigned long long otp_control_base=0;
 
 
-static int __metal_sifive_otp_read(struct metal_otp *otp, long int addr, const size_t len, uint8_t *rx_buff, int bits)
+static int __metal_sifive_otp_read(struct metal_otp *otp, uint64_t addr, const size_t len, uint8_t *rx_buff, int bits)
 {
 	otp_control_base=(uintptr_t)__metal_driver_sifive_nb2otp_base(otp);
 	uint32_t mask;
@@ -31,18 +31,20 @@ static int __metal_sifive_otp_read(struct metal_otp *otp, long int addr, const s
 			mask = (1 << bits) - 1;
 		else
 			mask = 0xFFFFFFFF;
+		
 		OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = 0x104C2700;
-		value = OTP_REGW(otp_control_base, addr);
+		value = (uint32_t)((uint64_t*)addr);
 		value &= mask;
 		*((uint32_t *)rx_buff) = value;
 		rx_buff += 4;
+		addr +=	4;
 	        bits -= 32;
 	}
 	return 0;
 }
 
 
-static int __metal_sifive_otp_write(struct metal_otp *otp,long int addr, const size_t len, uint8_t *tx_buff, int bits)
+static int __metal_sifive_otp_write(struct metal_otp *otp,uint64_t addr, const size_t len, uint8_t *tx_buff, int bits)
 {
 	otp_control_base=(uintptr_t)__metal_driver_sifive_nb2otp_base(otp);
 	int mask;
@@ -59,9 +61,10 @@ static int __metal_sifive_otp_write(struct metal_otp *otp,long int addr, const s
 		value = *((uint32_t *)tx_buff);
 		value &= mask;
 		OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = 0x104C2704;
-		OTP_REGW(otp_control_base, addr) = value;
+		*((uint64_t*)addr) = value;
 		tx_buff += 4;
 		bits -= 32;
+		addr +=	4;
 	}
 	return 0;
 }

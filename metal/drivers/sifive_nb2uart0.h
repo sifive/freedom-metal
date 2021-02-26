@@ -141,7 +141,7 @@ struct __metal_driver_sifive_nb2uart0;
 /*0x1 (FIFO_CHAR_2)	  : 2 characters in FIFO*/
 /*0x2 (FIFO_QUARTER_FULL) : FIFO 1/4 full*/
 /*0x3 (FIFO_HALF_FULL)    : FIFO 1/2 full*/
-#define UART_TX_TRIGGER(level) (level<<6)
+#define UART_TX_TRIGGER(level) (level<<4)
 
 
 

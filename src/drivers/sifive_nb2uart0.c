@@ -16,6 +16,10 @@
 #define UART_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)UART_REG(offset)))
 #define UART_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)UART_REG(offset)))
 
+#define FIFO_SIZE 256
+
+#define UART_FIFO_ENABLED
+
 static unsigned long long control_base=0;
 
 bool isFifoAccessEnabled(struct metal_uart *uart)
@@ -24,10 +28,10 @@ bool isFifoAccessEnabled(struct metal_uart *uart)
 	bool retval;
 	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-//	if(UART_REGW(METAL_SIFIVE_NB2UART0_) == Dw_set)
-//            retval = true;
-//        else
-//           retval = false;
+	if(((UART_REGW(METAL_SIFIVE_NB2UART0_IIR)>>6)&0x3) == 0x3)
+            retval = true;
+        else
+           retval = false;
 
 	return retval;
 }
@@ -91,29 +95,134 @@ int __metal_driver_sifive_nb2uart0_set_tx_watermark(struct metal_uart *uart,size
 {
     long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= UART_TX_TRIGGER(level);
-    return 0;
+    	uint32_t regval=0;
+	uint32_t error=0;
+	
+	switch(level)
+	{
+		case 0:
+			regval=0; //FIF Empty 
+			break;
+
+		case 2:
+			regval=1; //2 chars in FIFO
+			break;
+
+		case (FIFO_SIZE>>2):
+			regval=2; //FIFO 1/4 Full
+			break;
+
+		case (FIFO_SIZE>>1):
+			regval=3; //FIFO 1/2 FULL
+			break;
+		default:
+			error=-1;
+	}
+	if(error==0)
+	{
+		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= ~(UART_TX_TRIGGER(3));
+		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= UART_TX_TRIGGER(regval);
+	}
+	
+	return error;
 }
 
 size_t __metal_driver_sifive_nb2uart0_get_tx_watermark(struct metal_uart *uart) {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    return ((UART_REGW(METAL_SIFIVE_NB2UART0_FCR) >> 4) & 0x3);
+	uint32_t regval=((UART_REGW(METAL_SIFIVE_NB2UART0_FCR) >> 4) & 0x3);
+	uint32_t retval=0;
+
+	switch(regval)
+	{
+		case 0:
+			retval=0; //FIFO Empty
+			break;
+
+		case 1:
+			retval=2; //Two bytes in FIFO
+			break;
+
+		case 2:
+			retval=FIFO_SIZE/4; //FIFO 1/4 Full
+			break;
+
+		case 3:
+			retval=FIFO_SIZE/2; //FIFO Half Full
+			break;
+	}
+	return retval;
 }
 
 int __metal_driver_sifive_nb2uart0_set_rx_watermark(struct metal_uart *uart,
-                                                 size_t level) {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+		size_t level) {
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= UART_RX_TRIGGER(level);
-    return 0;
+	uint32_t regval=0;
+	uint32_t error=0;
+	
+	switch(level)
+	{
+		case 1:
+			regval=0; //1 Char in FIFO 
+			break;
+
+		case (FIFO_SIZE>>2):
+			regval=1; //FIFo 1/4 Full
+			break;
+
+		case (FIFO_SIZE>>1):
+			regval=2; //FIFO 1/2 Full
+			break;
+
+		case (FIFO_SIZE-2):
+			regval=3; //FIFO 2 less than full
+			break;
+		default:
+			error=-1;
+	}
+	if(error==0)
+	{
+		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= ~(UART_RX_TRIGGER(3));
+		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= UART_RX_TRIGGER(regval);
+	}
+	
+	return error;
 }
 
 size_t __metal_driver_sifive_nb2uart0_get_rx_watermark(struct metal_uart *uart) {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    return ((UART_REGW(METAL_SIFIVE_NB2UART0_FCR) >> 6) & 0x3);
+	uint32_t retval=0;
+	uint32_t regval= ((UART_REGW(METAL_SIFIVE_NB2UART0_FCR) >> 6) & 0x3);
+
+	switch(regval)
+	{
+		case 0:
+			retval=1; //1 Char in FIFO 
+			break;
+
+		case 1:
+			retval=FIFO_SIZE/4; //FIFo 1/4 Full
+			break;
+
+		case 2:
+			retval=FIFO_SIZE/2; //FIFO 1/2 Full
+			break;
+
+		case 3:
+			retval=FIFO_SIZE-2; //FIFO 2 less than full
+			break;
+	}
+	return retval;
 }
+
+
+
+
+
+
+
 
 uart_event __metal_driver_sifive_nb2uart0_get_event(struct metal_uart*uart){
 
@@ -126,43 +235,36 @@ int __metal_driver_sifive_nb2uart0_putc(struct metal_uart *uart, int c)
 {
 	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 	uint32_t timeout=0;
-//#ifdef UART_FIFO_ENABLED
-	while (!(UART_REGW(METAL_SIFIVE_NB2UART0_LSR) & UART_LSR_THRE))
+	int error=0;
+#ifndef UART_FIFO_ENABLED
+	if((UART_REGW(METAL_SIFIVE_NB2UART0_LSR) & UART_LSR_THRE))
 	{
-		if(timeout > MAX_COUNT) {
-			printf("Exit from function \"__metal_driver_sifive_nb2uart0_putc()\" due to timeout");
-			exit(1);
-		}
-		else
-			timeout++;
+		UART_REGW(METAL_SIFIVE_NB2UART0_THR) = c;
+	}else
+	{
+		error=-1;
 	}
-//#endif	
+#else
+	while (!(UART_REGW(METAL_SIFIVE_NB2UART0_LSR) & UART_LSR_THRE));
 	UART_REGW(METAL_SIFIVE_NB2UART0_THR) = c;
-	return 0;
+#endif	
+	return error;
 }
 
 int __metal_driver_sifive_nb2uart0_getc(struct metal_uart *uart, int *c)
 {
 	uint32_t ch = 0;
+	int error=0;
 	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-
 	if (!(UART_REGW(METAL_SIFIVE_NB2UART0_LSR) & UART_LSR_DR))
-		return -1;
+		error=-1;
 	else
-	ch = UART_REGW(METAL_SIFIVE_NB2UART0_RBR);
-
+		ch = UART_REGW(METAL_SIFIVE_NB2UART0_RBR);
+	
 	*c = ch & 0x0FF;
 	
-	/*
-	if(UART_REGW(METAL_SIFIVE_NB2UART0_USR) & UART_RFNE) {
-		*c = -1;
-	} 
-	else {
-		*c = ch & 0x0FF;
-	}*/
-
-	return 0;
+	return error;
 }
 
 int __metal_driver_sifive_nb2uart0_get_baud_rate(struct metal_uart *guart)
@@ -217,7 +319,6 @@ void __metal_driver_sifive_nb2uart0_init(struct metal_uart *guart, int baud_rate
 	control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
 	struct __metal_driver_sifive_nb2uart0 *uart = (void *)(guart);
 	struct metal_clock *clock = __metal_driver_sifive_nb2uart0_clock(guart);
-//	struct __metal_driver_sifive_nb2gpio0 *pinmux = __metal_driver_sifive_nb2uart0_pinmux(guart);
 
 	if(clock != NULL) {
 		uart->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
@@ -230,16 +331,6 @@ void __metal_driver_sifive_nb2uart0_init(struct metal_uart *guart, int baud_rate
 	}
 
 
-/*	if (pinmux != NULL) {
-		long pinmux_output_selector = __metal_driver_sifive_nb2uart0_pinmux_output_selector(guart);
-		long pinmux_source_selector = __metal_driver_sifive_nb2uart0_pinmux_source_selector(guart);
-		pinmux->gpio.vtable->enable_io(
-			(struct metal_gpio *) pinmux,
-			pinmux_output_selector,
-			pinmux_source_selector
-		);
-	}*/
-	
 	if(uart != NULL) {
 
 		while (!(UART_REGW(METAL_SIFIVE_NB2UART0_LSR) & UART_LSR_TEMT))
@@ -258,25 +349,15 @@ void __metal_driver_sifive_nb2uart0_init(struct metal_uart *guart, int baud_rate
 		/* set line control register value */
 		UART_REGW(METAL_SIFIVE_NB2UART0_LCR) = uart->setting;
 
-		/*Interrupt Enable*/
-		//UART_REGW(METAL_SIFIVE_NB2UART0_IER) = uart->int_enable;
-
-
-		//UART_REGW(METAL_SIFIVE_NB2UART0_MCR) = uart->int_enable;
-		//UART_REGW(METAL_SIFIVE_NB2UART0_FCR) = uart->int_enable;
-
 #ifdef UART_FIFO_ENABLED
 		/* attempt to determine hardware parameters */
 		val = UART_REGW(METAL_SIFIVE_NB2UART0_CPR);
 		if(val != 0x0) {
 			/* Enable transmit and receive FIFO registers */
-			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= !(UART_FIFOE);
 			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= (UART_FIFOE);
 
 			/* Reset control portion of transmit and receive FIFOs */
-			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= !(UART_XFIFOR);
 			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= (UART_XFIFOR);
-			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= !(UART_RFIFOR);
 			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= (UART_RFIFOR);
 		}
 #endif		
@@ -290,30 +371,9 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 	uint32_t timeout=0;
 	control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
 	struct __metal_driver_sifive_nb2uart0 *uart = (void *)(guart);
-	struct metal_clock *clock = __metal_driver_sifive_nb2uart0_clock(guart);
-//	struct __metal_driver_sifive_nb2gpio0 *pinmux = __metal_driver_sifive_nb2uart0_pinmux(guart);
 
-	if(clock != NULL) {
-		uart->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
-		uart->pre_rate_change_callback.priv = guart;
-		metal_clock_register_pre_rate_change_callback(clock, &(uart->pre_rate_change_callback));
-
-		uart->post_rate_change_callback.callback = &post_rate_change_callback_func;
-		uart->post_rate_change_callback.priv = guart;
-		metal_clock_register_post_rate_change_callback(clock, &(uart->post_rate_change_callback));
-	}
 
 	metal_uart_set_baud_rate(&(uart->uart), baud_rate);
-
-/*	if (pinmux != NULL) {
-		long pinmux_output_selector = __metal_driver_sifive_nb2uart0_pinmux_output_selector(guart);
-		long pinmux_source_selector = __metal_driver_sifive_nb2uart0_pinmux_source_selector(guart);
-		pinmux->gpio.vtable->enable_io(
-			(struct metal_gpio *) pinmux,
-			pinmux_output_selector,
-			pinmux_source_selector
-		);
-	}*/
 
 	if(uart != NULL) {
 
@@ -339,39 +399,39 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 		//UART_REGW(METAL_SIFIVE_NB2UART0_MCR) = uart->int_enable;
 		//UART_REGW(METAL_SIFIVE_NB2UART0_FCR) = uart->int_enable;
 
-
+#ifdef UART_FIFO_ENABLED
 		/* attempt to determine hardware parameters */
 		val = UART_REGW(METAL_SIFIVE_NB2UART0_CPR);
 		if(val != 0x0) {
 			/* Enable transmit and receive FIFO registers */
-			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= !(UART_FIFOE);
 			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= (UART_FIFOE);
 
 			/* Reset control portion of transmit and receive FIFOs */
-			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= !(UART_XFIFOR);
 			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= (UART_XFIFOR);
-			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= !(UART_RFIFOR);
 			UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= (UART_RFIFOR);
 		}
+#endif		
 	}
 
 	switch(data)
 	{
 		case METAL_UART_5_BITS:
-			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= !(UART_LCR_WLS_8);
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(0x3);
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) |= (UART_LCR_WLS_5);
 			break;
 
 		case METAL_UART_6_BITS:
-			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= !(UART_LCR_WLS_8);
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(0x3);
 			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) |= (UART_LCR_WLS_6);
 			break;
 
 		case METAL_UART_7_BITS:
-			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= !(UART_LCR_WLS_8);
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(0x3);
 			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) |= (UART_LCR_WLS_7);
 			break;
 
 		case METAL_UART_8_BITS:
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(0x3);
 			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) |= (UART_LCR_WLS_8);
 			break;
 
@@ -382,7 +442,7 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 	switch(stop)
 	{
 		case METAL_UART_1_STOP:
-			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= !(UART_LCR_STB);
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(UART_LCR_STB);
 			break;
 
 		case METAL_UART_2_STOP:
@@ -396,12 +456,12 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 	switch(parity)
 	{
 		case METAL_UART_NO_PARITY:
-			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= !(UART_LCR_PEN);
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(UART_LCR_PEN);
 			break;
 
 		case METAL_UART_ODD_PARITY:
 			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) |= (UART_LCR_PEN);
-			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= !(UART_LCR_EPS);
+			UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(UART_LCR_EPS);
 			break;
 
 		case METAL_UART_EVEN_PARITY:
