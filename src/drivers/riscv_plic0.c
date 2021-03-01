@@ -5,7 +5,7 @@
 
 #ifdef METAL_RISCV_PLIC0
 
-#define PLIC0_MAX_INTERRUPTS 1024
+#define PLIC0_MAX_INTERRUPTS 300
 
 #include <metal/drivers/riscv_plic0.h>
 #include <metal/interrupt.h>
