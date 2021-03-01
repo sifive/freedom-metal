@@ -19,9 +19,9 @@ int __metal_driver_riscv_dma0_chan_active(struct metal_pdma *gdma,
     return 0;
 }
 
-void __metal_driver_riscv_dma0_chan_init(struct metal_pdma *gdma,
-                                         unsigned int chan,
-                                         struct metal_pdma_chan_config *config) {
+void __metal_driver_riscv_dma0_chan_init(
+    struct metal_pdma *gdma, unsigned int chan,
+    struct metal_pdma_chan_config *config) {
     struct __metal_driver_riscv_dma0 *dma = (void *)gdma;
     unsigned long control_base =
         __metal_driver_riscv_dma0_control_base((struct metal_pdma *)gdma);
@@ -61,7 +61,8 @@ int __metal_driver_riscv_dma0_txfer_status(struct metal_pdma *gdma,
 
 void __metal_driver_riscv_dma0_enableIT(struct metal_pdma *gdma,
                                         unsigned int chanid,
-                                        struct metal_pdma_chan_config *config) {}
+                                        struct metal_pdma_chan_config *config) {
+}
 
 static struct metal_interrupt *
 __metal_driver_riscv_dma0_interrupt_controller(struct metal_pdma *gdma) {

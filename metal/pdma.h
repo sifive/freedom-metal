@@ -75,8 +75,8 @@ struct metal_pdma *metal_pdma_get_device(int device_num);
  * used for the channel
  */
 inline void metal_pdma_channel_init(struct metal_pdma *dma,
-                                   unsigned int metal_pdma_channel,
-                                   struct metal_pdma_chan_config *config) {
+                                    unsigned int metal_pdma_channel,
+                                    struct metal_pdma_chan_config *config) {
     return dma->vtable->chan_init(dma, metal_pdma_channel, config);
 }
 
@@ -87,7 +87,7 @@ inline void metal_pdma_channel_init(struct metal_pdma *dma,
  * TODO: Is this API required??? need to see once the confirmed spec is released
  */
 inline int metal_pdma_channel_active(struct metal_pdma *dma,
-                                    unsigned int metal_pdma_channel) {
+                                     unsigned int metal_pdma_channel) {
     return dma->vtable->chan_active(dma, metal_pdma_channel);
 }
 
@@ -97,7 +97,8 @@ inline int metal_pdma_channel_active(struct metal_pdma *dma,
  * @idx   channel id of the DMA device
  * @return The interrupt ID
  */
-inline int metal_pdma_get_interrupt_id(struct metal_pdma *dma, unsigned int idx) {
+inline int metal_pdma_get_interrupt_id(struct metal_pdma *dma,
+                                       unsigned int idx) {
     return dma->vtable->get_interrupt_id(dma, idx);
 }
 
@@ -109,7 +110,7 @@ inline int metal_pdma_get_interrupt_id(struct metal_pdma *dma, unsigned int idx)
  */
 inline void
 metal_pdma_channel_txfer_enable(struct metal_pdma *dma, unsigned int chanid,
-                               struct metal_pdma_chan_config *config) {
+                                struct metal_pdma_chan_config *config) {
     return dma->vtable->chan_txfer_enable(dma, chanid, config);
 }
 
@@ -118,7 +119,7 @@ metal_pdma_channel_txfer_enable(struct metal_pdma *dma, unsigned int chanid,
  * @param chanid DMA channel id.
  * @return 0 If no error.*/
 inline int metal_pdma_channel_txfer_status(struct metal_pdma *dma,
-                                          unsigned int chanid) {
+                                           unsigned int chanid) {
     return dma->vtable->chan_txfer_status(dma, chanid);
 }
 
@@ -129,7 +130,7 @@ inline int metal_pdma_channel_txfer_status(struct metal_pdma *dma,
  * @return 0 If no error.*/
 inline void
 metal_pdma_channel_txfer_enableIT(struct metal_pdma *dma, unsigned int chanid,
-                                 struct metal_pdma_chan_config *config) {
+                                  struct metal_pdma_chan_config *config) {
     return dma->vtable->chan_txfer_enableIT(dma, chanid, config);
 }
 
@@ -149,8 +150,8 @@ metal_pdma_interrupt_controller(struct metal_pdma *dma) {
  * @param flag DMA interrupt flags.
  * @return 0 If no error.*/
 inline int metal_pdma_chan_cfg_interrupt(struct metal_pdma *dma,
-                                        unsigned int chanid,
-                                        metal_pdma_interrupt_t flag) {
+                                         unsigned int chanid,
+                                         metal_pdma_interrupt_t flag) {
     return dma->vtable->chan_cfg_interrupt(dma, chanid, flag);
 }
 
@@ -160,8 +161,8 @@ inline int metal_pdma_chan_cfg_interrupt(struct metal_pdma *dma,
  * @param flag DMA interrupt flag.
  * @return 0 If no error.*/
 inline int metal_pdma_chan_clr_interrupt(struct metal_pdma *dma,
-                                        unsigned int chanid,
-                                        metal_pdma_interrupt_t flag) {
+                                         unsigned int chanid,
+                                         metal_pdma_interrupt_t flag) {
     return dma->vtable->chan_clr_interrupt(dma, chanid, flag);
 }
 
