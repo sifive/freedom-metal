@@ -157,27 +157,56 @@ uint32_t __metal_driver_sifive_nb2qspi0_get_interrupt_status(struct metal_qspi *
 }
 
 
-int __metal_driver_sifive_nb2qspi0_read(struct metal_qspi *gqspi,uint32_t addr_offset,size_t len,uint8_t *rx_buf)
+int __metal_driver_sifive_nb2qspi0_read(struct metal_qspi *gqspi,uint32_t addr_offset,size_t nbytes,uint8_t *rx_buf)
 {
-	if(len != 0){
+
+	uint32_t remaining_bytes=nbytes;
+
+	if(nbytes != 0){
 		if(rx_buf){
 			if(qcfg.burstmode==QSPI_APB_ACCESS)
 			{
+
+				
+
 				qspi_apb_read((uint32_t*)rx_buf);
+
 			}
 			else if(qcfg.burstmode==QSPI_SINGLE_BURST)
 			{
+				uint32_t data=0;	
 				/*Single burst read*/
 				uint32_t *axi_addr = (uint32_t*) (METAL_QSPI_AXI_BASE_ADDR+addr_offset);
 				uint32_t *dataptr= (uint32_t*)rx_buf;
-				/* Read length/4 locations */
-				for (int i = 0; i < len/4; i++)
+
+				if(nbytes>=4)
 				{
-					*dataptr=*axi_addr;
-					axi_addr++;
-					dataptr++;
+					/* Read length/4 locations */
+					for (int i = 0; i < nbytes/4; i++)
+					{
+						*dataptr=*axi_addr; /*Copy data from */
+						axi_addr++;
+						dataptr++;
+					}
 				}
-			}
+
+				uint8_t remaining_bytes = nbytes%4?(nbytes%4):0;
+
+				if(remaining_bytes)
+				{
+					uint8_t *tempbufptr=(uint8_t*)dataptr;
+					data=*axi_addr;
+
+					while(remaining_bytes){
+						*((uint8_t*)tempbufptr) = data & 0xFF;
+						data >>= 8;
+						remaining_bytes--;
+						tempbufptr++;
+					}
+				}
+			}	
+
+
 		}
 	}
 	return 0;
@@ -196,12 +225,12 @@ int __metal_driver_sifive_nb2qspi0_write(struct metal_qspi *gqspi,uint32_t addr_
 		else if(qcfg.burstmode==QSPI_SINGLE_BURST)
 		{
 			//flash_axi_write(flash_addr_offset,tx_buf,len);
-			
+
 			uint32_t *axi_addr = (uint32_t*)(METAL_QSPI_AXI_BASE_ADDR+addr_offset);
 			uint32_t *dataptr=(uint32_t *)tx_buf;
 			*axi_addr = *dataptr;
-			}
 		}
+	}
 }
 
 
@@ -210,7 +239,7 @@ void __metal_driver_sifive_nb2qspi0_init(struct metal_qspi *gqspi, uint32_t baud
 	control_base = __metal_driver_sifive_nb2qspi0_control_base(gqspi);
 	struct __metal_driver_sifive_nb2qspi0 *qspi = (void *)(gqspi);
 	struct metal_clock *clock = __metal_driver_sifive_nb2qspi0_clock(gqspi);
-//	struct __metal_driver_sifive_nb2gpio0 *pinmux = __metal_driver_sifive_nb2qspi0_pinmux(gqspi);
+	//	struct __metal_driver_sifive_nb2gpio0 *pinmux = __metal_driver_sifive_nb2qspi0_pinmux(gqspi);
 
 	if(clock != NULL) {
 		qspi->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
@@ -224,12 +253,12 @@ void __metal_driver_sifive_nb2qspi0_init(struct metal_qspi *gqspi, uint32_t baud
 
 	metal_qspi_set_baud_rate(&(qspi->qspi), baud_rate);
 
-/*	if (pinmux != NULL) {
+	/*	if (pinmux != NULL) {
 		long pinmux_output_selector = __metal_driver_sifive_nb2qspi0_pinmux_output_selector(gqspi);
 		long pinmux_source_selector = __metal_driver_sifive_nb2qspi0_pinmux_source_selector(gqspi);
 		pinmux->gpio.vtable->enable_io((struct metal_gpio *) pinmux,pinmux_output_selector,pinmux_source_selector);
-	}
-*/
+		}
+		*/
 	qspi_static_config_t cfg;
 
 	/* Set-up initial parameters */

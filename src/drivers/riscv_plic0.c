@@ -111,18 +111,11 @@ void __metal_plic0_handler(int id, void *priv) {
     unsigned int idx = __metal_plic0_claim_interrupt(plic, contextid);
     unsigned int num_interrupts = __metal_driver_sifive_plic0_num_interrupts(
         (struct metal_interrupt *)plic);
-    
 
     if ((idx < num_interrupts) && (plic->metal_exint_table[idx])) {
         plic->metal_exint_table[idx](idx,
                                      plic->metal_exdata_table[idx].exint_data);
     }
-
-    __metal_plic0_complete_interrupt(plic, contextid, idx);
-   // __asm__ volatile("li a0, 54");
-   // __asm__ volatile("li a1, 0xc200004");
-   // __asm__ volatile("sw a0,0(a1)");
-
 
     __metal_plic0_complete_interrupt(plic, contextid, idx);
 }
