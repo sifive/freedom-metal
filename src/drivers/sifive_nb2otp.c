@@ -38,9 +38,9 @@ static int __metal_sifive_otp_read(uintptr_t otp_control_base, uint64_t addr, co
 
 	OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_READ_CONFIG;
 	value = (*(uint32_t*)addr);
+	//printf(" opt read %x val %x mask %x\n",addr,value,mask);
 	value &= mask;
 	value=value>>pos;
-	/*printf(" opt read %x val %x mask %x\n",addr,value,mask);*/
 	*((uint32_t *)rx_buff) = value;
 
 	return 0;
@@ -51,6 +51,7 @@ static int __metal_sifive_otp_write(uintptr_t *otp_control_base,uint64_t addr, c
 {
 	uint32_t pos=0;
 	uint32_t read_val=0;
+	uint32_t write_data=*((uint32_t *)tx_buff);
 
 	for(int i=0;i<32;i++)
 	{
@@ -64,12 +65,14 @@ static int __metal_sifive_otp_write(uintptr_t *otp_control_base,uint64_t addr, c
 	OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_READ_CONFIG;
 	read_val = (*(uint32_t*)addr);
 
+	read_val &= ~mask;
 
-	uint32_t write_data = *((uint32_t *)tx_buff);
+
 	write_data=(write_data<<pos);
 	write_data&=mask;
 
 	write_data |= read_val;
+
 	OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_WRITE_CONFIG;
 	*((uint32_t*)addr) = write_data;
 
