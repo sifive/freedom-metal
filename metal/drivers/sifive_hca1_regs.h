@@ -1,12 +1,7 @@
 /**
  * HCA registers
  * @file sifive_hca1_regs.h
- *
- * @note This file has been automatically generated from the HCA object model
- * with all option enable see HCA properties.
- *
- * @copyright (c) 2020-2021 SiFive, Inc
- * @copyright SPDX-License-Identifier: MIT
+ * @brief registers definition of HCA revision 1.0.0
  */
 
 #ifndef SIFIVE_HCA1_REGS_H_
@@ -36,9 +31,8 @@ typedef struct _HCA {
             uint32_t   _reserved5;
     __IOM   uint32_t   DMA_LEN;           /**< Offset: 0x078 (R/W) DMA length */
             uint32_t   _reserved6;
-    __IOM   uint32_t   DMA_SRC;           /**< Offset: 0x080 (R/W) DMA source address */
-            uint32_t   _reserved7;
-    __IOM   uint32_t   DMA_DEST;          /**< Offset: 0x088 (R/W) DMA destination address */
+    __IOM   uint64_t   DMA_SRC;           /**< Offset: 0x080 (R/W) DMA source address */
+    __IOM   uint64_t   DMA_DEST;          /**< Offset: 0x088 (R/W) DMA destination address */
 } HCA_Type;
 
 /**
@@ -148,9 +142,8 @@ typedef union _HCA_SR {
         uint32_t IFIFOCNT:6;       /**< bit:  8..13  Input FIFO count */
         uint32_t _reserved1:2;     /**< bit: 14..15  (reserved) */
         uint32_t OFIFOCNT:6;       /**< bit: 16..21  Output FIFO count */
-        uint32_t _reserved2:2;     /**< bit: 22..23  (reserved) */
-        uint32_t BUSY:1;           /**< bit:     24  AES or SHA or PKA is busy */
-        uint32_t _reserved3:7;     /**< bit: 25..31  (reserved) */
+        uint32_t _reserved2:9;     /**< bit: 22..30  (reserved) */
+        uint32_t BUSY:1;           /**< bit:     31  AES or SHA or PKA is busy */
     } b;                           /**< Structure used for bit access */
     uint32_t w;                    /**< Structure used for word access */
 } HCA_SR_Type;
@@ -456,8 +449,8 @@ typedef union _HCA_SHA_CR {
         uint32_t _reserved0:1;     /**< bit:      3  (reserved) */
         uint32_t INIT:1;           /**< bit:      4  Initialize the SHA engine */
         uint32_t LAST:1;           /**< bit:      5  Last block flag */
-        uint32_t LASTLEN:10;       /**< bit:  6..15  Last block length */
-        uint32_t _reserved1:15;    /**< bit: 16..30  (reserved) */
+        uint32_t LASTLEN:7;        /**< bit:  6..12  Last block length */
+        uint32_t _reserved1:18;    /**< bit: 13..30  (reserved) */
         uint32_t BUSY:1;           /**< bit:     31  SHA Busy bit */
     } b;                           /**< Structure used for bit access */
     uint32_t w;                    /**< Structure used for word access */
@@ -481,7 +474,7 @@ typedef union _HCA_SHA_CR {
 
 /* HCA SHA control: Last block length */
 #define HCA_SHA_CR_LASTLEN_Pos          6U
-#define HCA_SHA_CR_LASTLEN_Msk          (0x3FFU << HCA_SHA_CR_LASTLEN_Pos)
+#define HCA_SHA_CR_LASTLEN_Msk          (0x7FU << HCA_SHA_CR_LASTLEN_Pos)
 
 /* HCA SHA control: Busy bit */
 #define HCA_SHA_CR_BUSY_Pos             31U
