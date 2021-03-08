@@ -223,6 +223,27 @@ Slot Register Set
 #define METAL_EMMC_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_EMMC_REG(offset)))
 #define METAL_EMMC_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_EMMC_REG(offset)))
 
+#define METAL_EMMC_IOMUX_REGW(ADDR)	 (__METAL_ACCESS_ONCE((__metal_io_u32 *)ADDR))
+
+#define SCR_RESET_BASE_ADDR     	0x4F0011000UL
+#define SCR_REG_BASE_ADDR       	0x4F0010000UL
+#define SCR_IOMUX_HSSS_CFG_BASE_ADDR    0x301500000UL
+
+#define PCSS_SCR_EMMC_SDIO_NIU_RESET    		( SCR_RESET_BASE_ADDR + 0x0048 )
+#define PCSS_SCR_EMMC_SDIO_RESET        		( SCR_REG_BASE_ADDR + 0x00B4 )
+
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_CLK                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x005C )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_CMD                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0060 )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT0                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0064 )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT1                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0068 )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT2                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x006C )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT3                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0070 )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT4                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0074 )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT5                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0078 )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT6                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x007C )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT7                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0080 )
+#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DS			( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0084 )
+
 static unsigned long long emmc_control_base=0;
 static eMMCRequest_t input_cmd;
 
@@ -240,10 +261,27 @@ static bool conditional_wait(volatile unsigned long reg,uint32_t val, bool condi
 	uint32_t val=0;
 	do{
 		val=METAL_EMMC_REGW(reg)__METAL_ACCESS_ONCE((__metal_io_u32 *)reg);
-	
+
 	}while(val & SWR== condition);
 }
 */
+static void emmc_iomux_config(void)
+{
+	METAL_EMMC_IOMUX_REGW(PCSS_SCR_EMMC_SDIO_NIU_RESET) = 0X49; //Deassert EMMC/SDIO NIU Reset
+	METAL_EMMC_IOMUX_REGW(PCSS_SCR_EMMC_SDIO_RESET) = 0X1FF;   //Deassert EMMC/SDIO Reset
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_CLK) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_CMD) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT0) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT1) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT2) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT3) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT4) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT5) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT6) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT7) = 0x5500;
+	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DS) = 0x5500;
+}
+
 static void emmc_host_reset()
 {
 	uint32_t timeout=0;
@@ -968,6 +1006,9 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
 
 	emmc->deviceblocklen=DEVICE_BLOCK_SIZE;
+
+	/*IOMUX CONFIG FOR EMMC */
+	emmc_iomux_config();
 
 	emmc_host_initialization();
 
