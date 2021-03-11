@@ -168,9 +168,9 @@ am__libmetal_gloss_semihost_a_SOURCES_DIST = gloss/crt0.S \
 	gloss/semihost-sys_fstat.c gloss/semihost-sys_ftime.c \
 	gloss/semihost-sys_isatty.c gloss/semihost-sys_link.c \
 	gloss/semihost-sys_lseek.c gloss/semihost-sys_open.c \
-	gloss/semihost-sys_read.c gloss/semihost-sys_sbrk.c \
-	gloss/semihost-sys_stat.c gloss/semihost-sys_stat_common.c \
-	gloss/semihost-sys_unlink.c gloss/semihost-sys_write.c
+	gloss/semihost-sys_read.c gloss/semihost-sys_stat.c \
+	gloss/semihost-sys_stat_common.c gloss/semihost-sys_unlink.c \
+	gloss/semihost-sys_write.c gloss/sys_sbrk.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@am_libmetal_gloss_semihost_a_OBJECTS =  \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT) \
@@ -185,11 +185,11 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_lseek.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_open.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_read.$(OBJEXT) \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_sbrk.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat_common.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_unlink.$(OBJEXT) \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_write.$(OBJEXT)
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_write.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_sbrk.$(OBJEXT)
 libmetal_gloss_semihost_a_OBJECTS =  \
 	$(am_libmetal_gloss_semihost_a_OBJECTS)
 libmetal_gloss_a_AR = $(AR) $(ARFLAGS)
@@ -647,11 +647,11 @@ libmetal_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_lseek.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_open.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_read.c \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_sbrk.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_stat_common.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_unlink.c \
-@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_write.c
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/semihost-sys_write.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_sbrk.c
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -752,8 +752,6 @@ gloss/semihost-sys_open.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/semihost-sys_read.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
-gloss/semihost-sys_sbrk.$(OBJEXT): gloss/$(am__dirstamp) \
-	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/semihost-sys_stat.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/semihost-sys_stat_common.$(OBJEXT): gloss/$(am__dirstamp) \
@@ -761,6 +759,8 @@ gloss/semihost-sys_stat_common.$(OBJEXT): gloss/$(am__dirstamp) \
 gloss/semihost-sys_unlink.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/semihost-sys_write.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_sbrk.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 
 libmetal-gloss-semihost.a: $(libmetal_gloss_semihost_a_OBJECTS) $(libmetal_gloss_semihost_a_DEPENDENCIES) $(EXTRA_libmetal_gloss_semihost_a_DEPENDENCIES) 
@@ -814,8 +814,6 @@ gloss/sys_open.$(OBJEXT): gloss/$(am__dirstamp) \
 gloss/sys_openat.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/sys_read.$(OBJEXT): gloss/$(am__dirstamp) \
-	gloss/$(DEPDIR)/$(am__dirstamp)
-gloss/sys_sbrk.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/sys_stat.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
@@ -1000,7 +998,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_lseek.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_open.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_read.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_stat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_stat_common.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/semihost-sys_unlink.Po@am__quote@

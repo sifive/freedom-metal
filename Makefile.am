@@ -242,11 +242,11 @@ libmetal_gloss_semihost_a_SOURCES = \
 	gloss/semihost-sys_lseek.c \
 	gloss/semihost-sys_open.c \
 	gloss/semihost-sys_read.c \
-	gloss/semihost-sys_sbrk.c \
 	gloss/semihost-sys_stat.c \
 	gloss/semihost-sys_stat_common.c \
 	gloss/semihost-sys_unlink.c \
-	gloss/semihost-sys_write.c
+	gloss/semihost-sys_write.c \
+	gloss/sys_sbrk.c
 
 endif
 
