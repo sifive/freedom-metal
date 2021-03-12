@@ -1,4 +1,7 @@
 /**
+ * Copyright 2021 SiFive, Inc
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * HCA registers
  * @file sifive_hca1_regs.h
  * @brief registers definition of HCA revision 1.0.0
@@ -519,13 +522,13 @@ typedef struct _HCA_PKA {
             uint32_t   _reserved1;
     __IM    uint32_t   SR;            /**< Offset: 0x10 (R/ ) PKA control */
             uint32_t   _reserved2;
-    __IOM   uint32_t   OPA;           /**< Offset: 0x18 (R/W) PKA Operand A Address */
-            uint32_t   _reserved3[3U];
-    __IOM   uint32_t   OPB;           /**< Offset: 0x28 (R/W) PKA Operand B Address */
-            uint32_t   _reserved4[3U];
-    __IOM   uint32_t   RES;           /**< Offset: 0x38 (R/W) PKA Result Address */
-            uint32_t   _reserved5[3U];
-    __IOM   uint32_t   MOD;           /**< Offset: 0x48 (R/W) PKA Modulo Address */
+    __IOM   uint64_t   OPA;           /**< Offset: 0x18 (R/W) PKA Operand A Address */
+            uint32_t   _reserved3[2U];
+    __IOM   uint64_t   OPB;           /**< Offset: 0x28 (R/W) PKA Operand B Address */
+            uint32_t   _reserved4[2U];
+    __IOM   uint64_t   RES;           /**< Offset: 0x38 (R/W) PKA Result Address */
+            uint32_t   _reserved5[2U];
+    __IOM   uint64_t   MOD;           /**< Offset: 0x48 (R/W) PKA Modulo Address */
 } HCA_PKA_Type;
 
 /**
