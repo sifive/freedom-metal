@@ -38,7 +38,7 @@ static int __metal_sifive_otp_read(uintptr_t otp_control_base, uint64_t addr, co
 
 	OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_READ_CONFIG;
 	value = (*(uint32_t*)addr);
-	//printf(" opt read %x val %x mask %x\n",addr,value,mask);
+	DEBUG_PRINT(" opt read %x val %x mask %x\n",addr,value,mask);
 	value &= mask;
 	value=value>>pos;
 	*((uint32_t *)rx_buff) = value;
@@ -99,7 +99,7 @@ static int __metal_sifive_otp_read_block(uintptr_t otp_control_base, uint64_t ad
 		OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = 0x104C2700;
 		value = (*(uint32_t*)addr);
 		value &= mask;
-		/*printf(" opt read %x val %x mask %x\n",addr,value,mask);*/
+		DEBUG_PRINT(" opt read %x val %x mask %x\n",addr,value,mask);
 		*((uint32_t *)rx_buff) = value;
 		rx_buff += 4;
 		addr +=	4;

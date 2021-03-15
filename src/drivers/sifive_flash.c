@@ -14,6 +14,14 @@
 #include <stdio.h>
 #include <metal/qspi.h>
 
+
+#define FLASH_DEFAULT_DUMMY 8
+#define FLASH_DEFAULT_OPCODE FLASH_CMD_QUAD_O_READ //1-1-4 QUAD FAst read
+
+#define PRINT_DEBUG_INFO
+#define PRINT_DEBUG_ERROR
+
+
 //#define AXI_FLASH_BASEADDR		 0x20000000UL
 
 static qspi_static_config_t qcfg;
@@ -83,12 +91,14 @@ static void flash_send_write_en(struct metal_flash *pfl)
 	metal_qspi_setcommand_params(qspi,&cmd_cfg,cfg);
 
 	metal_qspi_execute_cmd(qspi);
+
+
 }
 
 /* If we want to write less data use APB write
  *
  * */
-static int flash_write(struct metal_flash *pfl)
+static int flash_write(struct metal_flash *pfl,long int dst_addr_offset,size_t length,char *tx_buff)
 {
 
 	uint32_t read_status;
@@ -97,16 +107,20 @@ static int flash_write(struct metal_flash *pfl)
 	flash_send_write_en(pfl);
 
 	cmd_cfg.custom_command=QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_TX_DATA_PH_EN;
-	cmd_cfg.opcode=QSPI_SINGLE_BURST;
+	cmd_cfg.opcode=QSPI_APB_ACCESS;
+	cmd_cfg.addr=dst_addr_offset;
 	//cmd_cfg.dummy_stg=0;
 	//cmd_cfg.mode_stg=0;
 	//cmd_cfg.addr=0;
 	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+
+	metal_qspi_write(qspi,dst_addr_offset,4,tx_buff);
+
 	metal_qspi_execute_cmd(qspi);
 
 	do {
 		read_status = flash_status_read(pfl);
-	} while ((read_status & 0x1) == 0x1);
+	} while ((read_status & 0x1) != 0x1);
 	return 0;
 }
 /*
@@ -158,13 +172,14 @@ static int flash_write_page(struct metal_flash *pfl,long int dst_addr_offset,siz
 		/* wait until write in progress */
 		do {
 			read_status = flash_status_read(pfl);
-		} while ((read_status & 0x1) == 0x1);
+		} while ((read_status & 0x1) != 0x1);
 
 	}
-	printf("qspi_axi_write %d bytes written via AXI Write\n", length);
+	DEBUG_INFO("qspi_axi_write %d bytes written via AXI Write\n", length);
 
 	return 0;
 }
+
 
 static void flash_send_command_read(struct metal_flash *pfl)
 {
@@ -211,24 +226,41 @@ static int flash_is_busy(void)
 /*********************************************************************************************************************/
 int __metal_driver_sifive_flash_init(struct metal_flash *gflash,void *ptr)
 {
-	unsigned long baud_rate=100000;
+	unsigned long baud_rate=METAL_FLASH_BAUD;
 	struct __metal_driver_sifive_flash *flash = (void *)gflash;
 
-
-	/* Set-up initial parameters */
-   	qcfg.addrlen = QSPI_ADDR_24BIT;
-   	qcfg.rxlen = QSPI_32BIT;
-   	qcfg.txlen = QSPI_32BIT;
-   	qcfg.cs_i = QSPI_DEVICE_0;
-   	qcfg.clk_div = QSPI_DIV_1;
-   	qcfg.bit_align = QSPI_MSB_FIRST;
-   	qcfg.speedmode = QSPI_CMD_ADDR_SERIAL;
+	memset((void *)&qcfg,0,sizeof(qspi_static_config_t));
+   	/* Set-up initial parameters */
+   	qcfg.addrlen 	= QSPI_ADDR_24BIT;
+   	qcfg.rxlen 	= QSPI_32BIT;
+   	qcfg.txlen 	= QSPI_32BIT;
+   	qcfg.cs_i 	= QSPI_DEVICE_0;
+   	qcfg.clk_div 	= QSPI_DIV_4;//TODO 
+   	qcfg.wrmode  	= QSPI_READ;
+   	qcfg.bit_align 	= QSPI_MSB_FIRST;
+   	qcfg.clock_polarity=0;
+   	qcfg.opmode	= QSPI_QUAD;
+   	qcfg.speedmode 	= QSPI_CMD_ADDR_SERIAL;
    	qcfg.write_prot = QSPI_WRITE_PROT_DIS;
-   	qcfg.hold = QSPI_HOLD_DIS;
-   	qcfg.burstmode = QSPI_APB_ACCESS;
+   	qcfg.hold 	= QSPI_HOLD_DIS;
+   	qcfg.burstmode 	= QSPI_SINGLE_BURST;
+	qcfg.rxdelay	=0;
+   	qcfg.rxfinedelay=0;
+   	qcfg.rx_dly_half_clk=0;
+   	qcfg.rx_phshift_bypass=0;
 
 	qspi = metal_qspi_get_device(0);
 	metal_qspi_init(qspi,baud_rate);
+
+	metal_qspi_setconfig(qspi,&qcfg);
+
+	cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_RX_DATA_PH_EN);
+	cmd_cfg.dummy_stg	= QSPI_SET_DUMMY_DLP(0, FLASH_DEFAULT_DUMMY, 0);
+	cmd_cfg.mode_stg	= QSPI_SET_MODE_REG(0, 0x0);
+	cmd_cfg.opcode		= FLASH_CMD_QUAD_O_READ;
+	
+	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+	
 	return 0;
 }
 
@@ -256,6 +288,15 @@ int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, c
 	else
 	{
 		/*set command enable, address phase enable, dummy phase enable, mode phase enable, read phase enable*/
+		
+		if (flash->opcode == FLASH_CMD_QUAD_O_READ)
+		{
+			cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_RX_DATA_PH_EN);
+		}else 
+		{
+			cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
+		}
+
 		cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
 		cmd_cfg.dummy_stg	= QSPI_SET_DUMMY_DLP(0, (flash->dummy_count - 1), 0);
 		cmd_cfg.mode_stg	= QSPI_SET_MODE_REG((flash->mode_count - 1), 0x0);
@@ -272,40 +313,51 @@ int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, c
 /* Implement flash write operation here */
 int __metal_driver_sifive_flash_write(struct metal_flash *flash, uint32_t mem_addr_offset, const size_t size, char *tx_buf)
 {
-	uint32_t read_status;
+	uint32_t read_status=0;
 	qspi_static_config_t *cfg = &qcfg;
 
-	flash_send_write_en(flash);
-	
-	cfg->addrlen   = QSPI_ADDR_24BIT;
-	cfg->rxlen     = QSPI_32BIT;
-	cfg->txlen     = QSPI_32BIT;
-	cfg->wrmode    = QSPI_WRITE;
-	cfg->opmode    = QSPI_SPI;
-	cfg->speedmode = QSPI_CMD_SERIAL;
-	cfg->burstmode = QSPI_SINGLE_BURST;
+	uint32_t *dataptr=(uint32_t *)tx_buf;
+	uint32_t *memaddr=(uint32_t *)mem_addr_offset;
+
+	printf(" Size %d\n" , size);
+
+	for(int i=0;i<size/4;i++)
+	{
+		flash_send_write_en(flash);
+
+		cfg->addrlen   = QSPI_ADDR_24BIT;
+		cfg->rxlen     = QSPI_32BIT;
+		cfg->txlen     = QSPI_32BIT;
+		cfg->wrmode    = QSPI_WRITE;
+		cfg->opmode    = (flash->mode & 0x0F);
+		cfg->speedmode = ((flash->mode & 0xF0) >> 4);
+
+		cmd_cfg.opcode   = flash->opcode;
+
+		/*set cmd_en and tx_data, address enable phase*/
+		cmd_cfg.custom_command = (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_TX_DATA_PH_EN);
+
+		cfg->burstmode = QSPI_SINGLE_BURST;/*set AXI mode*/
+		metal_qspi_setconfig(qspi,cfg);
+
+		metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
 
 
-	cmd_cfg.opcode = FLASH_CMD_PAGE_PROGRAM;
-	/*set cmd_en and tx_data, address enable phase*/
-	cmd_cfg.custom_command = (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_TX_DATA_PH_EN);
+		//metal_qspi_write(qspi,(mem_addr_offset+i),4,(tx_buf+i));
+		metal_qspi_write(qspi,memaddr,4,(uint8_t*)dataptr);
 
-	cfg->burstmode = QSPI_SINGLE_BURST;/*set AXI mode*/
-	metal_qspi_setconfig(qspi,cfg);
+		printf("mem_addr_offset %x, i=%d  tx_buf %x %x\n",memaddr,i,dataptr,*dataptr);
 
-	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+		memaddr++;
+		dataptr++;
 
-
-	for(int i=0;i<size/4;i+=4)
-	{	
-		metal_qspi_write(qspi,(mem_addr_offset+i),4,(tx_buf+i));
 
 		/* wait until write in progress */
 		do {
 			read_status = flash_status_read(flash);
 		} while ((read_status & 0x1) == 0x1);
 	}
-	printf("\nflash_write %d bytes written via AXI Write\n", size);
+	DEBUG_INFO("flash_write %d bytes written via AXI Write\n", i);
 
 	return 0;
 }
@@ -336,36 +388,44 @@ int __metal_driver_sifive_flash_erase(struct metal_flash *flash, unsigned int ad
 	 * cmd_cfg.opcode = FLASH_BLOCK_ERASE
 	 * */
 
+	int num_of_sectors=((size/FLASH_SECTOR_SIZE)==0)?1:(size/FLASH_SECTOR_SIZE);
 	/* Sector erase */
-	uint32_t read_status;
-	flash_send_write_en(flash);
 
-	/*	following code is implemented in flash_send_write_en()
-	 * qspi_static_config_t *cfg=&qcfg;
+	for(int i=0;i<num_of_sectors;i++)
+	{
+		uint32_t read_status;
+		flash_send_write_en(flash);
 
-	 cfg->addrlen = QSPI_ADDR_24BIT;
-	 cfg->wrmode = QSPI_WRITE;
-	 cfg->rxlen = QSPI_32BIT;
-	 cfg->txlen = QSPI_32BIT;
-	 cfg->opmode = QSPI_SPI;
-	 cfg->burstmode = QSPI_APB_ACCESS;
-	 metal_qspi_setconfig(qspi,cfg);
-	 */
+		/*	following code is implemented in flash_send_write_en()
+		 * qspi_static_config_t *cfg=&qcfg;
 
-	cmd_cfg.opcode = FLASH_CMD_SECTOR_ERASE;
-	cmd_cfg.custom_command = QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN;
-	cmd_cfg.addr = addr;
-	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+		 cfg->addrlen = QSPI_ADDR_24BIT;
+		 cfg->wrmode = QSPI_WRITE;
+		 cfg->rxlen = QSPI_32BIT;
+		 cfg->txlen = QSPI_32BIT;
+		 cfg->opmode = QSPI_SPI;
+		 cfg->burstmode = QSPI_APB_ACCESS;
+		 metal_qspi_setconfig(qspi,cfg);
+		 */
 
-	metal_qspi_execute_cmd(qspi);
+		cmd_cfg.opcode = FLASH_CMD_SECTOR_ERASE;
 
-	printf(" Erase flash sector from %x \n", addr);
+		cmd_cfg.custom_command = QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN;
+		cmd_cfg.addr = addr;
+		metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
 
-	/*set cmd_en and address enable phase*/
+		metal_qspi_execute_cmd(qspi);
 
-	do {
-		read_status = flash_status_read(flash);
-	} while ((read_status & 0x1) == 0x1);
+		printf(" Erase flash sector from %x \n", addr);
+
+		/*set cmd_en and address enable phase*/
+
+		do {
+			read_status = flash_status_read(flash);
+		} while ((read_status & 0x1) == 0x1);
+
+		addr=addr+FLASH_SECTOR_SIZE+1;
+	}
 
 	return 0;
 }
@@ -402,11 +462,11 @@ int __metal_driver_sifive_flash_register_read(struct metal_flash *flash, reg_rea
 		/* Check SFDP signature */
 		if (data[0] == 'S' && data[1] == 'F' && data[2] == 'D' && data[3] == 'P')
 		{
-			printf("The device supports SFDP.\n");
+			DEBUG_INFO("The device supports SFDP.\n");
 			return 0;
 		}
 		else {
-			printf("The device does not support SFDP.\n");
+			DEBUG_ERROR("The device does not support SFDP.\n");
 			return -1;
 		}
 	}
@@ -470,7 +530,7 @@ int __metal_driver_sifive_flash_register_write(struct metal_flash *flash, reg_wr
 
 	do {
 		read_status = flash_status_read(flash);
-	} while ((read_status & 0x1) == 0x1);
+	} while ((read_status & 0x1)== 0x1);
 
 	return 0;
 }
@@ -491,6 +551,8 @@ int __metal_driver_sifive_flash_qpi_mode(struct metal_flash *flash)
 	/*set command enable*/
 	cmd_cfg.custom_command	= QSPI_OPCODE_PH_EN;
 	cmd_cfg.opcode		= flash->opcode;
+	cmd_cfg.dummy_stg	= QSPI_SET_DUMMY_DLP(0, (flash->dummy_count - 1), 0);
+	cmd_cfg.mode_stg	= QSPI_SET_MODE_REG(flash->dummy_count - 1, 0x0);
 
 	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
 
@@ -507,14 +569,14 @@ int __metal_driver_sifive_flash_manufacturer(struct metal_flash *flash, uint32_t
 	qspi_static_config_t *cfg=&qcfg;
 
 	cfg->wrmode	= QSPI_READ;
-	cfg->rxlen	= QSPI_8BIT;
+	cfg->rxlen	= QSPI_24BIT;
 	cfg->txlen	= QSPI_8BIT;
 	if (flash->mode == FLASH_MODE_444) {
 		cfg->opmode	= (flash->mode & 0x0F);
 		cfg->speedmode	= ((flash->mode & 0xF0) >> 4);
 	} else {
 		cfg->opmode	= QSPI_SPI;
-		cfg->speedmode	= QSPI_CMD_SERIAL;
+		cfg->speedmode	= QSPI_CMD_ADDR_SERIAL;
 	}
 	cfg->burstmode	= QSPI_APB_ACCESS;
 
@@ -528,36 +590,38 @@ int __metal_driver_sifive_flash_manufacturer(struct metal_flash *flash, uint32_t
 
 	metal_qspi_execute_cmd(qspi);
 
+
+
 	metal_qspi_read(qspi, 0, 1, (uint8_t *)&jd_mfr_id);
 
 	*mfr_id = jd_mfr_id;
-	
-	printf("Manufacturer ID: 0x%x\n", jd_mfr_id);
-	
-	switch (jd_mfr_id) {
+
+	DEBUG_INFO("Manufacturer ID: 0x%x\n", jd_mfr_id);
+
+	switch (jd_mfr_id&0xFF) {
 
 		case SPI_FLASH_MFR_ISSI: 
-			printf("Name of Manufacturer: Integrated Silicon\n");
+			DEBUG_INFO("Name of Manufacturer: Integrated Silicon\n");
 			break;
 
 		case SPI_FLASH_MFR_MICRON:
-			printf("Name of Manufacturer: Micron\n");
+			DEBUG_INFO("Name of Manufacturer: Micron\n");
 			break;
 
 		case SPI_FLASH_MFR_MACRONIX:
-			printf("Name of Manufacturer: Macronix\n");
+			DEBUG_INFO("Name of Manufacturer: Macronix\n");
 			break;
 
 		case SPI_FLASH_MFR_WINBOND:
-			printf("Name of Manufacturer: Winbond\n");
+			DEBUG_INFO("Name of Manufacturer: Winbond\n");
 			break;
 
 		case SPI_FLASH_MFR_GIGADEV:
-			printf("Name of Manufacturer: GigaDevice\n");
+			DEBUG_INFO("Name of Manufacturer: GigaDevice\n");
 			break;
 
 		case SPI_FLASH_MFR_SPANSION:
-			printf("Name of Manufacturer: Spansion\n");
+			DEBUG_INFO("Name of Manufacturer: Spansion\n");
 			break;
 
 		default:
@@ -569,6 +633,8 @@ int __metal_driver_sifive_flash_manufacturer(struct metal_flash *flash, uint32_t
 
 int __metal_driver_sifive_flash_soft_reset(struct metal_flash *flash)
 {
+	int retval=0;
+
 	qspi_static_config_t *cfg=&qcfg;
 
 	cfg->addrlen	= QSPI_ADDR_32BIT;
@@ -591,15 +657,18 @@ int __metal_driver_sifive_flash_soft_reset(struct metal_flash *flash)
 
 	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
 
-	metal_qspi_execute_cmd(qspi);
+	retval=metal_qspi_execute_cmd(qspi);
+	if(retval==0)
+	{
+		cmd_cfg.opcode		= FLASH_CMD_RST;
 
-	cmd_cfg.opcode		= FLASH_CMD_RST;
-
-	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
-
-	metal_qspi_execute_cmd(qspi);
-
-	return 0;
+		retval=metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+		if(retval==0)
+		{
+			retval=metal_qspi_execute_cmd(qspi);
+		}
+	}
+	return retval;
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_flash) = {
@@ -618,417 +687,4 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_flash) = {
 #endif /*METAL_SIFIVE_FLASH*/
 typedef int no_empty_translation_units;
 
-#if 0
-/* Flash read in AXI QUAD DDR mode */
-void flash_axi_quad_ddr_read(uint32_t src_addr,uint8_t *rxdata,uint32_t length) {
 
-	uint32_t *axi_addr = (uint32_t*) (AXI_FLASH_BASEADDR+src_addr);
-	qspi_config *cfg;
-	cfg = qspi_getconfig();
-
-	cfg->addrlen = QSPI_ADDR_32BIT;
-	cfg->rxlen = QSPI_32BIT;
-	cfg->txlen = QSPI_32BIT;
-	cfg->wrmode = QSPI_READ;
-	cfg->opmode = QSPI_QUAD_DDR;
-	cfg->speedmode = QSPI_CMD_SERIAL;
-	cfg->burstmode = QSPI_SINGLE_BURST;
-	qspi_setconfig(cfg);
-
-	/*set command enable, address enable phase,dummy phase enable,
-	 * mode phase enable,read enable phase*/
-	qspi_set_custom_cmd(
-			QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN
-			| QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
-
-	qspi_set_mode_reg(0x1, 0x00);
-
-	qspi_set_dummy_dlp(1, 5, 0);
-
-	qspi_set_opcode(DDR_QUAD_READ_CMD);
-
-	/* Read length/4 locations */
-	for (int i = 0; i < length; i+=4) {
-		printf("QSPI AXI QUAD DDR Read at address %x:%x \n", axi_addr, *axi_addr);
-		*(rxdata+i)=*axi_addr;
-		axi_addr++;
-	}
-}
-
-/* Flash read in AXI QUAD mode */
-void flash_axi_quad_read(uint32_t src_addr,uint8_t *rxdata,uint32_t length) {
-
-	uint32_t *axi_addr = (uint32_t*) (AXI_FLASH_BASEADDR+src_addr);
-	qspi_config *cfg;
-
-	cfg = qspi_getconfig();
-	cfg->addrlen = QSPI_ADDR_32BIT;
-	cfg->rxlen = QSPI_32BIT;
-	cfg->txlen = QSPI_32BIT;
-	cfg->wrmode = QSPI_READ;
-	cfg->opmode = QSPI_QUAD;
-	cfg->speedmode = QSPI_CMD_SERIAL;
-	cfg->burstmode = QSPI_SINGLE_BURST;
-
-	qspi_setconfig(cfg);
-
-	/*set command enable, address enable phase,dummy phase enable,
-	 * mode phase enable,read enable phase*/
-	qspi_set_custom_cmd(
-			QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN
-			| QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
-
-	qspi_set_mode_reg(0x1, 0x00);
-
-	qspi_set_dummy_dlp(0, 3, 0);
-
-	qspi_set_opcode(QUAD_READ_CMD);
-
-	/* Read length/4 locations */
-	for (int i = 0; i < length; i+=4) {
-		printf("QSPI AXI QUAD DDR Read at address %x:%x \n", axi_addr, *axi_addr);
-		*(rxdata+i)=*axi_addr;
-		axi_addr++;
-	}
-}
-
-/* Read Flash ID */
-static uint32_t flash_id_read(void) {
-
-
-}
-
-
-
-/* Flash write in AXI QUAD mode */
-static void flash_apb_quad_write(uint32_t dst_addr_offset,uint8_t *txdata,uint32_t length) {
-
-	qspi_config *cfg;
-	uint32_t tempaddr = (AXI_FLASH_BASEADDR+dst_addr_offset);
-	uint32_t read_status, cnt;
-
-	for (cnt = 0; cnt < length; cnt+=4) {
-
-		cfg = qspi_getconfig();
-
-		cfg->addrlen = QSPI_ADDR_24BIT;
-		cfg->wrmode = QSPI_WRITE;
-		cfg->opmode = QSPI_QUAD;
-		cfg->rxlen = QSPI_32BIT;
-		cfg->txlen = QSPI_32BIT;
-		cfg->burstmode = QSPI_APB_ACCESS;
-		cfg->speedmode = QSPI_CMD_ADDR_SERIAL;
-		qspi_setconfig(cfg);
-
-		qspi_set_opcode(WRITE_EN);
-		/*set command enable*/
-		qspi_set_custom_cmd(QSPI_OPCODE_PH_EN);
-		/*start command*/
-		qspi_apb_rw_trigger();
-
-		qspi_set_opcode(QUAD_WRITE);
-		qspi_apb_setaddr(tempaddr);
-
-		/*set cmd_en and tx_data, address enable phase*/
-		qspi_set_custom_cmd(
-				QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_TX_DATA_PH_EN);
-		qspi_apb_write((uint32_t)*(txdata+cnt));
-		tempaddr += 4;
-		/*start command*/
-		qspi_apb_rw_trigger();
-
-		do {
-			read_status = flash_status_read(flash);
-		} while ((read_status & 0x1) == 0x1);
-	}
-
-	printf("%d bytes written via APB QUAD Write, \n", cnt * 4);
-}
-
-/* Flash write in XIAPB QUAD mode */
-static void flash_axi_quad_write(uint32_t dst_addr_offset,uint8_t *txdata,uint32_t length) {
-
-	qspi_config *cfg;
-	uint32_t tempaddr = (AXI_FLASH_BASEADDR+dst_addr_offset);
-	uint32_t read_status, cnt;
-
-	uint32_t *axi_addr = (uint32_t*)(AXI_FLASH_BASEADDR+dst_addr_offset);
-
-	for (cnt = 0; cnt < length; cnt+=4)
-	{
-
-		cfg = qspi_getconfig();
-
-		cfg->addrlen = QSPI_ADDR_24BIT;
-		cfg->burstmode = QSPI_APB_ACCESS;
-		cfg->wrmode = QSPI_WRITE;
-		cfg->opmode = QSPI_QUAD;
-		cfg->rxlen = QSPI_32BIT;
-		cfg->txlen = QSPI_32BIT;
-		cfg->speedmode = QSPI_CMD_ADDR_SERIAL;
-		qspi_setconfig(cfg);
-
-		qspi_set_opcode(WRITE_EN);
-		/*set command enable*/
-		qspi_set_custom_cmd(QSPI_OPCODE_PH_EN);
-		/*start command*/
-		qspi_apb_rw_trigger();
-
-		qspi_set_opcode(QUAD_WRITE);
-
-		/*set cmd_en and tx_data, address enable phase*/
-		qspi_set_custom_cmd(
-				QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_TX_DATA_PH_EN);
-
-		cfg->burstmode = QSPI_SINGLE_BURST;
-		qspi_setconfig(cfg); /* set AXI mode */
-
-		*axi_addr = *(txdata+cnt);
-
-		axi_addr++;
-
-		/* wait unit write in progress */
-		do {
-			read_status = flash_status_read(flash);
-		} while ((read_status & 0x1) == 0x1);
-	}
-
-	printf("%d bytes written via AXI QUAD Write, pattern: 0xBEECEEXX \n", cnt * 4);
-}
-
-
-/*
- * SDR WRITE
- *
- * */
-static void flash_apb_write(uint32_t dst_addr_offset,uint8_t *txdata,uint32_t length) {
-
-	uint32_t read_status, cnt;
-	uint32_t tempaddr = (AXI_FLASH_BASEADDR+dst_addr_offset);
-
-	qspi_config *cfg;
-	cfg = qspi_getconfig();
-
-	for (int cnt = 0; cnt < length; cnt+=4)
-	{
-
-		cfg->addrlen = QSPI_ADDR_24BIT;
-		cfg->wrmode = QSPI_WRITE;
-		cfg->rxlen = QSPI_32BIT;
-		cfg->txlen = QSPI_32BIT;
-		cfg->opmode = QSPI_SPI;
-		cfg->burstmode = QSPI_APB_ACCESS;
-		qspi_setconfig(cfg);
-
-		qspi_set_opcode(WRITE_EN);
-
-
-		/*set command enable*/
-		qspi_set_custom_cmd(QSPI_OPCODE_PH_EN);
-
-		/*start command*/
-		qspi_apb_rw_trigger();
-
-		qspi_set_opcode(PAGE_PROGRAM_3BYTE_ADDR);
-
-
-		qspi_apb_setaddr(dst_addr_offset+cnt);
-		/*set cmd_en and tx_data, address enable phase*/
-		qspi_set_custom_cmd(
-				QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_TX_DATA_PH_EN);
-
-		qspi_apb_write(*(txdata+cnt));
-		/*start command*/
-		qspi_apb_rw_trigger();
-
-		do {
-			read_status = flash_status_read(flash);
-		} while ((read_status & 0x1) == 0x1);
-	}
-
-	printf("%d bytes written via APB SPI mode Write, pattern: 0xCAFFE9XX \n", cnt * 4);
-}
-
-static void flash_erase(uint32_t dst_addr,uint32_t length) {
-
-
-}
-
-/**
- * APB SDR READ
- */
-static void flash_apb_read(uint32_t dst_addr_offset,uint8_t *rxdata,uint32_t length) {
-
-	uint32_t cnt;
-
-	qspi_config *cfg;
-	cfg = qspi_getconfig();
-
-	cfg->addrlen = QSPI_ADDR_24BIT;
-	cfg->wrmode = QSPI_READ;
-	cfg->rxlen = QSPI_32BIT;
-	cfg->txlen = QSPI_32BIT;
-	cfg->opmode = QSPI_SPI;
-	cfg->burstmode = QSPI_APB_ACCESS;
-	qspi_setconfig(cfg);
-
-	/*set cmd_en and rx_data,address enable phase*/
-	qspi_set_custom_cmd(
-			QSPI_RX_DATA_PH_EN | QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN);
-
-
-	/* Read length/4 locations */
-	for (int i = 0; i < length; i+=4)
-	{
-		qspi_set_opcode(READ_CMD);
-		qspi_apb_setaddr(dst_addr_offset+i);
-		qspi_set_dummy_dlp(0, 3, 0);
-		/*start command*/
-		qspi_apb_rw_trigger();
-
-		for (volatile int i = 0; i < 5; i++)
-			;
-
-		qspi_apb_read((uint32_t *)(rxdata+i));
-		printf("APB DUAL mode Read at %x: %x \n", dst_addr_offset+i, rxdata[i]);
-	}
-
-}
-
-/**
- *
- *
- */
-static void flash_apb_dual_read(uint32_t dst_addr_offset,uint8_t *rxdata,uint32_t length) {
-
-	uint32_t cnt=0;
-
-	qspi_config *cfg;
-	cfg = qspi_getconfig();
-
-	cfg->addrlen = QSPI_ADDR_24BIT;
-	cfg->wrmode = QSPI_READ;
-	cfg->rxlen = QSPI_32BIT;
-	cfg->txlen = QSPI_32BIT;
-	cfg->opmode = QSPI_DUAL;
-	cfg->speedmode = QSPI_CMD_SERIAL;
-	cfg->burstmode = QSPI_APB_ACCESS;
-	qspi_setconfig(cfg);
-
-	/*set cmd_en and rx_data, dummy phase,address enable phase*/
-	qspi_set_custom_cmd(
-			QSPI_RX_DATA_PH_EN | QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN
-			| QSPI_DUMMY_PH_EN);
-
-	/* Read length/4 locations */
-	for (int i = 0; i < length; i+=4)
-	{
-		qspi_set_opcode(DUAL_READ);
-		qspi_apb_setaddr(dst_addr_offset+i);
-		qspi_set_dummy_dlp(0, 3, 0);
-		/*start command*/
-		qspi_apb_rw_trigger();
-
-		for (volatile int i = 0; i < 5; i++)
-			;
-
-		qspi_apb_read((uint32_t *)(rxdata+i));
-		printf("APB DUAL mode Read at %x: %x \n", dst_addr_offset+i, rxdata[i]);
-	}
-}
-
-/**
- *SDR mode AXI write
- *
- */
-void flash_axi_write(uint32_t dst_addr_offset,uint8_t *txdata,uint32_t length)
-{
-	uint32_t read_status, cnt;
-	uint32_t *axi_addr = (uint32_t*)(METAL_QSPI_AXI_BASE_ADDR+dst_addr_offset);
-
-	qspi_config *cfg;
-	cfg = qspi_getconfig();
-
-	cfg->addrlen = QSPI_ADDR_24BIT;
-	cfg->burstmode = QSPI_APB_ACCESS;
-	cfg->wrmode = QSPI_WRITE;
-	cfg->opmode = QSPI_SPI;
-	cfg->rxlen = QSPI_32BIT;
-	cfg->txlen = QSPI_32BIT;
-	qspi_setconfig(cfg);
-
-	qspi_set_opcode(WRITE_EN);
-	/*set command enable*/
-	qspi_set_custom_cmd(QSPI_OPCODE_PH_EN);
-	/*start command*/
-	qspi_apb_rw_trigger();
-
-	qspi_set_opcode(PAGE_PROGRAM_3BYTE_ADDR);
-
-	/*set cmd_en and tx_data, address enable phase*/
-	qspi_set_custom_cmd(
-			QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_TX_DATA_PH_EN);
-
-	cfg->burstmode = QSPI_SINGLE_BURST;
-	qspi_setconfig(cfg); /* set AXI mode */
-
-
-	uint32_t *dataptr=(uint32_t *)txdata;
-
-	for(int i=0;i<length;i+=4)
-	{
-		*axi_addr = *dataptr;
-
-		dataptr++;
-		axi_addr++;
-
-		/* wait until write in progress */
-		do {
-			read_status = flash_status_read(flash);
-		} while ((read_status & 0x1) == 0x1);
-
-	}
-	printf("qspi_axi_write %d bytes written via AXI Write\n", length);
-}
-
-
-/**
- *SDR mode AXI write
- *
- */
-void flash_axi_read(uint32_t dst_addr_offset,uint8_t *rxdata,uint32_t length)
-{
-	uint32_t *axi_addr = (uint32_t*) (METAL_QSPI_AXI_BASE_ADDR+dst_addr_offset);
-	qspi_config *cfg;
-
-	cfg = qspi_getconfig();
-	cfg->addrlen = QSPI_ADDR_32BIT;
-	cfg->rxlen = QSPI_32BIT;
-	cfg->txlen = QSPI_32BIT;
-	cfg->wrmode = QSPI_READ;
-	cfg->opmode = QSPI_SPI;
-	cfg->speedmode = QSPI_CMD_SERIAL;
-	cfg->burstmode = QSPI_SINGLE_BURST;
-
-	qspi_setconfig(cfg);
-
-	/*set command enable, address enable phase,dummy phase enable,
-	 * mode phase enable,read enable phase*/
-	qspi_set_custom_cmd(
-			QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN
-			| QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
-
-	qspi_set_mode_reg(0x1, 0x00);
-
-	qspi_set_dummy_dlp(0, 3, 0);
-
-	qspi_set_opcode(QUAD_READ_CMD);
-
-	/* Read length/4 locations */
-	for (int i = 0; i < length; i+=4) {
-		printf("QSPI AXI QUAD DDR Read at address %x:%x \n", axi_addr, *axi_addr);
-		*(rxdata+i)=*axi_addr;
-		axi_addr++;
-	}
-}
-#endif

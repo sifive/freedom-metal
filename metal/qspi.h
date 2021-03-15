@@ -39,14 +39,14 @@ struct metal_qspi_config {
 };
 
 struct metal_qspi_vtable {
-    void (*init)(struct metal_qspi *qspi, uint32_t baud_rate);
+    int (*init)(struct metal_qspi *qspi, uint32_t baud_rate);
     int (*setconfig)(struct metal_qspi *qspi,qspi_static_config_t *cfg);
-    void (*setcommand_params)(struct metal_qspi *qspi,qspi_command_config_t *cparams,qspi_static_config_t *cfg);
+    int (*setcommand_params)(struct metal_qspi *qspi,qspi_command_config_t *cparams,qspi_static_config_t *cfg);
     int (*get_baud_rate)(struct metal_qspi *qspi);
     int (*set_baud_rate)(struct metal_qspi *qspi, uint32_t baud_rate);
     int (*read)(struct metal_qspi *qspi,uint32_t addr,size_t len,uint8_t *rx_buf);
     int (*write)(struct metal_qspi *qspi,uint32_t addr,size_t len,uint8_t *tx_buf);
-    void (*execute_cmd)(struct metal_qspi *qspi);
+    int (*execute_cmd)(struct metal_qspi *qspi);
 };
 
 /*! @brief A handle for a SPI device */
@@ -63,7 +63,7 @@ struct metal_qspi *metal_qspi_get_device(unsigned int device_num);
  * @param spi The handle for the SPI device to initialize
  * @param baud_rate The baud rate to set the SPI device to
  */
-__inline__ void metal_qspi_init(struct metal_qspi *qspi, uint32_t baud_rate) { qspi->vtable->init(qspi, baud_rate); }
+__inline__ int metal_qspi_init(struct metal_qspi *qspi, uint32_t baud_rate) { qspi->vtable->init(qspi, baud_rate); }
 
 
 /*! @brief Get the current baud rate of the SPI device
@@ -83,7 +83,7 @@ __inline__ int metal_qspi_set_baud_rate(struct metal_qspi *qspi, uint32_t baud_r
 __inline__ int metal_qspi_setconfig(struct metal_qspi *qspi,qspi_static_config_t *cfg) {return qspi->vtable->setconfig(qspi,cfg);}
 
 /* @brief Set the command parameters */
-__inline__ void metal_qspi_setcommand_params(struct metal_qspi *qspi,qspi_command_config_t *cparams,qspi_static_config_t *cfg){ qspi->vtable->setcommand_params(qspi,cparams,cfg);}
+__inline__ int metal_qspi_setcommand_params(struct metal_qspi *qspi,qspi_command_config_t *cparams,qspi_static_config_t *cfg){ qspi->vtable->setcommand_params(qspi,cparams,cfg);}
 
 /* @brief read to block of len starting from addr */
 __inline__ int metal_qspi_read(struct metal_qspi *qspi,uint32_t addr,size_t len,uint8_t *rx_buf){return qspi->vtable->read(qspi,addr,len,rx_buf);}
@@ -92,7 +92,7 @@ __inline__ int metal_qspi_read(struct metal_qspi *qspi,uint32_t addr,size_t len,
 __inline__ int metal_qspi_write(struct metal_qspi *qspi,uint32_t addr,size_t len,uint8_t *tx_buf){return qspi->vtable->write(qspi,addr,len,tx_buf);}
 
 /* @brief Initiate any APB operation */
-__inline__ void metal_qspi_execute_cmd(struct metal_qspi *qspi){ qspi->vtable->execute_cmd(qspi);}
+__inline__ int metal_qspi_execute_cmd(struct metal_qspi *qspi){ qspi->vtable->execute_cmd(qspi);}
 
 
 #endif

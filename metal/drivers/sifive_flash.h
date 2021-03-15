@@ -11,9 +11,11 @@
 #include <metal/flash.h>
 
 
+
+#define FLASH_SECTOR_SIZE			0xFFF
 #define SPI_FLASH_MAXID_LEN			20
 
-#define FLASH_CMD_PAGE_PROGRAM			0x2
+#define FLASH_CMD_PAGE_PROGRAM		0x2
 #define FLASH_CMD_ID_READ			0x9F	/* Read JEDEC ID */
 
 #define FLASH_CMD_WRSR				0x01	/* Write status register */
