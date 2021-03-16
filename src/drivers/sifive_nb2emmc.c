@@ -1,6 +1,8 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+//#define PRINT_DEBUG
+
 #define SIFIVE_NB2_EMMC
 #ifdef SIFIVE_NB2_EMMC
 
@@ -316,7 +318,7 @@ static void emmc_host_set_clock(unsigned int freq)
 
 static void emmc_host_initialization()
 {
-	printf("Doing eMMC Reset\n");
+	DEBUG_PRINT("Doing eMMC Reset\n");
 	// Software reset
 	emmc_host_reset();
 
@@ -454,7 +456,7 @@ static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 		METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = input_cmd->blocklen|(input_cmd->blockcnt<<BCCT);
 	}
 
-	printf("Sending eMMC Command CMD%d\n arg=%x",input_cmd->cmd, input_cmd->arg);
+	DEBUG_PRINT("Sending eMMC Command CMD%d\n arg=%x",input_cmd->cmd, input_cmd->arg);
 
 	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS03) = cmd;  // execute command
 
@@ -464,7 +466,7 @@ static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 
 	} while ((input_cmd->status & ((1 << CC) | (1 << EINT)) ) == 0); // exit loop when CC (command complete) flag is set to 1
 
-	printf("EMMC:CMD%d complete status %x\n",input_cmd->cmd,input_cmd->status);
+	DEBUG_PRINT("EMMC:CMD%d complete status %x\n",input_cmd->cmd,input_cmd->status);
 
 
 
@@ -483,7 +485,7 @@ static int emmc_host_send_cmd(eMMCRequest_t *input_cmd)
 		input_cmd->cmd_response[2]=METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS06);
 		input_cmd->cmd_response[3]=METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS07);
 
-		printf("Response received %x %x %x %x\n",input_cmd->cmd_response[0],input_cmd->cmd_response[1],input_cmd->cmd_response[2],input_cmd->cmd_response[3]);
+		DEBUG_PRINT("Response received %x %x %x %x\n",input_cmd->cmd_response[0],input_cmd->cmd_response[1],input_cmd->cmd_response[2],input_cmd->cmd_response[3]);
 	}
 
 	return retval;
@@ -513,7 +515,7 @@ static int emmc_select_card (uint32_t card_rca)
 		input_cmd.arg=card_rca << 16;
 		input_cmd.response_type=EMMC_RESPONSE_R1;
 		input_cmd.data_present=0;
-		printf("card selected with RCA %x \n",card_rca );
+		DEBUG_PRINT("card selected with RCA %x \n",card_rca );
 	}
 	retval=emmc_host_send_cmd(&input_cmd);
 
@@ -523,7 +525,7 @@ static int emmc_select_card (uint32_t card_rca)
 
 static void emmc_read_cid()
 {
-	printf("Reading eMMC CID: CMD2\n");
+	DEBUG_PRINT("Reading eMMC CID: CMD2\n");
 
 	//eMMCRequest_t input_cmd;
 	input_cmd.cmd=EMMC_CMD2;
@@ -533,7 +535,7 @@ static void emmc_read_cid()
 
 	emmc_host_send_cmd(&input_cmd);
 
-	printf("CID received %x %x %x %x\n",input_cmd.cmd_response[0],input_cmd.cmd_response[1],input_cmd.cmd_response[2],input_cmd.cmd_response[3]);
+	DEBUG_PRINT("CID received %x %x %x %x\n",input_cmd.cmd_response[0],input_cmd.cmd_response[1],input_cmd.cmd_response[2],input_cmd.cmd_response[3]);
 
 
 	uint32_t manufacturerId = (uint8_t)((input_cmd.cmd_response[3] >> 16) & 0xFFU);
@@ -557,11 +559,11 @@ static void emmc_read_cid()
 
 	uint32_t manufacturingDate = (uint16_t)((input_cmd.cmd_response[0]) & 0xFFFU);
 
-	printf(" manufacturerId %x\n",manufacturerId); 
-	printf(" Name %s\n",name); 
-	printf(" productRevision %x\n",productRevision); 
-	printf(" productSn %x\n",productSn); 
-	printf(" manufacturingDate %x\n",manufacturingDate); 
+	DEBUG_PRINT(" manufacturerId %x\n",manufacturerId);
+	DEBUG_PRINT(" Name %s\n",name);
+	DEBUG_PRINT(" productRevision %x\n",productRevision);
+	DEBUG_PRINT(" productSn %x\n",productSn);
+	DEBUG_PRINT(" manufacturingDate %x\n",manufacturingDate);
 }
 
 
@@ -572,7 +574,7 @@ static int emmc_card_init(unsigned int low_voltage_en)
 	uint32_t _status;
 	uint32_t _count_delay;
 
-	printf("emmc_card_init\n");
+	DEBUG_PRINT("emmc_card_init\n");
 	// CMD0 - reset all cards to IDLE state
 	//eMMCRequest_t input_cmd;
 
@@ -613,7 +615,7 @@ static int emmc_card_init(unsigned int low_voltage_en)
 
 	if(EMMC_RCA==((input_cmd.cmd_response[0]>>16) &0xFFFFU))
 	 {
-		printf("RAC set %x\n",((input_cmd.cmd_response[0]>>16) &0xFFFFU));
+		DEBUG_PRINT("RAC set %x\n",((input_cmd.cmd_response[0]>>16) &0xFFFFU));
          }
 
 	// -- initialization finished --
@@ -644,7 +646,7 @@ static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 	{
 		status = METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS12);
 		if(timeout > MAX_COUNT) {
-			printf("Exit from function \"static void emmc_card_ext_csd_write()\" due to timeout");
+			DEBUG_PRINT("Exit from function \"static void emmc_card_ext_csd_write()\" due to timeout");
 			exit(1);
 		}
 		else
@@ -662,7 +664,7 @@ static int  emmc_card_ext_csd_read(uint8_t *rx_data)
 	long int arg;
 	uint32_t timeout=0;
 
-	printf("Reading eMMC CSD EXT\n");
+	DEBUG_PRINT("Reading eMMC CSD EXT\n");
 
 	//emmc_select_card(EMMC_RCA);
 
@@ -715,7 +717,7 @@ static void emmc_card_csd_write( unsigned int index, unsigned int val)
 	do {
 		status = METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS12);
 		if(timeout > MAX_COUNT) {
-			printf("Exit from function \"static void emmc_card_ext_csd_write()\" due to timeout");
+			DEBUG_PRINT("Exit from function \"static void emmc_card_ext_csd_write()\" due to timeout");
 			exit(1);
 		}
 		else
@@ -730,7 +732,7 @@ static void emmc_card_csd_read(uint8_t *rx_data)
 	long int arg;
 	uint32_t timeout=0;
 
-	printf("Reading eMMC CSD : CMD9\n");
+	DEBUG_PRINT("Reading eMMC CSD : CMD9\n");
 
 	emmc_select_card(EMMC_RCA);
 
@@ -774,7 +776,7 @@ static int emmc_host_set_bit_width( char bit_width)
 		case 0x01: bit_width = 0x00; break;  // bus width 1b
 		case 0x04: bit_width = 0x01; status |= (1 << DTW);  break;  // bus width 4b
 		case 0x08: bit_width = 0x02; status |= (1 << EDTW) | (1 << DTW); break;  // bus width 8b
-		default: /*printf("ERROR: wrong bit width selected \n");*/ return 1;
+		default: /*DEBUG_PRINT("ERROR: wrong bit width selected \n");*/ return 1;
 	}
 
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10) = status;
@@ -800,7 +802,7 @@ static int emmc_host_set_bit_width( char bit_width)
 
 static void emmc_toggle_sleep()
 {
-	printf("\n eMMC Sending: CMD5");
+	DEBUG_PRINT("\n eMMC Sending: CMD5");
 
 	uint32_t arg=0;
 	//eMMCRequest_t input_cmd;
@@ -911,7 +913,7 @@ static int emmc_get_partition_access(eMMC_Parition_t *partition,eMMC_ParitionAcc
 	retval=emmc_card_ext_csd_read((uint8_t*)g_data_buffer);
 
 
-	printf("########### BYTE 228 %d\n",GET_BYTE_FROM_BUFFER(g_data_buffer,228));
+	DEBUG_PRINT("########### BYTE 228 %d\n",GET_BYTE_FROM_BUFFER(g_data_buffer,228));
 	uint8_t bootcfg=GET_BYTE_FROM_BUFFER(g_data_buffer,MMC_EXCSD_BOOT_PART_CONFIG);//179
 
 	
@@ -987,12 +989,12 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,
 		}
 		else{
 
-		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 		}
 	}else
 	{
 
-		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}
 
 	return retval;
@@ -1027,7 +1029,7 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 		g_data_buffer[i]=0;
 
 	emmc_card_csd_read((uint8_t*)g_data_buffer);
-	printf("CSD %x %x %x %x\n",g_data_buffer[0],g_data_buffer[1],g_data_buffer[2],g_data_buffer[3]) ;
+	DEBUG_PRINT("CSD %x %x %x %x\n",g_data_buffer[0],g_data_buffer[1],g_data_buffer[2],g_data_buffer[3]) ;
 
 
 	//	emmc_host_set_bit_width(METAL_EMMC_BIT_WIDTH);
@@ -1041,7 +1043,7 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 		g_data_buffer[i]=0;
 
 	for(int i=0;i<128;i=i+4)
-		printf("CSD_EXT %x %x %x %x\n",g_data_buffer[i],g_data_buffer[i+1],g_data_buffer[i+2],g_data_buffer[i+3]) ;
+		DEBUG_PRINT("CSD_EXT %x %x %x %x\n",g_data_buffer[i],g_data_buffer[i+1],g_data_buffer[i+2],g_data_buffer[i+3]) ;
 #endif
 
 	return retval;
@@ -1086,7 +1088,7 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 		} while ((status & (1 << TC)) == 0);
 	}else{
 
-		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}
 
 	emmc_select_card(0);
@@ -1131,7 +1133,7 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 		} while ((status & (1 << TC)) == 0);
 	}else{
 
-		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}
 
 	emmc_select_card(0);
@@ -1150,7 +1152,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD35 << CI) |  (2 << CRCCE) |  (2 << RTS), start_addr);
 	if(retval!=0)
 	{
-		printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}else
 	{
 		input_cmd.cmd=EMMC_CMD36;
@@ -1159,7 +1161,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 		emmc_host_send_cmd(&input_cmd);//(EMMC_CMD36 << CI) |  (2 << CRCCE) |  (2 << RTS), end_addr);
 		if(retval!=0)
 		{
-			printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+			DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 
 		}else
 		{
@@ -1170,7 +1172,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 			emmc_host_send_cmd(&input_cmd);//(38 << CI) |  (3 << CRCCE) |  (3 << RTS), ERASE_VAL)
 			if(retval!=0)
 			{
-				printf("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+				DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 			}
 		}
 	}
