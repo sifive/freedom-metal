@@ -337,7 +337,7 @@ void __metal_driver_sifive_nb2uart0_init(struct metal_uart *guart, int baud_rate
 		{
 			metal_uart_set_baud_rate(&(uart->uart), baud_rate);
 			if(timeout > MAX_COUNT) {
-				printf("Exit from function \"__metal_driver_sifive_nb2uart0_init()\" due to timeout");
+//				printf("Exit from function \"__metal_driver_sifive_nb2uart0_init()\" due to timeout");
 				exit(1);
 			}
 			else
@@ -381,7 +381,7 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 		{		
 			metal_uart_set_baud_rate(&(uart->uart), baud_rate);
 			if(timeout > MAX_COUNT) {
-				printf("Exit from function \"__metal_driver_sifive_nb2uart0_reinit()\" due to timeout");
+//				printf("Exit from function \"__metal_driver_sifive_nb2uart0_reinit()\" due to timeout");
 				exit(1);
 			}
 			else
