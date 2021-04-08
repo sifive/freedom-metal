@@ -37,13 +37,11 @@
 #define METAL_QSPI_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_QSPI_REG(offset)))
 #define METAL_QSPI_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_QSPI_REG(offset)))
 
-//#define METAL_QSPI_AXI_BASE_ADDR		 0x20000000UL
-
 #define METAL_QSPI_IOMUX_REGW(ADDR)	(__METAL_ACCESS_ONCE((__metal_io_u32 *)(unsigned long long)ADDR))
 
 #define SCR_RESET_BASE_ADDR     		0x4F0011000UL
 #define SCR_REG_BASE_ADDR       		0x4F0010000UL
-#define SCR_IOMUX_HSSS_CFG_BASE_ADDR    0x301500000UL
+#define SCR_IOMUX_HSSS_CFG_BASE_ADDR    	0x301500000UL
 
 #define PCSS_SCR_PMISCSS_QSPI_NIU_RESET			( SCR_RESET_BASE_ADDR + 0x0018 )
 #define PCSS_SCR_PMISCSS_QSPI_RESET			    ( SCR_REG_BASE_ADDR   + 0x0084 )
@@ -268,16 +266,13 @@ int __metal_driver_sifive_nb2qspi0_write(struct metal_qspi *gqspi,uint32_t addr_
 			if(qcfg.burstmode==QSPI_APB_ACCESS)
 			{
 				qspi_apb_write((uint32_t)*tx_buf);
-
 				__metal_driver_sifive_nb2qspi0_execute_cmd(gqspi);
-
 			}
 			else if(qcfg.burstmode==QSPI_SINGLE_BURST)
 			{
 				uint64_t axi_addr =(METAL_QSPI_AXI_BASE_ADDR+addr_offset);
 				uint32_t *dataptr=(uint32_t *)tx_buf;
-				*(volatile uint32_t *)axi_addr =(uint32_t)*dataptr;
-				printf(" axi write %lx %x\n",axi_addr,*dataptr);
+				*(volatile uint32_t *)axi_addr =*dataptr;
 			}
 		}
 		else{

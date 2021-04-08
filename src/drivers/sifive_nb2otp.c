@@ -21,7 +21,7 @@ static unsigned long long otp_control_base=0;
 #define OPT_WRITE_CONFIG 0x104C2704
 #define OPT_READ_CONFIG  0x104C2700
 
-static int __metal_sifive_otp_read(uintptr_t otp_control_base, uint64_t addr, const size_t len, uint8_t *rx_buff, int nbits,uint32_t mask)
+static int __metal_sifive_otp_read(uint64_t otp_ctrl_base, uint64_t addr, const size_t len, uint8_t *rx_buff, int nbits,uint32_t mask)
 {
 	uint32_t value=0;
 	uint32_t pos=0;
@@ -36,7 +36,7 @@ static int __metal_sifive_otp_read(uintptr_t otp_control_base, uint64_t addr, co
 	}
 
 
-	OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_READ_CONFIG;
+	OTP_REGW(otp_ctrl_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_READ_CONFIG;
 	value = (*(uint32_t*)addr);
 	DEBUG_PRINT(" opt read %x val %x mask %x\n",addr,value,mask);
 	value &= mask;
@@ -47,7 +47,7 @@ static int __metal_sifive_otp_read(uintptr_t otp_control_base, uint64_t addr, co
 }
 
 
-static int __metal_sifive_otp_write(uintptr_t *otp_control_base,uint64_t addr, const size_t len, uint8_t *tx_buff, int nbits,uint32_t mask)
+static int __metal_sifive_otp_write(uint64_t otp_ctrl_base,uint64_t addr, const size_t len, uint8_t *tx_buff, int nbits,uint32_t mask)
 {
 	uint32_t pos=0;
 	uint32_t read_val=0;
@@ -62,7 +62,7 @@ static int __metal_sifive_otp_write(uintptr_t *otp_control_base,uint64_t addr, c
 		}
 	}
 	/*First Read value*/	
-	OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_READ_CONFIG;
+	OTP_REGW(otp_ctrl_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_READ_CONFIG;
 	read_val = (*(uint32_t*)addr);
 
 	read_val &= ~mask;
@@ -73,14 +73,14 @@ static int __metal_sifive_otp_write(uintptr_t *otp_control_base,uint64_t addr, c
 
 	write_data |= read_val;
 
-	OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_WRITE_CONFIG;
+	OTP_REGW(otp_ctrl_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = OPT_WRITE_CONFIG;
 	*((uint32_t*)addr) = write_data;
 
 	return 0;
 }
 
 
-static int __metal_sifive_otp_read_block(uintptr_t otp_control_base, uint64_t addr, const size_t len, uint8_t *rx_buff, int nbits)
+static int __metal_sifive_otp_read_block(uint64_t otp_ctrl_base, uint64_t addr, const size_t len, uint8_t *rx_buff, int nbits)
 {
 	uint32_t mask;
 	uint32_t value=0;
@@ -96,7 +96,7 @@ static int __metal_sifive_otp_read_block(uintptr_t otp_control_base, uint64_t ad
 		else
 			mask = 0xFFFFFFFF;
 
-		OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = 0x104C2700;
+		OTP_REGW(otp_ctrl_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = 0x104C2700;
 		value = (*(uint32_t*)addr);
 		value &= mask;
 		DEBUG_PRINT(" opt read %x val %x mask %x\n",addr,value,mask);
@@ -111,7 +111,7 @@ static int __metal_sifive_otp_read_block(uintptr_t otp_control_base, uint64_t ad
 }
 
 
-static int __metal_sifive_otp_write_block(uintptr_t *otp_control_base,uint64_t addr, const size_t len, uint8_t *tx_buff, int nbits)
+static int __metal_sifive_otp_write_block(uintptr_t otp_ctrl_base,uint64_t addr, const size_t len, uint8_t *tx_buff, int nbits)
 {
 	int mask;
 	uint32_t value=0;
@@ -126,7 +126,7 @@ static int __metal_sifive_otp_write_block(uintptr_t *otp_control_base,uint64_t a
 
 		value = *((uint32_t *)tx_buff);
 		value &= mask;
-		OTP_REGW(otp_control_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = 0x104C2704;
+		OTP_REGW(otp_ctrl_base, METAL_SIFIVE_NB2OTP_PCSS_SCR_OTP_2) = 0x104C2704;
 		*((uint32_t*)addr) = value;
 		tx_buff += 4;
 		bits -= 32;

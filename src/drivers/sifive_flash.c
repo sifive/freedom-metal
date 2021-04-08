@@ -295,11 +295,10 @@ int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, c
 		}else 
 		{
 			cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
+			cmd_cfg.mode_stg	= QSPI_SET_MODE_REG((flash->mode_count - 1), 0x0);
 		}
 
-		cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_MODE_BITS_PH_EN | QSPI_RX_DATA_PH_EN);
 		cmd_cfg.dummy_stg	= QSPI_SET_DUMMY_DLP(0, (flash->dummy_count - 1), 0);
-		cmd_cfg.mode_stg	= QSPI_SET_MODE_REG((flash->mode_count - 1), 0x0);
 		cmd_cfg.opcode		= flash->opcode;
 	}
 
@@ -319,7 +318,7 @@ int __metal_driver_sifive_flash_write(struct metal_flash *flash, uint32_t mem_ad
 	uint32_t *dataptr=(uint32_t *)tx_buf;
 	uint32_t *memaddr=(uint32_t *)mem_addr_offset;
 
-	printf(" Size %d\n" , size);
+	//printf(" Size %d\n" , size);
 
 	for(int i=0;i<size/4;i++)
 	{
@@ -342,15 +341,11 @@ int __metal_driver_sifive_flash_write(struct metal_flash *flash, uint32_t mem_ad
 
 		metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
 
-
-		//metal_qspi_write(qspi,(mem_addr_offset+i),4,(tx_buf+i));
 		metal_qspi_write(qspi,memaddr,4,(uint8_t*)dataptr);
 
-		printf("mem_addr_offset %x, i=%d  tx_buf %x %x\n",memaddr,i,dataptr,*dataptr);
-
+		//printf("mem_addr_offset %x, i=%d  tx_buf %x %x\n",memaddr,i,dataptr,*dataptr);
 		memaddr++;
 		dataptr++;
-
 
 		/* wait until write in progress */
 		do {
