@@ -235,12 +235,6 @@ _skip_init:
   la a2, envp  /* envp = {NULL} */
   call secondary_main
 
-  /* Call exit to handle libc's cleanup routines.  Under normal contains this
-   * shouldn't even get called, but I'm still not using a tail call here
-   * because returning to the METAL is the right thing to do in pathological
-   * situations. */
-  call exit
-
   /* And here's where we return.  Again, it's a bit odd but the METAL defines
    * this as a bad idea (ie, as opposed to leaving it undefined) and at this
    * point it's really the only thing left to do. */
@@ -269,6 +263,7 @@ _fini:
 
 secondary_main:
   addi sp, sp, -16
+  csrw mscratch, sp
 #if __riscv_xlen == 32
   sw ra, 4(sp)
 #else
@@ -281,7 +276,18 @@ secondary_main:
   wfi
   j 1b
 2:
+  la a0, user_program
+  /* If wanna enable mmu, then vm_boot will not return */
+  jal vm_boot
+user_program:
   call main
+
+  /* Call exit to handle libc's cleanup routines.  Under normal contains this
+   * shouldn't even get called, but I'm still not using a tail call here
+   * because returning to the METAL is the right thing to do in pathological
+   * situations. */
+  call exit
+
 #if __riscv_xlen == 32
   lw ra, 4(sp)
 #else
@@ -289,6 +295,45 @@ secondary_main:
 #endif
   addi sp, sp, 16
   ret
+
+#define REGBYTES 8
+.global  pop_tf
+.type   pop_tf, @function
+pop_tf:
+  ld  t0,33*REGBYTES(a0)
+  csrw  sepc,t0
+  ld  x1,1*REGBYTES(a0)
+  ld  x2,2*REGBYTES(a0)
+  ld  x3,3*REGBYTES(a0)
+  ld  x4,4*REGBYTES(a0)
+  ld  x5,5*REGBYTES(a0)
+  ld  x6,6*REGBYTES(a0)
+  ld  x7,7*REGBYTES(a0)
+  ld  x8,8*REGBYTES(a0)
+  ld  x9,9*REGBYTES(a0)
+  ld  x11,11*REGBYTES(a0)
+  ld  x12,12*REGBYTES(a0)
+  ld  x13,13*REGBYTES(a0)
+  ld  x14,14*REGBYTES(a0)
+  ld  x15,15*REGBYTES(a0)
+  ld  x16,16*REGBYTES(a0)
+  ld  x17,17*REGBYTES(a0)
+  ld  x18,18*REGBYTES(a0)
+  ld  x19,19*REGBYTES(a0)
+  ld  x20,20*REGBYTES(a0)
+  ld  x21,21*REGBYTES(a0)
+  ld  x22,22*REGBYTES(a0)
+  ld  x23,23*REGBYTES(a0)
+  ld  x24,24*REGBYTES(a0)
+  ld  x25,25*REGBYTES(a0)
+  ld  x26,26*REGBYTES(a0)
+  ld  x27,27*REGBYTES(a0)
+  ld  x28,28*REGBYTES(a0)
+  ld  x29,29*REGBYTES(a0)
+  ld  x30,30*REGBYTES(a0)
+  ld  x31,31*REGBYTES(a0)
+  ld  a0,10*REGBYTES(a0)
+  sret
 
 /* This shim allows main() to be passed a set of arguments that can satisfy the
  * requirements of the C API. */

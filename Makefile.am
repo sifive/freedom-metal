@@ -193,6 +193,7 @@ lib_LIBRARIES += libmetal-gloss.a
 
 libmetal_gloss_a_SOURCES = \
 	gloss/crt0.S \
+	gloss/vm.c \
 	gloss/nanosleep.c \
 	gloss/sys_access.c \
 	gloss/sys_chdir.c \

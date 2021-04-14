@@ -161,21 +161,22 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libmetal_gloss_a_AR = $(AR) $(ARFLAGS)
 libmetal_gloss_a_LIBADD =
-am__libmetal_gloss_a_SOURCES_DIST = gloss/crt0.S gloss/nanosleep.c \
-	gloss/sys_access.c gloss/sys_chdir.c gloss/sys_chmod.c \
-	gloss/sys_chown.c gloss/sys_clock_gettime.c gloss/sys_close.c \
-	gloss/sys_execve.c gloss/sys_exit.c gloss/sys_faccessat.c \
-	gloss/sys_fork.c gloss/sys_fstat.c gloss/sys_fstatat.c \
-	gloss/sys_ftime.c gloss/sys_getcwd.c gloss/sys_getpid.c \
-	gloss/sys_gettimeofday.c gloss/sys_isatty.c gloss/sys_kill.c \
-	gloss/sys_link.c gloss/sys_lseek.c gloss/sys_lstat.c \
-	gloss/sys_open.c gloss/sys_openat.c gloss/sys_read.c \
-	gloss/sys_sbrk.c gloss/sys_stat.c gloss/sys_sysconf.c \
-	gloss/sys_times.c gloss/sys_unlink.c gloss/sys_utime.c \
-	gloss/sys_wait.c gloss/sys_write.c
+am__libmetal_gloss_a_SOURCES_DIST = gloss/crt0.S gloss/vm.c \
+	gloss/nanosleep.c gloss/sys_access.c gloss/sys_chdir.c \
+	gloss/sys_chmod.c gloss/sys_chown.c gloss/sys_clock_gettime.c \
+	gloss/sys_close.c gloss/sys_execve.c gloss/sys_exit.c \
+	gloss/sys_faccessat.c gloss/sys_fork.c gloss/sys_fstat.c \
+	gloss/sys_fstatat.c gloss/sys_ftime.c gloss/sys_getcwd.c \
+	gloss/sys_getpid.c gloss/sys_gettimeofday.c gloss/sys_isatty.c \
+	gloss/sys_kill.c gloss/sys_link.c gloss/sys_lseek.c \
+	gloss/sys_lstat.c gloss/sys_open.c gloss/sys_openat.c \
+	gloss/sys_read.c gloss/sys_sbrk.c gloss/sys_stat.c \
+	gloss/sys_sysconf.c gloss/sys_times.c gloss/sys_unlink.c \
+	gloss/sys_utime.c gloss/sys_wait.c gloss/sys_write.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@am_libmetal_gloss_a_OBJECTS =  \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/vm.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.$(OBJEXT) \
@@ -566,6 +567,7 @@ libmetal_a_SOURCES = \
 
 @WITH_BUILTIN_LIBGLOSS_TRUE@libmetal_gloss_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/crt0.S \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/vm.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/nanosleep.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_access.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_chdir.c \
@@ -676,6 +678,8 @@ gloss/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) gloss/$(DEPDIR)
 	@: > gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/crt0.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/vm.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/nanosleep.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
@@ -934,6 +938,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_utime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/vm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@segger/$(DEPDIR)/SEGGER_target_metal.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/button.Po@am__quote@
