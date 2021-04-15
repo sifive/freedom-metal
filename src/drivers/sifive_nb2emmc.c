@@ -1,7 +1,7 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-//#define PRINT_DEBUG
+#define PRINT_DEBUG
 
 #define SIFIVE_NB2_EMMC
 #ifdef SIFIVE_NB2_EMMC
@@ -763,6 +763,16 @@ static void emmc_set_block_size( long int size)
 }
 
 
+static void emmc_set_nblocks(int nblock)
+{
+	input_cmd.cmd=EMMC_CMD23;
+	input_cmd.arg=nblock;
+	input_cmd.response_type=EMMC_RESPONSE_R1;
+	input_cmd.data_present=0;
+	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD16 << CI) | (2 << CRCCE) | (2 << RTS), size);
+}
+
+
 static int emmc_host_set_bit_width( char bit_width)
 {
 	unsigned int status, _bit_width;
@@ -997,6 +1007,21 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,
 		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}
 
+
+	// CMD3 - send RCA to eMMC card and go to STBY
+	uint32_t sd_card_rca = EMMC_RCA;
+	input_cmd.cmd=EMMC_CMD3;
+	input_cmd.arg=sd_card_rca<<16;
+	input_cmd.response_type=EMMC_RESPONSE_R1;
+	input_cmd.data_present=0;
+	
+	retval=emmc_host_send_cmd(&input_cmd);
+
+	if(EMMC_RCA==((input_cmd.cmd_response[0]>>16) &0xFFFFU))
+	 {
+		DEBUG_PRINT("RAC set %x\n",((input_cmd.cmd_response[0]>>16) &0xFFFFU));
+         }
+	
 	return retval;
 }
 
@@ -1014,37 +1039,7 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 
 	emmc_host_initialization();
 
-	retval=emmc_card_init(1);
-
-	/*
-	   input_cmd.cmd=EMMC_CMD0;
-	   input_cmd.arg=GO_IDLE_STATE;
-	   input_cmd.response_type=EMMC_RESPONSE_NO_RESP;
-	   input_cmd.data_present=0;
-	   retval=emmc_host_send_cmd(&input_cmd);	//idle state
-	   */
-#if 0
-	//TO Be Remvoed
-	for(int i=0;i<128;i++)
-		g_data_buffer[i]=0;
-
-	emmc_card_csd_read((uint8_t*)g_data_buffer);
-	DEBUG_PRINT("CSD %x %x %x %x\n",g_data_buffer[0],g_data_buffer[1],g_data_buffer[2],g_data_buffer[3]) ;
-
-
-	//	emmc_host_set_bit_width(METAL_EMMC_BIT_WIDTH);
-
-	for(int i=0;i<128;i++)
-		g_data_buffer[i]=0;
-
-	emmc_card_ext_csd_read((uint8_t*)g_data_buffer);
-
-	for(int i=0;i<128;i++)
-		g_data_buffer[i]=0;
-
-	for(int i=0;i<128;i=i+4)
-		DEBUG_PRINT("CSD_EXT %x %x %x %x\n",g_data_buffer[i],g_data_buffer[i+1],g_data_buffer[i+2],g_data_buffer[i+3]) ;
-#endif
+	retval=emmc_card_init(0);
 
 	return retval;
 }
@@ -1064,6 +1059,10 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 
 
 	emmc_set_block_size(emmc->deviceblocklen);
+
+	uint32_t nblocklocks=len/emmc->deviceblocklen;
+	emmc_set_nblocks(nblocklocks);
+
 
 	input_cmd.cmd=EMMC_CMD18;
 	input_cmd.arg=addr;
@@ -1107,8 +1106,10 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 	emmc_select_card(EMMC_RCA);
 
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS01) = emmc->deviceblocklen;
-
 	emmc_set_block_size(emmc->deviceblocklen);
+
+	uint32_t nblocklocks=len/emmc->deviceblocklen;
+	emmc_set_nblocks(nblocklocks);
 
 	input_cmd.cmd=EMMC_CMD25;
 	input_cmd.arg=addr;
@@ -1119,7 +1120,7 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 	input_cmd.dataptrpos=tx_buff;
 	input_cmd.dataRemaining=len;
 	input_cmd.blocklen=emmc->deviceblocklen;
-	input_cmd.blockcnt=len/emmc->deviceblocklen;
+	input_cmd.blockcnt=nblocklocks;
 
 	emmc_host_send_cmd(&input_cmd);
 	if(retval==0)
@@ -1127,7 +1128,8 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 		do
 		{
 		/*wait for BWE(buffer write enable)*/
-		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BWE) & 0x01) == 0 );
+		//while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BWE) & 0x01) == 0 );
+		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BWR) & 0x01) == 0 );
 		process_databuffer_write(&input_cmd);
 		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
 		} while ((status & (1 << TC)) == 0);
@@ -1146,7 +1148,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 {
 	int retval=0;
 	input_cmd.cmd=EMMC_CMD35;
-	input_cmd.cmd=start_addr;
+	input_cmd.arg=start_addr;
 	input_cmd.response_type=EMMC_RESPONSE_R1;
 
 	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD35 << CI) |  (2 << CRCCE) |  (2 << RTS), start_addr);
@@ -1156,7 +1158,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 	}else
 	{
 		input_cmd.cmd=EMMC_CMD36;
-		input_cmd.cmd=end_addr;
+		input_cmd.arg=end_addr;
 		input_cmd.response_type=EMMC_RESPONSE_R1;
 		emmc_host_send_cmd(&input_cmd);//(EMMC_CMD36 << CI) |  (2 << CRCCE) |  (2 << RTS), end_addr);
 		if(retval!=0)
@@ -1167,7 +1169,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 		{
 
 			input_cmd.cmd=EMMC_CMD38;
-			input_cmd.cmd=start_addr;
+			input_cmd.arg=start_addr;
 			input_cmd.response_type=EMMC_RESPONSE_R1B;
 			emmc_host_send_cmd(&input_cmd);//(38 << CI) |  (3 << CRCCE) |  (3 << RTS), ERASE_VAL)
 			if(retval!=0)
