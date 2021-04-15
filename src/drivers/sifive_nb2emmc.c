@@ -1,7 +1,7 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#define PRINT_DEBUG
+//#define PRINT_DEBUG
 
 #define SIFIVE_NB2_EMMC
 #ifdef SIFIVE_NB2_EMMC
