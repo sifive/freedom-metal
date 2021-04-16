@@ -1,7 +1,7 @@
 /* Copyright 2019 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-//#define PRINT_DEBUG
+#define PRINT_DEBUG
 
 #define SIFIVE_NB2_EMMC
 #ifdef SIFIVE_NB2_EMMC
@@ -373,7 +373,6 @@ static void process_databuffer_read(eMMCRequest_t* request)
 		uint8_t byte_count = 4;
 	
 	//	data_tocopy-=4;	
-		
 
 		while(data_tocopy && byte_count) {
 			*((uint8_t*)tempdataptr) = data & 0xFF;
@@ -392,8 +391,6 @@ static void process_databuffer_write(eMMCRequest_t* request)
 
 	request->dataRemaining -= data_tocopy;
 
-	uint8_t *tempdataptr=request->dataptrpos;
-
 	while(data_tocopy > 0U)
 	{
 		uint32_t data = 0;
@@ -401,10 +398,9 @@ static void process_databuffer_write(eMMCRequest_t* request)
 
 		while(data_tocopy && byte_count<4) {
 			//data |= (uint32_t)*((uint8_t*)request->dataptrpos) << (8 * byte_count);
-			data |= (uint32_t)*((uint8_t*)tempdataptr) << (8 * byte_count);
+			data |= (uint32_t)*((uint8_t*)request->dataptrpos) << (8 * byte_count);
 			byte_count++;
 			data_tocopy--;
-			//request->dataptrpos = (uint8_t*)request->dataptrpos + 1;
 			request->dataptrpos++;
 		}
 		METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS08) = data;
@@ -1073,7 +1069,7 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 	input_cmd.dataptrpos=rx_buff;
 	input_cmd.dataRemaining=len;
 	input_cmd.blocklen=emmc->deviceblocklen;
-	input_cmd.blockcnt=len/emmc->deviceblocklen;
+	input_cmd.blockcnt=nblocklocks;
 
 	retval=emmc_host_send_cmd(&input_cmd);//((EMMC_CMD17 << CI) | (1 << DPS) | (2 << CRCCE) | (1 << DTDS) | (2 << RTS)), addr);
 	if(retval==0)
@@ -1128,7 +1124,6 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 		do
 		{
 		/*wait for BWE(buffer write enable)*/
-		//while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BWE) & 0x01) == 0 );
 		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BWR) & 0x01) == 0 );
 		process_databuffer_write(&input_cmd);
 		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
