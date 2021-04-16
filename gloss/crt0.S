@@ -46,6 +46,46 @@ _start:
 
   /* Stack pointer is expected to be initialized before _start */
 
+  /* The delegation CSRs exist if user mode interrupts (N extension) or
+   * supervisor mode (S extension) are supported */
+  csrr a5, misa
+  lui  a4, 0x42
+  and  a4, a4, a5
+  beqz a4, 1f
+  csrc mideleg, a3
+  csrc medeleg, a3
+1:
+
+  /* The satp CSR exists if supervisor mode (S extension) is supported */
+  lui  a4, 0x40
+  and  a4, a4, a5
+  beqz a4, 1f
+  csrc satp, a3
+1:
+
+  /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
+  li   a4, 0x10028
+  and  a5, a5, a4
+  beqz a5, 1f
+  csrr a5, mstatus
+  lui  a4, 0x2
+  or   a5, a5, a4
+  csrw mstatus, a5
+  csrwi fcsr, 0
+1:
+
+  li a6, 0
+  /* Check for vector extension support and enable it if found */
+  csrr a5, misa
+  li a4, 0x200000
+  and a5, a5, a4
+  beqz a5, 1f
+  csrr a5, mstatus
+  ori a5, a5, 0x200
+  csrw mstatus, a5
+  li a6, 1
+1:
+
   /* If we're not hart 0, skip the initialization work */
   la t0, __metal_boot_hart
   bne a0, t0, _skip_init
@@ -144,6 +184,11 @@ _start:
 
   bge t1, t2, 2f
 
+# use rvv for zeroing
+  beqz a6, 1f
+  jal t3, rvv_memset_zero
+  j 2f
+
 1:
 #if __riscv_xlen == 32
   sw   x0, 0(t1)
@@ -189,44 +234,6 @@ _skip_init:
   csrc mie, a3
   csrc mip, a3
 
-  /* The delegation CSRs exist if user mode interrupts (N extension) or
-   * supervisor mode (S extension) are supported */
-  csrr a5, misa
-  lui  a4, 0x42
-  and  a4, a4, a5
-  beqz a4, 1f
-  csrc mideleg, a3
-  csrc medeleg, a3
-1:
-
-  /* The satp CSR exists if supervisor mode (S extension) is supported */
-  lui  a4, 0x40
-  and  a4, a4, a5
-  beqz a4, 1f
-  csrc satp, a3
-1:
-
-  /* Check RISC-V isa and enable FS bits if Floating Point architecture. */
-  li   a4, 0x10028
-  and  a5, a5, a4
-  beqz a5, 1f
-  csrr a5, mstatus
-  lui  a4, 0x2
-  or   a5, a5, a4
-  csrw mstatus, a5
-  csrwi fcsr, 0
-1:
-
-  /* Check for vector extension support and enable it if found */
-  csrr a5, misa
-  li a4, 0x200000
-  and a5, a5, a4
-  beqz a5, 1f
-  csrr a5, mstatus
-  ori a5, a5, 0x200
-  csrw mstatus, a5
-1:
-
   /* This is a C runtime, so main() is defined to have some arguments.  Since
    * there's nothing sane the METAL can pass we don't bother with that but
    * instead just setup as close to a NOP as we can. */
@@ -246,6 +253,25 @@ _skip_init:
    * point it's really the only thing left to do. */
   mv ra, s0
   ret
+
+  # dst=t1, len=t2-t1
+  # next pc: t3
+rvv_memset_zero:
+    # the copy length
+    sub t4, t2, t1
+    blez t4, 1f
+
+    vsetvli x0, t4, e8, m8
+    vmv.v.x v0, x0
+rvv_memset_zero_loop:
+    vsetvli t5, t4, e8, m8
+    vse8.v v0, (t1)
+    sub t4, t4, t5
+    add t1, t1, t5
+    bnez t4, rvv_memset_zero_loop
+1:
+  jalr x0, t3, 0
+
 
 .cfi_endproc
 
