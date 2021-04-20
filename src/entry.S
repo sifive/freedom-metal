@@ -110,7 +110,6 @@ _enter:
  * but to deal with what I think is probably a bug in the linker script I'm
  * going to leave this in for now.  At least it's fairly cheap :) */
 .weak __register_frame_info
-.global __register_frame_info
 .section .text.metal.init.__register_frame_info
 __register_frame_info:
     .cfi_startproc
