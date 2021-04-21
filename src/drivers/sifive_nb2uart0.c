@@ -10,6 +10,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define	SCR_RESET_BASE_ADDR			0x4F0011000UL
+#define SCR_REG_BASE_ADDR       		0x4F0010000UL
+#define	SCR_IOMUX_PCSS_CFG_BASE_ADDR		0x4F0016000UL
+
+#define PCSS_SCR_PLL_EN    ( SCR_REG_BASE_ADDR              + 0x0144 )
+
+#define PCSS_SCR_LSPERIPHSS_UART_RESET       ( SCR_REG_BASE_ADDR              + 0x0098 )
+#define PCSS_SCR_PNOCSS_RESET                ( SCR_RESET_BASE_ADDR            + 0x0000 )
+#define PCSS_SCR_PCSS_MISC_NIU_RESET         ( SCR_RESET_BASE_ADDR            + 0x0004 )
+#define PCSS_SCR_LSPERIPHSS_UART_NIU_RESET   ( SCR_RESET_BASE_ADDR            + 0x002C )
+#define PCSS_SCR_PCSS_MISC_RESET             ( SCR_REG_BASE_ADDR	      + 0x0068 )
+
+#define PCSS_SCR_PMISCSS_MISC_NIU_RESET       ( SCR_RESET_BASE_ADDR           + 0x001C )
+#define PCSS_SCR_LSPERIPHSS_MISC_NIU_RESET    ( SCR_RESET_BASE_ADDR           + 0x003C )
+#define PCSS_SCR_HSPERIPHSS_NIU_RESET         ( SCR_RESET_BASE_ADDR 	      + 0x0040 )
+#define PCSS_SCR_HSPERIPHSS_RESET             ( SCR_REG_BASE_ADDR             + 0x00AC )
+
+
+#define PCSS_SCR_IOMUX_CONFIG_UART1_TXD      ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x001C )
+#define PCSS_SCR_IOMUX_CONFIG_UART1_RTS      ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x0020 )
+#define PCSS_SCR_IOMUX_CONFIG_UART1_RXD      ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x0024 )
+#define PCSS_SCR_IOMUX_CONFIG_UART1_CTS      ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x0028 )
+
+
+#define PCSS_SCR_IOMUX_CONFIG_UART0_TXD       ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x000C )
+#define PCSS_SCR_IOMUX_CONFIG_UART0_RXD       ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x0010 )
+#define PCSS_SCR_IOMUX_CONFIG_UART0_RTS       ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x0014 )
+#define PCSS_SCR_IOMUX_CONFIG_UART0_CTS       ( SCR_IOMUX_PCSS_CFG_BASE_ADDR   + 0x0018 )
+#define PCSS_PINMUX_SCR_RESET                 ( SCR_RESET_BASE_ADDR            + 0x0054 )
+
+#define METAL_PCSS_REGW(ADDR)	(__METAL_ACCESS_ONCE((__metal_io_u32 *)(unsigned long long)ADDR))
+
 #define MAX_COUNT	10000
 
 #define UART_REG(offset)   (((unsigned long long)control_base + offset))
@@ -20,7 +52,59 @@
 
 #define UART_FIFO_ENABLED
 
+
 static unsigned long long control_base=0;
+
+
+static soc_init_done=0;
+
+
+void soc_init()
+{
+	uint32_t rd_dt=0;
+
+	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=0xC00;
+
+
+	// Deasserting NIU Rest for UART0
+	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_NIU_RESET);
+	rd_dt = (rd_dt | 0x2);
+	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_NIU_RESET)=rd_dt;
+
+	// Deasserting APB Rest for UART0
+	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET);
+	rd_dt = (rd_dt | 0x2);
+	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=rd_dt;
+
+	// Deasserting EFUSE Reset
+	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET);
+	rd_dt = (rd_dt | 0x200);                            //EFUSE Bit
+	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=rd_dt;
+
+	/*Deassert reset of all UARTs */
+
+	METAL_PCSS_REGW(PCSS_SCR_PNOCSS_RESET)=0x63F;
+	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_NIU_RESET)=0xB97;//Deassert AON PCNOC NIU Reset
+	METAL_PCSS_REGW(PCSS_SCR_LSPERIPHSS_UART_NIU_RESET)=0X1F;
+	METAL_PCSS_REGW(PCSS_SCR_LSPERIPHSS_MISC_NIU_RESET)=0xFFF;
+	METAL_PCSS_REGW(PCSS_SCR_LSPERIPHSS_UART_RESET)=0X1F;
+	METAL_PCSS_REGW(PCSS_SCR_HSPERIPHSS_NIU_RESET)=0x70;
+	METAL_PCSS_REGW(PCSS_PINMUX_SCR_RESET)=0x1;
+	METAL_PCSS_REGW(PCSS_SCR_HSPERIPHSS_RESET)=0x7E;
+
+
+	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART1_TXD)= 0x00001E01; //pull up txd
+	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART1_RTS)= 0x00001E01; //pull up rts
+	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART1_RXD)= 0x00001F01; //pull up rxd
+	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART1_CTS)= 0x00001F01; //pull up cts
+
+	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART0_TXD)= 0x00001E01; //pull up txd
+    	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART0_RTS)= 0x00001E01; //pull up rts
+    	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART0_RXD)= 0x00001F01; //pull up rxd
+    	METAL_PCSS_REGW(PCSS_SCR_IOMUX_CONFIG_UART0_CTS)= 0x00001F01; //pull up cts
+
+	soc_init_done=1;
+}
 
 bool isFifoAccessEnabled(struct metal_uart *uart)
 {
@@ -29,14 +113,14 @@ bool isFifoAccessEnabled(struct metal_uart *uart)
 	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
 	if(((UART_REGW(METAL_SIFIVE_NB2UART0_IIR)>>6)&0x3) == 0x3)
-            retval = true;
-        else
-           retval = false;
+		retval = true;
+	else
+		retval = false;
 
 	return retval;
 }
 
-struct metal_interrupt *
+	struct metal_interrupt *
 __metal_driver_sifive_nb2uart0_interrupt_controller(struct metal_uart *uart)
 {
 	return __metal_driver_sifive_nb2uart0_interrupt_parent(uart);
@@ -46,8 +130,8 @@ int __metal_driver_sifive_nb2uart0_get_interrupt_id(struct metal_uart *uart)
 {
 	control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
- 	//UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x81;//temp fix //we don't have Programmable THRE Interrupt Mode Enable in linux also
- 	//UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x0F;//temp fix
+	//UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x81;//temp fix //we don't have Programmable THRE Interrupt Mode Enable in linux also
+	//UART_REGW(METAL_SIFIVE_NB2UART0_IER) =  0x0F;//temp fix
 	return __metal_driver_sifive_nb2uart0_interrupt_line(uart);
 }
 
@@ -61,43 +145,43 @@ int __metal_driver_sifive_nb2uart0_txready(struct metal_uart *uart)
 
 int __metal_driver_sifive_nb2uart0_tx_interrupt_enable(struct metal_uart *uart) 
 {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    UART_REGW(METAL_SIFIVE_NB2UART0_IER) |= UART_IER_ETBEI;
-    return 0;
+	UART_REGW(METAL_SIFIVE_NB2UART0_IER) |= UART_IER_ETBEI;
+	return 0;
 }
 
 int __metal_driver_sifive_nb2uart0_tx_interrupt_disable(struct metal_uart *uart) 
 {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    UART_REGW(METAL_SIFIVE_NB2UART0_IER) &= ~UART_IER_ETBEI;
-    return 0;
+	UART_REGW(METAL_SIFIVE_NB2UART0_IER) &= ~UART_IER_ETBEI;
+	return 0;
 }
 
 int __metal_driver_sifive_nb2uart0_rx_interrupt_enable(struct metal_uart *uart) 
 {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    UART_REGW(METAL_SIFIVE_NB2UART0_IER) |= UART_IER_ERBFI;
-    return 0;
+	UART_REGW(METAL_SIFIVE_NB2UART0_IER) |= UART_IER_ERBFI;
+	return 0;
 }
 
 int __metal_driver_sifive_nb2uart0_rx_interrupt_disable(struct metal_uart *uart) 
 {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    UART_REGW(METAL_SIFIVE_NB2UART0_IER) &= ~UART_IER_ERBFI;
-    return 0;
+	UART_REGW(METAL_SIFIVE_NB2UART0_IER) &= ~UART_IER_ERBFI;
+	return 0;
 }
 
 int __metal_driver_sifive_nb2uart0_set_tx_watermark(struct metal_uart *uart,size_t level) 
 {
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
 
-    	uint32_t regval=0;
+	uint32_t regval=0;
 	uint32_t error=0;
-	
+
 	switch(level)
 	{
 		case 0:
@@ -123,7 +207,7 @@ int __metal_driver_sifive_nb2uart0_set_tx_watermark(struct metal_uart *uart,size
 		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= ~(UART_TX_TRIGGER(3));
 		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= UART_TX_TRIGGER(regval);
 	}
-	
+
 	return error;
 }
 
@@ -160,7 +244,7 @@ int __metal_driver_sifive_nb2uart0_set_rx_watermark(struct metal_uart *uart,
 
 	uint32_t regval=0;
 	uint32_t error=0;
-	
+
 	switch(level)
 	{
 		case 1:
@@ -186,7 +270,7 @@ int __metal_driver_sifive_nb2uart0_set_rx_watermark(struct metal_uart *uart,
 		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) &= ~(UART_RX_TRIGGER(3));
 		UART_REGW(METAL_SIFIVE_NB2UART0_FCR) |= UART_RX_TRIGGER(regval);
 	}
-	
+
 	return error;
 }
 
@@ -226,8 +310,8 @@ size_t __metal_driver_sifive_nb2uart0_get_rx_watermark(struct metal_uart *uart) 
 
 uart_event __metal_driver_sifive_nb2uart0_get_event(struct metal_uart*uart){
 
-    long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
-    return ((UART_REGW(METAL_SIFIVE_NB2UART0_IIR)& 0xF));
+	long control_base = __metal_driver_sifive_nb2uart0_control_base(uart);
+	return ((UART_REGW(METAL_SIFIVE_NB2UART0_IIR)& 0xF));
 }
 
 
@@ -261,9 +345,9 @@ int __metal_driver_sifive_nb2uart0_getc(struct metal_uart *uart, int *c)
 		error=-1;
 	else
 		ch = UART_REGW(METAL_SIFIVE_NB2UART0_RBR);
-	
+
 	*c = ch & 0x0FF;
-	
+
 	return error;
 }
 
@@ -289,14 +373,14 @@ int __metal_driver_sifive_nb2uart0_set_baud_rate(struct metal_uart *guart, int b
 
 		/* set DLAB to access DLL and DLH registers */
 		UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(UART_DLAB);
-                UART_REGW(METAL_SIFIVE_NB2UART0_LCR) |=  (UART_DLAB);
+		UART_REGW(METAL_SIFIVE_NB2UART0_LCR) |=  (UART_DLAB);
 
 		/* set clock divisor */
 		UART_REGW(METAL_SIFIVE_NB2UART0_DLL) = (uart->divisor & 0x00FF);
-                UART_REGW(METAL_SIFIVE_NB2UART0_DLH) = ((uart->divisor & 0xFF00) >> 8);
+		UART_REGW(METAL_SIFIVE_NB2UART0_DLH) = ((uart->divisor & 0xFF00) >> 8);
 
 		/* clear DLAB */
-                UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(UART_DLAB);
+		UART_REGW(METAL_SIFIVE_NB2UART0_LCR) &= ~(UART_DLAB);
 	}
 
 	return 0;
@@ -320,6 +404,9 @@ void __metal_driver_sifive_nb2uart0_init(struct metal_uart *guart, int baud_rate
 	struct __metal_driver_sifive_nb2uart0 *uart = (void *)(guart);
 	struct metal_clock *clock = __metal_driver_sifive_nb2uart0_clock(guart);
 
+	if(!soc_init_done)
+		soc_init();
+
 	if(clock != NULL) {
 		uart->pre_rate_change_callback.callback = &pre_rate_change_callback_func;
 		uart->pre_rate_change_callback.priv = guart;
@@ -337,7 +424,7 @@ void __metal_driver_sifive_nb2uart0_init(struct metal_uart *guart, int baud_rate
 		{
 			metal_uart_set_baud_rate(&(uart->uart), baud_rate);
 			if(timeout > MAX_COUNT) {
-				printf("Exit from function \"__metal_driver_sifive_nb2uart0_init()\" due to timeout");
+				DEBUG_PRINT("Exit from function \"__metal_driver_sifive_nb2uart0_init()\" due to timeout");
 				exit(1);
 			}
 			else
@@ -372,6 +459,8 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 	control_base = __metal_driver_sifive_nb2uart0_control_base(guart);
 	struct __metal_driver_sifive_nb2uart0 *uart = (void *)(guart);
 
+	if(!soc_init_done)
+		soc_init();
 
 	metal_uart_set_baud_rate(&(uart->uart), baud_rate);
 
@@ -381,7 +470,7 @@ void __metal_driver_sifive_nb2uart0_reinit(struct metal_uart *guart, int baud_ra
 		{		
 			metal_uart_set_baud_rate(&(uart->uart), baud_rate);
 			if(timeout > MAX_COUNT) {
-				printf("Exit from function \"__metal_driver_sifive_nb2uart0_reinit()\" due to timeout");
+				DEBUG_PRINT("Exit from function \"__metal_driver_sifive_nb2uart0_reinit()\" due to timeout");
 				exit(1);
 			}
 			else
@@ -480,24 +569,24 @@ struct metal_interrupt *__metal_driver_sifive_nb2uart0_get_interrupt(struct meta
 }
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_nb2uart0) = {
-    .uart.init          = __metal_driver_sifive_nb2uart0_init,
-    .uart.reinit	= __metal_driver_sifive_nb2uart0_reinit,
-    .uart.putc          = __metal_driver_sifive_nb2uart0_putc,
-    .uart.getc          = __metal_driver_sifive_nb2uart0_getc,
-    .uart.get_baud_rate = __metal_driver_sifive_nb2uart0_get_baud_rate,
-    .uart.set_baud_rate = __metal_driver_sifive_nb2uart0_set_baud_rate,
-    .uart.controller_interrupt = __metal_driver_sifive_nb2uart0_interrupt_controller,
-    .uart.get_interrupt_id     = __metal_driver_sifive_nb2uart0_get_interrupt_id,
-    
-    .uart.tx_interrupt_enable = __metal_driver_sifive_nb2uart0_tx_interrupt_enable,
-    .uart.tx_interrupt_disable = __metal_driver_sifive_nb2uart0_tx_interrupt_disable,
-    .uart.rx_interrupt_enable = __metal_driver_sifive_nb2uart0_rx_interrupt_enable,
-    .uart.rx_interrupt_disable = __metal_driver_sifive_nb2uart0_rx_interrupt_disable,
-    .uart.set_tx_watermark = __metal_driver_sifive_nb2uart0_set_tx_watermark,
-    .uart.get_tx_watermark = __metal_driver_sifive_nb2uart0_get_tx_watermark,
-    .uart.set_rx_watermark = __metal_driver_sifive_nb2uart0_set_rx_watermark,
-    .uart.get_rx_watermark = __metal_driver_sifive_nb2uart0_get_rx_watermark,
-    .uart.get_event        = __metal_driver_sifive_nb2uart0_get_event,
+	.uart.init          = __metal_driver_sifive_nb2uart0_init,
+	.uart.reinit	    = __metal_driver_sifive_nb2uart0_reinit,
+	.uart.putc          = __metal_driver_sifive_nb2uart0_putc,
+	.uart.getc          = __metal_driver_sifive_nb2uart0_getc,
+	.uart.get_baud_rate = __metal_driver_sifive_nb2uart0_get_baud_rate,
+	.uart.set_baud_rate = __metal_driver_sifive_nb2uart0_set_baud_rate,
+	.uart.controller_interrupt = __metal_driver_sifive_nb2uart0_interrupt_controller,
+	.uart.get_interrupt_id     = __metal_driver_sifive_nb2uart0_get_interrupt_id,
+
+	.uart.tx_interrupt_enable = __metal_driver_sifive_nb2uart0_tx_interrupt_enable,
+	.uart.tx_interrupt_disable = __metal_driver_sifive_nb2uart0_tx_interrupt_disable,
+	.uart.rx_interrupt_enable = __metal_driver_sifive_nb2uart0_rx_interrupt_enable,
+	.uart.rx_interrupt_disable = __metal_driver_sifive_nb2uart0_rx_interrupt_disable,
+	.uart.set_tx_watermark = __metal_driver_sifive_nb2uart0_set_tx_watermark,
+	.uart.get_tx_watermark = __metal_driver_sifive_nb2uart0_get_tx_watermark,
+	.uart.set_rx_watermark = __metal_driver_sifive_nb2uart0_set_rx_watermark,
+	.uart.get_rx_watermark = __metal_driver_sifive_nb2uart0_get_rx_watermark,
+	.uart.get_event        = __metal_driver_sifive_nb2uart0_get_event,
 };
 
 #endif /* METAL_SIFIVE_NB2UART0 */

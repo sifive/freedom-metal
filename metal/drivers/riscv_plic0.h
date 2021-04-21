@@ -18,13 +18,18 @@ struct __metal_driver_vtable_riscv_plic0 {
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_riscv_plic0)
 
+#define __METAL_NB2_HACK_PLIC_SUBINTERRUPTS_REMOVE 130
+#define __METAL_NB2_HACK_PLIC_SUBINTERRUPTS  (__METAL_PLIC_SUBINTERRUPTS-__METAL_NB2_HACK_PLIC_SUBINTERRUPTS_REMOVE)
+
 #define __METAL_MACHINE_MACROS
 #include <metal/machine.h>
 struct __metal_driver_riscv_plic0 {
     struct metal_interrupt controller;
     int init_done;
     metal_interrupt_handler_t metal_exint_table[__METAL_PLIC_SUBINTERRUPTS];
+    //metal_interrupt_handler_t metal_exint_table[__METAL_NB2_HACK_PLIC_SUBINTERRUPTS];
     __metal_interrupt_data metal_exdata_table[__METAL_PLIC_SUBINTERRUPTS];
+   //__metal_interrupt_data metal_exdata_table[__METAL_NB2_HACK_PLIC_SUBINTERRUPTS];
 };
 #undef __METAL_MACHINE_MACROS
 

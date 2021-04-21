@@ -145,7 +145,6 @@ static void post_rate_change_callback_func(void *priv)
 
 static void qspi_iomux_config(void)
 {
-
 	METAL_QSPI_IOMUX_REGW(PCSS_SCR_PMISCSS_QSPI_NIU_RESET) = 0x0;  //Deassert QSPI NIU Reset
 	METAL_QSPI_IOMUX_REGW(PCSS_SCR_PMISCSS_QSPI_RESET) = 0X0;      //Deassert QSPI Reset
 	for(volatile int i=0;i<100;i++);

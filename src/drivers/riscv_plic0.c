@@ -109,15 +109,18 @@ void __metal_plic0_handler(int id, void *priv) {
     int contextid =
         __metal_driver_sifive_plic0_context_ids(__metal_myhart_id());
     unsigned int idx = __metal_plic0_claim_interrupt(plic, contextid);
+    unsigned int idx_dummy=idx;	
     unsigned int num_interrupts = __metal_driver_sifive_plic0_num_interrupts(
         (struct metal_interrupt *)plic);
 
+    //if(idx==62) idx=2; //SG
     if ((idx < num_interrupts) && (plic->metal_exint_table[idx])) {
+
         plic->metal_exint_table[idx](idx,
                                      plic->metal_exdata_table[idx].exint_data);
     }
 
-    __metal_plic0_complete_interrupt(plic, contextid, idx);
+    __metal_plic0_complete_interrupt(plic, contextid, idx_dummy);
 }
 
 void __metal_driver_riscv_plic0_init(struct metal_interrupt *controller) {
@@ -140,6 +143,7 @@ void __metal_driver_riscv_plic0_init(struct metal_interrupt *controller) {
 
             for (int i = 0; i < PLIC0_MAX_INTERRUPTS; i++) {
                 __metal_plic0_enable(plic, parent, i, METAL_DISABLE);
+		//num_interrupts=7; //SG
                 if (i < num_interrupts) {
                     __metal_driver_riscv_plic0_set_priority(controller, i, 0);
                     plic->metal_exint_table[i] = NULL;
@@ -173,10 +177,12 @@ int __metal_driver_riscv_plic0_register(struct metal_interrupt *controller,
 
     if (isr) {
         __metal_driver_riscv_plic0_set_priority(controller, id, 2);
+    	//if(id==62) id=2; //SG
         plic->metal_exint_table[id] = isr;
         plic->metal_exdata_table[id].exint_data = priv;
     } else {
         __metal_driver_riscv_plic0_set_priority(controller, id, 1);
+    	//if(id==62) id=2; //SG
         plic->metal_exint_table[id] = __metal_plic0_default_handler;
         plic->metal_exdata_table[id].sub_int = priv;
     }

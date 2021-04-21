@@ -14,17 +14,21 @@ extern metal_constructor_t metal_constructors_end;
 extern metal_destructor_t metal_destructors_start;
 extern metal_destructor_t metal_destructors_end;
 
+extern  void  soc_init();
+
 void metal_init(void) {
     /* Make sure the constructors only run once */
     static int init_done = 0;
     if (init_done) {
         return;
     }
+    soc_init();
     init_done = 1;
 
     if (&metal_constructors_end <= &metal_constructors_start) {
         return;
     }
+
 
     metal_constructor_t *funcptr = &metal_constructors_start;
     while (funcptr != &metal_constructors_end) {

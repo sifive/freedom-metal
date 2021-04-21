@@ -318,7 +318,6 @@ int __metal_driver_sifive_flash_write(struct metal_flash *flash, uint32_t mem_ad
 	uint32_t *dataptr=(uint32_t *)tx_buf;
 	uint32_t *memaddr=(uint32_t *)mem_addr_offset;
 
-	//printf(" Size %d\n" , size);
 
 	for(int i=0;i<size/4;i++)
 	{
@@ -343,7 +342,6 @@ int __metal_driver_sifive_flash_write(struct metal_flash *flash, uint32_t mem_ad
 
 		metal_qspi_write(qspi,memaddr,4,(uint8_t*)dataptr);
 
-		//printf("mem_addr_offset %x, i=%d  tx_buf %x %x\n",memaddr,i,dataptr,*dataptr);
 		memaddr++;
 		dataptr++;
 
@@ -411,7 +409,7 @@ int __metal_driver_sifive_flash_erase(struct metal_flash *flash, unsigned int ad
 
 		metal_qspi_execute_cmd(qspi);
 
-		printf(" Erase flash sector from %x \n", addr);
+		DEBUG_INFO(" Erase flash sector from %x \n", addr);
 
 		/*set cmd_en and address enable phase*/
 

@@ -20,6 +20,10 @@ static unsigned long long otp_control_base=0;
 
 #define OPT_WRITE_CONFIG 0x104C2704
 #define OPT_READ_CONFIG  0x104C2700
+#define SCR_REG_BASE_ADDR       		0x4F0010000UL
+#define PCSS_SCR_PCSS_MISC_RESET             ( SCR_REG_BASE_ADDR	      + 0x0068 )
+#define METAL_PCSS_REGW(ADDR)	(__METAL_ACCESS_ONCE((__metal_io_u32 *)(unsigned long long)ADDR))
+
 
 static int __metal_sifive_otp_read(uint64_t otp_ctrl_base, uint64_t addr, const size_t len, uint8_t *rx_buff, int nbits,uint32_t mask)
 {
@@ -142,6 +146,17 @@ int __metal_driver_sifive_nb2otp_init(struct metal_otp *otp,void *ptr)
 {
 	int retval=0;
 	otp_control_base=(uintptr_t)__metal_driver_sifive_nb2otp_base(otp);
+
+
+	uint32_t rd_dt=0;
+
+	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=0xC00;
+
+
+	// Deasserting EFUSE Reset
+	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET);
+	rd_dt = (rd_dt | 0x200);                            //EFUSE Bit
+	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=rd_dt;
 
 	return retval;
 }
