@@ -147,17 +147,6 @@ int __metal_driver_sifive_nb2otp_init(struct metal_otp *otp,void *ptr)
 	int retval=0;
 	otp_control_base=(uintptr_t)__metal_driver_sifive_nb2otp_base(otp);
 
-
-	uint32_t rd_dt=0;
-
-	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=0xC00;
-
-
-	// Deasserting EFUSE Reset
-	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET);
-	rd_dt = (rd_dt | 0x200);                            //EFUSE Bit
-	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=rd_dt;
-
 	return retval;
 }
 

@@ -43,15 +43,7 @@
 #define SCR_REG_BASE_ADDR       		0x4F0010000UL
 #define SCR_IOMUX_HSSS_CFG_BASE_ADDR    	0x301500000UL
 
-#define PCSS_SCR_PMISCSS_QSPI_NIU_RESET			( SCR_RESET_BASE_ADDR + 0x0018 )
-#define PCSS_SCR_PMISCSS_QSPI_RESET			    ( SCR_REG_BASE_ADDR   + 0x0084 )
 
-#define HSSS_SCR_IOMUX_CONFIG_QSPI0_SCK                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x00F8 )
-#define HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ0                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x00FC )
-#define HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ1                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0100 )
-#define HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ2                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0104 )
-#define HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ3                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0108 )
-#define HSSS_SCR_IOMUX_CONFIG_QSPI0_CS                  ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x010C )
 
 #define  QSPI_IDLE_STATE    0
 #define  QSPI_COMMAND_STATe 1
@@ -143,21 +135,6 @@ static void post_rate_change_callback_func(void *priv)
 	metal_qspi_set_baud_rate(&qspi->qspi, qspi->baud_rate);
 }
 
-static void qspi_iomux_config(void)
-{
-	METAL_QSPI_IOMUX_REGW(PCSS_SCR_PMISCSS_QSPI_NIU_RESET) = 0x0;  //Deassert QSPI NIU Reset
-	METAL_QSPI_IOMUX_REGW(PCSS_SCR_PMISCSS_QSPI_RESET) = 0X0;      //Deassert QSPI Reset
-	for(volatile int i=0;i<100;i++);
-	METAL_QSPI_IOMUX_REGW(PCSS_SCR_PMISCSS_QSPI_NIU_RESET) = 0x6;  //Deassert QSPI NIU Reset
-	METAL_QSPI_IOMUX_REGW(PCSS_SCR_PMISCSS_QSPI_RESET) = 0X7;      //Deassert QSPI Reset
-
-	METAL_QSPI_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_QSPI0_SCK) = 0x1301;
-	METAL_QSPI_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ0) = 0x1301;
-	METAL_QSPI_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ1) = 0x1301;
-	METAL_QSPI_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ2) = 0x1301;
-	METAL_QSPI_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_QSPI0_DQ3) = 0x1301;
-	METAL_QSPI_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_QSPI0_CS)  = 0x1301;
-}
 
 /*********************************************************************************************************************************************/
 
@@ -295,7 +272,6 @@ int __metal_driver_sifive_nb2qspi0_init(struct metal_qspi *gqspi, uint32_t baud_
 	//	struct __metal_driver_sifive_nb2gpio0 *pinmux = __metal_driver_sifive_nb2qspi0_pinmux(gqspi);
 
 	/* QSPI IOMUX CONFIG */
-	qspi_iomux_config();
 
 	if(clock != NULL) {
 		qspi->pre_rate_change_callback.callback = &pre_rate_change_callback_func;

@@ -20,8 +20,11 @@
 #define EMMC_RCA 0x1000
 
 
+
+
 #define SD_HOST_CLK 200000000
 #define SD_ADDR_SECTOR_MODE 1
+#define SD_ADDR_BYTE_MODE 0
 
 
 #define SWR (1 << 0)
@@ -267,22 +270,7 @@ static bool conditional_wait(volatile unsigned long reg,uint32_t val, bool condi
 	}while(val & SWR== condition);
 }
 */
-static void emmc_iomux_config(void)
-{
-	METAL_EMMC_IOMUX_REGW(PCSS_SCR_EMMC_SDIO_NIU_RESET) = 0X49; //Deassert EMMC/SDIO NIU Reset
-	METAL_EMMC_IOMUX_REGW(PCSS_SCR_EMMC_SDIO_RESET) = 0X1FF;   //Deassert EMMC/SDIO Reset
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_CLK) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_CMD) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT0) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT1) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT2) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT3) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT4) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT5) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT6) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT7) = 0x5500;
-	METAL_EMMC_IOMUX_REGW(HSSS_SCR_IOMUX_CONFIG_EMMC0_DS) = 0x5500;
-}
+
 
 static void emmc_host_reset()
 {
@@ -1031,11 +1019,11 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 	emmc->deviceblocklen=DEVICE_BLOCK_SIZE;
 
 	/*IOMUX CONFIG FOR EMMC */
-	emmc_iomux_config();
+	//emmc_iomux_config();
 
 	emmc_host_initialization();
 
-	retval=emmc_card_init(0);
+	retval=emmc_card_init(1);
 
 	return retval;
 }
@@ -1056,34 +1044,74 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 
 	emmc_set_block_size(emmc->deviceblocklen);
 
+
 	uint32_t nblocklocks=len/emmc->deviceblocklen;
-	emmc_set_nblocks(nblocklocks);
 
-
-	input_cmd.cmd=EMMC_CMD18;
-	input_cmd.arg=addr;
-	input_cmd.response_type=EMMC_RESPONSE_R1;
-	input_cmd.data_present=1;
-	input_cmd.data_direction=EMMC_TRANSFER_READ;
-	input_cmd.dataptr=rx_buff;
-	input_cmd.dataptrpos=rx_buff;
-	input_cmd.dataRemaining=len;
-	input_cmd.blocklen=emmc->deviceblocklen;
-	input_cmd.blockcnt=nblocklocks;
-
-	retval=emmc_host_send_cmd(&input_cmd);//((EMMC_CMD17 << CI) | (1 << DPS) | (2 << CRCCE) | (1 << DTDS) | (2 << RTS)), addr);
-	if(retval==0)
+	if(nblocklocks>1)
 	{
-		do
-		{
-		// wait for BRE(buffer read enable)
-		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
-		process_databuffer_read(&input_cmd);
-		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
-		} while ((status & (1 << TC)) == 0);
-	}else{
+		emmc_set_nblocks(nblocklocks);
 
-		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+
+		input_cmd.cmd=EMMC_CMD18;
+		input_cmd.arg=addr;
+		input_cmd.response_type=EMMC_RESPONSE_R1;
+		input_cmd.data_present=1;
+		input_cmd.data_direction=EMMC_TRANSFER_READ;
+		input_cmd.dataptr=rx_buff;
+		input_cmd.dataptrpos=rx_buff;
+		input_cmd.dataRemaining=len;
+		input_cmd.blocklen=emmc->deviceblocklen;
+		input_cmd.blockcnt=nblocklocks;
+
+		retval=emmc_host_send_cmd(&input_cmd);//((EMMC_CMD17 << CI) | (1 << DPS) | (2 << CRCCE) | (1 << DTDS) | (2 << RTS)), addr);
+		if(retval==0)
+		{
+			do
+			{
+				// wait for BRE(buffer read enable)
+				while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
+				process_databuffer_read(&input_cmd);
+				status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+			} while ((status & (1 << TC)) == 0);
+		}else{
+
+			DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+		}
+	}else
+	{
+
+		if(nblocklocks==1)
+		{
+			input_cmd.cmd=EMMC_CMD17;
+			input_cmd.arg=addr;
+			input_cmd.response_type=EMMC_RESPONSE_R1;
+			input_cmd.data_present=1;
+			input_cmd.data_direction=EMMC_TRANSFER_READ;
+			input_cmd.dataptr=rx_buff;
+			input_cmd.dataptrpos=rx_buff;
+			input_cmd.dataRemaining=len;
+			input_cmd.blocklen=emmc->deviceblocklen;
+			input_cmd.blockcnt=1;
+
+			retval=emmc_host_send_cmd(&input_cmd);//((EMMC_CMD17 << CI) | (1 << DPS) | (2 << CRCCE) | (1 << DTDS) | (2 << RTS)), addr);
+			if(retval==0)
+			{
+				do
+				{
+					// wait for BRE(buffer read enable)
+					while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS09) >> BRE) & 0x01) == 0 );
+					process_databuffer_read(&input_cmd);
+					status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+				} while ((status & (1 << TC)) == 0);
+			}else{
+
+				DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
+			}
+		}else
+		{
+			retval=-1;
+		}
+
 	}
 
 	emmc_select_card(0);
@@ -1123,10 +1151,10 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 	{
 		do
 		{
-		/*wait for BWE(buffer write enable)*/
-		while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BWR) & 0x01) == 0 );
-		process_databuffer_write(&input_cmd);
-		status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
+			/*wait for BWE(buffer write enable)*/
+			while(((METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12) >> BWR) & 0x01) == 0 );
+			process_databuffer_write(&input_cmd);
+			status = METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS12);
 		} while ((status & (1 << TC)) == 0);
 	}else{
 
