@@ -9,9 +9,9 @@ void _exit(int exit_status) {
 
 #if __riscv_xlen == 32
     if (exit_status == 0)
-        value = (uintptr_t) ((2 << 16) + 38);
+        value = (uintptr_t)((2 << 16) + 38);
     else
-        value = (uintptr_t) ((2 << 16) + 35);
+        value = (uintptr_t)((2 << 16) + 35);
     (void)semihost_call_host(SEMIHOST_SYS_EXIT, value);
 #elif __riscv_xlen == 64
     volatile semihostparam_t arg = {.param1 = (uintptr_t)((2 << 16) + 38),
