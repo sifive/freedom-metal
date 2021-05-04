@@ -73,7 +73,6 @@ _enter:
      * segments having been initialized.  This is done to avoid putting a
      * burden on systems that can be initialized without having a C environment
      * set up. */
-    .weak __metal_before_start
     la ra, __metal_before_start
     beqz ra, 1f
     jalr ra

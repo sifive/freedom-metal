@@ -109,6 +109,36 @@ _start:
      complete */
   fence.i
 
+2:
+
+  /* Copy the LIM section */
+  la t0, metal_segment_lim_source_start
+  la t1, metal_segment_lim_target_start
+  la t2, metal_segment_lim_target_end
+
+  beq t0, t1, 2f
+  bge t1, t2, 2f
+
+1:
+#if __riscv_xlen == 32
+  lw   a0, 0(t0)
+  addi t0, t0, 4
+  sw   a0, 0(t1)
+  addi t1, t1, 4
+  blt  t1, t2, 1b
+#else
+  ld   a0, 0(t0)
+  addi t0, t0, 8
+  sd   a0, 0(t1)
+  addi t1, t1, 8
+  blt  t1, t2, 1b
+#endif
+2:
+
+  /* Fence all subsequent instruction fetches until after the LIM writes
+     complete */
+  fence.i
+
   /* Zero the BSS segment. */
   la t1, metal_segment_bss_target_start
   la t2, metal_segment_bss_target_end
@@ -126,6 +156,10 @@ _start:
   blt  t1, t2, 1b
 #endif
 2:
+
+  /* Set TLS pointer */
+  .weak __tls_base	
+  la tp, __tls_base
 
   /* At this point we're in an environment that can execute C code.  The first
    * thing to do is to make the callback to the parent environment if it's been
@@ -182,6 +216,16 @@ _skip_init:
   or   a5, a5, a4
   csrw mstatus, a5
   csrwi fcsr, 0
+1:
+
+  /* Check for vector extension support and enable it if found */
+  csrr a5, misa
+  li a4, 0x200000
+  and a5, a5, a4
+  beqz a5, 1f
+  csrr a5, mstatus
+  ori a5, a5, 0x200
+  csrw mstatus, a5
 1:
 
   /* This is a C runtime, so main() is defined to have some arguments. 
@@ -254,6 +298,7 @@ secondary_main:
 .global envp
 argc:
 .word 1
+.align 8
 argv:
 .dc.a name
 envp:

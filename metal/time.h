@@ -5,8 +5,9 @@
 #define METAL__TIME_H
 
 #include <time.h>
-
+#ifndef __SEGGER_LIBC__
 #include <sys/time.h>
+#endif
 
 /*!
  * @file time.h

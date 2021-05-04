@@ -1,0 +1,76 @@
+on:
+  push:
+    # Require one of the following patterns to match the tag
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+.[0-9]+' # ex. v20.00.00.00
+      - 'v[0-9]+.[0-9]+.RC.[0-9]+'     # ex. v20.00.RC.00
+
+name: Create Release
+
+env:
+  PROJECT_NAME: freedom-metal
+  # Release is a prerelease if the tag contains rc
+  PRERELEASE: ${{ contains(github.ref, 'RC') }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Perform a recursive, PAT-authenticated checkout of all freedom-metal
+      # submodules. This allows us to update the published docs on github.io.
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: 'Create Release Notes'
+        uses: sifive/action-release-notes@v1
+        id: create-release-notes
+        with:
+          project-name: ${{ env.PROJECT_NAME }}
+          release: ${{ github.ref }}
+
+      - name: 'Create Release'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ env.PROJECT_NAME }} ${{ github.ref }}
+          body: ${{ steps.create-release-notes.outputs.release-notes }}
+          draft: false
+          prerelease: ${{ env.PRERELEASE }}
+
+      - name: 'Build Docker Image for Docs Build'
+        run: |
+          docker build -t docs-build -f doc/Dockerfile .
+
+      - name: 'Clean Docs Output Folder'
+        run: |
+          cd doc/html
+          git fetch
+          git checkout master
+          git reset --hard origin/master
+
+      - name: 'Build Sphinx Documentation'
+        run: |
+          tag=$(echo ${{ github.ref }} | cut -d '/' -f 3)
+          docker run \
+            --rm \
+            -v $(pwd):/freedom-metal \
+            -e RELEASE_TAG="${tag}" \
+            docs-build \
+            make -C /freedom-metal/doc clean html
+
+      - name: 'Publish Documentation'
+        run: |
+          tag=$(echo ${{ github.ref }} | cut -d '/' -f 3)
+          cd doc/html
+          git config user.email "no-reply@sifive.com"
+          git config user.name "actions-bot"
+          git add .
+          git commit -m "Documentation for ${{ env.PROJECT_NAME }} ${tag}"
+          git push

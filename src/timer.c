@@ -4,8 +4,10 @@
 #include <metal/cpu.h>
 #include <metal/machine.h>
 #include <metal/timer.h>
+#ifndef __SEGGER_LIBC__
 #include <sys/time.h>
 #include <sys/times.h>
+#endif
 
 #if defined(__METAL_DT_MAX_HARTS)
 /* This implementation serves as a small shim that interfaces with the first

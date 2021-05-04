@@ -260,7 +260,8 @@ static int find_closest_config(long ref_hz, long rate) {
          i--) {
         long config_freq = get_pll_config_freq(ref_hz, &(pll_configs[i]));
         if (config_freq != PLL_CONFIG_NOT_VALID) {
-            long freq_diff = abs(config_freq - rate);
+            long freq_diff = labs(config_freq - rate);
+
             if (freq_diff < closest_diff) {
                 closest_index = i;
                 closest_diff = freq_diff;

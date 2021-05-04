@@ -38,6 +38,7 @@ nobase_include_HEADERS += \
 	metal/drivers/riscv_clint0.h \
 	metal/drivers/riscv_cpu.h \
 	metal/drivers/riscv_plic0.h \
+	metal/drivers/sifive_buserror0.h \
 	metal/drivers/sifive_ccache0.h \
 	metal/drivers/sifive_clic0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
@@ -45,13 +46,13 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_fe310-g000_lfrosc.h \
 	metal/drivers/sifive_fe310-g000_pll.h \
 	metal/drivers/sifive_fe310-g000_prci.h \
-	metal/drivers/sifive_fu540-c000_l2.h \
 	metal/drivers/sifive_global-external-interrupts0.h \
 	metal/drivers/sifive_gpio-buttons.h \
 	metal/drivers/sifive_gpio-leds.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h \
 	metal/drivers/sifive_i2c0.h \
+	metal/drivers/sifive_l2pf0.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_pwm0.h \
 	metal/drivers/sifive_rtc0.h \
@@ -59,6 +60,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_trace.h \
 	metal/drivers/sifive_uart0.h \
+	metal/drivers/sifive_simuart0.h \
 	metal/drivers/sifive_wdog0.h \
 	metal/drivers/ucb_htif0.h \
 	metal/atomic.h \
@@ -69,12 +71,14 @@ nobase_include_HEADERS += \
 	metal/cpu.h \
 	metal/csr.h \
 	metal/gpio.h \
+	metal/hpm.h \
 	metal/i2c.h \
 	metal/init.h \
 	metal/interrupt.h \
 	metal/io.h \
 	metal/itim.h \
 	metal/led.h \
+	metal/lim.h \
 	metal/lock.h \
 	metal/memory.h \
 	metal/pmp.h \
@@ -83,6 +87,7 @@ nobase_include_HEADERS += \
 	metal/rtc.h \
 	metal/semihosting.h \
 	metal/shutdown.h \
+	metal/scrub.h \
 	metal/spi.h \
 	metal/switch.h \
 	metal/timer.h \
@@ -104,6 +109,7 @@ libmetal_a_SOURCES = \
 	src/drivers/riscv_clint0.c \
 	src/drivers/riscv_cpu.c \
 	src/drivers/riscv_plic0.c \
+	src/drivers/sifive_buserror0.c \
 	src/drivers/sifive_ccache0.c \
 	src/drivers/sifive_clic0.c \
 	src/drivers/sifive_fe310-g000_hfrosc.c \
@@ -111,13 +117,13 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_fe310-g000_lfrosc.c \
 	src/drivers/sifive_fe310-g000_pll.c \
 	src/drivers/sifive_fe310-g000_prci.c \
-	src/drivers/sifive_fu540-c000_l2.c \
 	src/drivers/sifive_global-external-interrupts0.c \
 	src/drivers/sifive_gpio-buttons.c \
 	src/drivers/sifive_gpio-leds.c \
 	src/drivers/sifive_gpio-switches.c \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
+	src/drivers/sifive_l2pf0.c \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_pwm0.c \
 	src/drivers/sifive_rtc0.c \
@@ -125,6 +131,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_test0.c \
 	src/drivers/sifive_trace.c \
 	src/drivers/sifive_uart0.c \
+	src/drivers/sifive_simuart0.c \
 	src/drivers/sifive_wdog0.c \
 	src/drivers/ucb_htif0.c \
 	src/atomic.c \
@@ -133,8 +140,10 @@ libmetal_a_SOURCES = \
 	src/clock.c \
 	src/cpu.c \
 	src/entry.S \
+	src/scrub.S \
 	src/trap.S \
 	src/gpio.c \
+	src/hpm.c \
 	src/i2c.c \
 	src/init.c \
 	src/interrupt.c \
@@ -158,6 +167,22 @@ libmetal_a_SOURCES = \
 	src/watchdog.c
 
 ########################################################
+# libsegger
+########################################################
+
+# Provide segger hook with Freedom Metal that is built when
+# --with-builtin-libmetal-segger is passed to configure
+if WITH_BUILTIN_LIBMETAL_SEGGER
+
+lib_LIBRARIES += libmetal-segger.a
+
+libmetal_segger_a_SOURCES = \
+       gloss/crt0.S \
+       segger/SEGGER_target_metal.c
+
+endif # WITH_BUILTIN_LIBMETAL_SEGGER
+
+########################################################
 # libgloss
 ########################################################
 
@@ -174,6 +199,7 @@ libmetal_gloss_a_SOURCES = \
 	gloss/sys_chdir.c \
 	gloss/sys_chmod.c \
 	gloss/sys_chown.c \
+	gloss/sys_clock_gettime.c \
 	gloss/sys_close.c \
 	gloss/sys_execve.c \
 	gloss/sys_exit.c \

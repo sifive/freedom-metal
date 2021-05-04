@@ -1,3 +1,4 @@
+#include <metal/scrub.h>
 #include <sys/types.h>
 
 /* brk is handled entirely within the C library.  This limits METAL programs
@@ -8,15 +9,20 @@
  * that's been allocated. */
 extern char metal_segment_heap_target_start;
 extern char metal_segment_heap_target_end;
-static char *brk = &metal_segment_heap_target_start;
+static char *__brk = &metal_segment_heap_target_start;
+
+#ifdef _PICOLIBC__
+#define _brk brk
+#define _sbrk sbrk
+#endif
 
 int _brk(void *addr) {
-    brk = addr;
+    __brk = addr;
     return 0;
 }
 
 char *_sbrk(ptrdiff_t incr) {
-    char *old = brk;
+    char *old = __brk;
 
     /* If __heap_size == 0, we can't allocate memory on the heap */
     if (&metal_segment_heap_target_start == &metal_segment_heap_target_end) {
@@ -24,12 +30,14 @@ char *_sbrk(ptrdiff_t incr) {
     }
 
     /* Don't move the break past the end of the heap */
-    if ((brk + incr) < &metal_segment_heap_target_end) {
-        brk += incr;
+    if ((__brk + incr) < &metal_segment_heap_target_end) {
+        __brk += incr;
     } else {
-        brk = &metal_segment_heap_target_end;
+        __brk = &metal_segment_heap_target_end;
         return (void *)-1;
     }
+    /* Scrub out allocated memory to avoid spurious ECC errors */
+    metal_mem_scrub(old, incr);
 
     return old;
 }
