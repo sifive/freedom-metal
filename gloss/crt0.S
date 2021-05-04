@@ -10,6 +10,7 @@
 */
 
 /* crt0.S: Entry point for RISC-V METAL programs. */
+.extern _getcmdline
 
 .section .text.libgloss.start
 .global _start
@@ -227,12 +228,11 @@ _skip_init:
   csrw mstatus, a5
 1:
 
-  /* This is a C runtime, so main() is defined to have some arguments.  Since
-   * there's nothing sane the METAL can pass we don't bother with that but
-   * instead just setup as close to a NOP as we can. */
-  li a0, 1     /* argc=1 */
-  la a1, argv  /* argv = {"libgloss", NULL} */
-  la a2, envp  /* envp = {NULL} */
+  /* This is a C runtime, so main() is defined to have some arguments. 
+   * If we use semihosting these arguments can came from the host
+   * otherwise argc=1, argv = {"libgloss", NULL}, envp = {NULL}
+   */
+  call _getcmdline
   call secondary_main
 
   /* Call exit to handle libc's cleanup routines.  Under normal contains this
@@ -293,6 +293,11 @@ secondary_main:
 /* This shim allows main() to be passed a set of arguments that can satisfy the
  * requirements of the C API. */
 .section .rodata.libgloss.start
+.global argc
+.global argv
+.global envp
+argc:
+.word 1
 .align 8
 argv:
 .dc.a name

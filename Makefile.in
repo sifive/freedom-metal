@@ -166,8 +166,9 @@ am__libmetal_gloss_a_SOURCES_DIST = gloss/crt0.S gloss/nanosleep.c \
 	gloss/sys_chown.c gloss/sys_clock_gettime.c gloss/sys_close.c \
 	gloss/sys_execve.c gloss/sys_exit.c gloss/sys_faccessat.c \
 	gloss/sys_fork.c gloss/sys_fstat.c gloss/sys_fstatat.c \
-	gloss/sys_ftime.c gloss/sys_getcwd.c gloss/sys_getpid.c \
-	gloss/sys_gettimeofday.c gloss/sys_isatty.c gloss/sys_kill.c \
+	gloss/sys_ftime.c gloss/sys_getcmdline.c gloss/sys_getcwd.c \
+
+	gloss/sys_getpid.c gloss/sys_gettimeofday.c gloss/sys_isatty.c gloss/sys_kill.c \
 	gloss/sys_link.c gloss/sys_lseek.c gloss/sys_lstat.c \
 	gloss/sys_open.c gloss/sys_openat.c gloss/sys_read.c \
 	gloss/sys_sbrk.c gloss/sys_stat.c gloss/sys_sysconf.c \
@@ -190,6 +191,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstat.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstatat.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_ftime.$(OBJEXT) \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getcmdline.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getcwd.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getpid.$(OBJEXT) \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_gettimeofday.$(OBJEXT) \
@@ -441,7 +443,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -476,13 +477,13 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_spi0.h metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_trace.h metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_simuart0.h metal/drivers/sifive_wdog0.h \
-	metal/drivers/ucb_htif0.h metal/drivers/sifive_hca1_regs.h\
-	metal/atomic.h metal/button.h \
-	metal/cache.h metal/clock.h metal/compiler.h metal/cpu.h \
-	metal/csr.h metal/gpio.h metal/hpm.h metal/i2c.h metal/init.h \
-	metal/interrupt.h metal/io.h metal/itim.h metal/led.h \
-	metal/lim.h metal/lock.h metal/memory.h metal/pmp.h \
-	metal/privilege.h metal/pwm.h metal/rtc.h metal/shutdown.h \
+	metal/drivers/ucb_htif0.h metal/drivers/sifive_hca1_regs.h \
+	metal/atomic.h metal/button.h metal/cache.h metal/clock.h \
+	metal/compiler.h metal/cpu.h metal/csr.h metal/gpio.h \
+	metal/hpm.h metal/i2c.h metal/init.h metal/interrupt.h \
+	metal/io.h metal/itim.h metal/led.h metal/lim.h \
+	metal/lock.h metal/memory.h metal/pmp.h metal/privilege.h \
+	metal/pwm.h metal/rtc.h metal/semihosting.h metal/shutdown.h \
 	metal/scrub.h metal/spi.h metal/switch.h metal/timer.h \
 	metal/time.h metal/tty.h metal/uart.h metal/watchdog.h
 
@@ -581,6 +582,7 @@ libmetal_a_SOURCES = \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstat.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_fstatat.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_ftime.c \
+@WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getcmdline.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getcwd.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_getpid.c \
 @WITH_BUILTIN_LIBGLOSS_TRUE@	gloss/sys_gettimeofday.c \
@@ -705,6 +707,8 @@ gloss/sys_fstat.$(OBJEXT): gloss/$(am__dirstamp) \
 gloss/sys_fstatat.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/sys_ftime.$(OBJEXT): gloss/$(am__dirstamp) \
+	gloss/$(DEPDIR)/$(am__dirstamp)
+gloss/sys_getcmdline.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
 gloss/sys_getcwd.$(OBJEXT): gloss/$(am__dirstamp) \
 	gloss/$(DEPDIR)/$(am__dirstamp)
@@ -916,6 +920,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_fstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_fstatat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_ftime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_getcmdline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_getcwd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_getpid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_gettimeofday.Po@am__quote@
