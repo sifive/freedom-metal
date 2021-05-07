@@ -9,9 +9,14 @@ struct metal_memory *metal_get_memory_from_address(const uintptr_t address) {
         struct metal_memory *mem = __metal_memory_table[i];
 
         uintptr_t lower_bound = metal_memory_get_base_address(mem);
-        uintptr_t upper_bound = lower_bound + metal_memory_get_size(mem);
+        uintptr_t upper_bound = lower_bound + (metal_memory_get_size(mem) - 1);
 
-        if ((address >= lower_bound) && (address < upper_bound)) {
+        if (upper_bound < lower_bound) {
+            /* overflow detected this memory range is ignored */
+            continue;
+        }
+
+        if ((address >= lower_bound) && (address <= upper_bound)) {
             return mem;
         }
     }
