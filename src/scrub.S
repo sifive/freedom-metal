@@ -87,7 +87,6 @@ __metal_memory_scrub:
  */
 .weak __metal_eccscrub_bit
 .weak __metal_before_start
-.global __metal_before_start
 .type __metal_before_start, @function
 __metal_before_start:
     /* Save caller ra */
