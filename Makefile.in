@@ -167,7 +167,6 @@ am__libmetal_gloss_a_SOURCES_DIST = gloss/crt0.S gloss/nanosleep.c \
 	gloss/sys_execve.c gloss/sys_exit.c gloss/sys_faccessat.c \
 	gloss/sys_fork.c gloss/sys_fstat.c gloss/sys_fstatat.c \
 	gloss/sys_ftime.c gloss/sys_getcmdline.c gloss/sys_getcwd.c \
-
 	gloss/sys_getpid.c gloss/sys_gettimeofday.c gloss/sys_isatty.c gloss/sys_kill.c \
 	gloss/sys_link.c gloss/sys_lseek.c gloss/sys_lstat.c \
 	gloss/sys_open.c gloss/sys_openat.c gloss/sys_read.c \
