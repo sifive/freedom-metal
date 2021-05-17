@@ -264,7 +264,6 @@ _fini:
 /* By default, secondary_main will cause secondary harts to spin forever.
  * Users can redefine secondary_main themselves to run code on secondary harts */
 .weak   secondary_main
-.global secondary_main
 .type   secondary_main, @function
 
 secondary_main:
@@ -293,6 +292,7 @@ secondary_main:
 /* This shim allows main() to be passed a set of arguments that can satisfy the
  * requirements of the C API. */
 .section .rodata.libgloss.start
+.align 8
 argv:
 .dc.a name
 envp:
