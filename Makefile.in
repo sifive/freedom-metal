@@ -253,15 +253,14 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/ucb_htif0.$(OBJEXT) src/atomic.$(OBJEXT) \
 	src/button.$(OBJEXT) src/cache.$(OBJEXT) src/clock.$(OBJEXT) \
 	src/cpu.$(OBJEXT) src/entry.$(OBJEXT) src/scrub.$(OBJEXT) \
-	src/trap.$(OBJEXT) src/gpio.$(OBJEXT) src/hpm.$(OBJEXT) \
-	src/i2c.$(OBJEXT) src/init.$(OBJEXT) src/interrupt.$(OBJEXT) \
-	src/led.$(OBJEXT) src/lock.$(OBJEXT) src/memory.$(OBJEXT) \
-	src/pmp.$(OBJEXT) src/privilege.$(OBJEXT) src/pwm.$(OBJEXT) \
-	src/rtc.$(OBJEXT) src/shutdown.$(OBJEXT) src/spi.$(OBJEXT) \
-	src/switch.$(OBJEXT) src/synchronize_harts.$(OBJEXT) \
-	src/timer.$(OBJEXT) src/time.$(OBJEXT) src/trap.$(OBJEXT) \
-	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
-	src/watchdog.$(OBJEXT)
+	src/gpio.$(OBJEXT) src/hpm.$(OBJEXT) src/i2c.$(OBJEXT) \
+	src/init.$(OBJEXT) src/interrupt.$(OBJEXT) src/led.$(OBJEXT) \
+	src/lock.$(OBJEXT) src/memory.$(OBJEXT) src/pmp.$(OBJEXT) \
+	src/privilege.$(OBJEXT) src/pwm.$(OBJEXT) src/rtc.$(OBJEXT) \
+	src/shutdown.$(OBJEXT) src/spi.$(OBJEXT) src/switch.$(OBJEXT) \
+	src/synchronize_harts.$(OBJEXT) src/timer.$(OBJEXT) \
+	src/time.$(OBJEXT) src/trap.$(OBJEXT) src/tty.$(OBJEXT) \
+	src/uart.$(OBJEXT) src/vector.$(OBJEXT) src/watchdog.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -536,7 +535,6 @@ libmetal_a_SOURCES = \
 	src/cpu.c \
 	src/entry.S \
 	src/scrub.S \
-	src/trap.S \
 	src/gpio.c \
 	src/hpm.c \
 	src/i2c.c \
@@ -854,7 +852,6 @@ src/clock.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/cpu.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/entry.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/scrub.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
-src/trap.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/gpio.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/hpm.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/i2c.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
@@ -879,6 +876,7 @@ src/synchronize_harts.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/timer.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/time.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/trap.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/tty.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/uart.$(OBJEXT): src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/vector.$(OBJEXT): src/$(am__dirstamp) \
