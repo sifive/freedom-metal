@@ -97,8 +97,6 @@ void soc_init()
 {
 	uint32_t rd_dt=0;
 
-	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=0xC00;
-
 
 	// Deasserting NIU Rest for UART0
 	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_NIU_RESET);
@@ -109,7 +107,7 @@ void soc_init()
 	/*Deassert reset of all UARTs */
 
 	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET);
-	rd_dt = (rd_dt & ~0x202);
+	rd_dt = (rd_dt & ~0xE02);
 	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=rd_dt;
 
 	METAL_PCSS_REGW(PCSS_SCR_PNOCSS_RESET)=0x63F;
@@ -130,7 +128,7 @@ void soc_init()
 
 	// Deasserting APB Rest for UART0 &  EFUSE Bit
 	rd_dt = METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET);
-	rd_dt = (rd_dt | 0x202);                            
+	rd_dt = (rd_dt | 0xE02);                            
 	METAL_PCSS_REGW(PCSS_SCR_PCSS_MISC_RESET)=rd_dt;
 
 	METAL_PCSS_REGW(PCSS_PINMUX_SCR_RESET)=0x1;
