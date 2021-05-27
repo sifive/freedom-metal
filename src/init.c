@@ -1,7 +1,10 @@
 /* Copyright 2019 SiFive Inc. */
 /* SPDX-License-Identifier: Apache-2.0 */
 
+#include <metal/machine/platform.h>
 #include <metal/init.h>
+
+#include <metal/drivers/sifive_l2pf1.h>
 
 /*
  * These function pointers are created by the linker script
@@ -21,6 +24,11 @@ void metal_init(void) {
         return;
     }
     init_done = 1;
+
+#ifdef METAL_SIFIVE_L2PF1
+    /* Do L2 Stride Prefetcher initialization. */
+    sifive_l2pf1_init();
+#endif
 
     if (&metal_constructors_end <= &metal_constructors_start) {
         return;
