@@ -242,6 +242,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/sifive_gpio0.$(OBJEXT) \
 	src/drivers/sifive_i2c0.$(OBJEXT) \
 	src/drivers/sifive_l2pf0.$(OBJEXT) \
+	src/drivers/sifive_l2pf1.$(OBJEXT) \
 	src/drivers/sifive_local-external-interrupts0.$(OBJEXT) \
 	src/drivers/sifive_pwm0.$(OBJEXT) \
 	src/drivers/sifive_rtc0.$(OBJEXT) \
@@ -473,6 +474,7 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h metal/drivers/sifive_i2c0.h \
 	metal/drivers/sifive_l2pf0.h \
+	metal/drivers/sifive_l2pf1.h \
 	metal/drivers/sifive_local-external-interrupts0.h \
 	metal/drivers/sifive_pwm0.h metal/drivers/sifive_rtc0.h \
 	metal/drivers/sifive_spi0.h metal/drivers/sifive_test0.h \
@@ -523,6 +525,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_gpio0.c \
 	src/drivers/sifive_i2c0.c \
 	src/drivers/sifive_l2pf0.c \
+	src/drivers/sifive_l2pf1.c \
 	src/drivers/sifive_local-external-interrupts0.c \
 	src/drivers/sifive_pwm0.c \
 	src/drivers/sifive_rtc0.c \
@@ -825,6 +828,8 @@ src/drivers/sifive_i2c0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_l2pf0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/sifive_l2pf1.$(OBJEXT): src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_local-external-interrupts0.$(OBJEXT):  \
 	src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
@@ -998,6 +1003,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_gpio0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_i2c0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_l2pf0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_l2pf1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_local-external-interrupts0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_pwm0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_rtc0.Po@am__quote@
