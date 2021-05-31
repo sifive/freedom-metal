@@ -228,6 +228,10 @@ Slot Register Set
 #define METAL_EMMC_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_EMMC_REG(offset)))
 #define METAL_EMMC_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_EMMC_REG(offset)))
 
+
+#define METAL_REGDW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u64 *)METAL_CLINT_REG(offset)))
+
+
 #define METAL_EMMC_IOMUX_REGW(ADDR)	 (__METAL_ACCESS_ONCE((__metal_io_u32 *)ADDR))
 
 #define SCR_RESET_BASE_ADDR     	0x4F0011000UL
@@ -255,6 +259,8 @@ static eMMCRequest_t input_cmd;
 uint32_t g_data_buffer[128]; //512 bytes
 
 static uint32_t g_emmc_host_clk=0;
+
+static struct metal_cpu *g_cpu;
 
 static inline uint8_t GET_BYTE_FROM_BUFFER(const void* buffer, uintptr_t byteNumber)
 {
@@ -492,6 +498,7 @@ static int emmc_select_card (uint32_t card_rca)
 {
 	int retval=0;
 	//eMMCRequest_t input_cmd;
+
 	input_cmd.cmd=EMMC_CMD7;
 	if (card_rca == 0x000){
 
@@ -500,7 +507,6 @@ static int emmc_select_card (uint32_t card_rca)
 		input_cmd.data_present=0;
 
 		// no response from the deselected Card
-		//sd_emmc_host_send_cmd((7 << CI) | (0 << CRCCE) | (0 << RTS), 0x0000, 0);
 	}
 	else{
 		//  R1/R1b response from the selected Card
@@ -612,6 +618,60 @@ static int emmc_card_init(unsigned int low_voltage_en)
 }
 
 
+static int emmc_check_status()
+{
+	int retval=0;
+	//eMMCRequest_t input_cmd;
+	input_cmd.cmd=EMMC_CMD13;
+	input_cmd.arg=(EMMC_RCA<< 16);
+	input_cmd.response_type=EMMC_RESPONSE_R1;
+	input_cmd.data_present=0;
+	emmc_host_send_cmd(&input_cmd);//(EMMC_CMD16 << CI) | (2 << CRCCE) | (2 << RTS), size);
+
+	uint32_t status=input_cmd.cmd_response[0];
+	uint32_t cur_state = (status >> 9) & 0xf;
+
+	DEBUG_PRINT("Device Status %x\n",status);
+
+	if(cur_state == 3)//if standby	
+	{
+		retval=emmc_select_card(EMMC_RCA);
+		// Currently in the stand-by state - select it
+		if(retval<0)
+		{
+			DEBUG_PRINT("SD: ensure_data_mode() no response from CMD17\n");
+			return -1;
+		}
+	}
+	else if(cur_state == 5)//data transmission
+	{
+			
+		input_cmd.cmd=EMMC_CMD12;
+		input_cmd.arg=(EMMC_RCA<< 16);
+		input_cmd.response_type=EMMC_RESPONSE_R1;
+		input_cmd.data_present=0;
+		retval=emmc_host_send_cmd(&input_cmd);//(EMMC_CMD16 << CI) | (2 << CRCCE) | (2 << RTS), size);
+		if(retval<0)
+		{
+			DEBUG_PRINT("SD: ensure_data_mode() no response from CMD17\n");
+			return -1;
+		}
+		// Reset the data circuit
+		//sd_reset_dat();
+	}
+	else if(cur_state != 4)
+	{
+		// Not in the transfer state - re-initialise
+		retval = emmc_card_init(1);
+		if(retval != 0)
+			return retval;
+	}
+
+	return retval;
+}
+
+
+
 static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 {
 
@@ -619,7 +679,7 @@ static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 	unsigned int status;
 	long int arg;
 	uint32_t timeout=0;
-
+	uint32_t cur_state=0;
 
 	arg = ((val << 8) | (index << 16) | (3 << 24));
 
@@ -631,16 +691,19 @@ static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 
 	retval=emmc_host_send_cmd(&input_cmd);//(EMMC_CMD6 << CI) | (3 << CRCCE) | (3 << RTS), arg);
 
-	do 
+	if(retval==0)
 	{
-		status = METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS12);
-		if(timeout > MAX_COUNT) {
-			DEBUG_PRINT("Exit from function \"static void emmc_card_ext_csd_write()\" due to timeout");
-			exit(1);
-		}
-		else
-			timeout++;
-	} while ((status & (1 << TC)) == 0);
+		do{
+			input_cmd.cmd=EMMC_CMD13;
+			input_cmd.arg=(EMMC_RCA<< 16);
+			input_cmd.response_type=EMMC_RESPONSE_R1;
+			input_cmd.data_present=0;
+			emmc_host_send_cmd(&input_cmd);//(EMMC_CMD16 << CI) | (2 << CRCCE) | (2 << RTS), size);
+
+			status=input_cmd.cmd_response[0];
+			cur_state = (status >> 9) & 0xf;
+		}while(cur_state==7);
+	}
 
 	return retval;
 }
@@ -655,7 +718,6 @@ static int  emmc_card_ext_csd_read(uint8_t *rx_data)
 
 	DEBUG_PRINT("Reading eMMC CSD EXT\n");
 
-	//emmc_select_card(EMMC_RCA);
 
 	input_cmd.cmd=EMMC_CMD8;
 	input_cmd.arg=0;
@@ -693,6 +755,7 @@ static void emmc_card_csd_write( unsigned int index, unsigned int val)
 	long int arg;
 	uint32_t timeout=0;
 
+
 	arg = ((val << 8) | (index << 16) | (3 << 24));
 
 	//MMCRequest_t input_cmd;
@@ -723,7 +786,6 @@ static void emmc_card_csd_read(uint8_t *rx_data)
 
 	DEBUG_PRINT("Reading eMMC CSD : CMD9\n");
 
-	emmc_select_card(EMMC_RCA);
 
 	input_cmd.cmd=EMMC_CMD9;
 	input_cmd.arg=EMMC_RCA<<16;
@@ -768,6 +830,9 @@ static int emmc_host_set_bit_width( char bit_width)
 	long int val;
 	int retval=0;
 
+	if(emmc_check_status()!=0)
+		return -1;
+
 	status = METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10);
 	status &= ~((1 << DTW) | (1 << EDTW));
 
@@ -779,14 +844,7 @@ static int emmc_host_set_bit_width( char bit_width)
 	}
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10) = status;
 
-	val = ((bit_width << 8) | (183 << 16) | (3 << 24));
-
-	//eMMCRequest_t input_cmd;
-	input_cmd.cmd=EMMC_CMD6;
-	input_cmd.arg=val;
-	input_cmd.response_type=EMMC_RESPONSE_R1B;
-	input_cmd.data_present=0;
-	retval=emmc_host_send_cmd(&input_cmd);//(EMMC_CMD6 << CI) | (3 << CRCCE) | (3 << RTS), val);
+	retval=emmc_card_ext_csd_write(MMC_EXCSD_BUS_WIDTH,bit_width);	// Boot partition enable
 
 	return retval;
 }
@@ -812,7 +870,6 @@ static void emmc_toggle_sleep()
 
 
 }
-
 
 
 
@@ -865,13 +922,16 @@ static int GetPartitionAccessConfig(eMMC_ParitionAccess_t partition, uint8_t* pa
 
 
 
+
+
 static int emmc_set_bootpartition_access(eMMC_Parition_t partitionen,eMMC_ParitionAccess_t access, bool boot_ack)
 {
 	uint8_t PartConfigAccess=0;
 	uint8_t PartConfigEn=0;
 	int retval=0;
 
-	emmc_select_card(EMMC_RCA);
+	if(emmc_check_status()!=0)
+		return -1;
 
 	switch(partitionen) {
 		case EMMC_PAR_NONE:
@@ -892,11 +952,10 @@ static int emmc_set_bootpartition_access(eMMC_Parition_t partitionen,eMMC_Pariti
 
 	PartConfigAccess=access;
 
-	uint8_t ByteNew = ((boot_ack&1)<<6)| (PartConfigEn)| (PartConfigAccess&7UL) ;
+	uint8_t ByteNew = ((boot_ack&1)<<6)| ((PartConfigEn&7)<<3)| (PartConfigAccess&7UL) ;
 
-	retval=emmc_card_ext_csd_write(MMC_EXCSD_BOOT_PART_CONFIG,ByteNew);	// Boot partition 1 enable
+	retval=emmc_card_ext_csd_write(MMC_EXCSD_BOOT_PART_CONFIG,ByteNew);	// Boot partition enable
 
-	emmc_select_card(0);
 	return retval;
 }
 
@@ -904,7 +963,8 @@ static int emmc_get_partition_access(eMMC_Parition_t *partition,eMMC_ParitionAcc
 {
 	int retval=0;
 
-	emmc_select_card(EMMC_RCA);
+	if(emmc_check_status()!=0)
+		return -1;
 
 
 	retval=emmc_card_ext_csd_read((uint8_t*)g_data_buffer);
@@ -936,7 +996,6 @@ static int emmc_get_partition_access(eMMC_Parition_t *partition,eMMC_ParitionAcc
 
 	*access=(eMMC_ParitionAccess_t)boot_partition_access;
 
-	emmc_select_card(0);
 	return retval;
 }
 
@@ -1015,7 +1074,6 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,
 
 int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 {
-
 	int retval=0;
 	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
 
@@ -1030,11 +1088,10 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 
 	retval=emmc_card_init(1);
 
-	emmc_host_set_clock(g_emmc_host_clk,METAL_EMMC_STD_CLK); //clock freq. set 2Mhx for FPGA nd 20Mhz for ASIC
-	
-	emmc_select_card(EMMC_RCA);
+	//__metal_driver_sifive_nb2emmc_set_partition(emmc, EMMC_PAR_BOOT_1,EMMC_ACCCESS_BOOT_1);
 	emmc_host_set_bit_width(METAL_EMMC_BUS_WIDTH);
-	emmc_select_card(0);
+
+	emmc_host_set_clock(g_emmc_host_clk,METAL_EMMC_STD_CLK); //clock freq. set 2Mhx for FPGA nd 20Mhz for ASIC
 
 	return retval;
 }
@@ -1048,10 +1105,10 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 	uint32_t timeout1=0;
 	uint32_t timeout2=0;
 
-	emmc_select_card(EMMC_RCA);
+	if(emmc_check_status()!=0)
+		return -1;
 
 	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = emmc->deviceblocklen;
-
 
 	emmc_set_block_size(emmc->deviceblocklen);
 
@@ -1125,8 +1182,6 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 
 	}
 
-	emmc_select_card(0);
-
 	return retval;
 }
 
@@ -1138,7 +1193,8 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 	uint32_t timeout2=0;
 	unsigned int status=0;
 
-	emmc_select_card(EMMC_RCA);
+	if(emmc_check_status()!=0)
+		return -1;
 
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS01) = emmc->deviceblocklen;
 	emmc_set_block_size(emmc->deviceblocklen);
@@ -1171,8 +1227,6 @@ int __metal_driver_sifive_nb2emmc_write_block(struct metal_emmc *emmc,long int a
 
 		DEBUG_PRINT("EMMC:CMD%d Failed status %x\n",input_cmd.cmd,input_cmd.status);
 	}
-
-	emmc_select_card(0);
 
 	return retval;
 }
