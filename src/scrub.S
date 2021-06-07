@@ -112,14 +112,24 @@ __metal_before_start:
     bne     a5, t0, skip_scrub
 
     /* Zero out data segment */
+#ifdef __riscv_cmodel_compact
+    lla.gprel t1, metal_segment_data_target_start
+    lla.gprel t2, metal_segment_data_target_end
+#else
     la      t1, metal_segment_data_target_start
     la      t2, metal_segment_data_target_end
+#endif
     beq     t1, t2, 1f
     jal     __metal_memory_scrub
 1:
     /* Zero out itim memory */
+#ifdef __riscv_cmodel_compact
+    la.got.gprel t1, metal_segment_itim_target_start
+    la.got.gprel t2, metal_segment_itim_target_end
+#else
     la      t1, metal_segment_itim_target_start
     la      t2, metal_segment_itim_target_end
+#endif
     beq     t1, t2, skip_scrub
     jal     __metal_memory_scrub
 
