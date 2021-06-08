@@ -65,6 +65,11 @@ static int flash_status_read(struct metal_flash *pfl) {
 }
 
 
+
+
+
+
+
 static void flash_send_write_en(struct metal_flash *pfl)
 {
 	qspi_static_config_t *cfg=&qcfg;
@@ -93,6 +98,53 @@ static void flash_send_write_en(struct metal_flash *pfl)
 	metal_qspi_execute_cmd(qspi);
 
 
+}
+
+/* Read Flash status value */
+static int flash_write_quad_en(struct metal_flash *pfl, uint32_t enable) {
+
+	uint32_t read_status = 0;
+	uint32_t status_reg_val = flash_status_read(pfl);
+
+
+	if(((status_reg_val>>6)&1) && enable)
+	{
+		DEBUG_INFO("QE already enable\n");
+		return 0;
+	}else
+	{
+		flash_send_write_en(pfl);
+		
+		qspi_static_config_t *cfg=&qcfg;
+
+		cfg->wrmode	= QSPI_WRITE;
+		cfg->rxlen	= 0;
+		cfg->txlen	= QSPI_8BIT;
+		if (pfl->mode == FLASH_MODE_444) {
+			cfg->opmode	= (pfl->mode & 0x0F);
+			cfg->speedmode	= ((pfl->mode & 0xF0) >> 4);
+		} else {
+			cfg->opmode	= QSPI_SPI;
+			cfg->speedmode	= QSPI_CMD_SERIAL;
+		}
+		cfg->burstmode	= QSPI_APB_ACCESS;
+
+		metal_qspi_setconfig(qspi,cfg);
+
+		/*set command enable, read enable phase*/
+		cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_TX_DATA_PH_EN);
+		cmd_cfg.opcode		= FLASH_CMD_WRSR;
+
+		metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
+		status_reg_val=status_reg_val & ~(1<<6);
+		status_reg_val=status_reg_val | (enable<<6);
+		metal_qspi_write(qspi,0,4,(uint8_t*)&status_reg_val);
+
+		do {
+			read_status = flash_status_read(pfl);
+		} while ((read_status & 0x1)== 0x1);
+	}
+	return 0;
 }
 
 /* If we want to write less data use APB write
@@ -230,37 +282,40 @@ int __metal_driver_sifive_flash_init(struct metal_flash *gflash,void *ptr)
 	struct __metal_driver_sifive_flash *flash = (void *)gflash;
 
 	memset((void *)&qcfg,0,sizeof(qspi_static_config_t));
-   	/* Set-up initial parameters */
-   	qcfg.addrlen 	= QSPI_ADDR_24BIT;
-   	qcfg.rxlen 	= QSPI_32BIT;
-   	qcfg.txlen 	= QSPI_32BIT;
-   	qcfg.cs_i 	= QSPI_DEVICE_0;
-   	qcfg.clk_div 	= QSPI_DIV_4;//TODO 
-   	qcfg.wrmode  	= QSPI_READ;
-   	qcfg.bit_align 	= QSPI_MSB_FIRST;
-   	qcfg.clock_polarity=0;
-   	qcfg.opmode	= QSPI_QUAD;
-   	qcfg.speedmode 	= QSPI_CMD_ADDR_SERIAL;
-   	qcfg.write_prot = QSPI_WRITE_PROT_DIS;
-   	qcfg.hold 	= QSPI_HOLD_DIS;
-   	qcfg.burstmode 	= QSPI_SINGLE_BURST;
+	/* Set-up initial parameters */
+	qcfg.addrlen 	= QSPI_ADDR_24BIT;
+	qcfg.rxlen 	= QSPI_32BIT;
+	qcfg.txlen 	= QSPI_32BIT;
+	qcfg.cs_i 	= QSPI_DEVICE_0;
+	qcfg.clk_div 	= QSPI_DIV_4;//TODO 
+	qcfg.wrmode  	= QSPI_READ;
+	qcfg.bit_align 	= QSPI_MSB_FIRST;
+	qcfg.clock_polarity=0;
+	qcfg.opmode	= QSPI_QUAD;
+	qcfg.speedmode 	= QSPI_CMD_ADDR_SERIAL;
+	qcfg.write_prot = QSPI_WRITE_PROT_DIS;
+	qcfg.hold 	= QSPI_HOLD_DIS;
+	qcfg.burstmode 	= QSPI_SINGLE_BURST;
 	qcfg.rxdelay	=0;
-   	qcfg.rxfinedelay=0;
-   	qcfg.rx_dly_half_clk=0;
-   	qcfg.rx_phshift_bypass=0;
+	qcfg.rxfinedelay=0;
+	qcfg.rx_dly_half_clk=0;
+	qcfg.rx_phshift_bypass=0;
 
 	qspi = metal_qspi_get_device(0);
+
 	metal_qspi_init(qspi,baud_rate);
 
 	metal_qspi_setconfig(qspi,&qcfg);
+
+	flash_write_quad_en(flash,1);
 
 	cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_RX_DATA_PH_EN);
 	cmd_cfg.dummy_stg	= QSPI_SET_DUMMY_DLP(0, FLASH_DEFAULT_DUMMY, 0);
 	cmd_cfg.mode_stg	= QSPI_SET_MODE_REG(0, 0x0);
 	cmd_cfg.opcode		= FLASH_CMD_QUAD_O_READ;
-	
+
 	metal_qspi_setcommand_params(qspi,&cmd_cfg,&qcfg);
-	
+
 	return 0;
 }
 
@@ -288,7 +343,7 @@ int __metal_driver_sifive_flash_read(struct metal_flash *flash, uint32_t addr, c
 	else
 	{
 		/*set command enable, address phase enable, dummy phase enable, mode phase enable, read phase enable*/
-		
+
 		if (flash->opcode == FLASH_CMD_QUAD_O_READ)
 		{
 			cmd_cfg.custom_command	= (QSPI_OPCODE_PH_EN | QSPI_ADDR_PH_EN | QSPI_DUMMY_PH_EN | QSPI_RX_DATA_PH_EN);
