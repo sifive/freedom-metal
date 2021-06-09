@@ -13,7 +13,7 @@
 #include <metal/time.h>
 #include <stdio.h>
 #include <metal/qspi.h>
-
+#include <string.h>
 
 #define FLASH_DEFAULT_DUMMY 8
 #define FLASH_DEFAULT_OPCODE FLASH_CMD_QUAD_O_READ //1-1-4 QUAD FAst read
@@ -63,11 +63,6 @@ static int flash_status_read(struct metal_flash *pfl) {
 	
 	return read_status;
 }
-
-
-
-
-
 
 
 static void flash_send_write_en(struct metal_flash *pfl)

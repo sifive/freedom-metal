@@ -116,23 +116,6 @@
 
 
 
-/*
-   Host Register Set
-#define REG_HRS00 0x0000
-#define REG_HRS06 0x0018
-
-Slot Register Set
-#define REG_SRS01 0x0204
-#define REG_SRS02 0x0208
-#define REG_SRS03 0x020C
-#define REG_SRS08 0x0220
-#define REG_SRS09 0x0224
-#define REG_SRS10 0x0228
-#define REG_SRS11 0x022c
-#define REG_SRS12 0x0230
-#define REG_SRS13 0x0234
-#define REG_SRS14 0x0238
-*/
 
 //SRS01
 
@@ -227,40 +210,31 @@ Slot Register Set
 #define METAL_EMMC_REG(offset)   (((unsigned long long)emmc_control_base + offset))
 #define METAL_EMMC_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_EMMC_REG(offset)))
 #define METAL_EMMC_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_EMMC_REG(offset)))
-
-
 #define METAL_REGDW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u64 *)METAL_CLINT_REG(offset)))
 
 
-#define METAL_EMMC_IOMUX_REGW(ADDR)	 (__METAL_ACCESS_ONCE((__metal_io_u32 *)ADDR))
-
-#define SCR_RESET_BASE_ADDR     	0x4F0011000UL
-#define SCR_REG_BASE_ADDR       	0x4F0010000UL
-#define SCR_IOMUX_HSSS_CFG_BASE_ADDR    0x301500000UL
-
-#define PCSS_SCR_EMMC_SDIO_NIU_RESET    		( SCR_RESET_BASE_ADDR + 0x0048 )
-#define PCSS_SCR_EMMC_SDIO_RESET        		( SCR_REG_BASE_ADDR + 0x00B4 )
-
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_CLK                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x005C )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_CMD                 ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0060 )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT0                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0064 )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT1                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0068 )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT2                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x006C )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT3                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0070 )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT4                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0074 )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT5                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0078 )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT6                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x007C )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DAT7                ( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0080 )
-#define HSSS_SCR_IOMUX_CONFIG_EMMC0_DS			( SCR_IOMUX_HSSS_CFG_BASE_ADDR   + 0x0084 )
 
 static unsigned long long emmc_control_base=0;
+
 static eMMCRequest_t input_cmd;
 
 uint32_t g_data_buffer[128]; //512 bytes
 
 static uint32_t g_emmc_host_clk=0;
 
+static  uint32_t g_emmc_sdclock=400;
+
 static struct metal_cpu *g_cpu;
+
+void set_emmc_sdclk(uint32_t sdclk)
+{
+	g_emmc_sdclock=sdclk;
+}
+
+ uint32_t get_emmc_sdclk()
+{
+	return g_emmc_sdclock;
+}
 
 static inline uint8_t GET_BYTE_FROM_BUFFER(const void* buffer, uintptr_t byteNumber)
 {
@@ -298,13 +272,12 @@ static void emmc_host_reset()
 	while ((METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_HRS00) & SWR) == 1);  //wait for HRS0.0 (SWR)= 0
 }
 
-static void emmc_host_set_clock(uint32_t sdclk,unsigned int freq)
+static void emmc_host_set_clock(uint32_t sdclk,float freq)
 {
 	uint32_t sdclkfs, dtcvval;
 
-
 	if(freq) {
-		sdclkfs = (sdclk/(2000*freq));
+		sdclkfs = ceil((float)((float)sdclk/(2000*freq)));
 	} else {
 		sdclkfs = 0;
 	}
@@ -337,8 +310,9 @@ static void emmc_host_initialization(struct metal_emmc *emmc,uint32_t sdhostcloc
 	//enable supply voltage
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10) = (5 << BVS) | (1 << BP);  // BVS = 7, BP = 1, BP2 only in UHS2 mode
 
-	//starting SDclk
-	emmc_host_set_clock(sdhostclock,400); //clock freq. set 400Khz
+	//starting sdclk
+	set_emmc_sdclk(400);
+	emmc_host_set_clock(sdhostclock,get_emmc_sdclk()); //clock freq. set 400Khz
 
 	//enable flags
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS13) = ENABLE_FLAGS;		//all flags enable
@@ -621,7 +595,7 @@ static int emmc_card_init(unsigned int low_voltage_en)
 static int emmc_check_status()
 {
 	int retval=0;
-	//eMMCRequest_t input_cmd;
+	
 	input_cmd.cmd=EMMC_CMD13;
 	input_cmd.arg=(EMMC_RCA<< 16);
 	input_cmd.response_type=EMMC_RESPONSE_R1;
@@ -677,7 +651,7 @@ static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 
 	int retval=0;
 	unsigned int status;
-	long int arg;
+	uint32_t arg;
 	uint32_t timeout=0;
 	uint32_t cur_state=0;
 
@@ -690,21 +664,23 @@ static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 	input_cmd.data_present=0;
 
 	retval=emmc_host_send_cmd(&input_cmd);//(EMMC_CMD6 << CI) | (3 << CRCCE) | (3 << RTS), arg);
+	status =input_cmd.cmd_response[0];
 
 	if(retval==0)
 	{
+		if(!(((status>>9)&0xF)==4))
+		{
 		do{
 			input_cmd.cmd=EMMC_CMD13;
 			input_cmd.arg=(EMMC_RCA<< 16);
 			input_cmd.response_type=EMMC_RESPONSE_R1;
 			input_cmd.data_present=0;
 			emmc_host_send_cmd(&input_cmd);//(EMMC_CMD16 << CI) | (2 << CRCCE) | (2 << RTS), size);
-
 			status=input_cmd.cmd_response[0];
 			cur_state = (status >> 9) & 0xf;
 		}while(cur_state==7);
 	}
-
+	}
 	return retval;
 }
 
@@ -839,12 +815,12 @@ static int emmc_host_set_bit_width( char bit_width)
 	switch (bit_width) {
 		case 0x01: bit_width = 0x00; break;  // bus width 1b
 		case 0x04: bit_width = 0x01; status |= (1 << DTW);  break;  // bus width 4b
-		case 0x08: bit_width = 0x02; status |= (1 << EDTW); break;  // bus width 8b
+		case 0x08: bit_width = 0x02; status |= (1<<EDTW) | (1<<DTW); break;  // bus width 8b
 		default: /*DEBUG_PRINT("ERROR: wrong bit width selected \n");*/ return 1;
 	}
 	METAL_EMMC_REGW( METAL_SIFIVE_NB2EMMC_SRS10) = status;
 
-	retval=emmc_card_ext_csd_write(MMC_EXCSD_BUS_WIDTH,bit_width);	// Boot partition enable
+	retval=emmc_card_ext_csd_write(MMC_EXCSD_BUS_WIDTH,bit_width);	// Bit with seting ext_csd 183
 
 	return retval;
 }
@@ -1032,7 +1008,7 @@ int __metal_driver_sifive_nb2emmc_boot(struct metal_emmc *emmc,uint8_t *rx_data,
 
 		retval=emmc_host_send_cmd(&input_cmd);
 
-		uint32_t *dptr=input_cmd.dataptr;
+		uint32_t *dptr=(uint32_t *)input_cmd.dataptr;
 		if(retval==0)
 		{
 			do
@@ -1086,12 +1062,15 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 
 	emmc_host_initialization(emmc,g_emmc_host_clk);
 
+	for(volatile  int i=0;i<10000;i++);
+	
 	retval=emmc_card_init(1);
 
+	emmc_select_card(EMMC_RCA);
 	//__metal_driver_sifive_nb2emmc_set_partition(emmc, EMMC_PAR_BOOT_1,EMMC_ACCCESS_BOOT_1);
 	emmc_host_set_bit_width(METAL_EMMC_BUS_WIDTH);
-
-	emmc_host_set_clock(g_emmc_host_clk,METAL_EMMC_STD_CLK); //clock freq. set 2Mhx for FPGA nd 20Mhz for ASIC
+	
+	retval=emmc_card_ext_csd_write(MMC_EXCSD_HS_TIMING,0);	// 1=HS 2 HS200 3 HS400
 
 	return retval;
 }
@@ -1105,13 +1084,17 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 	uint32_t timeout1=0;
 	uint32_t timeout2=0;
 
-	if(emmc_check_status()!=0)
-		return -1;
 
 	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = emmc->deviceblocklen;
 
-	emmc_set_block_size(emmc->deviceblocklen);
+	//emmc_set_block_size(emmc->deviceblocklen);
 
+	if(get_emmc_sdclk()!=METAL_EMMC_STD_CLK)
+	{
+		if(emmc_check_status()!=0)return -1;
+		set_emmc_sdclk(METAL_EMMC_STD_CLK);
+		emmc_host_set_clock(g_emmc_host_clk,METAL_EMMC_STD_CLK/1000); //clock freq. set 2Mhx for FPGA nd 20Mhz for ASIC
+	}
 
 	uint32_t nblocklocks=len/emmc->deviceblocklen;
 
@@ -1159,7 +1142,7 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 			input_cmd.dataptrpos=rx_buff;
 			input_cmd.dataRemaining=len;
 			input_cmd.blocklen=emmc->deviceblocklen;
-			input_cmd.blockcnt=1;
+			input_cmd.blockcnt=0;
 
 			retval=emmc_host_send_cmd(&input_cmd);//((EMMC_CMD17 << CI) | (1 << DPS) | (2 << CRCCE) | (1 << DTDS) | (2 << RTS)), addr);
 			if(retval==0)
@@ -1272,6 +1255,7 @@ int __metal_driver_sifive_nb2emmc_erase_block(struct metal_emmc *emmc, long int 
 
 int __metal_driver_sifive_nb2emmc_set_partition(struct metal_emmc *emmc,eMMC_Parition_t partition, eMMC_ParitionAccess_t access)
 {
+	emmc_control_base=(uintptr_t)__metal_driver_sifive_nb2emmc_base(emmc);
 	return  emmc_set_bootpartition_access(partition,access,false);
 }
 

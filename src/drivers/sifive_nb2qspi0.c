@@ -11,7 +11,7 @@
 #include <metal/time.h>
 #include <time.h>
 #include <stdio.h>
-
+#include <string.h>
 
 #define START_APB				(1 << 0)
 
@@ -37,22 +37,6 @@
 #define METAL_QSPI_REGB(offset)  (__METAL_ACCESS_ONCE((__metal_io_u8  *)METAL_QSPI_REG(offset)))
 #define METAL_QSPI_REGW(offset)  (__METAL_ACCESS_ONCE((__metal_io_u32 *)METAL_QSPI_REG(offset)))
 
-#define METAL_QSPI_IOMUX_REGW(ADDR)	(__METAL_ACCESS_ONCE((__metal_io_u32 *)(unsigned long long)ADDR))
-
-#define SCR_RESET_BASE_ADDR     		0x4F0011000UL
-#define SCR_REG_BASE_ADDR       		0x4F0010000UL
-#define SCR_IOMUX_HSSS_CFG_BASE_ADDR    	0x301500000UL
-
-
-
-#define  QSPI_IDLE_STATE    0
-#define  QSPI_COMMAND_STATe 1
-#define  QSPI_ADDRESS_STATe 2
-#define  QSPI_MODE_STATE    3
-#define  QSPI_DUMMY_STATE   4
-#define  QSPI_DLP_STATE     5
-#define  QSPI_RXDATA_STATE  6
-#define  QSPI_TXDATA_STATE  7
 
 static unsigned long long control_base=0;
 
@@ -153,6 +137,21 @@ uint32_t __metal_driver_sifive_nb2qspi0_get_interrupt_status(struct metal_qspi *
 	return intr_status;
 }
 
+int __metal_driver_sifive_nb2qspi0_execute_cmd(struct metal_qspi *qspi)
+{
+	int retval=0;
+	if(METAL_QSPI_REGW(METAL_SIFIVE_NB2QSPI0_SYSTEM_STATUS_REG)==QSPI_IDLE_STATE)
+	{
+		qspi_apb_rw_trigger();
+		// wait For IDEL
+		qspi_wait_for_idle();
+	}else
+	{
+		retval=-1;
+	}
+
+	return retval;
+}
 
 int __metal_driver_sifive_nb2qspi0_read(struct metal_qspi *gqspi,uint32_t addr_offset,size_t len,uint8_t *rx_buf)
 {
@@ -428,24 +427,6 @@ int __metal_driver_sifive_nb2qspi0_setconfig(struct metal_qspi *qspi,qspi_static
 
 	return retval;
 }
-
-
-int __metal_driver_sifive_nb2qspi0_execute_cmd(struct metal_qspi *qspi)
-{
-	int retval=0;
-	if(METAL_QSPI_REGW(METAL_SIFIVE_NB2QSPI0_SYSTEM_STATUS_REG)==QSPI_IDLE_STATE)
-	{
-		qspi_apb_rw_trigger();
-		// wait For IDEL
-		qspi_wait_for_idle();
-	}else
-	{
-		retval=-1;
-	}
-
-	return retval;
-}
-
 
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_nb2qspi0) = {
 

@@ -21,8 +21,6 @@ static unsigned long long otp_control_base=0;
 #define OPT_WRITE_CONFIG 0x104C2704
 #define OPT_READ_CONFIG  0x104C2700
 #define SCR_REG_BASE_ADDR       		0x4F0010000UL
-#define PCSS_SCR_PCSS_MISC_RESET             ( SCR_REG_BASE_ADDR	      + 0x0068 )
-#define METAL_PCSS_REGW(ADDR)	(__METAL_ACCESS_ONCE((__metal_io_u32 *)(unsigned long long)ADDR))
 
 
 #define FUSE_BASE_ADDR 0x4F0004000UL
