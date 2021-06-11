@@ -668,18 +668,18 @@ static int emmc_card_ext_csd_write( unsigned int index, unsigned int val)
 
 	if(retval==0)
 	{
-		if(!(((status>>9)&0xF)==4))
+		//if(!(((status>>9)&0xF)==4))
 		{
-		do{
-			input_cmd.cmd=EMMC_CMD13;
-			input_cmd.arg=(EMMC_RCA<< 16);
-			input_cmd.response_type=EMMC_RESPONSE_R1;
-			input_cmd.data_present=0;
-			emmc_host_send_cmd(&input_cmd);//(EMMC_CMD16 << CI) | (2 << CRCCE) | (2 << RTS), size);
-			status=input_cmd.cmd_response[0];
-			cur_state = (status >> 9) & 0xf;
-		}while(cur_state==7);
-	}
+			do{
+				input_cmd.cmd=EMMC_CMD13;
+				input_cmd.arg=(EMMC_RCA<< 16);
+				input_cmd.response_type=EMMC_RESPONSE_R1;
+				input_cmd.data_present=0;
+				emmc_host_send_cmd(&input_cmd);//(EMMC_CMD16 << CI) | (2 << CRCCE) | (2 << RTS), size);
+				status=input_cmd.cmd_response[0];
+				cur_state = (status >> 9) & 0xf;
+			}while(cur_state==7);
+		}
 	}
 	return retval;
 }
@@ -1063,13 +1063,13 @@ int __metal_driver_sifive_nb2emmc_init(struct metal_emmc *emmc,void *ptr)
 	emmc_host_initialization(emmc,g_emmc_host_clk);
 
 	for(volatile  int i=0;i<10000;i++);
-	
+
 	retval=emmc_card_init(1);
 
 	emmc_select_card(EMMC_RCA);
 	//__metal_driver_sifive_nb2emmc_set_partition(emmc, EMMC_PAR_BOOT_1,EMMC_ACCCESS_BOOT_1);
 	emmc_host_set_bit_width(METAL_EMMC_BUS_WIDTH);
-	
+
 	retval=emmc_card_ext_csd_write(MMC_EXCSD_HS_TIMING,0);	// 1=HS 2 HS200 3 HS400
 
 	return retval;
@@ -1087,11 +1087,10 @@ int __metal_driver_sifive_nb2emmc_read_block(struct metal_emmc *emmc, long int a
 
 	METAL_EMMC_REGW(METAL_SIFIVE_NB2EMMC_SRS01) = emmc->deviceblocklen;
 
-	//emmc_set_block_size(emmc->deviceblocklen);
-
 	if(get_emmc_sdclk()!=METAL_EMMC_STD_CLK)
 	{
 		if(emmc_check_status()!=0)return -1;
+		emmc_set_block_size(emmc->deviceblocklen);
 		set_emmc_sdclk(METAL_EMMC_STD_CLK);
 		emmc_host_set_clock(g_emmc_host_clk,METAL_EMMC_STD_CLK/1000); //clock freq. set 2Mhx for FPGA nd 20Mhz for ASIC
 	}
