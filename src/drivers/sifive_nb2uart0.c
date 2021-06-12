@@ -9,7 +9,7 @@
 #include <metal/machine.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define METAL_PCSS_REGW(ADDR)	(__METAL_ACCESS_ONCE((__metal_io_u32 *)(unsigned long long)ADDR))
+#define METAL_PCSS_REGW(ADDR)	(__METAL_ACCESS_ONCE((__metal_io_u32 *)(unsigned long long)(ADDR)))
 
 #define MAX_COUNT	10000
 
