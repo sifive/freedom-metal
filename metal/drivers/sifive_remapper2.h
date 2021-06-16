@@ -18,4 +18,3 @@ struct __metal_driver_sifive_remapper2 {
 };
 
 #endif /* METAL__DRIVERS__SIFIVE_REMAPPER2_H */
-

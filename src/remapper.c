@@ -14,19 +14,19 @@ extern int __metal_remapper_disable_remaps(struct metal_remapper *remapper,
                                            int idxs[], int num_idxs);
 extern uint32_t __metal_remapper_get_valid(struct metal_remapper *remapper,
                                            int idx);
-extern int __metal_remapper_set_valid(struct metal_remapper *remapper,
-                                      int idx, uint32_t val);
+extern int __metal_remapper_set_valid(struct metal_remapper *remapper, int idx,
+                                      uint32_t val);
 extern int __metal_remapper_flush(struct metal_remapper *remapper);
-extern uint64_t __metal_remapper_get_from_region_base(
-        struct metal_remapper *remapper);
-extern uint64_t __metal_remapper_get_from_region_size(
-        struct metal_remapper *remapper);
-extern uint64_t __metal_remapper_get_to_region_base(
-        struct metal_remapper *remapper);
-extern uint64_t __metal_remapper_get_to_region_size(
-        struct metal_remapper *remapper);
+extern uint64_t
+__metal_remapper_get_from_region_base(struct metal_remapper *remapper);
+extern uint64_t
+__metal_remapper_get_from_region_size(struct metal_remapper *remapper);
+extern uint64_t
+__metal_remapper_get_to_region_base(struct metal_remapper *remapper);
+extern uint64_t
+__metal_remapper_get_to_region_size(struct metal_remapper *remapper);
 extern uint64_t __metal_remapper_get_max_from_entry_region_size(
-        struct metal_remapper *remapper);
+    struct metal_remapper *remapper);
 extern uint32_t __metal_remapper_get_version(struct metal_remapper *remapper);
 extern int __metal_remapper_set_version(struct metal_remapper *remapper,
                                         uint32_t version);
@@ -58,14 +58,13 @@ int metal_remapper_disable_remap(struct metal_remapper *remapper, int idx) {
     return __metal_remapper_disable_remap(remapper, idx);
 }
 
-int metal_remapper_enable_remaps(struct metal_remapper *remapper,
-                                 int idxs[], int num_idxs) {
-    return __metal_remapper_enable_remaps(remapper,
-                                          idxs, num_idxs);
+int metal_remapper_enable_remaps(struct metal_remapper *remapper, int idxs[],
+                                 int num_idxs) {
+    return __metal_remapper_enable_remaps(remapper, idxs, num_idxs);
 }
 
-int metal_remapper_disable_remaps(struct metal_remapper *remapper,
-                                  int idxs[], int num_idxs) {
+int metal_remapper_disable_remaps(struct metal_remapper *remapper, int idxs[],
+                                  int num_idxs) {
     return __metal_remapper_disable_remaps(remapper, idxs, num_idxs);
 }
 
@@ -73,8 +72,8 @@ uint32_t metal_remapper_get_valid(struct metal_remapper *remapper, int idx) {
     return __metal_remapper_get_valid(remapper, idx);
 }
 
-int metal_remapper_set_valid(struct metal_remapper *remapper,
-                             int idx, uint32_t val) {
+int metal_remapper_set_valid(struct metal_remapper *remapper, int idx,
+                             uint32_t val) {
     return __metal_remapper_set_valid(remapper, idx, val);
 }
 
@@ -98,8 +97,8 @@ uint64_t metal_remapper_get_to_region_size(struct metal_remapper *remapper) {
     return __metal_remapper_get_to_region_size(remapper);
 }
 
-uint64_t metal_remapper_get_max_from_entry_region_size(
-        struct metal_remapper *remapper) {
+uint64_t
+metal_remapper_get_max_from_entry_region_size(struct metal_remapper *remapper) {
     return __metal_remapper_get_max_from_entry_region_size(remapper);
 }
 
@@ -129,4 +128,3 @@ uint64_t metal_remapper_get_from(struct metal_remapper *remapper, int idx) {
 uint64_t metal_remapper_get_to(struct metal_remapper *remapper, int idx) {
     return __metal_remapper_get_to(remapper, idx);
 }
-

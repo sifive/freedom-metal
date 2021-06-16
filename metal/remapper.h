@@ -18,8 +18,7 @@ struct metal_remapper_vtable {
     int (*disable_remaps)(struct metal_remapper *remapper, int idxs[],
                           int num_idxs);
     uint32_t (*get_valid)(struct metal_remapper *remapper, int idx);
-    int (*set_valid)(struct metal_remapper *remapper,
-                     int idx, uint32_t val);
+    int (*set_valid)(struct metal_remapper *remapper, int idx, uint32_t val);
     int (*flush)(struct metal_remapper *remapper);
     uint64_t (*get_from_region_base)(struct metal_remapper *remapper);
     uint64_t (*get_from_region_size)(struct metal_remapper *remapper);
@@ -31,8 +30,7 @@ struct metal_remapper_vtable {
     int (*set_remap)(struct metal_remapper *remapper,
                      struct metal_remapper_entry *entry);
     int (*set_remaps)(struct metal_remapper *remapper,
-                      struct metal_remapper_entry *entries[],
-                      int num_entries);
+                      struct metal_remapper_entry *entries[], int num_entries);
     uint64_t (*get_from)(struct metal_remapper *remapper, int idx);
     uint64_t (*get_to)(struct metal_remapper *remapper, int idx);
 };
@@ -44,9 +42,9 @@ struct metal_remapper {
 
 /*! @brief Remap entry descriptor. */
 struct metal_remapper_entry {
-    int idx; /*!< Index of remap entry. */
+    int idx;            /*!< Index of remap entry. */
     uint64_t from_addr; /*!< From[] entry address to be remapped. */
-    uint64_t to_addr; /*!< To[] entry address to be remapped. */
+    uint64_t to_addr;   /*!< To[] entry address to be remapped. */
 };
 
 /*! @brief Enables an address remapper entry.
@@ -105,8 +103,8 @@ inline uint32_t __metal_remapper_get_valid(struct metal_remapper *remapper,
  * @param val Value to be set.
  * @return 0 If no error.
  */
-inline int __metal_remapper_set_valid(struct metal_remapper *remapper,
-                                      int idx, uint32_t val) {
+inline int __metal_remapper_set_valid(struct metal_remapper *remapper, int idx,
+                                      uint32_t val) {
     return remapper->vtable->set_valid(remapper, idx, val);
 }
 
@@ -121,32 +119,32 @@ inline int __metal_remapper_flush(struct metal_remapper *remapper) {
 /*! @brief Get hardware configured from region base address.
  * @param remapper Address remapper device handle.
  */
-inline uint64_t __metal_remapper_get_from_region_base(
-        struct metal_remapper *remapper) {
+inline uint64_t
+__metal_remapper_get_from_region_base(struct metal_remapper *remapper) {
     return remapper->vtable->get_from_region_base(remapper);
 }
 
 /*! @brief Get hardware configured from region size.
  * @param remapper Address remapper device handle.
  */
-inline uint64_t __metal_remapper_get_from_region_size(
-        struct metal_remapper *remapper) {
+inline uint64_t
+__metal_remapper_get_from_region_size(struct metal_remapper *remapper) {
     return remapper->vtable->get_from_region_size(remapper);
 }
 
 /*! @brief Get hardware configured to region base address.
  * @param remapper Address remapper device handle.
  */
-inline uint64_t __metal_remapper_get_to_region_base(
-         struct metal_remapper *remapper) {
+inline uint64_t
+__metal_remapper_get_to_region_base(struct metal_remapper *remapper) {
     return remapper->vtable->get_to_region_base(remapper);
 }
 
 /*! @brief Get hardware configured to region size.
  * @param remapper Address remapper device handle.
  */
-inline uint64_t __metal_remapper_get_to_region_size(
-        struct metal_remapper *remapper) {
+inline uint64_t
+__metal_remapper_get_to_region_size(struct metal_remapper *remapper) {
     return remapper->vtable->get_to_region_size(remapper);
 }
 
@@ -154,7 +152,7 @@ inline uint64_t __metal_remapper_get_to_region_size(
  * @param remapper Address remapper device handle.
  */
 inline uint64_t __metal_remapper_get_max_from_entry_region_size(
-        struct metal_remapper *remapper) {
+    struct metal_remapper *remapper) {
     return remapper->vtable->get_max_from_entry_region_size(remapper);
 }
 
@@ -221,20 +219,20 @@ inline uint64_t __metal_remapper_get_to(struct metal_remapper *remapper,
 struct metal_remapper *metal_remapper_get_device(void);
 int metal_remapper_enable_remap(struct metal_remapper *remapper, int idx);
 int metal_remapper_disable_remap(struct metal_remapper *remapper, int idx);
-int metal_remapper_enable_remaps(struct metal_remapper *remapper,
-                                 int idx[], int num_idxs);
-int metal_remapper_disable_remaps(struct metal_remapper *remapper,
-                                  int idx[], int num_idxs);
+int metal_remapper_enable_remaps(struct metal_remapper *remapper, int idx[],
+                                 int num_idxs);
+int metal_remapper_disable_remaps(struct metal_remapper *remapper, int idx[],
+                                  int num_idxs);
 uint32_t metal_remapper_get_valid(struct metal_remapper *remapper, int idx);
-int metal_remapper_set_valid(struct metal_remapper *remapper,
-                             int idx, uint32_t val);
+int metal_remapper_set_valid(struct metal_remapper *remapper, int idx,
+                             uint32_t val);
 int metal_remapper_flush(struct metal_remapper *remapper);
 uint64_t metal_remapper_get_from_region_base(struct metal_remapper *remapper);
 uint64_t metal_remapper_get_from_region_size(struct metal_remapper *remapper);
 uint64_t metal_remapper_get_to_region_base(struct metal_remapper *remapper);
 uint64_t metal_remapper_get_to_region_size(struct metal_remapper *remapper);
-uint64_t metal_remapper_get_max_from_entry_region_size(
-        struct metal_remapper *remapper);
+uint64_t
+metal_remapper_get_max_from_entry_region_size(struct metal_remapper *remapper);
 uint32_t metal_remapper_get_version(struct metal_remapper *remapper);
 uint32_t metal_remapper_get_entries(struct metal_remapper *remapper);
 int metal_remapper_set_remap(struct metal_remapper *remapper,
@@ -246,4 +244,3 @@ uint64_t metal_remapper_get_from(struct metal_remapper *remapper, int idx);
 uint64_t metal_remapper_get_to(struct metal_remapper *remapper, int idx);
 
 #endif /*METAL__REMAPPER_H */
-

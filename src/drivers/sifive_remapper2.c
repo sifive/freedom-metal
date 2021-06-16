@@ -6,34 +6,34 @@
 #ifdef METAL_SIFIVE_REMAPPER2
 
 #include <metal/drivers/sifive_remapper2.h>
-#include <metal/machine.h>
 #include <metal/io.h>
-#include <stdio.h>
+#include <metal/machine.h>
 #include <stdint.h>
+#include <stdio.h>
 
-#define METAL_SIFIVE_REMAPPER2_VALID_REGS_NUM   7
+#define METAL_SIFIVE_REMAPPER2_VALID_REGS_NUM 7
 
-#define METAL_SIFIVE_REMAPPER_ENABLE_KEY   0x51f15e
+#define METAL_SIFIVE_REMAPPER_ENABLE_KEY 0x51f15e
 
-#define METAL_SIFIVE_REMAPPER2_FROM_REG_OFFSET(idx) \
+#define METAL_SIFIVE_REMAPPER2_FROM_REG_OFFSET(idx)                            \
     (METAL_SIFIVE_REMAPPER2_FROM_BASE + idx * 16)
-#define METAL_SIFIVE_REMAPPER2_TO_REG_OFFSET(idx)   \
+#define METAL_SIFIVE_REMAPPER2_TO_REG_OFFSET(idx)                              \
     (METAL_SIFIVE_REMAPPER2_FROM_BASE + idx * 16 + 8)
 
 /* Macros to access registers */
 #define REMAPPER_REG(offset) (((unsigned long)base + offset))
-#define REMAPPER_REGW(offset)                                          \
+#define REMAPPER_REGW(offset)                                                  \
     (__METAL_ACCESS_ONCE((__metal_io_u32 *)REMAPPER_REG(offset)))
 
 static void
 __metal_driver_sifive_remapper_set_key_state(struct metal_remapper *remapper) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
-    REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_KEY) = METAL_SIFIVE_REMAPPER_ENABLE_KEY;
+    REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_KEY) =
+        METAL_SIFIVE_REMAPPER_ENABLE_KEY;
 }
 
-int
-__metal_driver_sifive_remapper_enable_remap(struct metal_remapper *remapper,
-                                            int idx) {
+int __metal_driver_sifive_remapper_enable_remap(struct metal_remapper *remapper,
+                                                int idx) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
     int reg_idx = idx / 32;
     int bit_offset = idx % 32;
@@ -46,9 +46,8 @@ __metal_driver_sifive_remapper_enable_remap(struct metal_remapper *remapper,
     return 0;
 }
 
-int
-__metal_driver_sifive_remapper_disable_remap(struct metal_remapper *remapper,
-                                             int idx) {
+int __metal_driver_sifive_remapper_disable_remap(
+    struct metal_remapper *remapper, int idx) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
     int reg_idx = idx / 32;
     int bit_offset = idx % 32;
@@ -61,9 +60,8 @@ __metal_driver_sifive_remapper_disable_remap(struct metal_remapper *remapper,
     return 0;
 }
 
-int
-__metal_driver_sifive_remapper_enable_remaps(struct metal_remapper *remapper,
-                                             int idxs[], int num_idxs) {
+int __metal_driver_sifive_remapper_enable_remaps(
+    struct metal_remapper *remapper, int idxs[], int num_idxs) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
     uint32_t enables[METAL_SIFIVE_REMAPPER2_VALID_REGS_NUM] = {0};
 
@@ -84,9 +82,8 @@ __metal_driver_sifive_remapper_enable_remaps(struct metal_remapper *remapper,
     return 0;
 }
 
-int
-__metal_driver_sifive_remapper_disable_remaps(struct metal_remapper *remapper,
-                                              int idxs[], int num_idxs) {
+int __metal_driver_sifive_remapper_disable_remaps(
+    struct metal_remapper *remapper, int idxs[], int num_idxs) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
     uint32_t disables[METAL_SIFIVE_REMAPPER2_VALID_REGS_NUM] = {0};
 
@@ -118,9 +115,8 @@ __metal_driver_sifive_remapper_get_valid(struct metal_remapper *remapper,
     return REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_VALID_BASE + idx * 4);
 }
 
-int
-__metal_driver_sifive_remapper_set_valid(struct metal_remapper *remapper,
-                                         int idx, uint32_t val) {
+int __metal_driver_sifive_remapper_set_valid(struct metal_remapper *remapper,
+                                             int idx, uint32_t val) {
     if (idx < 0 || idx >= METAL_SIFIVE_REMAPPER2_VALID_REGS_NUM) {
         return 1;
     }
@@ -132,8 +128,7 @@ __metal_driver_sifive_remapper_set_valid(struct metal_remapper *remapper,
     return 0;
 }
 
-int
-__metal_driver_sifive_remapper_flush(struct metal_remapper *remapper) {
+int __metal_driver_sifive_remapper_flush(struct metal_remapper *remapper) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
     __metal_driver_sifive_remapper_set_key_state(remapper);
     REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_FLUSH) = 1;
@@ -142,29 +137,30 @@ __metal_driver_sifive_remapper_flush(struct metal_remapper *remapper) {
     return 0;
 }
 
-uint64_t
-__metal_driver_sifive_remapper_get_from_region_base(struct metal_remapper *remapper) {
+uint64_t __metal_driver_sifive_remapper_get_from_region_base(
+    struct metal_remapper *remapper) {
     return __metal_driver_sifive_remapper2_from_region_base(remapper);
 }
 
-uint64_t
-__metal_driver_sifive_remapper_get_from_region_size(struct metal_remapper *remapper) {
+uint64_t __metal_driver_sifive_remapper_get_from_region_size(
+    struct metal_remapper *remapper) {
     return __metal_driver_sifive_remapper2_from_region_size(remapper);
 }
 
-uint64_t
-__metal_driver_sifive_remapper_get_to_region_base(struct metal_remapper *remapper) {
+uint64_t __metal_driver_sifive_remapper_get_to_region_base(
+    struct metal_remapper *remapper) {
     return __metal_driver_sifive_remapper2_to_region_base(remapper);
 }
 
-uint64_t
-__metal_driver_sifive_remapper_get_to_region_size(struct metal_remapper *remapper) {
+uint64_t __metal_driver_sifive_remapper_get_to_region_size(
+    struct metal_remapper *remapper) {
     return __metal_driver_sifive_remapper2_to_region_size(remapper);
 }
 
-uint64_t
-__metal_driver_sifive_remapper_get_max_from_entry_region_size(struct metal_remapper *remapper) {
-    return (1ULL << __metal_driver_sifive_remapper2_max_from_entry_addr_width(remapper));
+uint64_t __metal_driver_sifive_remapper_get_max_from_entry_region_size(
+    struct metal_remapper *remapper) {
+    return (1ULL << __metal_driver_sifive_remapper2_max_from_entry_addr_width(
+                remapper));
 }
 
 uint32_t
@@ -179,23 +175,23 @@ __metal_driver_sifive_remapper_get_entries(struct metal_remapper *remapper) {
     return REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_ENTRIES);
 }
 
-int
-__metal_driver_sifive_remapper_set_remap(struct metal_remapper *remapper,
-                                         struct metal_remapper_entry *entry) {
+int __metal_driver_sifive_remapper_set_remap(
+    struct metal_remapper *remapper, struct metal_remapper_entry *entry) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
     __metal_driver_sifive_remapper_set_key_state(remapper);
-    REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_FROM_REG_OFFSET(entry->idx)) = entry->from_addr;
+    REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_FROM_REG_OFFSET(entry->idx)) =
+        entry->from_addr;
     __metal_driver_sifive_remapper_set_key_state(remapper);
-    REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_TO_REG_OFFSET(entry->idx)) = entry->to_addr;
+    REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_TO_REG_OFFSET(entry->idx)) =
+        entry->to_addr;
     __METAL_IO_FENCE(o, rw);
 
     return 0;
 }
 
-int
-__metal_driver_sifive_remapper_set_remaps(struct metal_remapper *remapper,
-                                          struct metal_remapper_entry *entries[],
-                                          int num_entries) {
+int __metal_driver_sifive_remapper_set_remaps(
+    struct metal_remapper *remapper, struct metal_remapper_entry *entries[],
+    int num_entries) {
     for (int i = 0; i < num_entries; i++) {
         __metal_driver_sifive_remapper_set_remap(remapper, entries[i]);
     }
@@ -210,9 +206,8 @@ __metal_driver_sifive_remapper_get_from(struct metal_remapper *remapper,
     return REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_FROM_REG_OFFSET(idx));
 }
 
-uint64_t
-__metal_driver_sifive_remapper_get_to(struct metal_remapper *remapper,
-                                      int idx) {
+uint64_t __metal_driver_sifive_remapper_get_to(struct metal_remapper *remapper,
+                                               int idx) {
     unsigned long base = __metal_driver_sifive_remapper2_base(remapper);
     return REMAPPER_REGW(METAL_SIFIVE_REMAPPER2_TO_REG_OFFSET(idx));
 }
@@ -225,11 +220,16 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_remapper2) = {
     .remapper.get_valid = __metal_driver_sifive_remapper_get_valid,
     .remapper.set_valid = __metal_driver_sifive_remapper_set_valid,
     .remapper.flush = __metal_driver_sifive_remapper_flush,
-    .remapper.get_from_region_base = __metal_driver_sifive_remapper_get_from_region_base,
-    .remapper.get_from_region_size = __metal_driver_sifive_remapper_get_from_region_size,
-    .remapper.get_to_region_base = __metal_driver_sifive_remapper_get_to_region_base,
-    .remapper.get_to_region_size = __metal_driver_sifive_remapper_get_to_region_size,
-    .remapper.get_max_from_entry_region_size = __metal_driver_sifive_remapper_get_max_from_entry_region_size,
+    .remapper.get_from_region_base =
+        __metal_driver_sifive_remapper_get_from_region_base,
+    .remapper.get_from_region_size =
+        __metal_driver_sifive_remapper_get_from_region_size,
+    .remapper.get_to_region_base =
+        __metal_driver_sifive_remapper_get_to_region_base,
+    .remapper.get_to_region_size =
+        __metal_driver_sifive_remapper_get_to_region_size,
+    .remapper.get_max_from_entry_region_size =
+        __metal_driver_sifive_remapper_get_max_from_entry_region_size,
     .remapper.get_version = __metal_driver_sifive_remapper_get_version,
     .remapper.get_entries = __metal_driver_sifive_remapper_get_entries,
     .remapper.set_remap = __metal_driver_sifive_remapper_set_remap,
