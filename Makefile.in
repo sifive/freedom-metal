@@ -226,6 +226,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/drivers/riscv_clint0.$(OBJEXT) \
 	src/drivers/riscv_cpu.$(OBJEXT) \
 	src/drivers/riscv_plic0.$(OBJEXT) \
+	src/drivers/sifive_remapper2.$(OBJEXT) \
 	src/drivers/sifive_buserror0.$(OBJEXT) \
 	src/drivers/sifive_ccache0.$(OBJEXT) \
 	src/drivers/sifive_clic0.$(OBJEXT) \
@@ -262,7 +263,7 @@ am_libmetal_a_OBJECTS = src/drivers/fixed-clock.$(OBJEXT) \
 	src/switch.$(OBJEXT) src/synchronize_harts.$(OBJEXT) \
 	src/timer.$(OBJEXT) src/time.$(OBJEXT) src/trap.$(OBJEXT) \
 	src/tty.$(OBJEXT) src/uart.$(OBJEXT) src/vector.$(OBJEXT) \
-	src/watchdog.$(OBJEXT)
+	src/watchdog.$(OBJEXT) src/remapper.$(OBJEXT)
 libmetal_a_OBJECTS = $(am_libmetal_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -459,6 +460,7 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/machine/platform.h metal/drivers/fixed-clock.h \
 	metal/drivers/fixed-factor-clock.h \
 	metal/drivers/riscv_clint0.h metal/drivers/riscv_cpu.h \
+	metal/drivers/sifive_remapper2.h \
 	metal/drivers/riscv_plic0.h metal/drivers/sifive_buserror0.h \
 	metal/drivers/sifive_ccache0.h metal/drivers/sifive_clic0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
@@ -486,7 +488,8 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/lim.h metal/lock.h metal/memory.h metal/nmi.h metal/pmp.h \
 	metal/privilege.h metal/pwm.h metal/rtc.h metal/shutdown.h \
 	metal/scrub.h metal/spi.h metal/switch.h metal/timer.h \
-	metal/time.h metal/tty.h metal/uart.h metal/watchdog.h
+	metal/time.h metal/tty.h metal/uart.h metal/watchdog.h \
+	metal/remapper.h
 
 # This will generate these sources before the compilation step
 BUILT_SOURCES = \
@@ -506,6 +509,7 @@ libmetal_a_SOURCES = \
 	src/drivers/riscv_clint0.c \
 	src/drivers/riscv_cpu.c \
 	src/drivers/riscv_plic0.c \
+	src/drivers/sifive_remapper2.c \
 	src/drivers/sifive_buserror0.c \
 	src/drivers/sifive_ccache0.c \
 	src/drivers/sifive_clic0.c \
@@ -532,6 +536,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_simuart0.c \
 	src/drivers/sifive_wdog0.c \
 	src/drivers/ucb_htif0.c \
+	src/remapper.c \
 	src/atomic.c \
 	src/button.c \
 	src/cache.c \
@@ -783,6 +788,8 @@ src/drivers/riscv_cpu.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/riscv_plic0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
+src/drivers/sifive_remapper2.$(OBJEXT): src/drivers/$(am__dirstamp) \
+	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_buserror0.$(OBJEXT): src/drivers/$(am__dirstamp) \
 	src/drivers/$(DEPDIR)/$(am__dirstamp)
 src/drivers/sifive_ccache0.$(OBJEXT): src/drivers/$(am__dirstamp) \
@@ -850,6 +857,8 @@ src/$(am__dirstamp):
 src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/$(DEPDIR)
 	@: > src/$(DEPDIR)/$(am__dirstamp)
+src/remapper.$(OBJEXT): src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 src/atomic.$(OBJEXT): src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/button.$(OBJEXT): src/$(am__dirstamp) \
@@ -941,6 +950,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_wait.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@gloss/$(DEPDIR)/sys_write.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@segger/$(DEPDIR)/SEGGER_target_metal.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/remapper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/atomic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/button.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/cache.Po@am__quote@
@@ -977,6 +987,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_clint0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_cpu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/riscv_plic0.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_remapper2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_buserror0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_ccache0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/drivers/$(DEPDIR)/sifive_clic0.Po@am__quote@
