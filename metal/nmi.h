@@ -11,20 +11,22 @@
 
 #define _STR(x) #x
 
-#define _RNMI_IRQ(ID) _STR(.rnmi_irq_ ## ID)
-#define _RNMI_EXCP(ID) _STR(.rnmi_excp_ ## ID)
+#define _RNMI_IRQ(ID) _STR(.rnmi_irq_##ID)
+#define _RNMI_EXCP(ID) _STR(.rnmi_excp_##ID)
 
 #define METAL_NMI_MNRET __asm__ volatile(".word 0x70200073")
 
 /*! @def METAL_PLACE_IN_RNMI_IRQ
  * @brief Link a function into the RNMI interrupt handler.
  */
-#define METAL_PLACE_IN_RNMI_IRQ(ID) __attribute__((section(_RNMI_IRQ(ID)), naked))
+#define METAL_PLACE_IN_RNMI_IRQ(ID)                                            \
+    __attribute__((section(_RNMI_IRQ(ID)), naked))
 
 /*! @def METAL_PLACE_IN_RNMI_EXCP
  * @brief Link a function into the RNMI exception handler.
  */
 
-#define METAL_PLACE_IN_RNMI_EXCP(ID) __attribute__((section(_RNMI_EXCP(ID)), interrupt))
+#define METAL_PLACE_IN_RNMI_EXCP(ID)                                           \
+    __attribute__((section(_RNMI_EXCP(ID)), interrupt))
 
 #endif
