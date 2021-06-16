@@ -154,30 +154,30 @@ int sifive_gpio0_clear_interrupt(struct metal_gpio gpio, int pin,
 
     switch (int_type) {
     case METAL_GPIO_INT_RISING:
-        GPIO_REGW(METAL_SIFIVE_GPIO0_RISE_IP) |= (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_RISE_IP) = (1 << pin);
         break;
     case METAL_GPIO_INT_FALLING:
-        GPIO_REGW(METAL_SIFIVE_GPIO0_FALL_IP) |= (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_FALL_IP) = (1 << pin);
         break;
     case METAL_GPIO_INT_BOTH_EDGE:
-        GPIO_REGW(METAL_SIFIVE_GPIO0_RISE_IP) |= (1 << pin);
-        GPIO_REGW(METAL_SIFIVE_GPIO0_FALL_IP) |= (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_RISE_IP) = (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_FALL_IP) = (1 << pin);
         break;
     case METAL_GPIO_INT_HIGH:
-        GPIO_REGW(METAL_SIFIVE_GPIO0_HIGH_IP) |= (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_HIGH_IP) = (1 << pin);
         break;
     case METAL_GPIO_INT_LOW:
-        GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IP) |= (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IP) = (1 << pin);
         break;
     case METAL_GPIO_INT_BOTH_LEVEL:
-        GPIO_REGW(METAL_SIFIVE_GPIO0_HIGH_IP) |= (1 << pin);
-        GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IP) |= (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_HIGH_IP) = (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IP) = (1 << pin);
         break;
     case METAL_GPIO_INT_MAX:
-        GPIO_REGW(METAL_SIFIVE_GPIO0_RISE_IP) |= (1 << pin);
-        GPIO_REGW(METAL_SIFIVE_GPIO0_FALL_IP) |= (1 << pin);
-        GPIO_REGW(METAL_SIFIVE_GPIO0_HIGH_IP) |= (1 << pin);
-        GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IP) |= (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_RISE_IP) = (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_FALL_IP) = (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_HIGH_IP) = (1 << pin);
+        GPIO_REGW(METAL_SIFIVE_GPIO0_LOW_IP) = (1 << pin);
         break;
     default:
         return -1;
