@@ -8,11 +8,11 @@ struct metal_switch *metal_switch_get(char *label) {
     int i;
     struct metal_switch *flip;
 
-    if ((__METAL_DT_MAX_BUTTONS == 0) || (label == NULL)) {
+    if ((__METAL_DT_MAX_SWITCHES == 0) || (label == NULL)) {
         return NULL;
     }
 
-    for (i = 0; i < __METAL_DT_MAX_BUTTONS; i++) {
+    for (i = 0; i < __METAL_DT_MAX_SWITCHES; i++) {
         flip = (struct metal_switch *)__metal_switch_table[i];
         if (flip->vtable->switch_exist(flip, label)) {
             return flip;
