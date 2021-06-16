@@ -6,9 +6,16 @@
 
 /* Macros to generate driver prefix string */
 #ifdef METAL_CACHE_DRIVER_PREFIX
-#define METAL_FUNC_STR(a, b) a##_##b
-#define METAL_FUNC_STR_(a, b) METAL_FUNC_STR(a, b)
-#define METAL_FUNC(x) METAL_FUNC_STR_(METAL_CACHE_DRIVER_PREFIX, x)
+#define METAL_CACHE_FUNC_STR(a, b) a##_##b
+#define METAL_CACHE_FUNC_STR_(a, b) METAL_CACHE_FUNC_STR(a, b)
+#define METAL_CACHE_FUNC(x) METAL_CACHE_FUNC_STR_(METAL_CACHE_DRIVER_PREFIX, x)
+#endif
+
+#ifdef METAL_PL2CACHE_DRIVER_PREFIX
+#define METAL_PL2CACHE_FUNC_STR(a, b) a##_##b
+#define METAL_PL2CACHE_FUNC_STR_(a, b) METAL_PL2CACHE_FUNC_STR(a, b)
+#define METAL_PL2CACHE_FUNC(x)                                                 \
+    METAL_PL2CACHE_FUNC_STR_(METAL_PL2CACHE_DRIVER_PREFIX, x)
 #endif
 
 extern __inline__ void metal_cache_init(struct metal_cache *cache, int ways);
@@ -17,24 +24,30 @@ extern __inline__ int metal_cache_set_enabled_ways(struct metal_cache *cache,
                                                    int ways);
 
 int metal_l2cache_init(void) {
-#ifdef METAL_CACHE_DRIVER_PREFIX
-    return METAL_FUNC(init)();
+#if defined(METAL_PL2CACHE_DRIVER_PREFIX)
+    return 0;
+#elif defined(METAL_CACHE_DRIVER_PREFIX)
+    return METAL_CACHE_FUNC(init)();
 #else
     return -1;
 #endif
 }
 
 int metal_l2cache_get_enabled_ways(void) {
-#ifdef METAL_CACHE_DRIVER_PREFIX
-    return METAL_FUNC(get_enabled_ways)();
+#if defined(METAL_PL2CACHE_DRIVER_PREFIX)
+    return METAL_PL2CACHE_FUNC(get_enabled_ways)();
+#elif defined(METAL_CACHE_DRIVER_PREFIX)
+    return METAL_CACHE_FUNC(get_enabled_ways)();
 #else
     return -1;
 #endif
 }
 
 int metal_l2cache_set_enabled_ways(int ways) {
-#ifdef METAL_CACHE_DRIVER_PREFIX
-    return METAL_FUNC(set_enabled_ways)(ways);
+#if defined(METAL_PL2CACHE_DRIVER_PREFIX)
+    return METAL_PL2CACHE_FUNC(set_enabled_ways)(ways);
+#elif defined(METAL_CACHE_DRIVER_PREFIX)
+    return METAL_CACHE_FUNC(set_enabled_ways)(ways);
 #else
     return -1;
 #endif

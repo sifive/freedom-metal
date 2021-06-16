@@ -7,7 +7,7 @@
 /*!
  * @file sifive_ccache0.h
  *
- * @brief API for configuring the SiFive L2 cache controller
+ * @brief API for configuring the SiFive cache controller
  */
 
 #include <metal/interrupt.h>
