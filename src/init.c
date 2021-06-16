@@ -1,8 +1,8 @@
 /* Copyright 2019 SiFive Inc. */
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <metal/machine/platform.h>
 #include <metal/init.h>
+#include <metal/machine/platform.h>
 
 #include <metal/drivers/sifive_l2pf1.h>
 

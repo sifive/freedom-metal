@@ -5,32 +5,32 @@
 
 #ifdef METAL_SIFIVE_L2PF1
 
-#include <stdint.h>
-#include <metal/machine.h>
 #include <metal/drivers/sifive_l2pf1.h>
+#include <metal/machine.h>
+#include <stdint.h>
 
 /* Macros to access memory mapped registers. */
 #define REGW(x) *((volatile uint32_t *)(l2pf_base[hartid] + x))
 
 /* Macros for register bit masks. */
-#define REG_MASK_BITWIDTH_1         0x01
-#define REG_MASK_BITWIDTH_2         0x03
-#define REG_MASK_BITWIDTH_4         0x0f
-#define REG_MASK_BITWIDTH_5         0x1f
-#define REG_MASK_BITWIDTH_6         0x3f
+#define REG_MASK_BITWIDTH_1 0x01
+#define REG_MASK_BITWIDTH_2 0x03
+#define REG_MASK_BITWIDTH_4 0x0f
+#define REG_MASK_BITWIDTH_5 0x1f
+#define REG_MASK_BITWIDTH_6 0x3f
 
 /* Macros to specify register bit shift. */
-#define REG_BITSHIFT_2              2
-#define REG_BITSHIFT_4              4
-#define REG_BITSHIFT_8              8
-#define REG_BITSHIFT_9              9
-#define REG_BITSHIFT_13             13
-#define REG_BITSHIFT_14             14
-#define REG_BITSHIFT_19             19
-#define REG_BITSHIFT_20             20
-#define REG_BITSHIFT_21             21
-#define REG_BITSHIFT_28             28
-#define REG_BITSHIFT_29             29
+#define REG_BITSHIFT_2 2
+#define REG_BITSHIFT_4 4
+#define REG_BITSHIFT_8 8
+#define REG_BITSHIFT_9 9
+#define REG_BITSHIFT_13 13
+#define REG_BITSHIFT_14 14
+#define REG_BITSHIFT_19 19
+#define REG_BITSHIFT_20 20
+#define REG_BITSHIFT_21 21
+#define REG_BITSHIFT_28 28
+#define REG_BITSHIFT_29 29
 
 /* Array of base addresses with HART IDs as the index. */
 unsigned long l2pf_base[] = METAL_SIFIVE_L2PF1_BASE_ADDR;
@@ -60,18 +60,15 @@ static void _sifive_l2pf1_set_config(int hartid, sifive_l2pf1_config *config) {
 
         val = (uint32_t)(
             (config->QFullnessThrd & REG_MASK_BITWIDTH_4) |
-            ((config->HitCacheThrd & REG_MASK_BITWIDTH_5)
-              << REG_BITSHIFT_4) |
-            ((config->HitMSHRThrd & REG_MASK_BITWIDTH_4)
-              << REG_BITSHIFT_9) |
-            ((config->Window & REG_MASK_BITWIDTH_6)
-              << REG_BITSHIFT_13) |
+            ((config->HitCacheThrd & REG_MASK_BITWIDTH_5) << REG_BITSHIFT_4) |
+            ((config->HitMSHRThrd & REG_MASK_BITWIDTH_4) << REG_BITSHIFT_9) |
+            ((config->Window & REG_MASK_BITWIDTH_6) << REG_BITSHIFT_13) |
             ((config->ScalarStoreSupportEn & REG_MASK_BITWIDTH_1)
-              << REG_BITSHIFT_19) |
+             << REG_BITSHIFT_19) |
             ((config->VectorLoadSupportEn & REG_MASK_BITWIDTH_1)
-              << REG_BITSHIFT_20) |
+             << REG_BITSHIFT_20) |
             ((config->VectorStoreSupportEn & REG_MASK_BITWIDTH_1)
-              << REG_BITSHIFT_21));
+             << REG_BITSHIFT_21));
 
         REGW(METAL_SIFIVE_L2PF1_USER_CONTROL) = val;
     }
@@ -124,25 +121,18 @@ void sifive_l2pf1_get_config(sifive_l2pf1_config *config) {
         val = REGW(METAL_SIFIVE_L2PF1_BASIC_CONTROL);
 
         config->ScalarLoadSupportEn = (val & REG_MASK_BITWIDTH_1);
-        config->Dist =
-            ((val >> REG_BITSHIFT_2) & distance_bits_mask);
-        config->MaxAllowedDist =
-            ((val >> REG_BITSHIFT_8) & distance_bits_mask);
-        config->LinToExpThrd =
-            ((val >> REG_BITSHIFT_14) & distance_bits_mask);
-        config->CrossPageEn =
-            ((val >> REG_BITSHIFT_28) & REG_MASK_BITWIDTH_1);
-        config->ForgiveThrd =
-            ((val >> REG_BITSHIFT_29) & REG_MASK_BITWIDTH_2);
+        config->Dist = ((val >> REG_BITSHIFT_2) & distance_bits_mask);
+        config->MaxAllowedDist = ((val >> REG_BITSHIFT_8) & distance_bits_mask);
+        config->LinToExpThrd = ((val >> REG_BITSHIFT_14) & distance_bits_mask);
+        config->CrossPageEn = ((val >> REG_BITSHIFT_28) & REG_MASK_BITWIDTH_1);
+        config->ForgiveThrd = ((val >> REG_BITSHIFT_29) & REG_MASK_BITWIDTH_2);
 
         /* Get L2 user bits control register configuration values. */
         val = REGW(METAL_SIFIVE_L2PF1_USER_CONTROL);
 
         config->QFullnessThrd = (val & REG_MASK_BITWIDTH_4);
-        config->HitCacheThrd =
-            ((val >> REG_BITSHIFT_4) & REG_MASK_BITWIDTH_5);
-        config->HitMSHRThrd =
-            ((val >> REG_BITSHIFT_9) & REG_MASK_BITWIDTH_4);
+        config->HitCacheThrd = ((val >> REG_BITSHIFT_4) & REG_MASK_BITWIDTH_5);
+        config->HitMSHRThrd = ((val >> REG_BITSHIFT_9) & REG_MASK_BITWIDTH_4);
         config->Window = ((val >> REG_BITSHIFT_13) & REG_MASK_BITWIDTH_6);
         config->ScalarStoreSupportEn =
             ((val >> REG_BITSHIFT_19) & REG_MASK_BITWIDTH_1);
