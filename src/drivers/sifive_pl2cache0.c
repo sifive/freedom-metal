@@ -11,11 +11,9 @@
 #include <stdint.h>
 
 /* Macros to access memory mapped registers */
-#define REGW(_x_) \
-    *(volatile uint32_t *)(pl2cache_base[hartid] + (_x_))
+#define REGW(_x_) *(volatile uint32_t *)(pl2cache_base[hartid] + (_x_))
 
-#define REGD(_x_) \
-    *(volatile uint64_t *)(pl2cache_base[hartid] + (_x_))
+#define REGD(_x_) *(volatile uint64_t *)(pl2cache_base[hartid] + (_x_))
 
 /* Macros to specify register bit shift */
 #define REG_SHIFT_4 4
@@ -50,13 +48,13 @@ void sifive_pl2cache0_get_config(sifive_pl2cache0_config *config) {
 }
 
 uint32_t sifive_pl2cache0_get_enabled_ways(void) {
-    sifive_pl2cache0_config config = { 0, 0, 0, 0 };
+    sifive_pl2cache0_config config = {0, 0, 0, 0};
     sifive_pl2cache0_get_config(&config);
     return config.num_ways;
 }
 
 int sifive_pl2cache0_set_enabled_ways(uint32_t ways) {
-    sifive_pl2cache0_config config = { 0, 0, 0, 0 };
+    sifive_pl2cache0_config config = {0, 0, 0, 0};
     sifive_pl2cache0_get_config(&config);
     return ways <= config.num_ways ? 0 : -1;
 }
@@ -70,10 +68,9 @@ void sifive_pl2cache0_inject_ecc_error(uint32_t bitindex,
 
     /* Induce ECC error at given bit index and location */
     REGW(METAL_SIFIVE_PL2CACHE0_ECCINJECTERROR) =
-        (uint32_t)(((target & 0x03) << (REG_SHIFT_16 + 0)) | 
-                   ((dir & 0x01) << (REG_SHIFT_16 + 2u)) | 
-                   ((type & 0x01) << (REG_SHIFT_16 + 3u)) | 
-                   (bitindex & 0xFF));
+        (uint32_t)(((target & 0x03) << (REG_SHIFT_16 + 0)) |
+                   ((dir & 0x01) << (REG_SHIFT_16 + 2u)) |
+                   ((type & 0x01) << (REG_SHIFT_16 + 3u)) | (bitindex & 0xFF));
 }
 
 void sifive_pl2cache0_flush(uintptr_t flush_addr) {
@@ -85,7 +82,7 @@ void sifive_pl2cache0_flush(uintptr_t flush_addr) {
 
 #if __riscv_xlen == 32
     REGW(METAL_SIFIVE_PL2CACHE0_CFLUSH64) = flush_addr;
-    REGW(METAL_SIFIVE_PL2CACHE0_CFLUSH64+sizeof(uint32_t)) = 0x13u << 24u;
+    REGW(METAL_SIFIVE_PL2CACHE0_CFLUSH64 + sizeof(uint32_t)) = 0x13u << 24u;
 #else
     REGD(METAL_SIFIVE_PL2CACHE0_CFLUSH64) = flush_addr | (0x13ull << 24u);
 #endif

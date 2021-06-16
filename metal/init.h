@@ -49,7 +49,7 @@ typedef void (*metal_destructor_t)(void);
 #define __METAL_CONSTRUCTOR_PRIO(function_name, priority)                      \
     __attribute__((section(".metal.ctors"))) void function_name(void);         \
     __attribute__((section(".metal.init_array." #priority)))                   \
-        metal_constructor_t _##function_name##_ptr = &function_name;           \
+    metal_constructor_t _##function_name##_ptr = &function_name;               \
     void function_name(void)
 
 /*! @def METAL_DESTRUCTOR
@@ -78,7 +78,7 @@ typedef void (*metal_destructor_t)(void);
 #define __METAL_DESTRUCTOR_PRIO(function_name, priority)                       \
     __attribute__((section(".metal.dtors"))) void function_name(void);         \
     __attribute__((section(".metal.fini_array." #priority)))                   \
-        metal_destructor_t _##function_name##_ptr = &function_name;            \
+    metal_destructor_t _##function_name##_ptr = &function_name;                \
     void function_name(void)
 
 /*!

@@ -118,8 +118,8 @@ metal_buserror_event_t metal_buserror_get_cause(struct metal_buserror *beu) {
 
     uintptr_t cause = base + METAL_SIFIVE_BUSERROR0_CAUSE;
 
-    return (metal_buserror_event_t)(
-        1 << __METAL_ACCESS_ONCE((__metal_io_u8 *)cause));
+    return (metal_buserror_event_t)(1 << __METAL_ACCESS_ONCE(
+                                        (__metal_io_u8 *)cause));
 }
 
 int metal_buserror_clear_cause(struct metal_buserror *beu) {

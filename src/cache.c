@@ -14,7 +14,8 @@
 #ifdef METAL_PL2CACHE_DRIVER_PREFIX
 #define METAL_PL2CACHE_FUNC_STR(a, b) a##_##b
 #define METAL_PL2CACHE_FUNC_STR_(a, b) METAL_PL2CACHE_FUNC_STR(a, b)
-#define METAL_PL2CACHE_FUNC(x) METAL_PL2CACHE_FUNC_STR_(METAL_PL2CACHE_DRIVER_PREFIX, x)
+#define METAL_PL2CACHE_FUNC(x)                                                 \
+    METAL_PL2CACHE_FUNC_STR_(METAL_PL2CACHE_DRIVER_PREFIX, x)
 #endif
 
 extern __inline__ void metal_cache_init(struct metal_cache *cache, int ways);
