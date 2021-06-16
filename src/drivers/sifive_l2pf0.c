@@ -105,32 +105,30 @@ void sifive_l2pf0_set_config(sifive_l2pf0_config *config) {
     /* Check for NULL, valid base address */
     if ((config) && (hartid < l2pf_base_len) && (l2pf_base[hartid] != 0UL)) {
         /* Get values from configuration to write into register */
-        val = (uint32_t)((config->HwPrefetchEnable & REG_MASK_BITWIDTH1) |
-                         ((config->CrossPageOptmDisable & REG_MASK_BITWIDTH1)
-                          << REG_BITSHIFT_1) |
-                         ((config->PrefetchDistance & REG_MASK_BITWIDTH6)
-                          << REG_BITSHIFT_2) |
-                         ((config->MaxAllowedDistance & REG_MASK_BITWIDTH6)
-                          << REG_BITSHIFT_8) |
-                         ((config->LinToExpThreshold & REG_MASK_BITWIDTH6)
-                          << REG_BITSHIFT_14) |
-                         ((config->AgeOutEn & REG_MASK_BITWIDTH1)
-                          << REG_BITSHIFT_20) |
-                         ((config->NumLdsToAgeOut & REG_MASK_BITWIDTH7)
-                          << REG_BITSHIFT_21) |
-                         ((config->CrossPageEn & REG_MASK_BITWIDTH1)
-                          << REG_BITSHIFT_28));
+        val = (uint32_t)(
+            (config->HwPrefetchEnable & REG_MASK_BITWIDTH1) |
+            ((config->CrossPageOptmDisable & REG_MASK_BITWIDTH1)
+             << REG_BITSHIFT_1) |
+            ((config->PrefetchDistance & REG_MASK_BITWIDTH6)
+             << REG_BITSHIFT_2) |
+            ((config->MaxAllowedDistance & REG_MASK_BITWIDTH6)
+             << REG_BITSHIFT_8) |
+            ((config->LinToExpThreshold & REG_MASK_BITWIDTH6)
+             << REG_BITSHIFT_14) |
+            ((config->AgeOutEn & REG_MASK_BITWIDTH1) << REG_BITSHIFT_20) |
+            ((config->NumLdsToAgeOut & REG_MASK_BITWIDTH7) << REG_BITSHIFT_21) |
+            ((config->CrossPageEn & REG_MASK_BITWIDTH1) << REG_BITSHIFT_28));
 
         /* Set user specified L2 prefetch configuration values */
         REGW(METAL_SIFIVE_L2PF0_BASIC_CONTROL) = val;
 
-        val = (uint32_t)((config->QFullnessThreshold & REG_MASK_BITWIDTH4) |
-                         ((config->HitCacheThreshold & REG_MASK_BITWIDTH5)
-                          << REG_BITSHIFT_4) |
-                         ((config->hitMSHRThreshold & REG_MASK_BITWIDTH4)
-                          << REG_BITSHIFT_9) |
-                         ((config->Window & REG_MASK_BITWIDTH6)
-                          << REG_BITSHIFT_13));
+        val = (uint32_t)(
+            (config->QFullnessThreshold & REG_MASK_BITWIDTH4) |
+            ((config->HitCacheThreshold & REG_MASK_BITWIDTH5)
+             << REG_BITSHIFT_4) |
+            ((config->hitMSHRThreshold & REG_MASK_BITWIDTH4)
+             << REG_BITSHIFT_9) |
+            ((config->Window & REG_MASK_BITWIDTH6) << REG_BITSHIFT_13));
 
         REGW(METAL_SIFIVE_L2PF0_USER_CONTROL) = val;
     }
