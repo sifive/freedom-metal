@@ -23,5 +23,33 @@
 #define __METAL_DT_NUM_I2CS 0
 {% endif %}
 
+{% if 'synopsys_i2c' in default_drivers and default_drivers['synopsys_i2c'] in devices %}
+{% set synopsys_i2cs = devices[default_drivers['synopsys_i2c']] %}
+#define __METAL_DT_NUM_I2CS {{ synopsys_i2cs|length }}
+
+{% set driver_string = to_snakecase(default_drivers['synopsys_i2c']) %}
+#define metal_i2c_enable                   {{ driver_string }}_enable_i2c
+#define metal_i2c_disable                  {{ driver_string }}_disable_i2c
+#define metal_i2c_init                     {{ driver_string }}_init
+#define metal_i2c_write                    {{ driver_string }}_put_data
+#define metal_i2c_read                     {{ driver_string }}_get_data
+#define metal_i2c_set_address_mode         {{ driver_string }}_set_address_mode
+#define metal_i2c_set_speed_mode           {{ driver_string }}_set_speed_mode
+#define metal_i2c_set_target_address       {{ driver_string }}_set_target_address
+#define metal_i2c_get_interrupt_controller {{ driver_string }}_interrupt_parent
+#define metal_i2c_load_buffer              {{ driver_string }}_load_buffer
+#define metal_i2c_global_interrupt_clear   {{ driver_string }}_global_interrupt_clear_handler
+#define metal_i2c_disable_interrupt        {{ driver_string }}_disable_interrupt
+#define metal_i2c_get_interrupt_id         {{ driver_string }}_get_interrupt_id
+#define metal_i2c_enable_interrupt         {{ driver_string }}_enable_interrupt
+
+{% for i2c in synopsys_i2cs %}
+#define metal_i2c_{{ i2c.id }} ((struct metal_i2c) { {{ i2c.id }} })
+{% endfor %}
+
+{% else %}
+#define __METAL_DT_NUM_I2CS 0
+{% endif %}
+
 #endif /* ! __METAL_DT_I2C__H */
 
