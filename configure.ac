@@ -31,19 +31,19 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
 ########################################################
 
 AC_ARG_WITH([builtin-libgloss],
-    [AS_HELP_STRING([--with-bultin-libgloss], [Build libgloss along with Metal])],
+    [AS_HELP_STRING([--with-builtin-libgloss], [Build libgloss along with Metal])],
     [with_builtin_libgloss="yes"],
     [with_builtin_libgloss="no"]
 )
 
 AC_ARG_WITH([builtin-libmetal-pico],
-    [AS_HELP_STRING([--with-bultin-libmetal-pico], [Build libmetal-pico along with Metal])],
+    [AS_HELP_STRING([--with-builtin-libmetal-pico], [Build libmetal-pico along with Metal])],
     [with_builtin_libmetal_pico="yes"],
     [with_builtin_libmetal_pico="no"]
 )
 
 AC_ARG_WITH([builtin-libmetal-segger],
-    [AS_HELP_STRING([--with-bultin-libmetal-segger], [Build libmetal-segger along with Metal])],
+    [AS_HELP_STRING([--with-builtin-libmetal-segger], [Build libmetal-segger along with Metal])],
     [with_builtin_libmetal_segger="yes"],
     [with_builtin_libmetal_segger="no"]
 )

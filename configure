@@ -1364,10 +1364,10 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-bultin-libgloss  Build libgloss along with Metal
-  --with-bultin-libmetal-pico
+  --with-builtin-libgloss Build libgloss along with Metal
+  --with-builtin-libmetal-pico
                           Build libmetal-pico along with Metal
-  --with-bultin-libmetal-segger
+  --with-builtin-libmetal-segger
                           Build libmetal-segger along with Metal
   --with-machine-header=PATH
                           Path to the machine header file
