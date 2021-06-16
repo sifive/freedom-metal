@@ -21,7 +21,15 @@ _enter:
      * that's safe as it's a fixed register. */
 .option push
 .option norelax
+#ifdef __riscv_cmodel_compact
+1:
+    auipc a0, %pcrel_hi(__global_pointer__)
+    addi a0, a0, %pcrel_lo(1b)
+    ld   gp, 0(a0)
+    add  gp, gp, a0
+#else
     la gp, __global_pointer$
+#endif
 .option pop
 
     /* trap over the chicken bit register clearing, aloe & fe310 dont have it */
@@ -53,7 +61,11 @@ _enter:
     * stack alignment. */
 
     bne sp, zero, 1f
+#ifdef __riscv_cmodel_compact
+    lla.gprel sp, _sp
+#else
     la sp, _sp
+#endif
 1:
     /* Increment by hartid number of stack sizes */
     csrr a0, mhartid
