@@ -261,8 +261,7 @@ _skip_init:
   ori a5, a5, 0x200
   csrw mstatus, a5
   vsetivli x0, 0, e8, m1, ta, ma
-  csrwi vxrm, 0
-  csrwi vxsat, 0
+  csrwi vcsr, 0
 1:
 
   /* This is a C runtime, so main() is defined to have some arguments.  Since
