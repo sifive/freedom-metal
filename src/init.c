@@ -4,6 +4,7 @@
 #include <metal/init.h>
 #include <metal/machine/platform.h>
 
+#include <metal/drivers/sifive_ccache0.h>
 #include <metal/drivers/sifive_l2pf1.h>
 
 /*
