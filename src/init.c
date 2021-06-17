@@ -25,6 +25,9 @@ void metal_init(void) {
     }
     init_done = 1;
 
+#ifdef METAL_SIFIVE_CCACHE0
+    sifive_ccache0_init();
+#endif
 #ifdef METAL_SIFIVE_L2PF1
     /* Do L2 Stride Prefetcher initialization. */
     sifive_l2pf1_init();
