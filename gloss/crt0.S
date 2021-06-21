@@ -252,7 +252,9 @@ _skip_init:
   csrwi fcsr, 0
 1:
 
-  /* Check for vector extension support and enable it if found */
+  /* Check for vector extension support and enable it if found.
+   * Omit if toolchain doesn't support the vector extension. */
+#ifdef __riscv_v
   csrr a5, misa
   li a4, 0x200000
   and a5, a5, a4
@@ -260,7 +262,10 @@ _skip_init:
   csrr a5, mstatus
   ori a5, a5, 0x200
   csrw mstatus, a5
+  vsetivli x0, 0, e8, m1, ta, ma
+  csrwi vcsr, 0
 1:
+#endif
 
   /* This is a C runtime, so main() is defined to have some arguments.  Since
    * there's nothing sane the METAL can pass we don't bother with that but
