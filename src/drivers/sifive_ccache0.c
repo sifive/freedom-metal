@@ -30,6 +30,8 @@ METAL_CONSTRUCTOR(_sifive_ccache0_init) { sifive_ccache0_init(); }
 
 /* Linker symbols to calculate LIM allocated size */
 extern char metal_segment_lim_target_start, metal_segment_lim_target_end;
+/* Linker symbols for the bss section */
+extern char metal_segment_bss_target_start, metal_segment_bss_target_end;
 
 int sifive_ccache0_init(void) {
     int ret;
@@ -48,6 +50,23 @@ int sifive_ccache0_init(void) {
             lim_size -= (config.block_size * config.num_sets * config.num_bank);
             config.num_ways--;
         }
+    }
+
+    /* Sanity check */
+    int ccache_size =
+        config.block_size * config.num_sets * config.num_bank * config.num_ways;
+    uintptr_t tmp;
+
+    tmp = &metal_segment_bss_target_start;
+    if ((tmp >= &metal_segment_lim_target_start) &&
+        (tmp < (&metal_segment_lim_target_start + ccache_size))) {
+        return -1;
+    }
+
+    tmp = &metal_segment_bss_target_end;
+    if ((tmp >= &metal_segment_lim_target_start) &&
+        (tmp < (&metal_segment_lim_target_start + ccache_size))) {
+        return -1;
     }
 
     /* Enable ways */
