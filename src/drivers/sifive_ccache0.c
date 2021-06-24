@@ -55,7 +55,7 @@ int sifive_ccache0_init(void) {
     /* Sanity check */
     int ccache_size =
         config.block_size * config.num_sets * config.num_bank * config.num_ways;
-    uintptr_t tmp;
+    char *tmp;
 
     tmp = &metal_segment_bss_target_start;
     if ((tmp >= &metal_segment_lim_target_start) &&
