@@ -332,7 +332,11 @@ secondary_main:
 /* This shim allows main() to be passed a set of arguments that can satisfy the
  * requirements of the C API. */
 .section .rodata.libgloss.start
+#ifdef __is_series_8
 .balign 8
+#else
+.align 8
+#endif
 argv:
 .dc.a name
 envp:
