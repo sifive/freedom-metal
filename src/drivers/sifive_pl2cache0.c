@@ -26,6 +26,23 @@
 /* Array of base addresses with HART IDs as the index */
 unsigned long pl2cache_base[] = METAL_SIFIVE_PL2CACHE0_BASE_ADDR;
 
+void sifive_pl2cache0_set_cleanEvictenale_bit(bool val) {
+    sifive_pl2cache0_configbits tmp;
+
+    tmp = (sifive_pl2cache0_configbits)REGW(METAL_SIFIVE_PL2CACHE0_CONFIGBITS);
+    tmp.cleanEvictEnable = val;
+    REGW(METAL_SIFIVE_PL2CACHE0_CONFIGBITS) = (uint32_t)tmp;
+}
+
+void sifive_pl2cache0_init(void) {
+#ifndef METAL_SIFIVE_CCACHE0
+    // (L3 CACHE) CCACHE0 is not present
+    sifive_pl2cache0_set_cleanEvictenale_bit(0);
+#else
+    sifive_pl2cache0_set_cleanEvictenale_bit(1);
+#endif /* METAL_SIFIVE_CCACHE0 */
+}
+
 void sifive_pl2cache0_get_config(sifive_pl2cache0_config *config) {
     if (config) /* Check for NULL */
     {
