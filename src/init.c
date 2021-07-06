@@ -26,13 +26,18 @@ void metal_init(void) {
     }
     init_done = 1;
 
+#ifdef METAL_SIFIVE_PL2CACHE0
+    sifive_pl2cache0_init();
+#endif /* METAL_SIFIVE_PL2CACHE0 */
+
 #ifdef METAL_SIFIVE_CCACHE0
     sifive_ccache0_init();
-#endif
+#endif /* METAL_SIFIVE_CCACHE0 */
+
 #ifdef METAL_SIFIVE_L2PF1
     /* Do L2 Stride Prefetcher initialization. */
     sifive_l2pf1_init();
-#endif
+#endif /* METAL_SIFIVE_L2PF1 */
 
     if (&metal_constructors_end <= &metal_constructors_start) {
         return;

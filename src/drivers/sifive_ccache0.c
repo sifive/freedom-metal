@@ -9,6 +9,9 @@
 #include <metal/init.h>
 #include <metal/machine.h>
 #include <stdint.h>
+#ifdef METAL_SIFIVE_PL2CACHE0
+#include <metal/drivers/sifive_pl2cache0.h>
+#endif /* METAL_SIFIVE_PL2CACHE0 */
 
 /* Macros to access memory mapped registers */
 #define REGW(x) *(volatile uint32_t *)(METAL_SIFIVE_CCACHE0_0_BASE_ADDRESS + x)
@@ -60,17 +63,28 @@ int sifive_ccache0_init(void) {
     tmp = &metal_segment_bss_target_start;
     if ((tmp >= &metal_segment_lim_target_start) &&
         (tmp < (&metal_segment_lim_target_start + ccache_size))) {
-        return -1;
+        ret = -1;
+        goto ccache0_init_exit;
     }
 
     tmp = &metal_segment_bss_target_end;
     if ((tmp >= &metal_segment_lim_target_start) &&
         (tmp < (&metal_segment_lim_target_start + ccache_size))) {
-        return -1;
+        ret = -1;
+        goto ccache0_init_exit;
     }
 
     /* Enable ways */
     ret = sifive_ccache0_set_enabled_ways(config.num_ways);
+
+ccache0_init_exit:
+#ifdef METAL_SIFIVE_PL2CACHE0
+    /* ccache0 is used as a L3 cache */
+    if (0 != ret) {
+        /* ccache0 was not configure as cache */
+        sifive_pl2cache0_set_cleanEvictenale_bit(0);
+    }
+#endif /* METAL_SIFIVE_PL2CACHE0 */
 
     return ret;
 }

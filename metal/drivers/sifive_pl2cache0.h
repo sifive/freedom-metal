@@ -11,6 +11,7 @@
  */
 
 #include <metal/interrupt.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 /*! @brief Cache configuration data */
@@ -20,6 +21,20 @@ typedef struct {
     uint32_t num_sets;
     uint32_t block_size;
 } sifive_pl2cache0_config;
+
+typedef struct {
+    uint32_t _reserved0 : 3;
+    uint32_t cleanEvictEnable : 1;
+    uint32_t _reserved1 : 5;
+    uint32_t l2AvoidL1LineDisable : 1;
+    uint32_t _reserved2 : 6;
+    uint32_t softwareEccInjectEnable : 1;
+    uint32_t errInjectOnWriteEnable : 1;
+    uint32_t errInjectOnReadEnable : 1;
+    uint32_t dataUceInjectEnable : 1;
+    uint32_t dirUceInjectEnable : 1;
+    uint32_t _reserved3 : 11;
+} sifive_pl2cache0_configbits;
 
 /*! @brief Set of values for ECC error target */
 typedef enum {
@@ -39,6 +54,16 @@ typedef enum {
     SIFIVE_PL2CACHE0_ECC_ERROR_CORRECTABLE = 0,
     SIFIVE_PL2CACHE0_ECC_ERROR_UNCORRECTABLE = 1,
 } sifive_pl2cache0_ecc_errtype_t;
+
+/*! @brief Set theCleanEvicenable bit of the Private L2 cache controller.
+ * @param val boolean parameter true(enable) or false(desable).
+ * @return None.*/
+void sifive_pl2cache0_set_cleanEvictenale_bit(bool val);
+
+/*! @brief Initialize Private L2 cache controller.
+ * @param None.
+ * @return None.*/
+void sifive_pl2cache0_init(void);
 
 /*! @brief Get cache configuration data.
  * @param config User specified data buffer.
