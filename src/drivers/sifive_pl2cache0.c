@@ -31,9 +31,9 @@ void sifive_pl2cache0_set_cleanEvictenale_bit(bool val) {
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
 
-    tmp = (sifive_pl2cache0_configbits)REGW(METAL_SIFIVE_PL2CACHE0_CONFIGBITS);
-    tmp.cleanEvictEnable = val;
-    REGW(METAL_SIFIVE_PL2CACHE0_CONFIGBITS) = (uint32_t)tmp;
+    tmp.w = REGW(METAL_SIFIVE_PL2CACHE0_CONFIGBITS);
+    tmp.b.cleanEvictEnable = val;
+    REGW(METAL_SIFIVE_PL2CACHE0_CONFIGBITS) = tmp.w;
 }
 
 void sifive_pl2cache0_init(void) {

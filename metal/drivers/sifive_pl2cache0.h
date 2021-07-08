@@ -22,18 +22,21 @@ typedef struct {
     uint32_t block_size;
 } sifive_pl2cache0_config;
 
-typedef struct {
-    uint32_t _reserved0 : 3;
-    uint32_t cleanEvictEnable : 1;
-    uint32_t _reserved1 : 5;
-    uint32_t l2AvoidL1LineDisable : 1;
-    uint32_t _reserved2 : 6;
-    uint32_t softwareEccInjectEnable : 1;
-    uint32_t errInjectOnWriteEnable : 1;
-    uint32_t errInjectOnReadEnable : 1;
-    uint32_t dataUceInjectEnable : 1;
-    uint32_t dirUceInjectEnable : 1;
-    uint32_t _reserved3 : 11;
+typedef union _sifive_pl2cache0_configbits {
+    struct {
+        uint32_t _reserved0 : 3;
+        uint32_t cleanEvictEnable : 1;
+        uint32_t _reserved1 : 5;
+        uint32_t l2AvoidL1LineDisable : 1;
+        uint32_t _reserved2 : 6;
+        uint32_t softwareEccInjectEnable : 1;
+        uint32_t errInjectOnWriteEnable : 1;
+        uint32_t errInjectOnReadEnable : 1;
+        uint32_t dataUceInjectEnable : 1;
+        uint32_t dirUceInjectEnable : 1;
+        uint32_t _reserved3 : 11;
+    } b;        /**< Structure used for bit access */
+    uint32_t w; /**< Structure used for 32bits access */
 } sifive_pl2cache0_configbits;
 
 /*! @brief Set of values for ECC error target */
