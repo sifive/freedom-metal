@@ -52,6 +52,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_gpio-leds.h \
 	metal/drivers/sifive_gpio-switches.h \
 	metal/drivers/sifive_gpio0.h \
+	metal/drivers/sifive_gpio2.h \
 	metal/drivers/sifive_i2c0.h \
 	metal/drivers/sifive_l2pf0.h \
 	metal/drivers/sifive_l2pf1.h \
@@ -129,6 +130,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_gpio-leds.c \
 	src/drivers/sifive_gpio-switches.c \
 	src/drivers/sifive_gpio0.c \
+	src/drivers/sifive_gpio2.c \
 	src/drivers/sifive_i2c0.c \
 	src/drivers/sifive_l2pf0.c \
 	src/drivers/sifive_l2pf1.c \
