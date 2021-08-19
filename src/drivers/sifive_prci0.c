@@ -101,14 +101,12 @@ void __metal_driver_sifive_prci0_init(void) {
         /* 500 MHz */
         coreHz = (PLL_R(0)) | (PLL_F(59)) | // 4000MHz VCO
                  (PLL_Q(3)) |               // /8 Output divider
-                 (PLL_RANGE(0x4)) |         // 26MHz is between 18-38MHz
-                 (PLL_BYPASS(0)) | (PLL_FSE(1));
+                 (PLL_RANGE(0x4)) | (PLL_BYPASS(0)) | (PLL_FSE(1));
     } else {
         /* 1 GHz */
         coreHz = (PLL_R(0)) | (PLL_F(59)) | // 4000MHz VCO
                  (PLL_Q(2)) |               // /4 Output divider
-                 (PLL_RANGE(0x3)) |         // 26MHz is between 18-38MHz
-                 (PLL_BYPASS(0)) | (PLL_FSE(1));
+                 (PLL_RANGE(0x4)) | (PLL_BYPASS(0)) | (PLL_FSE(1));
     }
 
     PRCI_REG(METAL_SIFIVE_PRCI0_COREPLLCFG) = coreHz;
