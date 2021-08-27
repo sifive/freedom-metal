@@ -267,6 +267,8 @@ _skip_init:
 1:
 #endif
 
+  call metal_secondary_init
+
   /* This is a C runtime, so main() is defined to have some arguments.  Since
    * there's nothing sane the METAL can pass we don't bother with that but
    * instead just setup as close to a NOP as we can. */
