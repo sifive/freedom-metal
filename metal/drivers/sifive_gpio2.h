@@ -1,4 +1,4 @@
-/* Copyright 2018 SiFive, Inc */
+/* Copyright 2021 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #ifndef METAL__DRIVERS__SIFIVE_GPI02_H
@@ -10,8 +10,6 @@
 struct __metal_driver_vtable_sifive_gpio2 {
     const struct __metal_gpio_vtable gpio;
 };
-
-// struct __metal_driver_sifive_gpio2;
 
 __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_gpio2)
 
