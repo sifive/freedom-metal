@@ -1,4 +1,4 @@
-/* Copyright 2018 SiFive, Inc */
+/* Copyright 2021 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/machine/platform.h>
@@ -42,7 +42,7 @@ long __metal_driver_sifive_gpio2_output(struct metal_gpio *ggpio) {
 #if 0
     return __METAL_ACCESS_ONCE(
         (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_PORT));
-#endif 
+#endif
     return 0;
 }
 
@@ -70,20 +70,18 @@ int __metal_driver_sifive_gpio2_output_set(struct metal_gpio *ggpio,
                                            long value) {
     long base = __metal_driver_sifive_gpio2_base(ggpio);
 
-#if 0
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_PORT)) |=
-        value;
-#endif
+    __METAL_ACCESS_ONCE(
+        (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_OUTPUT_VALUE)) |= value;
+
     return 0;
 }
 
 int __metal_driver_sifive_gpio2_output_clear(struct metal_gpio *ggpio,
                                              long value) {
     long base = __metal_driver_sifive_gpio2_base(ggpio);
-#if 0
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_PORT)) &=
-        ~value;
-#endif
+
+    __METAL_ACCESS_ONCE(
+        (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_OUTPUT_VALUE)) &= ~value;
 
     return 0;
 }
@@ -92,12 +90,11 @@ int __metal_driver_sifive_gpio2_output_toggle(struct metal_gpio *ggpio,
                                               long value) {
     long base = __metal_driver_sifive_gpio2_base(ggpio);
 
-#if 0
-    __METAL_ACCESS_ONCE((__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_PORT)) =
+    __METAL_ACCESS_ONCE(
+        (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_OUTPUT_VALUE)) =
         __METAL_ACCESS_ONCE(
-            (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_PORT)) ^
+            (__metal_io_u32 *)(base + METAL_SIFIVE_GPIO2_OUTPUT_VALUE)) ^
         value;
-#endif
 
     return 0;
 }
