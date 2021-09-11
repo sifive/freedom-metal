@@ -38,12 +38,14 @@ struct metal_cpu_vtable {
     uintptr_t (*get_epc)(struct metal_cpu *cpu);
     int (*set_epc)(struct metal_cpu *cpu, uintptr_t epc);
     struct metal_buserror *(*get_buserror)(struct metal_cpu *cpu);
+    void *(*get_cpu_specific)(struct metal_cpu *cpu);
 };
 
 /*! @brief A device handle for a CPU hart
  */
 struct metal_cpu {
     const struct metal_cpu_vtable *vtable;
+    void *cpu_specific;
 };
 
 /*! @brief Get a reference to a CPU hart
@@ -52,6 +54,13 @@ struct metal_cpu {
  * @return A pointer to the CPU device handle
  */
 struct metal_cpu *metal_cpu_get(unsigned int hartid);
+
+/*! @brief Set SiFive CPU specific structure
+ *
+ * @param cpu The CPU device handle
+ * @param cpu_specific The pointer of SiFive CPU handle
+ */
+void metal_cpu_set_cpu_specific(struct metal_cpu *cpu, void *cpu_specific);
 
 /*! @brief Get the hartid of the CPU hart executing this function
  *

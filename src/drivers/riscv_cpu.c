@@ -835,6 +835,10 @@ struct metal_buserror *__metal_driver_cpu_get_buserror(struct metal_cpu *cpu) {
     return __metal_driver_cpu_buserror(cpu);
 }
 
+void *__metal_driver_cpu_get_cpu_specific(struct metal_cpu *cpu) {
+    return cpu->cpu_specific;
+};
+
 __METAL_DEFINE_VTABLE(__metal_driver_vtable_riscv_cpu_intc) = {
     .controller_vtable.interrupt_init =
         __metal_driver_riscv_cpu_controller_interrupt_init,
@@ -873,4 +877,5 @@ __METAL_DEFINE_VTABLE(__metal_driver_vtable_cpu) = {
     .cpu_vtable.get_epc = __metal_driver_cpu_get_exception_pc,
     .cpu_vtable.set_epc = __metal_driver_cpu_set_exception_pc,
     .cpu_vtable.get_buserror = __metal_driver_cpu_get_buserror,
+    .cpu_vtable.get_cpu_specific = __metal_driver_cpu_get_cpu_specific,
 };
