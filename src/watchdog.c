@@ -1,4 +1,4 @@
-/* Copyright 2019 SiFive, Inc */
+/* Copyright 2021 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/machine.h>
@@ -24,14 +24,26 @@ metal_watchdog_run(const struct metal_watchdog *const wdog,
 extern inline struct metal_interrupt *
 metal_watchdog_get_interrupt(const struct metal_watchdog *const wdog);
 extern inline int
-metal_watchdog_get_interrupt_id(const struct metal_watchdog *const wdog);
+metal_watchdog_get_interrupt_id(const struct metal_watchdog *const wdog,
+                                int idx);
 extern inline int
-metal_watchdog_clear_interrupt(const struct metal_watchdog *const wdog);
+metal_watchdog_clear_interrupt(const struct metal_watchdog *const wdog,
+                               int idx);
+extern inline int
+metal_watchdog_cfg_interrupt(const struct metal_watchdog *const wdog, int idx);
 
 struct metal_watchdog *metal_watchdog_get_device(const int index) {
+#if __METAL_DT_MAX_WDOGS > 0
     if (index > __METAL_DT_MAX_WDOGS) {
         return NULL;
     }
 
     return (struct metal_watchdog *)__metal_wdog_table[index];
+#elif __METAL_DT_MAX_WDOG2S > 0
+    if (index > __METAL_DT_MAX_WDOG2S) {
+        return NULL;
+    }
+
+    return (struct metal_watchdog *)__metal_wdog2_table[index];
+#endif
 }

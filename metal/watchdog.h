@@ -1,4 +1,4 @@
-/* Copyright 2019 SiFive, Inc */
+/* Copyright 2021 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #ifndef METAL__WATCHDOG_H
@@ -36,6 +36,10 @@ enum metal_watchdog_result {
                                   system reset */
 };
 
+#define METAL_WATCHDOG_ROLLOVER_INT 0
+#define METAL_WATCHDOG_EXPWARNING_INT 1
+#define METAL_WATCHDOG_EXPIRY_INT 2
+
 struct metal_watchdog_vtable {
     int (*feed)(const struct metal_watchdog *const wdog);
     long int (*get_rate)(const struct metal_watchdog *const wdog);
@@ -50,8 +54,9 @@ struct metal_watchdog_vtable {
                const enum metal_watchdog_run_option option);
     struct metal_interrupt *(*get_interrupt)(
         const struct metal_watchdog *const wdog);
-    int (*get_interrupt_id)(const struct metal_watchdog *const wdog);
-    int (*clear_interrupt)(const struct metal_watchdog *const wdog);
+    int (*get_interrupt_id)(const struct metal_watchdog *const wdog, int idx);
+    int (*cfg_interrupt)(const struct metal_watchdog *const wdog, int idx);
+    int (*clear_interrupt)(const struct metal_watchdog *const wdog, int idx);
 };
 
 /*!
@@ -148,16 +153,26 @@ metal_watchdog_get_interrupt(const struct metal_watchdog *const wdog) {
  * @Brief Get the interrupt id for the watchdog interrupt
  */
 inline int
-metal_watchdog_get_interrupt_id(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->get_interrupt_id(wdog);
+metal_watchdog_get_interrupt_id(const struct metal_watchdog *const wdog,
+                                int idx) {
+    return wdog->vtable->get_interrupt_id(wdog, idx);
+}
+
+/*!
+ * @brief Conigure the watchdog interrupt
+ */
+inline int metal_watchdog_cfg_interrupt(const struct metal_watchdog *const wdog,
+                                        int idx) {
+    return wdog->vtable->cfg_interrupt(wdog, idx);
 }
 
 /*!
  * @brief Clear the watchdog interrupt
  */
 inline int
-metal_watchdog_clear_interrupt(const struct metal_watchdog *const wdog) {
-    return wdog->vtable->clear_interrupt(wdog);
+metal_watchdog_clear_interrupt(const struct metal_watchdog *const wdog,
+                               int idx) {
+    return wdog->vtable->clear_interrupt(wdog, idx);
 }
 
 /*!

@@ -66,6 +66,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_uart0.h \
 	metal/drivers/sifive_simuart0.h \
 	metal/drivers/sifive_wdog0.h \
+	metal/drivers/sifive_wdog2.h \
 	metal/drivers/ucb_htif0.h \
 	metal/remapper.h \
 	metal/atomic.h \
@@ -143,6 +144,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_uart0.c \
 	src/drivers/sifive_simuart0.c \
 	src/drivers/sifive_wdog0.c \
+	src/drivers/sifive_wdog2.c \
 	src/drivers/ucb_htif0.c \
 	src/remapper.c \
 	src/atomic.c \
