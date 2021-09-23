@@ -32,9 +32,9 @@ extern __inline__ size_t
 metal_uart_get_receive_watermark(struct metal_uart *uart);
 
 struct metal_uart *metal_uart_get_device(unsigned int device_num) {
-#if __METAL_DT_MAX_UARTS > 0
-    if (device_num < __METAL_DT_MAX_UARTS) {
-        return (struct metal_uart *)__metal_uart_table[device_num];
+#if __METAL_DT_MAX_UART1S > 0
+    if (device_num < __METAL_DT_MAX_UART1S) {
+        return (struct metal_uart *)__metal_uart1_table[device_num];
     }
 #endif
 
