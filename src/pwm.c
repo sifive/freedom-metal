@@ -27,10 +27,10 @@ metal_pwm_interrupt_controller(struct metal_pwm *pwm);
 extern int metal_pwm_get_interrupt_id(struct metal_pwm *pwm, unsigned int idx);
 
 struct metal_pwm *metal_pwm_get_device(unsigned int device_num) {
-#if __METAL_DT_MAX_PWMS > 0
-    if (device_num < __METAL_DT_MAX_PWMS) {
+//#if __METAL_DT_MAX_PWM1S > 0
+    if (device_num < __METAL_DT_MAX_PWM1S) {
         return (struct metal_pwm *)__metal_pwm_table[device_num];
     }
-#endif
+//#endif
     return NULL;
 }
