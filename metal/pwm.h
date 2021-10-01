@@ -1,4 +1,4 @@
-/* Copyright 2020 SiFive, Inc */
+/* Copyright 2021 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #ifndef METAL__PWM_H

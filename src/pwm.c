@@ -1,4 +1,4 @@
-/* Copyright 2020 SiFive, Inc */
+/* Copyright 2021 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/machine.h>
@@ -28,7 +28,7 @@ extern int metal_pwm_get_interrupt_id(struct metal_pwm *pwm, unsigned int idx);
 
 struct metal_pwm *metal_pwm_get_device(unsigned int device_num) {
 //#if __METAL_DT_MAX_PWM1S > 0
-    if (device_num < __METAL_DT_MAX_PWM1S) {
+    if (device_num < __METAL_DT_MAX_PWM2S) {
         return (struct metal_pwm *)__metal_pwm_table[device_num];
     }
 //#endif

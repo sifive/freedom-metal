@@ -1,13 +1,13 @@
-/* Copyright 2020 SiFive, Inc */
+/* Copyright 2021 SiFive, Inc */
 /* SPDX-License-Identifier: Apache-2.0 */
 
 #include <metal/machine/platform.h>
 
-#ifdef METAL_SIFIVE_PWM1
+#ifdef METAL_SIFIVE_PWM2
 #include <metal/clock.h>
 #include <metal/compiler.h>
 #include <metal/drivers/sifive_gpio0.h>
-#include <metal/drivers/sifive_pwm1.h>
+#include <metal/drivers/sifive_pwm2.h>
 #include <metal/io.h>
 #include <metal/machine.h>
 #include <metal/time.h>
@@ -21,7 +21,7 @@
 #define METAL_PWMCFG_ENONESHOT (1UL << 13)
 #define METAL_PWMCFG_CMPCENTER(x) (1UL << (16 + x))
 #define METAL_PWMCFG_CMPIP(x) (1UL << (28 + x))
-#define METAL_SIFIVE_PWM1_PWMCMP(x) (METAL_SIFIVE_PWM1_PWMCMP0 + (x * 4))
+#define METAL_SIFIVE_PWM2_PWMCMP(x) (METAL_SIFIVE_PWM2_PWMCMP0 + (x * 4))
 
 /* Macros to access registers */
 #define METAL_PWM_REG(offset) ((base + offset))
@@ -40,7 +40,7 @@
 #error *** Unsupported endianess ***
 #endif
 
-#if (METAL_MAX_PWM1_NCMP > METAL_MAX_PWM_CHANNELS)
+#if (METAL_MAX_PWM2_NCMP > METAL_MAX_PWM_CHANNELS)
 #error *** METAL_MAX_PWM_CHANNELS exceeded ***
 #endif
 
@@ -55,10 +55,10 @@ static void pre_rate_change_callback(void *priv) {
 }
 
 static void post_rate_change_callback(void *priv) {
-    struct __metal_driver_sifive_pwm1 *pwm = priv;
+    struct __metal_driver_sifive_pwm2 *pwm = priv;
     struct metal_pwm *gpwm = priv;
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
-    unsigned int cmp_count = __metal_driver_sifive_pwm1_comparator_count(gpwm);
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
+    unsigned int cmp_count = __metal_driver_sifive_pwm2_comparator_count(gpwm);
     unsigned int idx = 0;
     unsigned int duty;
 
@@ -71,18 +71,18 @@ static void post_rate_change_callback(void *priv) {
         while (++idx < cmp_count) {
             duty = pwm->duty[idx];
             if (duty != 0) {
-                METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCMP(idx)) =
+                METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCMP(idx)) =
                     METAL_PWM_GETCMPVAL(duty);
             }
         }
     }
 }
 
-static int __metal_driver_sifive_pwm1_enable(struct metal_pwm *gpwm) {
+static int __metal_driver_sifive_pwm2_enable(struct metal_pwm *gpwm) {
     struct __metal_driver_sifive_gpio0 *pinmux =
-        __metal_driver_sifive_pwm1_pinmux(gpwm);
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
-    struct __metal_driver_sifive_pwm1 *pwm = (void *)gpwm;
+        __metal_driver_sifive_pwm2_pinmux(gpwm);
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
+    struct __metal_driver_sifive_pwm2 *pwm = (void *)gpwm;
     int ret = METAL_PWM_RET_ERR;
 
     if (base != 0) {
@@ -90,9 +90,9 @@ static int __metal_driver_sifive_pwm1_enable(struct metal_pwm *gpwm) {
         if ((pinmux != NULL) && (gpwm != NULL)) {
             /* Configure PWM I/O pins */
             long pinmux_output_selector =
-                __metal_driver_sifive_pwm1_pinmux_output_selector(gpwm);
+                __metal_driver_sifive_pwm2_pinmux_output_selector(gpwm);
             long pinmux_source_selector =
-                __metal_driver_sifive_pwm1_pinmux_source_selector(gpwm);
+                __metal_driver_sifive_pwm2_pinmux_source_selector(gpwm);
 
             pinmux->gpio.vtable->enable_io((struct metal_gpio *)pinmux,
                                            pinmux_output_selector,
@@ -101,18 +101,18 @@ static int __metal_driver_sifive_pwm1_enable(struct metal_pwm *gpwm) {
 
         /* Initialize default values */
         pwm->max_count =
-            (1UL << __metal_driver_sifive_pwm1_compare_width(gpwm)) - 1;
+            (1UL << __metal_driver_sifive_pwm2_compare_width(gpwm)) - 1;
         pwm->freq = 0;
         pwm->count_val = 0;
-        METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) = 0;
+        METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) = 0;
         ret = METAL_PWM_RET_OK;
     }
     return ret;
 }
 
-static int __metal_driver_sifive_pwm1_disable(struct metal_pwm *gpwm) {
+static int __metal_driver_sifive_pwm2_disable(struct metal_pwm *gpwm) {
     struct __metal_driver_sifive_gpio0 *pinmux =
-        __metal_driver_sifive_pwm1_pinmux(gpwm);
+        __metal_driver_sifive_pwm2_pinmux(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
     if (gpwm != NULL) {
@@ -120,7 +120,7 @@ static int __metal_driver_sifive_pwm1_disable(struct metal_pwm *gpwm) {
         if (pinmux != NULL) {
             /* Disable PWM I/O pins */
             long pinmux_source_selector =
-                __metal_driver_sifive_pwm1_pinmux_source_selector(gpwm);
+                __metal_driver_sifive_pwm2_pinmux_source_selector(gpwm);
             pinmux->gpio.vtable->disable_io((struct metal_gpio *)pinmux,
                                             pinmux_source_selector);
         }
@@ -130,13 +130,13 @@ static int __metal_driver_sifive_pwm1_disable(struct metal_pwm *gpwm) {
     return ret;
 }
 
-static int __metal_driver_sifive_pwm1_set_freq(struct metal_pwm *gpwm,
+static int __metal_driver_sifive_pwm2_set_freq(struct metal_pwm *gpwm,
                                                unsigned int idx,
                                                unsigned int freq) {
-    struct metal_clock *clock = __metal_driver_sifive_pwm1_clock(gpwm);
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
-    unsigned int cmp_count = __metal_driver_sifive_pwm1_comparator_count(gpwm);
-    struct __metal_driver_sifive_pwm1 *pwm = (void *)gpwm;
+    struct metal_clock *clock = __metal_driver_sifive_pwm2_clock(gpwm);
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
+    unsigned int cmp_count = __metal_driver_sifive_pwm2_comparator_count(gpwm);
+    struct __metal_driver_sifive_pwm2 *pwm = (void *)gpwm;
     unsigned int clock_rate;
     unsigned int count;
     unsigned int prescale = 0;
@@ -168,8 +168,8 @@ static int __metal_driver_sifive_pwm1_set_freq(struct metal_pwm *gpwm,
         pwm->count_val = --count;
 
         /* Update values into registers */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCMP0) = count;
-        METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) |= (prescale & 0x0FUL);
+        METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCMP0) = count;
+        METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) |= (prescale & 0x0FUL);
         ret = METAL_PWM_RET_OK;
 
 #if defined(METAL_PWM_DEBUG)
@@ -182,28 +182,28 @@ static int __metal_driver_sifive_pwm1_set_freq(struct metal_pwm *gpwm,
 }
 
 static int
-__metal_driver_sifive_pwm1_set_duty(struct metal_pwm *gpwm, unsigned int idx,
+__metal_driver_sifive_pwm2_set_duty(struct metal_pwm *gpwm, unsigned int idx,
                                     unsigned int duty,
                                     metal_pwm_phase_correct_t phase_corr) {
-    struct __metal_driver_sifive_pwm1 *pwm = (void *)gpwm;
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
-    unsigned int cmp_count = __metal_driver_sifive_pwm1_comparator_count(gpwm);
+    struct __metal_driver_sifive_pwm2 *pwm = (void *)gpwm;
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
+    unsigned int cmp_count = __metal_driver_sifive_pwm2_comparator_count(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
     /* Check if duty value is within limits, duty cycle cannot be set for
      * PWMCMP0 */
     if ((idx > 0) && (idx < cmp_count) && (duty <= METAL_PWM_MAXDUTY)) {
         /* Calculate PWM compare count value for given duty cycle */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCMP(idx)) =
+        METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCMP(idx)) =
             METAL_PWM_GETCMPVAL(duty);
         pwm->duty[idx] = duty;
 
         /* Enable / Disable phase correct PWM mode */
         if (phase_corr == METAL_PWM_PHASE_CORRECT_ENABLE) {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) |=
+            METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) |=
                 METAL_PWMCFG_CMPCENTER(idx);
         } else {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) &=
+            METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) &=
                 ~METAL_PWMCFG_CMPCENTER(idx);
         }
         ret = METAL_PWM_RET_OK;
@@ -211,10 +211,10 @@ __metal_driver_sifive_pwm1_set_duty(struct metal_pwm *gpwm, unsigned int idx,
     return ret;
 }
 
-static unsigned int __metal_driver_sifive_pwm1_get_duty(struct metal_pwm *gpwm,
+static unsigned int __metal_driver_sifive_pwm2_get_duty(struct metal_pwm *gpwm,
                                                         unsigned int idx) {
-    struct __metal_driver_sifive_pwm1 *pwm = (void *)gpwm;
-    unsigned int cmp_count = __metal_driver_sifive_pwm1_comparator_count(gpwm);
+    struct __metal_driver_sifive_pwm2 *pwm = (void *)gpwm;
+    unsigned int cmp_count = __metal_driver_sifive_pwm2_comparator_count(gpwm);
     unsigned int duty = 0;
 
     /* Check for valid parameters and get configured duty cycle value */
@@ -224,9 +224,9 @@ static unsigned int __metal_driver_sifive_pwm1_get_duty(struct metal_pwm *gpwm,
     return duty;
 }
 
-static unsigned int __metal_driver_sifive_pwm1_get_freq(struct metal_pwm *gpwm,
+static unsigned int __metal_driver_sifive_pwm2_get_freq(struct metal_pwm *gpwm,
                                                         unsigned int idx) {
-    struct __metal_driver_sifive_pwm1 *pwm = (void *)gpwm;
+    struct __metal_driver_sifive_pwm2 *pwm = (void *)gpwm;
     unsigned int freq = 0;
 
     (void)idx; /* Unused parameter, no support for per channel frequency */
@@ -238,10 +238,10 @@ static unsigned int __metal_driver_sifive_pwm1_get_freq(struct metal_pwm *gpwm,
     return freq;
 }
 
-static int __metal_driver_sifive_pwm1_trigger(struct metal_pwm *gpwm,
+static int __metal_driver_sifive_pwm2_trigger(struct metal_pwm *gpwm,
                                               unsigned int idx,
                                               metal_pwm_run_mode_t mode) {
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
     (void)idx; /* Unused parameter,for later use */
@@ -249,11 +249,11 @@ static int __metal_driver_sifive_pwm1_trigger(struct metal_pwm *gpwm,
     if (base != 0) {
         /* Configure for requested PWM run mode */
         if (mode == METAL_PWM_CONTINUOUS) {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) |= METAL_PWMCFG_DEGLITCH |
+            METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) |= METAL_PWMCFG_DEGLITCH |
                                                         METAL_PWMCFG_ZEROCMP |
                                                         METAL_PWMCFG_ENALWAYS;
         } else {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) |= METAL_PWMCFG_DEGLITCH |
+            METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) |= METAL_PWMCFG_DEGLITCH |
                                                         METAL_PWMCFG_ZEROCMP |
                                                         METAL_PWMCFG_ENONESHOT;
         }
@@ -262,79 +262,79 @@ static int __metal_driver_sifive_pwm1_trigger(struct metal_pwm *gpwm,
     return ret;
 }
 
-static int __metal_driver_sifive_pwm1_stop(struct metal_pwm *gpwm,
+static int __metal_driver_sifive_pwm2_stop(struct metal_pwm *gpwm,
                                            unsigned int idx) {
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
     (void)idx; /* Unused parameter,for later use */
 
     if (base != 0) {
         /* Disable always running mode */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) &= ~METAL_PWMCFG_ENALWAYS;
+        METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) &= ~METAL_PWMCFG_ENALWAYS;
         ret = METAL_PWM_RET_OK;
     }
     return ret;
 }
 
 static int
-__metal_driver_sifive_pwm1_cfg_interrupt(struct metal_pwm *gpwm,
+__metal_driver_sifive_pwm2_cfg_interrupt(struct metal_pwm *gpwm,
                                          metal_pwm_interrupt_t flag) {
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
     if (base != 0) {
         if (flag == METAL_PWM_INTERRUPT_ENABLE) {
             /* Enable sticky bit, to make sure interrupts are not forgotten */
-            METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) |= METAL_PWMCFG_STICKY;
+            METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) |= METAL_PWMCFG_STICKY;
         } else {
-            METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) &= ~METAL_PWMCFG_STICKY;
+            METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) &= ~METAL_PWMCFG_STICKY;
         }
         ret = METAL_PWM_RET_OK;
     }
     return ret;
 }
 
-static int __metal_driver_sifive_pwm1_clr_interrupt(struct metal_pwm *gpwm,
+static int __metal_driver_sifive_pwm2_clr_interrupt(struct metal_pwm *gpwm,
                                                     unsigned int idx) {
-    unsigned long base = __metal_driver_sifive_pwm1_control_base(gpwm);
-    unsigned int cmp_count = __metal_driver_sifive_pwm1_comparator_count(gpwm);
+    unsigned long base = __metal_driver_sifive_pwm2_control_base(gpwm);
+    unsigned int cmp_count = __metal_driver_sifive_pwm2_comparator_count(gpwm);
     int ret = METAL_PWM_RET_ERR;
 
     if ((base != 0) && (idx < cmp_count)) {
         /* Clear interrupt pending bit for given PWM comparator */
-        METAL_PWM_REGW(METAL_SIFIVE_PWM1_PWMCFG1) &= ~METAL_PWMCFG_CMPIP(idx);
+        METAL_PWM_REGW(METAL_SIFIVE_PWM2_PWMCFG1) &= ~METAL_PWMCFG_CMPIP(idx);
         ret = METAL_PWM_RET_OK;
     }
     return ret;
 }
 
 static struct metal_interrupt *
-__metal_driver_sifive_pwm1_interrupt_controller(struct metal_pwm *gpwm) {
-    return __metal_driver_sifive_pwm1_interrupt_parent(gpwm);
+__metal_driver_sifive_pwm2_interrupt_controller(struct metal_pwm *gpwm) {
+    return __metal_driver_sifive_pwm2_interrupt_parent(gpwm);
 }
 
-static int __metal_driver_sifive_pwm1_interrupt_id(struct metal_pwm *gpwm,
+static int __metal_driver_sifive_pwm2_interrupt_id(struct metal_pwm *gpwm,
                                                    unsigned int idx) {
-    return __metal_driver_sifive_pwm1_interrupt_lines(gpwm, idx);
+    return __metal_driver_sifive_pwm2_interrupt_lines(gpwm, idx);
 }
 
-__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_pwm1) = {
-    .pwm.enable = __metal_driver_sifive_pwm1_enable,
-    .pwm.disable = __metal_driver_sifive_pwm1_disable,
-    .pwm.set_duty = __metal_driver_sifive_pwm1_set_duty,
-    .pwm.set_freq = __metal_driver_sifive_pwm1_set_freq,
-    .pwm.get_duty = __metal_driver_sifive_pwm1_get_duty,
-    .pwm.get_freq = __metal_driver_sifive_pwm1_get_freq,
-    .pwm.trigger = __metal_driver_sifive_pwm1_trigger,
-    .pwm.stop = __metal_driver_sifive_pwm1_stop,
-    .pwm.cfg_interrupt = __metal_driver_sifive_pwm1_cfg_interrupt,
-    .pwm.clr_interrupt = __metal_driver_sifive_pwm1_clr_interrupt,
+__METAL_DEFINE_VTABLE(__metal_driver_vtable_sifive_pwm2) = {
+    .pwm.enable = __metal_driver_sifive_pwm2_enable,
+    .pwm.disable = __metal_driver_sifive_pwm2_disable,
+    .pwm.set_duty = __metal_driver_sifive_pwm2_set_duty,
+    .pwm.set_freq = __metal_driver_sifive_pwm2_set_freq,
+    .pwm.get_duty = __metal_driver_sifive_pwm2_get_duty,
+    .pwm.get_freq = __metal_driver_sifive_pwm2_get_freq,
+    .pwm.trigger = __metal_driver_sifive_pwm2_trigger,
+    .pwm.stop = __metal_driver_sifive_pwm2_stop,
+    .pwm.cfg_interrupt = __metal_driver_sifive_pwm2_cfg_interrupt,
+    .pwm.clr_interrupt = __metal_driver_sifive_pwm2_clr_interrupt,
     .pwm.get_interrupt_controller =
-        __metal_driver_sifive_pwm1_interrupt_controller,
-    .pwm.get_interrupt_id = __metal_driver_sifive_pwm1_interrupt_id,
+        __metal_driver_sifive_pwm2_interrupt_controller,
+    .pwm.get_interrupt_id = __metal_driver_sifive_pwm2_interrupt_id,
 };
 
-#endif /* METAL_SIFIVE_PWM1 */
+#endif /* METAL_SIFIVE_PWM2 */
 
 typedef int no_empty_translation_units;
