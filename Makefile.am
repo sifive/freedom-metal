@@ -60,6 +60,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_prci0.h \
 	metal/drivers/sifive_pwm0.h \
 	metal/drivers/sifive_rtc0.h \
+	metal/drivers/sifive_rtc1.h \
 	metal/drivers/sifive_spi0.h \
 	metal/drivers/sifive_test0.h \
 	metal/drivers/sifive_trace.h \
@@ -137,6 +138,7 @@ libmetal_a_SOURCES = \
 	src/drivers/sifive_prci0.c \
 	src/drivers/sifive_pwm0.c \
 	src/drivers/sifive_rtc0.c \
+	src/drivers/sifive_rtc1.c \
 	src/drivers/sifive_spi0.c \
 	src/drivers/sifive_test0.c \
 	src/drivers/sifive_trace.c \
