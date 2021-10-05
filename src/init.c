@@ -6,6 +6,7 @@
 
 #include <metal/drivers/sifive_ccache0.h>
 #include <metal/drivers/sifive_l2pf1.h>
+#include <metal/drivers/sifive_pl2cache0.h>
 
 /*
  * These function pointers are created by the linker script
