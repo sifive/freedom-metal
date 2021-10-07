@@ -7,6 +7,8 @@
 #include <metal/compiler.h>
 #include <metal/drivers/riscv_cpu.h>
 
+#ifdef METAL_RISCV_PLIC0
+
 #define METAL_PLIC_SOURCE_MASK 0x1F
 #define METAL_PLIC_SOURCE_SHIFT 5
 #define METAL_PLIC_SOURCE_PRIORITY_SHIFT 2
@@ -28,4 +30,5 @@ struct __metal_driver_riscv_plic0 {
 };
 #undef __METAL_MACHINE_MACROS
 
-#endif
+#endif /* METAL_RISCV_PLIC0 */
+#endif /* METAL__DRIVERS__RISCV_PLIC0_H */
