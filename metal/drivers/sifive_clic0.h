@@ -7,6 +7,8 @@
 #include <metal/compiler.h>
 #include <metal/drivers/riscv_cpu.h>
 
+#ifdef METAL_SIFIVE_CLIC0
+
 #define METAL_CLIC_MAX_NMBITS 2
 #define METAL_CLIC_MAX_NLBITS 8
 #define METAL_CLIC_MAX_NVBITS 1
@@ -34,9 +36,8 @@ __METAL_DECLARE_VTABLE(__metal_driver_vtable_sifive_clic0)
 struct __metal_driver_sifive_clic0 {
     struct metal_interrupt controller;
     int init_done;
-    struct {
-    } __attribute__((aligned(64)));
-    metal_interrupt_vector_handler_t
+
+    __attribute__((aligned(64))) metal_interrupt_vector_handler_t
         metal_mtvt_table[__METAL_CLIC_SUBINTERRUPTS];
     __metal_interrupt_data metal_exint_table[__METAL_CLIC_SUBINTERRUPTS];
 };
@@ -44,5 +45,5 @@ struct __metal_driver_sifive_clic0 {
 
 int __metal_driver_sifive_clic0_command_request(
     struct metal_interrupt *controller, int command, void *data);
-
-#endif
+#endif /* METAL_SIFIVE_CLIC0 */
+#endif /* METAL__DRIVERS__SIFIVE_CLIC0_H */
