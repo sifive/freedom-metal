@@ -6,6 +6,7 @@
 
 #include <metal/drivers/sifive_ccache0.h>
 #include <metal/drivers/sifive_l2pf1.h>
+#include <metal/drivers/sifive_mallard0.h>
 #include <metal/drivers/sifive_pl2cache0.h>
 
 /*
@@ -39,6 +40,10 @@ void metal_init(void) {
     /* Do L2 Stride Prefetcher initialization. */
     sifive_l2pf1_init();
 #endif /* METAL_SIFIVE_L2PF1 */
+
+#ifdef METAL_SIFIVE_MALLARD0
+    sifive_mallard0_init();
+#endif /* METAL_SIFIVE_MALLARD0 */
 
     if (&metal_constructors_end <= &metal_constructors_start) {
         return;
@@ -74,6 +79,18 @@ void metal_fini(void) {
 
         funcptr += 1;
     }
+}
+
+/*
+ * metal_secondary_init do the initialization on secondary harts.
+ * We doesn't currently run the metal constructors on secondary hart,
+ * If it is necessary, we could add the constructors/destructors for
+ * secondary harts, but they might as well be separated from main hart.
+ */
+void metal_secondary_init(void) {
+#ifdef METAL_SIFIVE_MALLARD0
+    sifive_mallard0_init();
+#endif
 }
 
 /*

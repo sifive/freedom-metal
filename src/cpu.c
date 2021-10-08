@@ -11,6 +11,10 @@ struct metal_cpu *metal_cpu_get(unsigned int hartid) {
     return NULL;
 }
 
+void metal_cpu_set_cpu_specific(struct metal_cpu *cpu, void *cpu_specific) {
+    cpu->cpu_specific = cpu_specific;
+}
+
 int metal_cpu_get_current_hartid() {
 #ifdef __riscv
     int mhartid;
