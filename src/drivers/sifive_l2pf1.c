@@ -108,6 +108,28 @@ void sifive_l2pf1_disable(void) {
     }
 }
 
+static void __sifive_l2pf1_import_basic_control_reg(sifive_l2pf1_config *config, const uint32_t val, const uint32_t distance_bits_mask) {
+    config->ScalarLoadSupportEn = (val & REG_MASK_BITWIDTH_1);
+    config->Dist = ((val >> REG_BITSHIFT_2) & distance_bits_mask);
+    config->MaxAllowedDist = ((val >> REG_BITSHIFT_8) & distance_bits_mask);
+    config->LinToExpThrd = ((val >> REG_BITSHIFT_14) & distance_bits_mask);
+    config->CrossPageEn = ((val >> REG_BITSHIFT_28) & REG_MASK_BITWIDTH_1);
+    config->ForgiveThrd = ((val >> REG_BITSHIFT_29) & REG_MASK_BITWIDTH_2);
+}
+
+static void __sifive_l2pf1_import_user_control_reg(sifive_l2pf1_config *config, const uint32_t val) {
+    config->QFullnessThrd = (val & REG_MASK_BITWIDTH_4);
+    config->HitCacheThrd = ((val >> REG_BITSHIFT_4) & REG_MASK_BITWIDTH_5);
+    config->HitMSHRThrd = ((val >> REG_BITSHIFT_9) & REG_MASK_BITWIDTH_4);
+    config->Window = ((val >> REG_BITSHIFT_13) & REG_MASK_BITWIDTH_6);
+    config->ScalarStoreSupportEn =
+        ((val >> REG_BITSHIFT_19) & REG_MASK_BITWIDTH_1);
+    config->VectorLoadSupportEn =
+        ((val >> REG_BITSHIFT_20) & REG_MASK_BITWIDTH_1);
+    config->VectorStoreSupportEn =
+        ((val >> REG_BITSHIFT_21) & REG_MASK_BITWIDTH_1);
+}
+
 void sifive_l2pf1_get_config(sifive_l2pf1_config *config) {
     int hartid;
     __asm__ volatile("csrr %0, mhartid" : "=r"(hartid));
@@ -119,27 +141,11 @@ void sifive_l2pf1_get_config(sifive_l2pf1_config *config) {
 
         /* Get basic control register configuration values. */
         val = REGW(METAL_SIFIVE_L2PF1_BASIC_CONTROL);
-
-        config->ScalarLoadSupportEn = (val & REG_MASK_BITWIDTH_1);
-        config->Dist = ((val >> REG_BITSHIFT_2) & distance_bits_mask);
-        config->MaxAllowedDist = ((val >> REG_BITSHIFT_8) & distance_bits_mask);
-        config->LinToExpThrd = ((val >> REG_BITSHIFT_14) & distance_bits_mask);
-        config->CrossPageEn = ((val >> REG_BITSHIFT_28) & REG_MASK_BITWIDTH_1);
-        config->ForgiveThrd = ((val >> REG_BITSHIFT_29) & REG_MASK_BITWIDTH_2);
+        __sifive_l2pf1_import_basic_control_reg(config, val, distance_bits_mask);
 
         /* Get L2 user bits control register configuration values. */
         val = REGW(METAL_SIFIVE_L2PF1_USER_CONTROL);
-
-        config->QFullnessThrd = (val & REG_MASK_BITWIDTH_4);
-        config->HitCacheThrd = ((val >> REG_BITSHIFT_4) & REG_MASK_BITWIDTH_5);
-        config->HitMSHRThrd = ((val >> REG_BITSHIFT_9) & REG_MASK_BITWIDTH_4);
-        config->Window = ((val >> REG_BITSHIFT_13) & REG_MASK_BITWIDTH_6);
-        config->ScalarStoreSupportEn =
-            ((val >> REG_BITSHIFT_19) & REG_MASK_BITWIDTH_1);
-        config->VectorLoadSupportEn =
-            ((val >> REG_BITSHIFT_20) & REG_MASK_BITWIDTH_1);
-        config->VectorStoreSupportEn =
-            ((val >> REG_BITSHIFT_21) & REG_MASK_BITWIDTH_1);
+        __sifive_l2pf1_import_user_control_reg(config, val);
     }
 }
 
@@ -152,12 +158,20 @@ void sifive_l2pf1_set_config(sifive_l2pf1_config *config) {
 void sifive_l2pf1_init(void) {
     sifive_l2pf1_config config;
 
+#ifdef METAL_PF_BASIC_INIT
+    __sifive_l2pf1_import_basic_control_reg(&config, METAL_PF_BASIC_INIT, (1 << l2pf_distance_bits[0]) - 1);
+#else
+
     /* Basic control register initial configuration (0x15811). */
     config.ScalarLoadSupportEn = 0x1;
     config.Dist = 0x4;
     config.MaxAllowedDist = 0x18;
     config.LinToExpThrd = 0x5;
+#endif
 
+#ifdef METAL_PF_USER_INIT
+    __sifive_l2pf1_import_user_control_reg(&config, METAL_PF_USER_INIT);
+#else
     /* L2 user bits control register initial configuration (0x38c84e). */
     config.QFullnessThrd = 0xe;
     config.HitCacheThrd = 0x4;
@@ -166,6 +180,7 @@ void sifive_l2pf1_init(void) {
     config.ScalarStoreSupportEn = 0x1;
     config.VectorLoadSupportEn = 0x1;
     config.VectorStoreSupportEn = 0x1;
+#endif
 
     _sifive_l2pf1_set_all_harts_config(&config);
 }
