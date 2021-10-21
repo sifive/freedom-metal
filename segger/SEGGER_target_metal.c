@@ -2,6 +2,7 @@
 #include "__libc.h"
 #include "stdio.h"
 #include "time.h"
+#include <metal/cpu.h>
 #include <metal/shutdown.h>
 #include <metal/time.h>
 #include <metal/timer.h>
@@ -24,31 +25,47 @@ static inline int metal_writeC(char *pChar) {
     return r;
 }
 
+/* v * num / den while avoiding overflow
+ *
+ * Modulus on unsigned values is defined as:
+ *
+ *      v % den = v - (v / den) * den
+ *      v = v % den + (v / den) * den
+ *
+ * This lets us break the computation down as follows:
+ *
+ *      r = (v * num) / den
+ *        = ((v % den + (v / den) * den) * num) / den
+ *        = ((v % den) * num) / den + ((v / den) * den) * num / den
+ *        = ((v % den) * num) / den + ((v / den) * num
+ *
+ * As long as num * den fits in 64 bits, then this computation will fit
+ * in 64 bits. CLOCKS_PER_SEC is defined as 1,000,000, so we just need
+ * timebase to be less than about 4,000,000,000,000 (4 trillion).
+ */
+
+static inline unsigned long long
+muldiv(unsigned long long v, unsigned long long num, unsigned long long den) {
+    return (((v % den) * num) / den) + ((v / den) * num);
+}
+
 static inline clock_t metal_clock(void) {
-    int rv;
-    clock_t res;
-    static struct timeval t0;
-    /* we use this init var due to some RTL issue that t0 is always 0 */
-    static int timeval_init = 0;
-    struct timeval t;
+    unsigned long long mcc;
     unsigned long long timebase;
+    int hartid = metal_cpu_get_current_hartid();
 
-    if (timeval_init == 0) {
-        metal_gettimeofday(&t0, 0);
-        timeval_init = 1;
-    }
+    metal_timer_get_timebase_frequency(hartid, &timebase);
+    metal_timer_get_cyclecount(hartid, &mcc);
 
-    metal_gettimeofday(&t, 0);
-
-    rv = metal_timer_get_timebase_frequency(0, &timebase);
-    if (rv != 0) {
-        return -1;
-    }
-
-    long long utime =
-        (t.tv_sec - t0.tv_sec) * 1000000 + (t.tv_usec - t0.tv_usec);
-    res = (clock_t)utime * timebase / 1000000;
-    return res;
+    /*
+     * Convert from native resolution to published resolution.
+     *
+     * Truncating this to 64 bits works because a change of 'c' in
+     * cyclecount will change the return value by
+     * c * CLOCKS_PER_SEC / timebase, so applications will see
+     * time marching forward.
+     */
+    return muldiv(mcc, CLOCKS_PER_SEC, timebase);
 }
 
 /*********************************************************************
