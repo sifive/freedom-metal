@@ -252,16 +252,20 @@ _skip_init:
   csrwi fcsr, 0
 1:
 
-  /* Check for vector extension support and enable it if found.
-   * Omit if toolchain doesn't support the vector extension. */
-#ifdef __riscv_v
-  csrr a5, misa
-  li a4, 0x200000
-  and a5, a5, a4
-  beqz a5, 1f
+  /* Check for vector extension support and enable the vector unit if found.
+   * Omit if the toolchain doesn't support any vector extension.
+   * (NB: __riscv_vector is defined for V as well as Zve*.) */
+#ifdef __riscv_vector
+  /* Unfortunately, Zve* (embedded vector extensions) do not set misa.V,
+   * so, until the RISC-V standard discovery mechanism is finalized, we use
+   * a trick: we set mstatus.VS to Dirty, and then read it back. It's set to
+   * Off iff there's no vector unit. This should detect the presence of any
+   * standard vector extension (V or Zve*) or the absence of all. */
+  li a5, 0x600
+  csrs mstatus, a5
   csrr a5, mstatus
-  ori a5, a5, 0x200
-  csrw mstatus, a5
+  andi a5, a5, 0x600
+  beqz a5, 1f
   vsetivli x0, 0, e8, m1, ta, ma
   csrwi vcsr, 0
 1:
