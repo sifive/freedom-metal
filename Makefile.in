@@ -466,6 +466,7 @@ nobase_include_HEADERS = metal/machine.h metal/machine/inline.h \
 	metal/drivers/sifive_remapper2.h \
 	metal/drivers/riscv_plic0.h metal/drivers/sifive_buserror0.h \
 	metal/drivers/sifive_ccache0.h metal/drivers/sifive_clic0.h \
+	metal/drivers/sifive_pmc0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
 	metal/drivers/sifive_fe310-g000_hfxosc.h \
 	metal/drivers/sifive_fe310-g000_lfrosc.h \
