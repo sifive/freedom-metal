@@ -42,6 +42,7 @@ nobase_include_HEADERS += \
 	metal/drivers/sifive_buserror0.h \
 	metal/drivers/sifive_ccache0.h \
 	metal/drivers/sifive_pmc0.h \
+	metal/drivers/ucbbar_cacheable-zero0.h \
 	metal/drivers/sifive_clic0.h \
 	metal/drivers/sifive_fe310-g000_hfrosc.h \
 	metal/drivers/sifive_fe310-g000_hfxosc.h \
