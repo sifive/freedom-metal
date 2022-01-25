@@ -13,7 +13,7 @@ ssize_t _write(int file, const void *ptr, size_t len) {
     const char *bptr = ptr;
     for (size_t i = 0; i < len; ++i)
         metal_tty_putc(bptr[i]);
-    return 0;
+    return len;
 }
 
 extern __typeof(_write) write
