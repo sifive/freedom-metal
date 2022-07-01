@@ -109,9 +109,9 @@ static int configure_spi(struct __metal_driver_sifive_spi0 *spi,
 
     /* Set CS Active */
     if (config->cs_active_high) {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 0;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) &= ~(1 << config->csid);
     } else {
-        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) = 1;
+        METAL_SPI_REGW(METAL_SIFIVE_SPI0_CSDEF) |= (1 << config->csid);
     }
 
     /* Set frame length */
