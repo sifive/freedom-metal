@@ -119,7 +119,7 @@ int metal_pmp_set_region(struct metal_pmp *pmp, unsigned int region,
         return 1;
     }
 
-    if (region > _pmp_regions()) {
+    if (region >= _pmp_regions()) {
         /* Region outside of supported range */
         return 2;
     }
